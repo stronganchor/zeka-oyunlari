@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.0.1
+ * Version: 1.0.2
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -384,6 +384,41 @@ function zo_render_game($slug, $post_id = 0) {
 	return '<div class="zo-game-shell zo-game-shell--' . esc_attr($module['slug']) . '">' . $html . '</div>';
 }
 
+function zo_get_game_posts_by_slug() {
+	$posts_by_slug = array();
+	$query         = new WP_Query(
+		array(
+			'post_type'      => 'zeka_oyunu',
+			'post_status'    => 'publish',
+			'posts_per_page' => -1,
+			'orderby'        => 'date',
+			'order'          => 'DESC',
+			'no_found_rows'  => true,
+		)
+	);
+
+	if (!$query->have_posts()) {
+		return $posts_by_slug;
+	}
+
+	while ($query->have_posts()) {
+		$query->the_post();
+
+		$post_id = get_the_ID();
+		$slug    = zo_get_game_slug_for_post($post_id);
+
+		if ($slug === '' || isset($posts_by_slug[$slug])) {
+			continue;
+		}
+
+		$posts_by_slug[$slug] = get_post($post_id);
+	}
+
+	wp_reset_postdata();
+
+	return $posts_by_slug;
+}
+
 function zo_enqueue_grid_styles() {
 	static $done = false;
 
@@ -506,50 +541,41 @@ function zo_games_grid_shortcode($atts = array()) {
 
 	$author_filter = sanitize_title($atts['author']);
 	$limit         = (int) $atts['limit'];
+	$modules       = zo_get_game_modules();
 
 	if ($limit === 0) {
 		return '';
 	}
 
-	zo_enqueue_grid_styles();
-
-	$query = new WP_Query(
-		array(
-			'post_type'      => 'zeka_oyunu',
-			'post_status'    => 'publish',
-			'posts_per_page' => $limit > 0 ? $limit : -1,
-			'orderby'        => 'date',
-			'order'          => 'DESC',
-			'no_found_rows'  => true,
-		)
-	);
-
-	if (!$query->have_posts()) {
+	if (empty($modules)) {
 		return '<p class="zo-games-grid__empty">Henüz oyun bulunamadı.</p>';
 	}
 
+	zo_enqueue_grid_styles();
+	$posts_by_slug = zo_get_game_posts_by_slug();
+
 	ob_start();
 	$has_results = false;
+	$shown       = 0;
 
 	echo '<div class="zo-games-grid">';
 
-	while ($query->have_posts()) {
-		$query->the_post();
-
-		$post_id = get_the_ID();
-		$slug    = zo_get_game_slug_for_post($post_id);
-		$module  = $slug ? zo_get_game_module($slug) : null;
-
-		if (!$module) {
-			continue;
-		}
-
+	foreach ($modules as $slug => $module) {
 		if ($author_filter !== '' && (($module['author_key'] ?? '') !== $author_filter)) {
 			continue;
 		}
 
+		if ($limit > 0 && $shown >= $limit) {
+			break;
+		}
+
+		$post    = $posts_by_slug[$slug] ?? null;
+		$title   = $post instanceof WP_Post ? get_the_title($post) : $module['name'];
+		$excerpt = $post instanceof WP_Post ? get_the_excerpt($post) : '';
+		$url     = $post instanceof WP_Post ? get_permalink($post) : '';
+
 		$has_results = true;
-		$excerpt     = get_the_excerpt();
+		$shown++;
 
 		if ($excerpt === '' && !empty($module['description']) && is_string($module['description'])) {
 			$excerpt = $module['description'];
@@ -557,9 +583,9 @@ function zo_games_grid_shortcode($atts = array()) {
 
 		echo '<article class="zo-games-grid__card">';
 
-		if (has_post_thumbnail()) {
-			echo '<a class="zo-games-grid__thumb" href="' . esc_url(get_permalink()) . '">';
-			the_post_thumbnail('large');
+		if ($post instanceof WP_Post && has_post_thumbnail($post)) {
+			echo '<a class="zo-games-grid__thumb" href="' . esc_url($url) . '">';
+			echo get_the_post_thumbnail($post, 'large');
 			echo '</a>';
 		}
 
@@ -569,7 +595,11 @@ function zo_games_grid_shortcode($atts = array()) {
 			echo '<p class="zo-games-grid__author">' . esc_html($module['author']) . '</p>';
 		}
 
-		echo '<h3 class="zo-games-grid__title"><a href="' . esc_url(get_permalink()) . '">' . esc_html(get_the_title()) . '</a></h3>';
+		if ($url !== '') {
+			echo '<h3 class="zo-games-grid__title"><a href="' . esc_url($url) . '">' . esc_html($title) . '</a></h3>';
+		} else {
+			echo '<h3 class="zo-games-grid__title">' . esc_html($title) . '</h3>';
+		}
 
 		if ($excerpt !== '') {
 			echo '<p class="zo-games-grid__excerpt">' . esc_html($excerpt) . '</p>';
@@ -581,8 +611,6 @@ function zo_games_grid_shortcode($atts = array()) {
 	}
 
 	echo '</div>';
-
-	wp_reset_postdata();
 
 	if (!$has_results) {
 		ob_end_clean();
