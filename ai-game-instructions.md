@@ -16,12 +16,16 @@ Your output must strictly follow this structure so the game works automatically.
 
 - Each game MUST include:
   - `game.php` (required)
-  - `style.css` (optional but recommended)
-  - `script.js` (optional but recommended)
+- Optional split files:
+  - `style.css`
+  - `script.js`
+- Preferred format:
+  - a single `game.php` that contains the HTML renderer plus `inline_style` and `inline_script`
 
 - The plugin will automatically:
   - load `game.php`
-  - register and enqueue CSS/JS if present
+  - register and enqueue `style.css` / `script.js` if present
+  - register and enqueue `inline_style` / `inline_script` from `game.php` if provided
 - The plugin can also render a filtered game grid with:
   - `[zeka_oyunlari_grid author="Asker"]`
   - This filter reads the `author` value returned by each game's `game.php`
@@ -58,34 +62,28 @@ Examples:
 
 ## OUTPUT FORMAT (STRICT)
 
-You MUST output EXACTLY 3 FILES:
+Default: output EXACTLY 1 FILE:
+
+1. `game.php`
+
+Only if the user explicitly asks for split files, output EXACTLY 3 FILES:
 
 1. `game.php`
 2. `style.css`
 3. `script.js`
 
-Use this exact format:
+Preferred format for copy-paste is the single-file version below.
+
+Use this exact format for the default single-file version:
 
 ### game.php
 ```php
-// full file here
-````
-
-### style.css
-
-```css
-/* full file here */
-```
-
-### script.js
-
-```javascript
 // full file here
 ```
 
 DO NOT add explanations.
 DO NOT add extra files.
-DO NOT omit any file.
+DO NOT omit the required file(s).
 
 ---
 
@@ -96,6 +94,7 @@ DO NOT omit any file.
 * Must use output buffering
 * Must not echo directly outside buffer
 * Must include an `author` field with the game creator name used by `[zeka_oyunlari_grid author="..."]`
+* Single-file games should put CSS in `inline_style` and JavaScript in `inline_script`
 
 Template:
 
@@ -105,6 +104,24 @@ Template:
 if (!defined('ABSPATH')) {
 	exit;
 }
+
+$css = <<<'CSS'
+.zo-game-root {
+	max-width: 500px;
+	margin: 0 auto;
+	text-align: center;
+}
+CSS;
+
+$js = <<<'JS'
+document.addEventListener('DOMContentLoaded', function () {
+	const games = document.querySelectorAll('.zo-game-root--{game-slug}');
+
+	games.forEach(function (game) {
+		// game-specific logic here
+	});
+});
+JS;
 
 if (!function_exists('zo_game_{UNIQUE_NAME}_render')) {
 	function zo_game_{UNIQUE_NAME}_render($post_id = 0, $module = array()) {
@@ -126,6 +143,8 @@ return array(
 	'author'          => '{Author Name}',
 	'description'     => '{Short description}',
 	'render_callback' => 'zo_game_{UNIQUE_NAME}_render',
+	'inline_style'    => $css,
+	'inline_script'   => $js,
 );
 ```
 
@@ -133,6 +152,8 @@ return array(
 
 ## CSS RULES
 
+* In single-file games, put CSS in the `inline_style` string
+* In split-file games, put CSS in `style.css`
 * Scope everything under `.zo-game-root`
 * Do NOT style global elements like `body`
 * Keep styles isolated
@@ -151,6 +172,8 @@ Example:
 
 ## JS RULES
 
+* In single-file games, put JavaScript in the `inline_script` string
+* In split-file games, put JavaScript in `script.js`
 * Must support multiple instances on one page
 * Use `document.querySelectorAll('.zo-game-root')`
 * Loop through each instance
@@ -200,7 +223,8 @@ document.addEventListener('DOMContentLoaded', function () {
 * The JavaScript should not break if the same game appears twice on the same page
 * Avoid inline JavaScript
 * Avoid inline CSS
-* Do not use `<script>` tags or `<style>` tags inside `game.php`
+* Do not use `<script>` tags or `<style>` tags inside the rendered HTML
+* Use `inline_style` and `inline_script` in `game.php` for single-file games
 * Do not rely on WordPress AJAX, REST API, fetch calls, local storage, or cookies unless explicitly requested
 * Keep the game self-contained
 
@@ -216,9 +240,8 @@ Create a memory matching card game for kids.
 
 Return ONLY:
 
-* `game.php`
-* `style.css`
-* `script.js`
+* `game.php` by default
+* or `game.php`, `style.css`, `script.js` only if the user explicitly asks for split files
 
 Nothing else.
 No explanation.

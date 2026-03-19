@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-define('ZO_PLUGIN_VERSION', '1.0.4');
+define('ZO_PLUGIN_VERSION', '1.0.5');
 define('ZO_PLUGIN_FILE', __FILE__);
 define('ZO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('ZO_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -112,20 +112,32 @@ function zo_get_game_modules() {
 			continue;
 		}
 
-		$slug   = sanitize_title($module['slug']);
-		$folder = basename(dirname($file));
-		$author = '';
+		$slug         = sanitize_title($module['slug']);
+		$folder       = basename(dirname($file));
+		$author       = '';
+		$inline_style = '';
+		$inline_script = '';
 
 		if (!empty($module['author']) && is_string($module['author'])) {
 			$author = trim(wp_strip_all_tags($module['author']));
 		}
 
-		$module['slug']       = $slug;
-		$module['folder']     = $folder;
-		$module['dir']        = trailingslashit(ZO_PLUGIN_DIR . 'games/' . $folder);
-		$module['url']        = trailingslashit(ZO_PLUGIN_URL . 'games/' . $folder);
-		$module['author']     = $author;
-		$module['author_key'] = $author !== '' ? sanitize_title($author) : '';
+		if (!empty($module['inline_style']) && is_string($module['inline_style'])) {
+			$inline_style = trim($module['inline_style']);
+		}
+
+		if (!empty($module['inline_script']) && is_string($module['inline_script'])) {
+			$inline_script = trim($module['inline_script']);
+		}
+
+		$module['slug']          = $slug;
+		$module['folder']        = $folder;
+		$module['dir']           = trailingslashit(ZO_PLUGIN_DIR . 'games/' . $folder);
+		$module['url']           = trailingslashit(ZO_PLUGIN_URL . 'games/' . $folder);
+		$module['author']        = $author;
+		$module['author_key']    = $author !== '' ? sanitize_title($author) : '';
+		$module['inline_style']  = $inline_style;
+		$module['inline_script'] = $inline_script;
 
 		$modules[$slug] = $module;
 	}
@@ -438,28 +450,57 @@ function zo_get_script_handle($slug) {
 	return 'zo-game-script-' . sanitize_title($slug);
 }
 
+function zo_get_game_style_url($module) {
+	$style_file = $module['dir'] . 'style.css';
+
+	return file_exists($style_file) ? $module['url'] . 'style.css' : '';
+}
+
+function zo_get_game_script_url($module) {
+	$script_file = $module['dir'] . 'script.js';
+
+	return file_exists($script_file) ? $module['url'] . 'script.js' : '';
+}
+
 function zo_register_game_assets() {
 	$modules = zo_get_game_modules();
 
 	foreach ($modules as $module) {
-		$style_file = $module['dir'] . 'style.css';
-		$script_file = $module['dir'] . 'script.js';
+		$style_file    = $module['dir'] . 'style.css';
+		$script_file   = $module['dir'] . 'script.js';
+		$style_handle  = zo_get_style_handle($module['slug']);
+		$script_handle = zo_get_script_handle($module['slug']);
 
 		if (file_exists($style_file)) {
 			wp_register_style(
-				zo_get_style_handle($module['slug']),
+				$style_handle,
 				$module['url'] . 'style.css',
 				array(),
 				(string) filemtime($style_file)
+			);
+		} elseif ($module['inline_style'] !== '') {
+			wp_register_style(
+				$style_handle,
+				false,
+				array(),
+				md5($module['inline_style'])
 			);
 		}
 
 		if (file_exists($script_file)) {
 			wp_register_script(
-				zo_get_script_handle($module['slug']),
+				$script_handle,
 				$module['url'] . 'script.js',
 				array(),
 				(string) filemtime($script_file),
+				true
+			);
+		} elseif ($module['inline_script'] !== '') {
+			wp_register_script(
+				$script_handle,
+				false,
+				array(),
+				md5($module['inline_script']),
 				true
 			);
 		}
@@ -469,8 +510,11 @@ add_action('wp_enqueue_scripts', 'zo_register_game_assets', 5);
 
 function zo_enqueue_game_assets_by_slug($slug) {
 	$slug = sanitize_title($slug);
+	$module = zo_get_game_module($slug);
+	static $inline_style_added = array();
+	static $inline_script_added = array();
 
-	if (!$slug) {
+	if (!$slug || !$module) {
 		return;
 	}
 
@@ -478,10 +522,20 @@ function zo_enqueue_game_assets_by_slug($slug) {
 	$script_handle = zo_get_script_handle($slug);
 
 	if (wp_style_is($style_handle, 'registered')) {
+		if ($module['inline_style'] !== '' && empty($inline_style_added[$style_handle])) {
+			wp_add_inline_style($style_handle, $module['inline_style']);
+			$inline_style_added[$style_handle] = true;
+		}
+
 		wp_enqueue_style($style_handle);
 	}
 
 	if (wp_script_is($script_handle, 'registered')) {
+		if ($module['inline_script'] !== '' && empty($inline_script_added[$script_handle])) {
+			wp_add_inline_script($script_handle, $module['inline_script']);
+			$inline_script_added[$script_handle] = true;
+		}
+
 		wp_enqueue_script($script_handle);
 	}
 }

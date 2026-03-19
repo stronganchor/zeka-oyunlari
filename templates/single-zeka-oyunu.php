@@ -22,8 +22,10 @@ if (!is_string($page_title) || $page_title === '') {
 }
 
 $site_name = get_bloginfo('name');
-$style_url = file_exists($module['dir'] . 'style.css') ? $module['url'] . 'style.css' : '';
-$script_url = file_exists($module['dir'] . 'script.js') ? $module['url'] . 'script.js' : '';
+$style_url = function_exists('zo_get_game_style_url') ? zo_get_game_style_url($module) : '';
+$script_url = function_exists('zo_get_game_script_url') ? zo_get_game_script_url($module) : '';
+$inline_style = !empty($module['inline_style']) && is_string($module['inline_style']) ? $module['inline_style'] : '';
+$inline_script = !empty($module['inline_script']) && is_string($module['inline_script']) ? $module['inline_script'] : '';
 ?>
 <!doctype html>
 <html <?php language_attributes(); ?>>
@@ -121,6 +123,9 @@ $script_url = file_exists($module['dir'] . 'script.js') ? $module['url'] . 'scri
 	<?php if ($style_url !== '') : ?>
 	<link rel="stylesheet" href="<?php echo esc_url($style_url); ?>">
 	<?php endif; ?>
+	<?php if ($inline_style !== '') : ?>
+	<style><?php echo $inline_style; ?></style>
+	<?php endif; ?>
 </head>
 <body>
 	<div class="zo-game-page">
@@ -135,6 +140,9 @@ $script_url = file_exists($module['dir'] . 'script.js') ? $module['url'] . 'scri
 	</div>
 	<?php if ($script_url !== '') : ?>
 	<script src="<?php echo esc_url($script_url); ?>"></script>
+	<?php endif; ?>
+	<?php if ($inline_script !== '') : ?>
+	<script><?php echo $inline_script; ?></script>
 	<?php endif; ?>
 </body>
 </html>
