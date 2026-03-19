@@ -15,9 +15,10 @@
 		const scoreEl = game.querySelector('.zo-ht__score');
 		const timeEl = game.querySelector('.zo-ht__time');
 		const button = game.querySelector('.zo-ht__button');
+		const restartButton = game.querySelector('.zo-ht__restart');
 		const message = game.querySelector('.zo-ht__message');
 
-		if (!scoreEl || !timeEl || !button || !message) {
+		if (!scoreEl || !timeEl || !button || !restartButton || !message) {
 			return;
 		}
 
@@ -41,9 +42,11 @@
 		function endGame() {
 			running = false;
 			clearGameTimer();
-			button.textContent = 'Tekrar Oyna';
+			button.textContent = 'Süre Doldu';
+			button.disabled = true;
 			button.classList.remove('is-playing');
 			button.classList.add('is-finished');
+			restartButton.hidden = false;
 			message.textContent = 'Süre bitti. Skorun: ' + score;
 		}
 
@@ -55,8 +58,10 @@
 			updateUI();
 
 			button.textContent = 'Tıkla';
+			button.disabled = false;
 			button.classList.add('is-playing');
 			button.classList.remove('is-finished');
+			restartButton.hidden = true;
 			message.textContent = 'Hızlı ol. Süre başladı.';
 
 			clearGameTimer();
@@ -79,6 +84,10 @@
 
 			score += 1;
 			updateUI();
+		});
+
+		restartButton.addEventListener('click', function () {
+			startGame();
 		});
 
 		updateUI();

@@ -27,7 +27,10 @@ if (!function_exists('zo_game_hizli_tikla_render')) {
 					</div>
 				</div>
 
-				<button type="button" class="zo-ht__button">Başla</button>
+				<div class="zo-ht__actions">
+					<button type="button" class="zo-ht__button">Başla</button>
+					<button type="button" class="zo-ht__restart" hidden>Tekrar Oyna</button>
+				</div>
 				<p class="zo-ht__message" aria-live="polite">Butona basınca oyun başlar.</p>
 			</div>
 		</div>
