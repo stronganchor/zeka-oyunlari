@@ -662,6 +662,33 @@ function zo_enqueue_grid_styles() {
 
 	$handle = 'zo-shared-styles';
 	$css    = '
+.zo-games-grid-wrap {
+	width: min(100%, 1120px);
+	margin: 0 auto;
+}
+.zo-games-grid__toolbar {
+	display: flex;
+	justify-content: flex-start;
+	margin: 0 0 20px;
+}
+.zo-games-grid__home {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 42px;
+	padding: 0 16px;
+	border-radius: 999px;
+	background: #1d4ed8;
+	color: #fff;
+	font-weight: 600;
+	text-decoration: none;
+}
+.zo-games-grid__home:hover,
+.zo-games-grid__home:focus {
+	background: #1e40af;
+	color: #fff;
+	text-decoration: none;
+}
 .zo-games-grid {
 	display: grid;
 	width: min(100%, 1120px);
@@ -757,6 +784,9 @@ function zo_enqueue_grid_styles() {
 	background: #f9fafb;
 	color: #374151;
 }
+.zo-games-grid:empty {
+	display: none;
+}
 ';
 
 	if (!wp_style_is($handle, 'registered')) {
@@ -813,10 +843,18 @@ function zo_games_grid_shortcode($atts = array()) {
 
 	zo_enqueue_grid_styles();
 	$posts_by_slug = zo_get_game_posts_by_slug();
+	$home_url      = home_url('/');
+	$show_home_button = !is_front_page() && !is_home() && is_string($home_url) && $home_url !== '';
 
 	ob_start();
 	$has_results = false;
 	$shown       = 0;
+
+	echo '<div class="zo-games-grid-wrap">';
+
+	if ($show_home_button) {
+		echo '<div class="zo-games-grid__toolbar"><a class="zo-games-grid__home" href="' . esc_url($home_url) . '">Ana Sayfaya Dön</a></div>';
+	}
 
 	echo '<div class="zo-games-grid">';
 
@@ -880,9 +918,10 @@ function zo_games_grid_shortcode($atts = array()) {
 	echo '</div>';
 
 	if (!$has_results) {
-		ob_end_clean();
-		return '<p class="zo-games-grid__empty">Filtreye uyan oyun bulunamadı.</p>';
+		echo '<p class="zo-games-grid__empty">Filtreye uyan oyun bulunamadı.</p>';
 	}
+
+	echo '</div>';
 
 	return ob_get_clean();
 }
