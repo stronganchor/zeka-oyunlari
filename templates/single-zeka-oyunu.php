@@ -130,7 +130,7 @@ $inline_script = !empty($module['inline_script']) && is_string($module['inline_s
 <body>
 	<div class="zo-game-page">
 		<header class="zo-game-page__header">
-			<a class="zo-game-page__back" href="<?php echo esc_url($back_url); ?>">Geri Don</a>
+			<a class="zo-game-page__back" href="<?php echo esc_url($back_url); ?>">Geri Dön</a>
 		</header>
 		<main class="zo-game-page__main">
 			<div class="zo-game-page__stage">

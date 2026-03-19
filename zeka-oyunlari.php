@@ -661,7 +661,7 @@ function zo_enqueue_grid_styles() {
 	}
 
 	$handle = 'zo-shared-styles';
-	$css    = '
+$css    = '
 .zo-games-grid-wrap {
 	width: min(100%, 1120px);
 	margin: 0 auto;
@@ -908,7 +908,7 @@ function zo_games_grid_shortcode($atts = array()) {
 		}
 
 		if ($url !== '') {
-			echo '<div class="zo-games-grid__actions"><a class="zo-games-grid__button" href="' . esc_url($url) . '">Oyunu Ac</a></div>';
+			echo '<div class="zo-games-grid__actions"><a class="zo-games-grid__button" href="' . esc_url($url) . '">Oyunu Aç</a></div>';
 		}
 
 		echo '</div>';
