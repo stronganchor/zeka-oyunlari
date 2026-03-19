@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-define('ZO_PLUGIN_VERSION', '1.0.2');
+define('ZO_PLUGIN_VERSION', '1.0.4');
 define('ZO_PLUGIN_FILE', __FILE__);
 define('ZO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('ZO_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -144,6 +144,76 @@ function zo_get_game_module($slug) {
 
 function zo_get_game_slug_for_post($post_id) {
 	return sanitize_title((string) get_post_meta($post_id, '_zo_game_slug', true));
+}
+
+function zo_resolve_game_slug_for_post($post_id) {
+	$slug = zo_get_game_slug_for_post($post_id);
+
+	if ($slug !== '') {
+		return $slug;
+	}
+
+	$post = get_post($post_id);
+	if (!$post instanceof WP_Post) {
+		return '';
+	}
+
+	$fallback_slug = sanitize_title((string) $post->post_name);
+	if ($fallback_slug === '') {
+		return '';
+	}
+
+	return zo_get_game_module($fallback_slug) ? $fallback_slug : '';
+}
+
+function zo_get_current_request_url() {
+	if (empty($_SERVER['REQUEST_URI']) || !is_string($_SERVER['REQUEST_URI'])) {
+		return '';
+	}
+
+	$url = home_url(wp_unslash($_SERVER['REQUEST_URI']));
+
+	return is_string($url) ? esc_url_raw($url) : '';
+}
+
+function zo_get_game_launch_url($post) {
+	$url = get_permalink($post);
+
+	if (!is_string($url) || $url === '') {
+		return '';
+	}
+
+	$back_url = zo_get_current_request_url();
+	if ($back_url !== '') {
+		$url = add_query_arg('zo_back', $back_url, $url);
+	}
+
+	return $url;
+}
+
+function zo_get_game_back_url($post_id = 0) {
+	$current_url = $post_id ? get_permalink($post_id) : '';
+
+	if (!empty($_GET['zo_back']) && is_string($_GET['zo_back'])) {
+		$candidate = wp_unslash($_GET['zo_back']);
+		$candidate = wp_validate_redirect($candidate, '');
+
+		if ($candidate !== '' && $candidate !== $current_url) {
+			return $candidate;
+		}
+	}
+
+	$referer = wp_get_referer();
+	if (is_string($referer) && $referer !== '' && $referer !== $current_url) {
+		return $referer;
+	}
+
+	$archive = get_post_type_archive_link('zeka_oyunu');
+	if (is_string($archive) && $archive !== '') {
+		return $archive;
+	}
+
+	return home_url('/');
 }
 
 function zo_get_default_game_post_excerpt($module) {
@@ -444,8 +514,10 @@ function zo_maybe_enqueue_current_game_assets() {
 	}
 
 	if (is_singular('zeka_oyunu')) {
+		wp_enqueue_script('jquery');
+
 		$post_id = get_queried_object_id();
-		$slug    = zo_get_game_slug_for_post($post_id);
+		$slug    = zo_resolve_game_slug_for_post($post_id);
 
 		if ($slug) {
 			zo_enqueue_game_assets_by_slug($slug);
@@ -494,7 +566,6 @@ function zo_render_game($slug, $post_id = 0) {
 
 function zo_get_game_posts_by_slug() {
 	$posts_by_slug = array();
-	$modules       = zo_get_game_modules();
 	$query         = new WP_Query(
 		array(
 			'post_type'      => 'zeka_oyunu',
@@ -514,14 +585,7 @@ function zo_get_game_posts_by_slug() {
 		$query->the_post();
 
 		$post_id = get_the_ID();
-		$slug    = zo_get_game_slug_for_post($post_id);
-
-		if ($slug === '') {
-			$fallback_slug = sanitize_title((string) get_post_field('post_name', $post_id));
-			if ($fallback_slug !== '' && isset($modules[$fallback_slug])) {
-				$slug = $fallback_slug;
-			}
-		}
+		$slug    = zo_resolve_game_slug_for_post($post_id);
 
 		if ($slug === '' || isset($posts_by_slug[$slug])) {
 			continue;
@@ -646,6 +710,7 @@ function zo_enqueue_grid_styles() {
 	}
 
 	wp_enqueue_style($handle);
+	wp_enqueue_script('jquery');
 	wp_add_inline_style($handle, $css);
 
 	$done = true;
@@ -713,7 +778,7 @@ function zo_games_grid_shortcode($atts = array()) {
 		$post    = $posts_by_slug[$slug] ?? null;
 		$title   = $post instanceof WP_Post ? get_the_title($post) : $module['name'];
 		$excerpt = $post instanceof WP_Post ? get_the_excerpt($post) : '';
-		$url     = $post instanceof WP_Post ? get_permalink($post) : '';
+		$url     = $post instanceof WP_Post ? zo_get_game_launch_url($post) : '';
 
 		$has_results = true;
 		$shown++;
@@ -768,6 +833,24 @@ function zo_games_grid_shortcode($atts = array()) {
 	return ob_get_clean();
 }
 add_shortcode('zeka_oyunlari_grid', 'zo_games_grid_shortcode');
+
+function zo_locate_game_template($template) {
+	if (!is_singular('zeka_oyunu')) {
+		return $template;
+	}
+
+	$post_id = get_queried_object_id();
+	$slug    = zo_resolve_game_slug_for_post($post_id);
+
+	if ($slug === '' || !zo_get_game_module($slug)) {
+		return $template;
+	}
+
+	$custom_template = ZO_PLUGIN_DIR . 'templates/single-zeka-oyunu.php';
+
+	return file_exists($custom_template) ? $custom_template : $template;
+}
+add_filter('template_include', 'zo_locate_game_template', 99);
 
 function zo_append_game_to_content($content) {
 	if (!is_singular('zeka_oyunu') || !in_the_loop() || !is_main_query()) {
