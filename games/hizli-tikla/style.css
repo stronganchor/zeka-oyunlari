@@ -54,6 +54,13 @@
 	line-height: 1;
 }
 
+.zo-game-root.zo-game-root--hizli-tikla .zo-ht__actions {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 12px;
+}
+
 .zo-game-root.zo-game-root--hizli-tikla .zo-ht__button {
 	display: inline-block;
 	min-width: 180px;
@@ -84,6 +91,35 @@
 	background: #2997aa;
 }
 
+.zo-game-root.zo-game-root--hizli-tikla .zo-ht__button:disabled {
+	cursor: default;
+	opacity: 0.75;
+	transform: none;
+}
+
+.zo-game-root.zo-game-root--hizli-tikla .zo-ht__restart {
+	display: inline-block;
+	min-width: 180px;
+	padding: 12px 20px;
+	border: 1px solid #2997aa;
+	border-radius: 14px;
+	background: #ffffff;
+	color: #2997aa;
+	font-size: 18px;
+	font-weight: 700;
+	cursor: pointer;
+	transition: opacity 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.zo-game-root.zo-game-root--hizli-tikla .zo-ht__restart:hover {
+	background: #2997aa;
+	color: #ffffff;
+}
+
+.zo-game-root.zo-game-root--hizli-tikla .zo-ht__restart[hidden] {
+	display: none;
+}
+
 .zo-game-root.zo-game-root--hizli-tikla .zo-ht__message {
 	margin: 18px 0 0;
 	font-size: 16px;
@@ -100,6 +136,11 @@
 	}
 
 	.zo-game-root.zo-game-root--hizli-tikla .zo-ht__button {
+		width: 100%;
+		min-width: 0;
+	}
+
+	.zo-game-root.zo-game-root--hizli-tikla .zo-ht__restart {
 		width: 100%;
 		min-width: 0;
 	}
