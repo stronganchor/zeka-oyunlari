@@ -4,6 +4,7 @@
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
  * Version: 1.0.0
+ * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
  * Text Domain: zeka-oyunlari
@@ -19,6 +20,60 @@ define('ZO_PLUGIN_VERSION', '1.0.0');
 define('ZO_PLUGIN_FILE', __FILE__);
 define('ZO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('ZO_PLUGIN_URL', plugin_dir_url(__FILE__));
+
+function zo_get_update_branch() {
+	$branch = 'main';
+
+	if (defined('ZEKA_OYUNLARI_UPDATE_BRANCH') && is_string(ZEKA_OYUNLARI_UPDATE_BRANCH)) {
+		$override = trim(ZEKA_OYUNLARI_UPDATE_BRANCH);
+		if ($override !== '') {
+			$branch = $override;
+		}
+	}
+
+	return (string) apply_filters('zeka_oyunlari_update_branch', $branch);
+}
+
+function zo_bootstrap_update_checker() {
+	$checker_file = ZO_PLUGIN_DIR . 'plugin-update-checker/plugin-update-checker.php';
+	if (!file_exists($checker_file)) {
+		return;
+	}
+
+	require_once $checker_file;
+
+	if (!class_exists('\YahnisElsts\PluginUpdateChecker\v5\PucFactory')) {
+		return;
+	}
+
+	$repo_url = (string) apply_filters(
+		'zeka_oyunlari_update_repository',
+		'https://github.com/stronganchor/zeka-oyunlari'
+	);
+	$slug = dirname(plugin_basename(__FILE__));
+
+	$update_checker = \YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdateChecker(
+		$repo_url,
+		__FILE__,
+		$slug
+	);
+
+	$update_checker->setBranch(zo_get_update_branch());
+
+	foreach (array('ZEKA_OYUNLARI_GITHUB_TOKEN', 'STRONGANCHOR_GITHUB_TOKEN', 'ANCHOR_GITHUB_TOKEN') as $constant_name) {
+		if (!defined($constant_name) || !is_string(constant($constant_name))) {
+			continue;
+		}
+
+		$token = trim((string) constant($constant_name));
+		if ($token !== '') {
+			$update_checker->setAuthentication($token);
+			break;
+		}
+	}
+}
+
+zo_bootstrap_update_checker();
 
 register_activation_hook(__FILE__, 'zo_plugin_activate');
 register_deactivation_hook(__FILE__, 'zo_plugin_deactivate');
