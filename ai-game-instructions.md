@@ -22,6 +22,9 @@ Your output must strictly follow this structure so the game works automatically.
 - The plugin will automatically:
   - load `game.php`
   - register and enqueue CSS/JS if present
+- The plugin can also render a filtered game grid with:
+  - `[zeka_oyunlari_grid author="Asker"]`
+  - This filter reads the `author` value returned by each game's `game.php`
 
 ---
 
@@ -92,6 +95,7 @@ DO NOT omit any file.
 * Must define a UNIQUE function name
 * Must use output buffering
 * Must not echo directly outside buffer
+* Must include an `author` field with the game creator name used by `[zeka_oyunlari_grid author="..."]`
 
 Template:
 
@@ -119,6 +123,7 @@ if (!function_exists('zo_game_{UNIQUE_NAME}_render')) {
 return array(
 	'slug'            => '{game-slug}',
 	'name'            => '{Game Name}',
+	'author'          => '{Author Name}',
 	'description'     => '{Short description}',
 	'render_callback' => 'zo_game_{UNIQUE_NAME}_render',
 );
@@ -173,6 +178,8 @@ document.addEventListener('DOMContentLoaded', function () {
 * function name must match slug in underscore style
   Example slug: `memory-match`
   Example function: `zo_game_memory_match_render`
+* author: human-readable creator name
+  Example: `Asker`
 
 ---
 

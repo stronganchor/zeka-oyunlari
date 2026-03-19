@@ -114,11 +114,18 @@ function zo_get_game_modules() {
 
 		$slug   = sanitize_title($module['slug']);
 		$folder = basename(dirname($file));
+		$author = '';
 
-		$module['slug']   = $slug;
-		$module['folder'] = $folder;
-		$module['dir']    = trailingslashit(ZO_PLUGIN_DIR . 'games/' . $folder);
-		$module['url']    = trailingslashit(ZO_PLUGIN_URL . 'games/' . $folder);
+		if (!empty($module['author']) && is_string($module['author'])) {
+			$author = trim(wp_strip_all_tags($module['author']));
+		}
+
+		$module['slug']       = $slug;
+		$module['folder']     = $folder;
+		$module['dir']        = trailingslashit(ZO_PLUGIN_DIR . 'games/' . $folder);
+		$module['url']        = trailingslashit(ZO_PLUGIN_URL . 'games/' . $folder);
+		$module['author']     = $author;
+		$module['author_key'] = $author !== '' ? sanitize_title($author) : '';
 
 		$modules[$slug] = $module;
 	}
@@ -377,6 +384,97 @@ function zo_render_game($slug, $post_id = 0) {
 	return '<div class="zo-game-shell zo-game-shell--' . esc_attr($module['slug']) . '">' . $html . '</div>';
 }
 
+function zo_enqueue_grid_styles() {
+	static $done = false;
+
+	if ($done) {
+		return;
+	}
+
+	$handle = 'zo-shared-styles';
+	$css    = '
+.zo-games-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	gap: 24px;
+}
+.zo-games-grid__card {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	border: 1px solid rgba(0, 0, 0, 0.08);
+	border-radius: 18px;
+	overflow: hidden;
+	background: #fff;
+	box-shadow: 0 12px 30px rgba(0, 0, 0, 0.06);
+}
+.zo-games-grid__thumb {
+	display: block;
+	aspect-ratio: 16 / 10;
+	background: #f3f4f6;
+}
+.zo-games-grid__thumb img {
+	display: block;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+.zo-games-grid__body {
+	display: flex;
+	flex: 1 1 auto;
+	flex-direction: column;
+	gap: 10px;
+	padding: 18px;
+}
+.zo-games-grid__author {
+	margin: 0;
+	font-size: 0.85rem;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: #b45309;
+}
+.zo-games-grid__title {
+	margin: 0;
+	font-size: 1.15rem;
+	line-height: 1.3;
+}
+.zo-games-grid__title a {
+	color: inherit;
+	text-decoration: none;
+}
+.zo-games-grid__title a:hover,
+.zo-games-grid__title a:focus {
+	text-decoration: underline;
+}
+.zo-games-grid__excerpt {
+	margin: 0;
+	color: #374151;
+}
+.zo-games-grid__module {
+	margin-top: auto;
+	font-size: 0.9rem;
+	color: #6b7280;
+}
+.zo-games-grid__empty {
+	margin: 0;
+	padding: 16px 18px;
+	border-radius: 14px;
+	background: #f9fafb;
+	color: #374151;
+}
+';
+
+	if (!wp_style_is($handle, 'registered')) {
+		wp_register_style($handle, false, array(), ZO_PLUGIN_VERSION);
+	}
+
+	wp_enqueue_style($handle);
+	wp_add_inline_style($handle, $css);
+
+	$done = true;
+}
+
 function zo_game_shortcode($atts = array()) {
 	$atts = shortcode_atts(
 		array(
@@ -395,6 +493,105 @@ function zo_game_shortcode($atts = array()) {
 	return zo_render_game($slug);
 }
 add_shortcode('zeka_oyunu', 'zo_game_shortcode');
+
+function zo_games_grid_shortcode($atts = array()) {
+	$atts = shortcode_atts(
+		array(
+			'author' => '',
+			'limit'  => '-1',
+		),
+		$atts,
+		'zeka_oyunlari_grid'
+	);
+
+	$author_filter = sanitize_title($atts['author']);
+	$limit         = (int) $atts['limit'];
+
+	if ($limit === 0) {
+		return '';
+	}
+
+	zo_enqueue_grid_styles();
+
+	$query = new WP_Query(
+		array(
+			'post_type'      => 'zeka_oyunu',
+			'post_status'    => 'publish',
+			'posts_per_page' => $limit > 0 ? $limit : -1,
+			'orderby'        => 'date',
+			'order'          => 'DESC',
+			'no_found_rows'  => true,
+		)
+	);
+
+	if (!$query->have_posts()) {
+		return '<p class="zo-games-grid__empty">Henüz oyun bulunamadı.</p>';
+	}
+
+	ob_start();
+	$has_results = false;
+
+	echo '<div class="zo-games-grid">';
+
+	while ($query->have_posts()) {
+		$query->the_post();
+
+		$post_id = get_the_ID();
+		$slug    = zo_get_game_slug_for_post($post_id);
+		$module  = $slug ? zo_get_game_module($slug) : null;
+
+		if (!$module) {
+			continue;
+		}
+
+		if ($author_filter !== '' && (($module['author_key'] ?? '') !== $author_filter)) {
+			continue;
+		}
+
+		$has_results = true;
+		$excerpt     = get_the_excerpt();
+
+		if ($excerpt === '' && !empty($module['description']) && is_string($module['description'])) {
+			$excerpt = $module['description'];
+		}
+
+		echo '<article class="zo-games-grid__card">';
+
+		if (has_post_thumbnail()) {
+			echo '<a class="zo-games-grid__thumb" href="' . esc_url(get_permalink()) . '">';
+			the_post_thumbnail('large');
+			echo '</a>';
+		}
+
+		echo '<div class="zo-games-grid__body">';
+
+		if (!empty($module['author']) && is_string($module['author'])) {
+			echo '<p class="zo-games-grid__author">' . esc_html($module['author']) . '</p>';
+		}
+
+		echo '<h3 class="zo-games-grid__title"><a href="' . esc_url(get_permalink()) . '">' . esc_html(get_the_title()) . '</a></h3>';
+
+		if ($excerpt !== '') {
+			echo '<p class="zo-games-grid__excerpt">' . esc_html($excerpt) . '</p>';
+		}
+
+		echo '<div class="zo-games-grid__module">' . esc_html($module['name']) . '</div>';
+		echo '</div>';
+		echo '</article>';
+	}
+
+	echo '</div>';
+
+	wp_reset_postdata();
+
+	if (!$has_results) {
+		ob_end_clean();
+		return '<p class="zo-games-grid__empty">Filtreye uyan oyun bulunamadı.</p>';
+	}
+
+	return ob_get_clean();
+}
+add_shortcode('zeka_oyunlari_grid', 'zo_games_grid_shortcode');
 
 function zo_append_game_to_content($content) {
 	if (!is_singular('zeka_oyunu') || !in_the_loop() || !is_main_query()) {
