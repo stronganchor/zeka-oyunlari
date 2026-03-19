@@ -1,0 +1,238 @@
+.zo-game-root.zo-game-root--dama-ai {
+	max-width: 760px;
+	margin: 0 auto;
+}
+
+.zo-game-root--dama-ai .zo-dama-ai {
+	background: #ffffff;
+	border: 2px solid #d9d9d9;
+	border-radius: 18px;
+	padding: 16px;
+	box-sizing: border-box;
+	box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.zo-game-root--dama-ai .zo-dama-ai__header {
+	text-align: center;
+	margin-bottom: 14px;
+}
+
+.zo-game-root--dama-ai .zo-dama-ai__title {
+	margin: 0 0 8px;
+	font-size: 28px;
+	line-height: 1.2;
+	color: #222;
+}
+
+.zo-game-root--dama-ai .zo-dama-ai__instructions {
+	margin: 0;
+	font-size: 15px;
+	line-height: 1.5;
+	color: #555;
+}
+
+.zo-game-root--dama-ai .zo-dama-ai__topbar {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
+	margin: 16px 0;
+}
+
+.zo-game-root--dama-ai .zo-dama-ai__status-wrap {
+	flex: 1 1 280px;
+	min-width: 0;
+}
+
+.zo-game-root--dama-ai .zo-dama-ai__turn {
+	font-size: 16px;
+	font-weight: 700;
+	color: #222;
+	margin-bottom: 4px;
+}
+
+.zo-game-root--dama-ai .zo-dama-ai__status {
+	font-size: 14px;
+	color: #444;
+	min-height: 22px;
+}
+
+.zo-game-root--dama-ai .zo-dama-ai__restart {
+	border: 0;
+	border-radius: 12px;
+	padding: 10px 16px;
+	font-size: 15px;
+	font-weight: 700;
+	cursor: pointer;
+	background: #1f6feb;
+	color: #fff;
+	transition: transform 0.12s ease, opacity 0.12s ease;
+}
+
+.zo-game-root--dama-ai .zo-dama-ai__restart:hover {
+	opacity: 0.92;
+}
+
+.zo-game-root--dama-ai .zo-dama-ai__restart:active {
+	transform: scale(0.98);
+}
+
+.zo-game-root--dama-ai .zo-dama-ai__board-wrap {
+	display: flex;
+	justify-content: center;
+}
+
+.zo-game-root--dama-ai .zo-dama-ai__board {
+	width: min(100%, 560px);
+	aspect-ratio: 1 / 1;
+	display: grid;
+	grid-template-columns: repeat(8, 1fr);
+	grid-template-rows: repeat(8, 1fr);
+	border: 4px solid #444;
+	border-radius: 14px;
+	overflow: hidden;
+	background: #444;
+	touch-action: manipulation;
+	user-select: none;
+}
+
+.zo-game-root--dama-ai .zo-dama-ai__cell {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border: 0;
+	padding: 0;
+	margin: 0;
+	cursor: pointer;
+	font: inherit;
+	background: transparent;
+}
+
+.zo-game-root--dama-ai .zo-dama-ai__cell:focus-visible {
+	outline: 3px solid #1f6feb;
+	outline-offset: -3px;
+	z-index: 2;
+}
+
+.zo-game-root--dama-ai .zo-dama-ai__cell--light {
+	background: #eee;
+}
+
+.zo-game-root--dama-ai .zo-dama-ai__cell--dark {
+	background: #888;
+}
+
+.zo-game-root--dama-ai .zo-dama-ai__cell--selected {
+	box-shadow: inset 0 0 0 4px #ff3b30;
+}
+
+.zo-game-root--dama-ai .zo-dama-ai__cell--move::after {
+	content: "";
+	position: absolute;
+	width: 22%;
+	height: 22%;
+	border-radius: 50%;
+	background: rgba(33, 180, 75, 0.9);
+	box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.65);
+}
+
+.zo-game-root--dama-ai .zo-dama-ai__cell--capture::after {
+	background: rgba(255, 149, 0, 0.95);
+}
+
+.zo-game-root--dama-ai .zo-dama-ai__piece {
+	width: 72%;
+	height: 72%;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-size: clamp(16px, 2vw, 22px);
+	font-weight: 800;
+	box-sizing: border-box;
+	position: relative;
+	z-index: 1;
+}
+
+.zo-game-root--dama-ai .zo-dama-ai__piece--white {
+	background: radial-gradient(circle at 35% 30%, #ffffff 0%, #fafafa 50%, #d9d9d9 100%);
+	border: 2px solid #bfbfbf;
+	color: #d22;
+}
+
+.zo-game-root--dama-ai .zo-dama-ai__piece--black {
+	background: radial-gradient(circle at 35% 30%, #444 0%, #222 60%, #000 100%);
+	border: 2px solid #111;
+	color: #ffdf5d;
+}
+
+.zo-game-root--dama-ai .zo-dama-ai__legend {
+	display: flex;
+	justify-content: center;
+	gap: 18px;
+	flex-wrap: wrap;
+	margin-top: 14px;
+	font-size: 14px;
+	color: #444;
+}
+
+.zo-game-root--dama-ai .zo-dama-ai__legend span {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.zo-game-root--dama-ai .zo-dama-ai__legend-piece {
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	display: inline-block;
+}
+
+.zo-game-root--dama-ai .zo-dama-ai__legend-piece--white {
+	background: #fff;
+	border: 2px solid #bfbfbf;
+}
+
+.zo-game-root--dama-ai .zo-dama-ai__legend-piece--black {
+	background: #111;
+	border: 2px solid #000;
+}
+
+.zo-game-root--dama-ai .zo-dama-ai__legend-king {
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	background: #ffdf5d;
+	color: #000;
+	font-weight: 800;
+	font-size: 12px;
+}
+
+@media (max-width: 640px) {
+	.zo-game-root--dama-ai .zo-dama-ai {
+		padding: 12px;
+		border-radius: 14px;
+	}
+
+	.zo-game-root--dama-ai .zo-dama-ai__title {
+		font-size: 23px;
+	}
+
+	.zo-game-root--dama-ai .zo-dama-ai__instructions {
+		font-size: 14px;
+	}
+
+	.zo-game-root--dama-ai .zo-dama-ai__topbar {
+		align-items: stretch;
+	}
+
+	.zo-game-root--dama-ai .zo-dama-ai__restart {
+		width: 100%;
+	}
+}
