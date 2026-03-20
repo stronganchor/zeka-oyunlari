@@ -254,11 +254,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	games.forEach(function (game) {
 		const words = [
-			'python', 'anahtar', 'lezzetli', 'import', 'rastgele', 'aralik', 'yakala',
-			'ingilizce', 'hayir', 'pencere', 'kitap', 'dogru', 'kazan', 'pokemon',
-			'test', 'dosya', 'harf', 'adamasmaca', 'fil', 'komik',
-			'zirafa', 'bilgisayar', 'girdi', 'defter', 'eglence', 'minecraft', 'maden',
-			'klavye', 'televizyon', 'ucak', 'oyuncak', 'okul', 'masa', 'kalem'
+			'python', 'anahtar', 'lezzetli', 'asker', 'rastgele',  'yakala',
+			'ingilizce', 'pencere', 'kitap', 'doğru', 'kazan', 'pokemon',
+			'test', 'dosya', 'harf', 'adama asmaca', 'fil', 'komik',
+			'made', 'bilgisayar', 'girdi', 'defter', 'harika', 'minecraft', 'maden',
+			'klavye', 'televizyon', 'adam', 'oyuncak', 'okul', 'masa', 'kalem'
 		];
 
 		const maxAttempts = 10;
