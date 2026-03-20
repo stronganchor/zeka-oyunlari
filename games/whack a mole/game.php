@@ -84,14 +84,16 @@ $css = <<<'CSS'
 	border: 2px solid #111;
 	border-radius: 50%;
 	transform: translate(-50%, -50%);
+	z-index: 1;
 }
 
 .zo-game-root--whack-a-mole .wam-mole {
 	position: absolute;
 	width: 12.6%;
 	height: 12%;
-	transform: translate(-50%, -50%);
+	transform: translate(-50%, -72%);
 	cursor: pointer;
+	z-index: 2;
 }
 
 .zo-game-root--whack-a-mole .wam-mole[hidden] {
@@ -101,7 +103,7 @@ $css = <<<'CSS'
 .zo-game-root--whack-a-mole .wam-mole-head {
 	position: absolute;
 	left: 50%;
-	top: 44%;
+	top: 50%;
 	width: 100%;
 	height: 100%;
 	transform: translate(-50%, -50%);
@@ -118,6 +120,7 @@ $css = <<<'CSS'
 	background: #fff;
 	border: 1px solid #111;
 	border-radius: 50%;
+	z-index: 3;
 }
 
 .zo-game-root--whack-a-mole .wam-eye::after {
@@ -149,6 +152,7 @@ $css = <<<'CSS'
 	background: pink;
 	border: 1px solid #111;
 	border-radius: 50%;
+	z-index: 3;
 }
 
 .zo-game-root--whack-a-mole .wam-tooth {
@@ -158,6 +162,7 @@ $css = <<<'CSS'
 	height: 16%;
 	background: #fff;
 	border: 1px solid #111;
+	z-index: 3;
 }
 
 .zo-game-root--whack-a-mole .wam-tooth--left {
@@ -176,6 +181,7 @@ $css = <<<'CSS'
 	justify-content: center;
 	padding: 20px;
 	background: rgba(20, 30, 20, 0.35);
+	z-index: 5;
 }
 
 .zo-game-root--whack-a-mole .wam-overlay[hidden] {
@@ -448,6 +454,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			hole.style.top = pos.y + '%';
 			board.appendChild(hole);
 		});
+
+		board.appendChild(moleEl);
 
 		updateHud();
 		moleEl.hidden = true;
