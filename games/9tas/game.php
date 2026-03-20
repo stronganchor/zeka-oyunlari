@@ -72,6 +72,8 @@ $css = <<<'CSS'
 	aspect-ratio: 1 / 1;
 	position: relative;
 	margin: 0 auto;
+	background: #f8f5ef;
+	border-radius: 12px;
 }
 
 .zo-game-root--dokuz-tas .zo-dt-line {
@@ -79,6 +81,8 @@ $css = <<<'CSS'
 	background: #222;
 	border-radius: 999px;
 	transform-origin: center center;
+	z-index: 1;
+	pointer-events: none;
 }
 
 .zo-game-root--dokuz-tas .zo-dt-point {
@@ -92,7 +96,16 @@ $css = <<<'CSS'
 	cursor: pointer;
 	padding: 0;
 	transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
-	z-index: 2;
+	z-index: 3;
+	display: block;
+}
+
+.zo-game-root--dokuz-tas .zo-dt-point::before {
+	content: '';
+	position: absolute;
+	inset: 8px;
+	border-radius: 999px;
+	background: #ececec;
 }
 
 .zo-game-root--dokuz-tas .zo-dt-point:hover,
@@ -104,6 +117,7 @@ $css = <<<'CSS'
 
 .zo-game-root--dokuz-tas .zo-dt-point.is-selectable {
 	box-shadow: 0 0 0 5px rgba(76, 175, 80, 0.22);
+	background: #f7fff7;
 }
 
 .zo-game-root--dokuz-tas .zo-dt-point.is-selected {
@@ -118,6 +132,7 @@ $css = <<<'CSS'
 	position: absolute;
 	inset: 4px;
 	border-radius: 999px;
+	z-index: 2;
 }
 
 .zo-game-root--dokuz-tas .zo-dt-piece--w {
@@ -254,18 +269,24 @@ document.addEventListener('DOMContentLoaded', function () {
 		board.appendChild(line);
 	}
 
+	function getMillsForIndex(index) {
+		return mills.filter(function (mill) {
+			return mill.indexOf(index) !== -1;
+		});
+	}
+
 	function isPartOfMill(state, index, player) {
-		return mills.some(function (mill) {
-			return mill.indexOf(index) !== -1 && mill.every(function (pos) {
+		return getMillsForIndex(index).some(function (mill) {
+			return mill.every(function (pos) {
 				return state.board[pos] === player;
 			});
 		});
 	}
 
-	function wouldFormMill(state, index, player) {
-		return mills.some(function (mill) {
-			return mill.indexOf(index) !== -1 && mill.every(function (pos) {
-				return pos === index || state.board[pos] === player;
+	function formedMillAfterPlay(state, index, player) {
+		return getMillsForIndex(index).some(function (mill) {
+			return mill.every(function (pos) {
+				return state.board[pos] === player;
 			});
 		});
 	}
@@ -298,10 +319,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	function hasAnyMove(state, player) {
 		const pieceCount = countPieces(state, player);
+
 		for (let i = 0; i < state.board.length; i++) {
 			if (state.board[i] !== player) {
 				continue;
 			}
+
 			if (pieceCount <= 3) {
 				for (let j = 0; j < state.board.length; j++) {
 					if (state.board[j] === null) {
@@ -316,6 +339,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				}
 			}
 		}
+
 		return false;
 	}
 
@@ -323,10 +347,11 @@ document.addEventListener('DOMContentLoaded', function () {
 		const whiteCount = countPieces(state, 'W');
 		const blackCount = countPieces(state, 'B');
 
-		if (whiteCount < 3 && state.toPlace.W === 0) {
+		if (state.toPlace.W === 0 && whiteCount < 3) {
 			return 'B';
 		}
-		if (blackCount < 3 && state.toPlace.B === 0) {
+
+		if (state.toPlace.B === 0 && blackCount < 3) {
 			return 'W';
 		}
 
@@ -334,12 +359,31 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (!hasAnyMove(state, 'W')) {
 				return 'B';
 			}
+
 			if (!hasAnyMove(state, 'B')) {
 				return 'W';
 			}
 		}
 
 		return null;
+	}
+
+	function getAllowedTargets(state, fromIndex) {
+		const pieceCount = countPieces(state, state.currentPlayer);
+		const canFly = pieceCount <= 3;
+		const targets = [];
+
+		for (let i = 0; i < state.board.length; i++) {
+			if (state.board[i] !== null) {
+				continue;
+			}
+
+			if (canFly || neighbors[fromIndex].indexOf(i) !== -1) {
+				targets.push(i);
+			}
+		}
+
+		return targets;
 	}
 
 	function renderGame(game) {
@@ -395,6 +439,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function refreshBoard() {
 			const removable = state.mustRemove ? getRemovablePieces(state, otherPlayer(state.currentPlayer)) : [];
+			const allowedTargets = state.phase === 'moving' && state.selected !== null && !state.mustRemove
+				? getAllowedTargets(state, state.selected)
+				: [];
 
 			pointButtons.forEach(function (button, index) {
 				button.innerHTML = '';
@@ -427,19 +474,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
 				if (state.selected === index) {
 					button.classList.add('is-selected');
+					return;
 				}
 
-				if (state.selected === null && state.board[index] === state.currentPlayer) {
-					button.classList.add('is-selectable');
-				}
-
-				if (state.selected !== null && state.board[index] === null) {
-					const pieceCount = countPieces(state, state.currentPlayer);
-					const canFly = pieceCount <= 3;
-					const allowed = canFly || neighbors[state.selected].indexOf(index) !== -1;
-					if (allowed) {
+				if (state.selected === null) {
+					if (state.board[index] === state.currentPlayer) {
 						button.classList.add('is-selectable');
 					}
+					return;
+				}
+
+				if (allowedTargets.indexOf(index) !== -1) {
+					button.classList.add('is-selectable');
 				}
 			});
 
@@ -499,13 +545,14 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function afterMoveOrPlace(indexJustPlayed) {
-			if (wouldFormMill(state, indexJustPlayed, state.currentPlayer)) {
+			if (formedMillAfterPlay(state, indexJustPlayed, state.currentPlayer)) {
 				state.mustRemove = true;
 				setHintMessage();
 				refreshBoard();
 				updateStatus((state.currentPlayer === 'W' ? 'White' : 'Black') + ' made a mill. Remove one enemy stone.');
 				return;
 			}
+
 			switchTurn();
 		}
 
@@ -545,14 +592,12 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function handleMoving(index) {
-			const pieceCount = countPieces(state, state.currentPlayer);
-			const canFly = pieceCount <= 3;
-
 			if (state.selected === null) {
 				if (state.board[index] !== state.currentPlayer) {
 					updateStatus('Select one of your own stones.');
 					return;
 				}
+
 				state.selected = index;
 				setHintMessage();
 				refreshBoard();
@@ -581,7 +626,8 @@ document.addEventListener('DOMContentLoaded', function () {
 				return;
 			}
 
-			if (!canFly && neighbors[state.selected].indexOf(index) === -1) {
+			const allowedTargets = getAllowedTargets(state, state.selected);
+			if (allowedTargets.indexOf(index) === -1) {
 				updateStatus('Move to a connected point.');
 				return;
 			}
