@@ -116,75 +116,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		let use24Hour = true;
 		let timerId = null;
-
-		function pad(num) {
-			return String(num).padStart(2, '0');
-		}
-
-		function formatTime(date) {
-			let hours = date.getHours();
-			let suffix = '';
-
-			if (!use24Hour) {
-				suffix = hours >= 12 ? ' PM' : ' AM';
-				hours = hours % 12;
-				if (hours === 0) {
-					hours = 12;
-				}
-			}
-
-			const minutes = pad(date.getMinutes());
-			const seconds = pad(date.getSeconds());
-
-			if (use24Hour) {
-				return pad(hours) + ':' + minutes + ':' + seconds;
-			}
-
-			return hours + ':' + minutes + ':' + seconds + suffix;
-		}
-
-		function formatDate(date) {
-			const month = date.getMonth() + 1;
-			const day = date.getDate();
-			const year = date.getFullYear();
-			return month + '/' + day + '/' + year;
-		}
-
-		function getLondonDate() {
-			const now = new Date();
-			const parts = new Intl.DateTimeFormat('en-US', {
-				timeZone: 'Europe/London',
-				year: 'numeric',
-				month: 'numeric',
-				day: 'numeric',
-				hour: 'numeric',
-				minute: 'numeric',
-				second: 'numeric',
-				hour12: false
-			}).formatToParts(now);
-
-			const data = {};
-
-			parts.forEach(function (part) {
-				if (part.type !== 'literal') {
-					data[part.type] = parseInt(part.value, 10);
-				}
-			});
-
-			return new Date(
-				data.year,
-				(data.month || 1) - 1,
-				data.day || 1,
-				data.hour || 0,
-				data.minute || 0,
-				data.second || 0
-			);
-		}
+		const timeZone = 'Europe/London';
 
 		function updateClock() {
-			const londonNow = getLondonDate();
-			timeEl.textContent = formatTime(londonNow);
-			dateEl.textContent = formatDate(londonNow);
+			const now = new Date();
+
+			timeEl.textContent = new Intl.DateTimeFormat('en-GB', {
+				timeZone: timeZone,
+				hour: '2-digit',
+				minute: '2-digit',
+				second: '2-digit',
+				hour12: !use24Hour
+			}).format(now);
+
+			dateEl.textContent = new Intl.DateTimeFormat('en-US', {
+				timeZone: timeZone,
+				year: 'numeric',
+				month: 'numeric',
+				day: 'numeric'
+			}).format(now);
+
 			zoneEl.textContent = 'London Time';
 		}
 
@@ -193,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				clearInterval(timerId);
 			}
 			updateClock();
-			timerId = setInterval(updateClock, 200);
+			timerId = setInterval(updateClock, 1000);
 		}
 
 		formatButton.addEventListener('click', function () {
