@@ -313,7 +313,7 @@ if (!function_exists('zo_game_game_does_not_exist_render')) {
 return array(
 	'slug'            => 'game-does-not-exist',
 	'name'            => 'The Game That Does Not Exist',
-	'author'          => 'Asker',
+	'author'          => 'Arslan',
 	'description'     => 'A funny hide-and-seek door game where players hunt for a missing game.',
 	'render_callback' => 'zo_game_game_does_not_exist_render',
 	'inline_style'    => $css,
