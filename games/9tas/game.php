@@ -73,6 +73,7 @@ $css = <<<'CSS'
 	position: relative;
 	margin: 0 auto;
 	background: #f8f5ef;
+	border: 3px solid #222;
 	border-radius: 12px;
 }
 
@@ -87,8 +88,8 @@ $css = <<<'CSS'
 
 .zo-game-root--dokuz-tas .zo-dt-point {
 	position: absolute;
-	width: 40px;
-	height: 40px;
+	width: 38px;
+	height: 38px;
 	border: 3px solid #222;
 	border-radius: 999px;
 	background: #fff;
@@ -103,9 +104,13 @@ $css = <<<'CSS'
 .zo-game-root--dokuz-tas .zo-dt-point::before {
 	content: '';
 	position: absolute;
-	inset: 8px;
+	left: 50%;
+	top: 50%;
+	width: 10px;
+	height: 10px;
+	background: #999;
 	border-radius: 999px;
-	background: #ececec;
+	transform: translate(-50%, -50%);
 }
 
 .zo-game-root--dokuz-tas .zo-dt-point:hover,
@@ -116,8 +121,8 @@ $css = <<<'CSS'
 }
 
 .zo-game-root--dokuz-tas .zo-dt-point.is-selectable {
-	box-shadow: 0 0 0 5px rgba(76, 175, 80, 0.22);
-	background: #f7fff7;
+	box-shadow: 0 0 0 5px rgba(76, 175, 80, 0.28);
+	background: #f2fff2;
 }
 
 .zo-game-root--dokuz-tas .zo-dt-point.is-selected {
@@ -125,12 +130,16 @@ $css = <<<'CSS'
 }
 
 .zo-game-root--dokuz-tas .zo-dt-point.is-removable {
-	box-shadow: 0 0 0 6px rgba(244, 67, 54, 0.25);
+	box-shadow: 0 0 0 6px rgba(244, 67, 54, 0.28);
+}
+
+.zo-game-root--dokuz-tas .zo-dt-point.has-piece::before {
+	display: none;
 }
 
 .zo-game-root--dokuz-tas .zo-dt-piece {
 	position: absolute;
-	inset: 4px;
+	inset: 3px;
 	border-radius: 999px;
 	z-index: 2;
 }
@@ -188,8 +197,8 @@ $css = <<<'CSS'
 
 @media (max-width: 520px) {
 	.zo-game-root--dokuz-tas .zo-dt-point {
-		width: 34px;
-		height: 34px;
+		width: 32px;
+		height: 32px;
 	}
 }
 CSS;
@@ -199,30 +208,30 @@ document.addEventListener('DOMContentLoaded', function () {
 	const games = document.querySelectorAll('.zo-game-root--dokuz-tas');
 
 	const positions = [
-		{x: 10, y: 10},  // 0
-		{x: 50, y: 10},  // 1
-		{x: 90, y: 10},  // 2
-		{x: 22, y: 22},  // 3
-		{x: 50, y: 22},  // 4
-		{x: 78, y: 22},  // 5
-		{x: 34, y: 34},  // 6
-		{x: 50, y: 34},  // 7
-		{x: 66, y: 34},  // 8
-		{x: 10, y: 50},  // 9
-		{x: 22, y: 50},  // 10
-		{x: 34, y: 50},  // 11
-		{x: 66, y: 50},  // 12
-		{x: 78, y: 50},  // 13
-		{x: 90, y: 50},  // 14
-		{x: 34, y: 66},  // 15
-		{x: 50, y: 66},  // 16
-		{x: 66, y: 66},  // 17
-		{x: 22, y: 78},  // 18
-		{x: 50, y: 78},  // 19
-		{x: 78, y: 78},  // 20
-		{x: 10, y: 90},  // 21
-		{x: 50, y: 90},  // 22
-		{x: 90, y: 90}   // 23
+		{x: 10, y: 10},
+		{x: 50, y: 10},
+		{x: 90, y: 10},
+		{x: 22, y: 22},
+		{x: 50, y: 22},
+		{x: 78, y: 22},
+		{x: 34, y: 34},
+		{x: 50, y: 34},
+		{x: 66, y: 34},
+		{x: 10, y: 50},
+		{x: 22, y: 50},
+		{x: 34, y: 50},
+		{x: 66, y: 50},
+		{x: 78, y: 50},
+		{x: 90, y: 50},
+		{x: 34, y: 66},
+		{x: 50, y: 66},
+		{x: 66, y: 66},
+		{x: 22, y: 78},
+		{x: 50, y: 78},
+		{x: 78, y: 78},
+		{x: 10, y: 90},
+		{x: 50, y: 90},
+		{x: 90, y: 90}
 	];
 
 	const lines = [
@@ -386,7 +395,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		return targets;
 	}
 
-	function renderGame(game) {
+	games.forEach(function (game) {
 		const boardEl = game.querySelector('.zo-dt-board');
 		const statusEl = game.querySelector('.zo-dt-status');
 		const turnEl = game.querySelector('.zo-dt-turn-value');
@@ -403,7 +412,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			selected: null,
 			mustRemove: false,
 			winner: null,
-			hint: 'Place a stone on any empty point.'
+			hint: 'Place a stone on any visible spot.'
 		};
 
 		lines.forEach(function (pair) {
@@ -418,12 +427,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			button.style.top = pos.y + '%';
 			button.setAttribute('aria-label', 'Point ' + (index + 1));
 			button.dataset.index = String(index);
-			boardEl.appendChild(button);
 
 			button.addEventListener('click', function () {
 				handlePointClick(index);
 			});
 
+			boardEl.appendChild(button);
 			return button;
 		});
 
@@ -445,10 +454,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			pointButtons.forEach(function (button, index) {
 				button.innerHTML = '';
-				button.classList.remove('is-selectable', 'is-selected', 'is-removable');
+				button.classList.remove('is-selectable', 'is-selected', 'is-removable', 'has-piece');
 
 				const piece = state.board[index];
 				if (piece) {
+					button.classList.add('has-piece');
 					const pieceEl = document.createElement('span');
 					pieceEl.className = 'zo-dt-piece zo-dt-piece--' + piece.toLowerCase();
 					button.appendChild(pieceEl);
@@ -504,23 +514,23 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			if (state.phase === 'placing') {
-				state.hint = 'Place a stone on any empty point.';
+				state.hint = 'Place a stone on any visible spot.';
 				return;
 			}
 
 			if (state.selected === null) {
 				const pieceCount = countPieces(state, state.currentPlayer);
 				if (pieceCount <= 3) {
-					state.hint = 'Select one of your stones, then move it to any empty point.';
+					state.hint = 'Select one of your stones, then move it to any empty spot.';
 				} else {
-					state.hint = 'Select one of your stones, then move it to a connected empty point.';
+					state.hint = 'Select one of your stones, then move it to a connected empty spot.';
 				}
 			} else {
 				const pieceCount = countPieces(state, state.currentPlayer);
 				if (pieceCount <= 3) {
-					state.hint = 'Now choose any empty point.';
+					state.hint = 'Now choose any empty spot.';
 				} else {
-					state.hint = 'Now choose a connected empty point.';
+					state.hint = 'Now choose a connected empty spot.';
 				}
 			}
 		}
@@ -581,7 +591,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function handlePlacing(index) {
 			if (state.board[index] !== null) {
-				updateStatus('Pick an empty point.');
+				updateStatus('Pick an empty spot.');
 				return;
 			}
 
@@ -622,13 +632,13 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			if (state.board[index] !== null) {
-				updateStatus('That point is not empty.');
+				updateStatus('That spot is not empty.');
 				return;
 			}
 
 			const allowedTargets = getAllowedTargets(state, state.selected);
 			if (allowedTargets.indexOf(index) === -1) {
-				updateStatus('Move to a connected point.');
+				updateStatus('Move to a connected spot.');
 				return;
 			}
 
@@ -666,7 +676,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.winner = null;
 			setHintMessage();
 			refreshBoard();
-			updateStatus('White starts. Place a stone.');
+			updateStatus('White starts. Place a stone on a visible spot.');
 		}
 
 		resetBtn.addEventListener('click', function () {
@@ -700,7 +710,7 @@ if (!function_exists('zo_game_dokuz_tas_render')) {
 					<div class="zo-dt-stat">Black: <span class="zo-dt-black-value">0 on board, 9 left</span></div>
 				</div>
 
-				<div class="zo-dt-status" aria-live="polite">White starts. Place a stone.</div>
+				<div class="zo-dt-status" aria-live="polite">White starts. Place a stone on a visible spot.</div>
 
 				<div class="zo-dt-board-wrap">
 					<div class="zo-dt-board"></div>
@@ -712,7 +722,7 @@ if (!function_exists('zo_game_dokuz_tas_render')) {
 				</div>
 
 				<div class="zo-dt-help">
-					<strong>How to play:</strong> During the first phase, players take turns placing stones on empty points. When all stones are placed, players move one stone per turn. If a player has only 3 stones left, that player may jump to any empty point. Making a row of 3 stones lets you remove one enemy stone. Stones inside a mill cannot be removed unless all enemy stones are in mills.
+					<strong>How to play:</strong> During the first phase, players take turns placing stones on empty spots. When all stones are placed, players move one stone per turn. If a player has only 3 stones left, that player may jump to any empty spot. Making a row of 3 stones lets you remove one enemy stone. Stones inside a mill cannot be removed unless all enemy stones are in mills.
 				</div>
 			</div>
 		</div>
