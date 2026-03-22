@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.1.6.5
+ * Version: 1.1.6.6
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -20,6 +20,20 @@ define('ZO_PLUGIN_VERSION', '1.0.5');
 define('ZO_PLUGIN_FILE', __FILE__);
 define('ZO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('ZO_PLUGIN_URL', plugin_dir_url(__FILE__));
+
+function zo_bootstrap_all_game_modules() {
+	$files = glob(ZO_PLUGIN_DIR . 'games/*/game.php');
+
+	if (empty($files)) {
+		return;
+	}
+
+	foreach ($files as $file) {
+		require_once $file;
+	}
+}
+
+add_action('plugins_loaded', 'zo_bootstrap_all_game_modules', 1);
 
 function zo_get_update_branch() {
 	$branch = 'main';
