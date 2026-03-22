@@ -225,6 +225,11 @@ $css = <<<'CSS'
 	color: #ffffff;
 }
 
+.zo-game-root--language-learning-platform .zo-llp-button--danger {
+	background: #dc2626;
+	color: #ffffff;
+}
+
 .zo-game-root--language-learning-platform .zo-llp-button--choice,
 .zo-game-root--language-learning-platform .zo-llp-button--match {
 	background: #eef4fb;
@@ -346,6 +351,13 @@ $css = <<<'CSS'
 	margin-bottom: 10px;
 }
 
+.zo-game-root--language-learning-platform .zo-llp-admin-tools {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 10px;
+	margin-top: 12px;
+}
+
 @media (max-width: 820px) {
 	.zo-game-root.zo-game-root--language-learning-platform {
 		padding: 16px;
@@ -362,7 +374,8 @@ $css = <<<'CSS'
 	.zo-game-root--language-learning-platform .zo-llp-settings-grid,
 	.zo-game-root--language-learning-platform .zo-llp-admin-grid,
 	.zo-game-root--language-learning-platform .zo-llp-footer,
-	.zo-game-root--language-learning-platform .zo-llp-admin-password-row {
+	.zo-game-root--language-learning-platform .zo-llp-admin-password-row,
+	.zo-game-root--language-learning-platform .zo-llp-admin-tools {
 		grid-template-columns: 1fr;
 	}
 
@@ -383,7 +396,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	games.forEach(function (game) {
 		const ADMIN_PASSWORD = 'askerkindle1905';
 
-		const words = [
+		const defaultWords = [
 			{ tr: 'elma', en: 'apple', category: 'food', sentence: 'Kırmızı bir meyve.' },
 			{ tr: 'kitap', en: 'book', category: 'school', sentence: 'Okumak için kullanılır.' },
 			{ tr: 'su', en: 'water', category: 'food', sentence: 'İçilir.' },
@@ -401,6 +414,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			{ tr: 'süt', en: 'milk', category: 'food', sentence: 'Beyaz bir içecektir.' },
 			{ tr: 'kuş', en: 'bird', category: 'animal', sentence: 'Kanatları vardır.' }
 		];
+
+		const storageKey = 'zo-language-learning-platform-words';
 
 		const tabs = Array.prototype.slice.call(game.querySelectorAll('.zo-llp-tab'));
 		const panels = Array.prototype.slice.call(game.querySelectorAll('.zo-llp-panel'));
@@ -450,7 +465,10 @@ document.addEventListener('DOMContentLoaded', function () {
 		const adminCategoryEl = game.querySelector('.zo-llp-input--admin-category');
 		const adminSentenceEl = game.querySelector('.zo-llp-textarea--admin-sentence');
 		const adminAddButton = game.querySelector('.zo-llp-button--admin-add');
+		const adminExportButton = game.querySelector('.zo-llp-button--admin-export');
+		const adminResetWordsButton = game.querySelector('.zo-llp-button--admin-reset-words');
 
+		let words = [];
 		let direction = 'tr-en';
 		let category = 'all';
 		let learnedWords = 0;
@@ -459,7 +477,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		let activeMode = 'flashcards';
 		let adminUnlocked = false;
 
-		let filteredWords = words.slice();
+		let filteredWords = [];
 		let flashIndex = 0;
 		let flashFlipped = false;
 
@@ -486,7 +504,60 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function normalizeText(text) {
-			return text.toLocaleLowerCase('tr-TR').trim();
+			return String(text || '').toLocaleLowerCase('tr-TR').trim();
+		}
+
+		function sanitizeWord(word) {
+			return {
+				tr: String(word.tr || '').trim(),
+				en: String(word.en || '').trim(),
+				category: String(word.category || '').trim(),
+				sentence: String(word.sentence || '').trim()
+			};
+		}
+
+		function isValidWord(word) {
+			return word.tr && word.en && word.category;
+		}
+
+		function saveWords() {
+			try {
+				localStorage.setItem(storageKey, JSON.stringify(words));
+				return true;
+			} catch (error) {
+				return false;
+			}
+		}
+
+		function loadWords() {
+			try {
+				const raw = localStorage.getItem(storageKey);
+				if (!raw) {
+					words = defaultWords.map(function (word) {
+						return sanitizeWord(word);
+					});
+					saveWords();
+					return;
+				}
+
+				const parsed = JSON.parse(raw);
+				if (!Array.isArray(parsed)) {
+					throw new Error('Invalid stored words');
+				}
+
+				const cleaned = parsed.map(function (word) {
+					return sanitizeWord(word);
+				}).filter(isValidWord);
+
+				words = cleaned.length ? cleaned : defaultWords.map(function (word) {
+					return sanitizeWord(word);
+				});
+			} catch (error) {
+				words = defaultWords.map(function (word) {
+					return sanitizeWord(word);
+				});
+				saveWords();
+			}
 		}
 
 		function getPrompt(word) {
@@ -890,22 +961,35 @@ document.addEventListener('DOMContentLoaded', function () {
 				return;
 			}
 
-			const tr = adminTrEl.value.trim();
-			const en = adminEnEl.value.trim();
-			const newCategory = adminCategoryEl.value.trim();
-			const sentence = adminSentenceEl.value.trim();
+			const word = sanitizeWord({
+				tr: adminTrEl.value,
+				en: adminEnEl.value,
+				category: adminCategoryEl.value,
+				sentence: adminSentenceEl.value || 'Yeni eklenen kelime.'
+			});
 
-			if (!tr || !en || !newCategory) {
+			if (!isValidWord(word)) {
 				setStatus(adminStatusEl, 'Türkçe, İngilizce ve kategori gerekli.', 'is-warn');
 				return;
 			}
 
-			words.push({
-				tr: tr,
-				en: en,
-				category: newCategory,
-				sentence: sentence || 'Yeni eklenen kelime.'
+			const duplicate = words.some(function (item) {
+				return normalizeText(item.tr) === normalizeText(word.tr) &&
+					normalizeText(item.en) === normalizeText(word.en) &&
+					normalizeText(item.category) === normalizeText(word.category);
 			});
+
+			if (duplicate) {
+				setStatus(adminStatusEl, 'Bu kelime zaten var.', 'is-warn');
+				return;
+			}
+
+			words.push(word);
+
+			if (!saveWords()) {
+				setStatus(adminStatusEl, 'Kelime eklendi ama kaydedilemedi.', 'is-bad');
+				return;
+			}
 
 			adminTrEl.value = '';
 			adminEnEl.value = '';
@@ -914,13 +998,46 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			refreshCategorySelect();
 
-			if (category === 'all' || category === normalizeText(newCategory)) {
+			if (category === 'all' || category === normalizeText(word.category)) {
 				refreshAllModes();
 			} else {
 				renderWordList();
 			}
 
-			setStatus(adminStatusEl, 'Yeni kelime eklendi.', 'is-good');
+			setStatus(adminStatusEl, 'Yeni kelime eklendi ve kaydedildi.', 'is-good');
+		}
+
+		function exportWords() {
+			if (!adminUnlocked) {
+				setStatus(adminStatusEl, 'Önce şifreyi gir.', 'is-bad');
+				return;
+			}
+
+			const blob = new Blob([JSON.stringify(words, null, 2)], { type: 'application/json' });
+			const url = URL.createObjectURL(blob);
+			const link = document.createElement('a');
+			link.href = url;
+			link.download = 'language-learning-platform-words.json';
+			document.body.appendChild(link);
+			link.click();
+			document.body.removeChild(link);
+			URL.revokeObjectURL(url);
+			setStatus(adminStatusEl, 'Kelime listesi dışa aktarıldı.', 'is-good');
+		}
+
+		function resetSavedWords() {
+			if (!adminUnlocked) {
+				setStatus(adminStatusEl, 'Önce şifreyi gir.', 'is-bad');
+				return;
+			}
+
+			words = defaultWords.map(function (word) {
+				return sanitizeWord(word);
+			});
+			saveWords();
+			refreshCategorySelect();
+			restartAll();
+			setStatus(adminStatusEl, 'Kelime listesi varsayılan hale döndürüldü.', 'is-good');
 		}
 
 		tabs.forEach(function (tab) {
@@ -961,7 +1078,10 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 
 		adminAddButton.addEventListener('click', addWord);
+		adminExportButton.addEventListener('click', exportWords);
+		adminResetWordsButton.addEventListener('click', resetSavedWords);
 
+		loadWords();
 		refreshCategorySelect();
 		restartAll();
 	});
@@ -1090,7 +1210,7 @@ if (!function_exists('zo_game_language_learning_platform_render')) {
 					</div>
 
 					<div class="zo-llp-admin-box">
-						<div class="zo-llp-admin-note">Bu admin paneli sadece bu sayfa oturumu içinde çalışır. Sayfa yenilenirse eklenen kelimeler sıfırlanır.</div>
+						<div class="zo-llp-admin-note">Eklenen kelimeler tarayıcıda kalıcı olarak kaydedilir ve sayfa yenilense de durur.</div>
 
 						<div class="zo-llp-admin-password-row">
 							<input type="password" class="zo-llp-input zo-llp-input--admin-password" placeholder="Admin şifresi" />
@@ -1108,6 +1228,11 @@ if (!function_exists('zo_game_language_learning_platform_render')) {
 							</div>
 
 							<button type="button" class="zo-llp-button zo-llp-button--good zo-llp-button--admin-add">Kelime Ekle</button>
+
+							<div class="zo-llp-admin-tools">
+								<button type="button" class="zo-llp-button zo-llp-button--primary zo-llp-button--admin-export">Kelime Listesini İndir</button>
+								<button type="button" class="zo-llp-button zo-llp-button--danger zo-llp-button--admin-reset-words">Varsayılana Sıfırla</button>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -1122,7 +1247,7 @@ return array(
 	'slug'            => 'language-learning-platform',
 	'name'            => 'Language Learning Platform',
 	'author'          => 'Asker',
-	'description'     => 'Flashcards, quiz, typing, matching, and an admin word-adder in one browser-based language learning platform.',
+	'description'     => 'Flashcards, quiz, typing, matching, and a persistent admin word-adder in one browser-based language learning platform.',
 	'render_callback' => 'zo_game_language_learning_platform_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,
