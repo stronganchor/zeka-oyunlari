@@ -138,7 +138,8 @@ $css = <<<'CSS'
 }
 
 .zo-game-root--language-learning-platform .zo-llp-input,
-.zo-game-root--language-learning-platform .zo-llp-select {
+.zo-game-root--language-learning-platform .zo-llp-select,
+.zo-game-root--language-learning-platform .zo-llp-textarea {
 	width: 100%;
 	padding: 13px 14px;
 	border: 2px solid #c8d4e0;
@@ -149,10 +150,17 @@ $css = <<<'CSS'
 	box-sizing: border-box;
 }
 
+.zo-game-root--language-learning-platform .zo-llp-textarea {
+	min-height: 88px;
+	resize: vertical;
+	font-family: Arial, sans-serif;
+}
+
 .zo-game-root--language-learning-platform .zo-llp-input-row,
 .zo-game-root--language-learning-platform .zo-llp-choice-grid,
 .zo-game-root--language-learning-platform .zo-llp-match-grid,
-.zo-game-root--language-learning-platform .zo-llp-settings-grid {
+.zo-game-root--language-learning-platform .zo-llp-settings-grid,
+.zo-game-root--language-learning-platform .zo-llp-admin-grid {
 	display: grid;
 	gap: 10px;
 }
@@ -173,6 +181,11 @@ $css = <<<'CSS'
 }
 
 .zo-game-root--language-learning-platform .zo-llp-settings-grid {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	margin-bottom: 14px;
+}
+
+.zo-game-root--language-learning-platform .zo-llp-admin-grid {
 	grid-template-columns: repeat(2, minmax(0, 1fr));
 	margin-bottom: 14px;
 }
@@ -205,6 +218,11 @@ $css = <<<'CSS'
 .zo-game-root--language-learning-platform .zo-llp-button--neutral {
 	background: #e5e7eb;
 	color: #111827;
+}
+
+.zo-game-root--language-learning-platform .zo-llp-button--admin {
+	background: #f59e0b;
+	color: #ffffff;
 }
 
 .zo-game-root--language-learning-platform .zo-llp-button--choice,
@@ -292,6 +310,42 @@ $css = <<<'CSS'
 	gap: 10px;
 }
 
+.zo-game-root--language-learning-platform .zo-llp-admin-box {
+	display: none;
+	margin-top: 14px;
+	padding: 14px;
+	border: 2px solid #f3d18d;
+	border-radius: 14px;
+	background: #fff8eb;
+}
+
+.zo-game-root--language-learning-platform .zo-llp-admin-box.is-open {
+	display: block;
+}
+
+.zo-game-root--language-learning-platform .zo-llp-admin-password-row {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	gap: 10px;
+	margin-bottom: 12px;
+}
+
+.zo-game-root--language-learning-platform .zo-llp-admin-form {
+	display: none;
+}
+
+.zo-game-root--language-learning-platform .zo-llp-admin-form.is-open {
+	display: block;
+}
+
+.zo-game-root--language-learning-platform .zo-llp-admin-note {
+	font-size: 13px;
+	line-height: 1.4;
+	color: #7c5a11;
+	text-align: left;
+	margin-bottom: 10px;
+}
+
 @media (max-width: 820px) {
 	.zo-game-root.zo-game-root--language-learning-platform {
 		padding: 16px;
@@ -306,7 +360,9 @@ $css = <<<'CSS'
 	.zo-game-root--language-learning-platform .zo-llp-choice-grid,
 	.zo-game-root--language-learning-platform .zo-llp-match-grid,
 	.zo-game-root--language-learning-platform .zo-llp-settings-grid,
-	.zo-game-root--language-learning-platform .zo-llp-footer {
+	.zo-game-root--language-learning-platform .zo-llp-admin-grid,
+	.zo-game-root--language-learning-platform .zo-llp-footer,
+	.zo-game-root--language-learning-platform .zo-llp-admin-password-row {
 		grid-template-columns: 1fr;
 	}
 
@@ -325,6 +381,8 @@ document.addEventListener('DOMContentLoaded', function () {
 	const games = document.querySelectorAll('.zo-game-root--language-learning-platform');
 
 	games.forEach(function (game) {
+		const ADMIN_PASSWORD = 'askerkindle1905';
+
 		const words = [
 			{ tr: 'elma', en: 'apple', category: 'food', sentence: 'Kırmızı bir meyve.' },
 			{ tr: 'kitap', en: 'book', category: 'school', sentence: 'Okumak için kullanılır.' },
@@ -377,9 +435,21 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		const settingsDirectionEl = game.querySelector('.zo-llp-select--direction');
 		const settingsCategoryEl = game.querySelector('.zo-llp-select--category');
-		const wordListEl = game.querySelector('.zo-llp-list');
+		const wordListEl = game.querySelector('.zo-llp-list--words');
 		const applySettingsButton = game.querySelector('.zo-llp-button--apply');
 		const restartAllButton = game.querySelector('.zo-llp-button--restart-all');
+
+		const adminOpenButton = game.querySelector('.zo-llp-button--admin-open');
+		const adminBoxEl = game.querySelector('.zo-llp-admin-box');
+		const adminPasswordEl = game.querySelector('.zo-llp-input--admin-password');
+		const adminUnlockButton = game.querySelector('.zo-llp-button--admin-unlock');
+		const adminStatusEl = game.querySelector('.zo-llp-status--admin');
+		const adminFormEl = game.querySelector('.zo-llp-admin-form');
+		const adminTrEl = game.querySelector('.zo-llp-input--admin-tr');
+		const adminEnEl = game.querySelector('.zo-llp-input--admin-en');
+		const adminCategoryEl = game.querySelector('.zo-llp-input--admin-category');
+		const adminSentenceEl = game.querySelector('.zo-llp-textarea--admin-sentence');
+		const adminAddButton = game.querySelector('.zo-llp-button--admin-add');
 
 		let direction = 'tr-en';
 		let category = 'all';
@@ -387,6 +457,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		let score = 0;
 		let streak = 0;
 		let activeMode = 'flashcards';
+		let adminUnlocked = false;
 
 		let filteredWords = words.slice();
 		let flashIndex = 0;
@@ -443,12 +514,49 @@ document.addEventListener('DOMContentLoaded', function () {
 			modeEl.textContent = activeMode;
 		}
 
+		function getAllCategories() {
+			const map = {};
+			words.forEach(function (word) {
+				const key = normalizeText(word.category);
+				if (key) {
+					map[key] = word.category;
+				}
+			});
+			return Object.keys(map).sort().map(function (key) {
+				return map[key];
+			});
+		}
+
+		function refreshCategorySelect() {
+			const currentValue = settingsCategoryEl.value;
+			const categories = getAllCategories();
+
+			settingsCategoryEl.innerHTML = '';
+			const allOption = document.createElement('option');
+			allOption.value = 'all';
+			allOption.textContent = 'Tüm Kategoriler';
+			settingsCategoryEl.appendChild(allOption);
+
+			categories.forEach(function (cat) {
+				const option = document.createElement('option');
+				option.value = normalizeText(cat);
+				option.textContent = cat;
+				settingsCategoryEl.appendChild(option);
+			});
+
+			if (currentValue && settingsCategoryEl.querySelector('option[value="' + currentValue + '"]')) {
+				settingsCategoryEl.value = currentValue;
+			} else {
+				settingsCategoryEl.value = 'all';
+			}
+		}
+
 		function applyFilters() {
 			filteredWords = words.filter(function (word) {
 				if (category === 'all') {
 					return true;
 				}
-				return word.category === category;
+				return normalizeText(word.category) === category;
 			});
 
 			if (!filteredWords.length) {
@@ -461,7 +569,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			filteredWords.forEach(function (word) {
 				const item = document.createElement('div');
 				item.className = 'zo-llp-list-item';
-				item.innerHTML = '<span><strong>' + word.tr + '</strong> → ' + word.en + '</span><span class="zo-llp-mini">' + word.category + '</span>';
+				item.innerHTML = '<span><strong>' + word.tr + '</strong> → ' + word.en + '<br><span class="zo-llp-mini">' + word.sentence + '</span></span><span class="zo-llp-mini">' + word.category + '</span>';
 				wordListEl.appendChild(item);
 			});
 		}
@@ -479,6 +587,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function loadFlashcard() {
 			if (!filteredWords.length) {
+				flashWordEl.textContent = '-';
+				flashTranslationEl.textContent = '???';
+				flashCategoryEl.textContent = '-';
 				return;
 			}
 			if (flashIndex >= filteredWords.length) {
@@ -492,12 +603,18 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function flipFlashcard() {
+			if (!filteredWords.length) {
+				return;
+			}
 			const word = filteredWords[flashIndex];
 			flashFlipped = !flashFlipped;
 			flashTranslationEl.textContent = flashFlipped ? getAnswer(word) : '???';
 		}
 
 		function nextFlashcard() {
+			if (!filteredWords.length) {
+				return;
+			}
 			flashIndex += 1;
 			if (flashIndex >= filteredWords.length) {
 				flashIndex = 0;
@@ -508,14 +625,22 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function loadQuiz() {
+			if (!filteredWords.length) {
+				return;
+			}
+
 			currentQuizWord = sample(filteredWords, 1)[0];
 			const correct = getAnswer(currentQuizWord);
 			const wrongPool = filteredWords.filter(function (word) {
 				return getAnswer(word) !== correct;
 			});
-			const options = shuffle([correct].concat(sample(wrongPool.map(function (word) {
+			const fallbackPool = words.filter(function (word) {
+				return getAnswer(word) !== correct;
+			});
+			const optionPool = wrongPool.length >= 3 ? wrongPool : fallbackPool;
+			const options = shuffle([correct].concat(sample(optionPool.map(function (word) {
 				return getAnswer(word);
-			}), 3)));
+			}), Math.min(3, optionPool.length))));
 
 			quizPromptEl.textContent = getPrompt(currentQuizWord);
 			quizChoicesEl.innerHTML = '';
@@ -560,6 +685,9 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function loadTyping() {
+			if (!filteredWords.length) {
+				return;
+			}
 			currentTypeWord = sample(filteredWords, 1)[0];
 			typePromptEl.textContent = getPrompt(currentTypeWord);
 			typeInputEl.value = '';
@@ -571,6 +699,10 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function checkTyping() {
+			if (!currentTypeWord) {
+				return;
+			}
+
 			const guess = normalizeText(typeInputEl.value);
 			const answer = normalizeText(getAnswer(currentTypeWord));
 
@@ -597,16 +729,20 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function hintTyping() {
+			if (!currentTypeWord) {
+				return;
+			}
 			const answer = getAnswer(currentTypeWord);
 			if (!answer) {
 				return;
 			}
 			typeInputEl.value = answer.charAt(0);
-			setStatus(typeStatusEl, 'İpucu verildi. Bu tur daha az değerli.', 'is-warn');
+			setStatus(typeStatusEl, 'İpucu verildi.', 'is-warn');
 		}
 
 		function loadMatch() {
-			currentMatchSet = sample(filteredWords, 4);
+			const source = filteredWords.length >= 4 ? filteredWords : words;
+			currentMatchSet = sample(source, Math.min(4, source.length));
 			matchSelectedLeft = null;
 			matchSelectedRight = null;
 			matchPairsSolved = 0;
@@ -617,12 +753,11 @@ document.addEventListener('DOMContentLoaded', function () {
 			const leftWords = currentMatchSet.slice();
 			const rightWords = shuffle(currentMatchSet.slice());
 
-			leftWords.forEach(function (word, index) {
+			leftWords.forEach(function (word) {
 				const button = document.createElement('button');
 				button.type = 'button';
 				button.className = 'zo-llp-button zo-llp-button--match';
 				button.textContent = direction === 'tr-en' ? word.tr : word.en;
-				button.setAttribute('data-index', String(index));
 				button.addEventListener('click', function () {
 					if (button.disabled) {
 						return;
@@ -706,9 +841,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			updateHeader();
 		}
 
-		function applySettings() {
-			direction = settingsDirectionEl.value;
-			category = settingsCategoryEl.value;
+		function refreshAllModes() {
 			applyFilters();
 			renderWordList();
 			flashIndex = 0;
@@ -719,6 +852,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			updateHeader();
 		}
 
+		function applySettings() {
+			direction = settingsDirectionEl.value;
+			category = settingsCategoryEl.value;
+			refreshAllModes();
+		}
+
 		function restartAll() {
 			learnedWords = 0;
 			score = 0;
@@ -727,9 +866,61 @@ document.addEventListener('DOMContentLoaded', function () {
 			direction = 'tr-en';
 			category = 'all';
 			settingsDirectionEl.value = direction;
+			refreshCategorySelect();
 			settingsCategoryEl.value = category;
-			applySettings();
+			refreshAllModes();
 			setActiveMode('flashcards');
+		}
+
+		function unlockAdmin() {
+			const password = adminPasswordEl.value;
+			if (password === ADMIN_PASSWORD) {
+				adminUnlocked = true;
+				adminFormEl.classList.add('is-open');
+				setStatus(adminStatusEl, 'Admin paneli açıldı.', 'is-good');
+				adminPasswordEl.value = '';
+			} else {
+				setStatus(adminStatusEl, 'Şifre yanlış.', 'is-bad');
+			}
+		}
+
+		function addWord() {
+			if (!adminUnlocked) {
+				setStatus(adminStatusEl, 'Önce şifreyi gir.', 'is-bad');
+				return;
+			}
+
+			const tr = adminTrEl.value.trim();
+			const en = adminEnEl.value.trim();
+			const newCategory = adminCategoryEl.value.trim();
+			const sentence = adminSentenceEl.value.trim();
+
+			if (!tr || !en || !newCategory) {
+				setStatus(adminStatusEl, 'Türkçe, İngilizce ve kategori gerekli.', 'is-warn');
+				return;
+			}
+
+			words.push({
+				tr: tr,
+				en: en,
+				category: newCategory,
+				sentence: sentence || 'Yeni eklenen kelime.'
+			});
+
+			adminTrEl.value = '';
+			adminEnEl.value = '';
+			adminCategoryEl.value = '';
+			adminSentenceEl.value = '';
+
+			refreshCategorySelect();
+
+			if (category === 'all' || category === normalizeText(newCategory)) {
+				refreshAllModes();
+			} else {
+				renderWordList();
+			}
+
+			setStatus(adminStatusEl, 'Yeni kelime eklendi.', 'is-good');
 		}
 
 		tabs.forEach(function (tab) {
@@ -758,6 +949,20 @@ document.addEventListener('DOMContentLoaded', function () {
 		applySettingsButton.addEventListener('click', applySettings);
 		restartAllButton.addEventListener('click', restartAll);
 
+		adminOpenButton.addEventListener('click', function () {
+			adminBoxEl.classList.toggle('is-open');
+		});
+
+		adminUnlockButton.addEventListener('click', unlockAdmin);
+		adminPasswordEl.addEventListener('keydown', function (event) {
+			if (event.key === 'Enter') {
+				unlockAdmin();
+			}
+		});
+
+		adminAddButton.addEventListener('click', addWord);
+
+		refreshCategorySelect();
 		restartAll();
 	});
 });
@@ -771,7 +976,7 @@ if (!function_exists('zo_game_language_learning_platform_render')) {
 		?>
 		<div class="zo-game-root zo-game-root--language-learning-platform" id="<?php echo esc_attr($instance_id); ?>">
 			<h2 class="zo-llp-title">Language Learning Platform</h2>
-			<p class="zo-llp-desc">Kelime öğren, test çöz, yazı yaz ve eşleştirme yap. Aynı oyunda mini bir dil öğrenme sistemi var.</p>
+			<p class="zo-llp-desc">Kelime öğren, test çöz, yazı yaz, eşleştirme yap ve admin panelinden yeni kelimeler ekle.</p>
 
 			<div class="zo-llp-top">
 				<div class="zo-llp-stat">
@@ -809,8 +1014,8 @@ if (!function_exists('zo_game_language_learning_platform_render')) {
 					</div>
 
 					<div class="zo-llp-footer">
-						<button type="button" class="zo-llp-button zo-llp-button--hint">Çeviriyi Göster</button>
-						<button type="button" class="zo-llp-button zo-llp-button--good">Sonraki Kart</button>
+						<button type="button" class="zo-llp-button zo-llp-button--hint zo-llp-button--flash-flip">Çeviriyi Göster</button>
+						<button type="button" class="zo-llp-button zo-llp-button--good zo-llp-button--flash-next">Sonraki Kart</button>
 					</div>
 				</div>
 
@@ -822,7 +1027,7 @@ if (!function_exists('zo_game_language_learning_platform_render')) {
 
 					<div class="zo-llp-choice-grid"></div>
 					<div class="zo-llp-status zo-llp-status--quiz" aria-live="polite"></div>
-					<button type="button" class="zo-llp-button zo-llp-button--good">Yeni Soru</button>
+					<button type="button" class="zo-llp-button zo-llp-button--good zo-llp-button--quiz-next">Yeni Soru</button>
 				</div>
 
 				<div class="zo-llp-panel" data-mode="typing">
@@ -833,12 +1038,12 @@ if (!function_exists('zo_game_language_learning_platform_render')) {
 
 					<div class="zo-llp-input-row">
 						<input type="text" class="zo-llp-input zo-llp-input--type" placeholder="Cevabını yaz" />
-						<button type="button" class="zo-llp-button zo-llp-button--primary">Kontrol Et</button>
-						<button type="button" class="zo-llp-button zo-llp-button--hint">İpucu</button>
+						<button type="button" class="zo-llp-button zo-llp-button--primary zo-llp-button--type-check">Kontrol Et</button>
+						<button type="button" class="zo-llp-button zo-llp-button--hint zo-llp-button--type-hint">İpucu</button>
 					</div>
 
 					<div class="zo-llp-status zo-llp-status--type" aria-live="polite"></div>
-					<button type="button" class="zo-llp-button zo-llp-button--good">Yeni Kelime</button>
+					<button type="button" class="zo-llp-button zo-llp-button--good zo-llp-button--type-next">Yeni Kelime</button>
 				</div>
 
 				<div class="zo-llp-panel" data-mode="matching">
@@ -853,7 +1058,7 @@ if (!function_exists('zo_game_language_learning_platform_render')) {
 					</div>
 
 					<div class="zo-llp-status zo-llp-status--match" aria-live="polite"></div>
-					<button type="button" class="zo-llp-button zo-llp-button--good">Yeni Eşleştirme</button>
+					<button type="button" class="zo-llp-button zo-llp-button--good zo-llp-button--match-next">Yeni Eşleştirme</button>
 				</div>
 
 				<div class="zo-llp-card">
@@ -867,23 +1072,44 @@ if (!function_exists('zo_game_language_learning_platform_render')) {
 
 						<select class="zo-llp-select zo-llp-select--category">
 							<option value="all">Tüm Kategoriler</option>
-							<option value="animal">Animals</option>
-							<option value="food">Food</option>
-							<option value="home">Home</option>
-							<option value="school">School</option>
-							<option value="nature">Nature</option>
 						</select>
 					</div>
 
 					<div class="zo-llp-footer">
-						<button type="button" class="zo-llp-button zo-llp-button--primary">Ayarları Uygula</button>
-						<button type="button" class="zo-llp-button zo-llp-button--neutral">Baştan Başla</button>
+						<button type="button" class="zo-llp-button zo-llp-button--primary zo-llp-button--apply">Ayarları Uygula</button>
+						<button type="button" class="zo-llp-button zo-llp-button--neutral zo-llp-button--restart-all">Baştan Başla</button>
 					</div>
 				</div>
 
 				<div class="zo-llp-card">
 					<span class="zo-llp-card-label">Kelime Listesi</span>
-					<div class="zo-llp-list"></div>
+					<div class="zo-llp-list zo-llp-list--words"></div>
+
+					<div class="zo-llp-footer">
+						<button type="button" class="zo-llp-button zo-llp-button--admin zo-llp-button--admin-open">Add Words</button>
+					</div>
+
+					<div class="zo-llp-admin-box">
+						<div class="zo-llp-admin-note">Bu admin paneli sadece bu sayfa oturumu içinde çalışır. Sayfa yenilenirse eklenen kelimeler sıfırlanır.</div>
+
+						<div class="zo-llp-admin-password-row">
+							<input type="password" class="zo-llp-input zo-llp-input--admin-password" placeholder="Admin şifresi" />
+							<button type="button" class="zo-llp-button zo-llp-button--admin zo-llp-button--admin-unlock">Aç</button>
+						</div>
+
+						<div class="zo-llp-status zo-llp-status--admin" aria-live="polite"></div>
+
+						<div class="zo-llp-admin-form">
+							<div class="zo-llp-admin-grid">
+								<input type="text" class="zo-llp-input zo-llp-input--admin-tr" placeholder="Türkçe kelime" />
+								<input type="text" class="zo-llp-input zo-llp-input--admin-en" placeholder="English word" />
+								<input type="text" class="zo-llp-input zo-llp-input--admin-category" placeholder="Kategori" />
+								<textarea class="zo-llp-textarea zo-llp-textarea--admin-sentence" placeholder="Açıklama veya ipucu"></textarea>
+							</div>
+
+							<button type="button" class="zo-llp-button zo-llp-button--good zo-llp-button--admin-add">Kelime Ekle</button>
+						</div>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -896,7 +1122,7 @@ return array(
 	'slug'            => 'language-learning-platform',
 	'name'            => 'Language Learning Platform',
 	'author'          => 'Asker',
-	'description'     => 'Flashcards, quiz, typing, and matching in one simple browser-based language learning platform.',
+	'description'     => 'Flashcards, quiz, typing, matching, and an admin word-adder in one browser-based language learning platform.',
 	'render_callback' => 'zo_game_language_learning_platform_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,
