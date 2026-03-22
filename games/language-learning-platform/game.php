@@ -4,6 +4,272 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
+if (!function_exists('zo_llp_get_words_option')) {
+	function zo_llp_get_words_option() {
+		$default_words = array(
+			array('tr' => 'elma',  'en' => 'apple',  'category' => 'food',   'sentence' => 'Kırmızı bir meyve.'),
+			array('tr' => 'kitap', 'en' => 'book',   'category' => 'school', 'sentence' => 'Okumak için kullanılır.'),
+			array('tr' => 'su',    'en' => 'water',  'category' => 'food',   'sentence' => 'İçilir.'),
+			array('tr' => 'masa',  'en' => 'table',  'category' => 'home',   'sentence' => 'Üstünde bir şey durur.'),
+			array('tr' => 'kedi',  'en' => 'cat',    'category' => 'animal', 'sentence' => 'Miyav der.'),
+			array('tr' => 'köpek', 'en' => 'dog',    'category' => 'animal', 'sentence' => 'Hav hav der.'),
+			array('tr' => 'okul',  'en' => 'school', 'category' => 'school', 'sentence' => 'Ders yapılan yer.'),
+			array('tr' => 'kalem', 'en' => 'pen',    'category' => 'school', 'sentence' => 'Yazı yazmaya yarar.'),
+			array('tr' => 'güneş', 'en' => 'sun',    'category' => 'nature', 'sentence' => 'Gökyüzünde parlar.'),
+			array('tr' => 'ev',    'en' => 'house',  'category' => 'home',   'sentence' => 'İçinde yaşanır.')
+		);
+
+		$words = get_option('zo_llp_words', $default_words);
+
+		if (!is_array($words) || empty($words)) {
+			$words = $default_words;
+			update_option('zo_llp_words', $words, false);
+		}
+
+		return $words;
+	}
+}
+
+if (!function_exists('zo_llp_get_categories_option')) {
+	function zo_llp_get_categories_option() {
+		$default_categories = array('animal', 'food', 'home', 'school', 'nature');
+
+		$categories = get_option('zo_llp_categories', $default_categories);
+
+		if (!is_array($categories) || empty($categories)) {
+			$categories = $default_categories;
+			update_option('zo_llp_categories', $categories, false);
+		}
+
+		return array_values(array_unique(array_map('strval', $categories)));
+	}
+}
+
+if (!function_exists('zo_llp_get_pending_option')) {
+	function zo_llp_get_pending_option() {
+		$pending = get_option('zo_llp_pending_requests', array());
+
+		if (!is_array($pending)) {
+			$pending = array();
+			update_option('zo_llp_pending_requests', $pending, false);
+		}
+
+		return array_values($pending);
+	}
+}
+
+if (!function_exists('zo_llp_normalize_text')) {
+	function zo_llp_normalize_text($text) {
+		$text = wp_strip_all_tags((string) $text);
+		$text = trim($text);
+		return $text;
+	}
+}
+
+if (!function_exists('zo_llp_build_payload')) {
+	function zo_llp_build_payload() {
+		return array(
+			'words'     => zo_llp_get_words_option(),
+			'categories'=> zo_llp_get_categories_option(),
+			'pending'   => current_user_can('manage_options') ? zo_llp_get_pending_option() : array(),
+			'is_admin'  => current_user_can('manage_options'),
+		);
+	}
+}
+
+if (!function_exists('zo_llp_ajax_get_data')) {
+	function zo_llp_ajax_get_data() {
+		check_ajax_referer('zo_llp_nonce', 'nonce');
+
+		wp_send_json_success(zo_llp_build_payload());
+	}
+}
+add_action('wp_ajax_zo_llp_get_data', 'zo_llp_ajax_get_data');
+add_action('wp_ajax_nopriv_zo_llp_get_data', 'zo_llp_ajax_get_data');
+
+if (!function_exists('zo_llp_ajax_submit_request')) {
+	function zo_llp_ajax_submit_request() {
+		check_ajax_referer('zo_llp_nonce', 'nonce');
+
+		$request_type = isset($_POST['request_type']) ? sanitize_key(wp_unslash($_POST['request_type'])) : '';
+
+		$pending = zo_llp_get_pending_option();
+
+		if ($request_type === 'word') {
+			$tr       = zo_llp_normalize_text(wp_unslash($_POST['tr'] ?? ''));
+			$en       = zo_llp_normalize_text(wp_unslash($_POST['en'] ?? ''));
+			$category = zo_llp_normalize_text(wp_unslash($_POST['category'] ?? ''));
+			$sentence = zo_llp_normalize_text(wp_unslash($_POST['sentence'] ?? ''));
+
+			if ($tr === '' || $en === '' || $category === '') {
+				wp_send_json_error(array('message' => 'Türkçe, İngilizce ve kategori gerekli.'));
+			}
+
+			$words = zo_llp_get_words_option();
+			foreach ($words as $word) {
+				if (
+					mb_strtolower((string) ($word['tr'] ?? ''), 'UTF-8') === mb_strtolower($tr, 'UTF-8') &&
+					mb_strtolower((string) ($word['en'] ?? ''), 'UTF-8') === mb_strtolower($en, 'UTF-8')
+				) {
+					wp_send_json_error(array('message' => 'Bu kelime zaten kayıtlı.'));
+				}
+			}
+
+			$pending[] = array(
+				'id'          => wp_generate_uuid4(),
+				'type'        => 'word',
+				'tr'          => $tr,
+				'en'          => $en,
+				'category'    => $category,
+				'sentence'    => $sentence,
+				'submitted_at'=> current_time('mysql'),
+			);
+
+			update_option('zo_llp_pending_requests', $pending, false);
+
+			wp_send_json_success(array(
+				'message' => 'Kelime isteği gönderildi. Yönetici onaylarsa eklenecek.',
+			));
+		}
+
+		if ($request_type === 'category') {
+			$category_name = zo_llp_normalize_text(wp_unslash($_POST['category_name'] ?? ''));
+
+			if ($category_name === '') {
+				wp_send_json_error(array('message' => 'Kategori adı gerekli.'));
+			}
+
+			$categories = zo_llp_get_categories_option();
+			foreach ($categories as $cat) {
+				if (mb_strtolower($cat, 'UTF-8') === mb_strtolower($category_name, 'UTF-8')) {
+					wp_send_json_error(array('message' => 'Bu kategori zaten var.'));
+				}
+			}
+
+			$pending[] = array(
+				'id'           => wp_generate_uuid4(),
+				'type'         => 'category',
+				'category_name'=> $category_name,
+				'submitted_at' => current_time('mysql'),
+			);
+
+			update_option('zo_llp_pending_requests', $pending, false);
+
+			wp_send_json_success(array(
+				'message' => 'Kategori isteği gönderildi. Yönetici onaylarsa eklenecek.',
+			));
+		}
+
+		wp_send_json_error(array('message' => 'Geçersiz istek.'));
+	}
+}
+add_action('wp_ajax_zo_llp_submit_request', 'zo_llp_ajax_submit_request');
+add_action('wp_ajax_nopriv_zo_llp_submit_request', 'zo_llp_ajax_submit_request');
+
+if (!function_exists('zo_llp_ajax_review_request')) {
+	function zo_llp_ajax_review_request() {
+		check_ajax_referer('zo_llp_nonce', 'nonce');
+
+		if (!current_user_can('manage_options')) {
+			wp_send_json_error(array('message' => 'Yetki yok.'));
+		}
+
+		$request_id = zo_llp_normalize_text(wp_unslash($_POST['request_id'] ?? ''));
+		$decision   = sanitize_key(wp_unslash($_POST['decision'] ?? ''));
+
+		if ($request_id === '' || !in_array($decision, array('approve', 'reject'), true)) {
+			wp_send_json_error(array('message' => 'Geçersiz işlem.'));
+		}
+
+		$pending = zo_llp_get_pending_option();
+		$target  = null;
+		$rest    = array();
+
+		foreach ($pending as $item) {
+			if (($item['id'] ?? '') === $request_id) {
+				$target = $item;
+			} else {
+				$rest[] = $item;
+			}
+		}
+
+		if (!$target) {
+			wp_send_json_error(array('message' => 'İstek bulunamadı.'));
+		}
+
+		if ($decision === 'approve') {
+			if (($target['type'] ?? '') === 'category') {
+				$categories = zo_llp_get_categories_option();
+				$new_cat    = zo_llp_normalize_text($target['category_name'] ?? '');
+
+				if ($new_cat !== '') {
+					$exists = false;
+					foreach ($categories as $cat) {
+						if (mb_strtolower($cat, 'UTF-8') === mb_strtolower($new_cat, 'UTF-8')) {
+							$exists = true;
+							break;
+						}
+					}
+					if (!$exists) {
+						$categories[] = $new_cat;
+						update_option('zo_llp_categories', array_values(array_unique($categories)), false);
+					}
+				}
+			}
+
+			if (($target['type'] ?? '') === 'word') {
+				$words      = zo_llp_get_words_option();
+				$categories = zo_llp_get_categories_option();
+
+				$new_word = array(
+					'tr'       => zo_llp_normalize_text($target['tr'] ?? ''),
+					'en'       => zo_llp_normalize_text($target['en'] ?? ''),
+					'category' => zo_llp_normalize_text($target['category'] ?? ''),
+					'sentence' => zo_llp_normalize_text($target['sentence'] ?? ''),
+				);
+
+				if ($new_word['tr'] !== '' && $new_word['en'] !== '' && $new_word['category'] !== '') {
+					$exists = false;
+					foreach ($words as $word) {
+						if (
+							mb_strtolower((string) ($word['tr'] ?? ''), 'UTF-8') === mb_strtolower($new_word['tr'], 'UTF-8') &&
+							mb_strtolower((string) ($word['en'] ?? ''), 'UTF-8') === mb_strtolower($new_word['en'], 'UTF-8')
+						) {
+							$exists = true;
+							break;
+						}
+					}
+
+					if (!$exists) {
+						$words[] = $new_word;
+						update_option('zo_llp_words', array_values($words), false);
+					}
+
+					$cat_exists = false;
+					foreach ($categories as $cat) {
+						if (mb_strtolower($cat, 'UTF-8') === mb_strtolower($new_word['category'], 'UTF-8')) {
+							$cat_exists = true;
+							break;
+						}
+					}
+					if (!$cat_exists) {
+						$categories[] = $new_word['category'];
+						update_option('zo_llp_categories', array_values(array_unique($categories)), false);
+					}
+				}
+			}
+		}
+
+		update_option('zo_llp_pending_requests', array_values($rest), false);
+
+		wp_send_json_success(array(
+			'message' => $decision === 'approve' ? 'İstek onaylandı.' : 'İstek reddedildi.',
+			'data'    => zo_llp_build_payload(),
+		));
+	}
+}
+add_action('wp_ajax_zo_llp_review_request', 'zo_llp_ajax_review_request');
+
 $css = <<<'CSS'
 .zo-game-root.zo-game-root--language-learning-platform {
 	max-width: 980px;
@@ -15,7 +281,6 @@ $css = <<<'CSS'
 	box-sizing: border-box;
 	font-family: Arial, sans-serif;
 }
-
 .zo-game-root--language-learning-platform .zo-llp-title {
 	margin: 0 0 10px;
 	font-size: 30px;
@@ -23,7 +288,6 @@ $css = <<<'CSS'
 	text-align: center;
 	color: #1f2937;
 }
-
 .zo-game-root--language-learning-platform .zo-llp-desc {
 	margin: 0 0 18px;
 	font-size: 15px;
@@ -31,22 +295,51 @@ $css = <<<'CSS'
 	text-align: center;
 	color: #4b5563;
 }
-
-.zo-game-root--language-learning-platform .zo-llp-top {
+.zo-game-root--language-learning-platform .zo-llp-top,
+.zo-game-root--language-learning-platform .zo-llp-tabs,
+.zo-game-root--language-learning-platform .zo-llp-settings,
+.zo-game-root--language-learning-platform .zo-llp-actions,
+.zo-game-root--language-learning-platform .zo-llp-request-grid,
+.zo-game-root--language-learning-platform .zo-llp-review-actions {
 	display: grid;
-	grid-template-columns: repeat(4, minmax(0, 1fr));
 	gap: 10px;
+}
+.zo-game-root--language-learning-platform .zo-llp-top {
+	grid-template-columns: repeat(4, minmax(0, 1fr));
 	margin-bottom: 16px;
 }
-
-.zo-game-root--language-learning-platform .zo-llp-stat {
+.zo-game-root--language-learning-platform .zo-llp-tabs {
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	margin-bottom: 16px;
+}
+.zo-game-root--language-learning-platform .zo-llp-settings {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	margin-bottom: 14px;
+}
+.zo-game-root--language-learning-platform .zo-llp-actions {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	margin-top: 14px;
+}
+.zo-game-root--language-learning-platform .zo-llp-request-grid {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+.zo-game-root--language-learning-platform .zo-llp-review-actions {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	margin-top: 10px;
+}
+.zo-game-root--language-learning-platform .zo-llp-stat,
+.zo-game-root--language-learning-platform .zo-llp-card,
+.zo-game-root--language-learning-platform .zo-llp-panel-box {
 	border: 2px solid #d7e0ea;
 	border-radius: 14px;
-	padding: 12px;
-	background: #f4f7fb;
-	text-align: center;
+	padding: 14px;
+	background: #f8fbff;
+	box-sizing: border-box;
 }
-
+.zo-game-root--language-learning-platform .zo-llp-stat {
+	text-align: center;
+	background: #f4f7fb;
+}
 .zo-game-root--language-learning-platform .zo-llp-stat-label {
 	display: block;
 	font-size: 13px;
@@ -54,142 +347,13 @@ $css = <<<'CSS'
 	color: #51606f;
 	margin-bottom: 4px;
 }
-
 .zo-game-root--language-learning-platform .zo-llp-stat-value {
 	display: block;
 	font-size: 24px;
 	font-weight: 700;
-	line-height: 1.1;
 	color: #111827;
 }
-
-.zo-game-root--language-learning-platform .zo-llp-tabs {
-	display: grid;
-	grid-template-columns: repeat(4, minmax(0, 1fr));
-	gap: 10px;
-	margin-bottom: 16px;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-tab {
-	border: 2px solid #cdd8e5;
-	border-radius: 12px;
-	padding: 12px 10px;
-	background: #eef4fb;
-	color: #1f2937;
-	font-size: 15px;
-	font-weight: 700;
-	cursor: pointer;
-	box-sizing: border-box;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-tab.is-active {
-	background: #2997aa;
-	border-color: #2997aa;
-	color: #ffffff;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-main {
-	border: 2px solid #dbe4ee;
-	border-radius: 16px;
-	padding: 16px;
-	background: #fbfdff;
-	box-sizing: border-box;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-panel {
-	display: none;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-panel.is-active {
-	display: block;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-card {
-	border: 2px dashed #c8d4e0;
-	border-radius: 16px;
-	padding: 18px;
-	background: #f8fbff;
-	text-align: center;
-	margin-bottom: 14px;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-card-label {
-	display: block;
-	font-size: 14px;
-	font-weight: 700;
-	color: #51606f;
-	margin-bottom: 8px;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-big {
-	font-size: 34px;
-	font-weight: 700;
-	line-height: 1.2;
-	color: #111827;
-	word-break: break-word;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-mid {
-	margin-top: 8px;
-	font-size: 18px;
-	font-weight: 700;
-	color: #2563eb;
-	word-break: break-word;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-input,
-.zo-game-root--language-learning-platform .zo-llp-select,
-.zo-game-root--language-learning-platform .zo-llp-textarea {
-	width: 100%;
-	padding: 13px 14px;
-	border: 2px solid #c8d4e0;
-	border-radius: 12px;
-	font-size: 17px;
-	background: #ffffff;
-	color: #111827;
-	box-sizing: border-box;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-textarea {
-	min-height: 88px;
-	resize: vertical;
-	font-family: Arial, sans-serif;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-input-row,
-.zo-game-root--language-learning-platform .zo-llp-choice-grid,
-.zo-game-root--language-learning-platform .zo-llp-match-grid,
-.zo-game-root--language-learning-platform .zo-llp-settings-grid,
-.zo-game-root--language-learning-platform .zo-llp-admin-grid {
-	display: grid;
-	gap: 10px;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-input-row {
-	grid-template-columns: minmax(0, 1fr) auto auto;
-	margin-bottom: 14px;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-choice-grid {
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	margin-bottom: 14px;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-match-grid {
-	grid-template-columns: 1fr 1fr;
-	margin-bottom: 14px;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-settings-grid {
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	margin-bottom: 14px;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-admin-grid {
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	margin-bottom: 14px;
-}
-
+.zo-game-root--language-learning-platform .zo-llp-tab,
 .zo-game-root--language-learning-platform .zo-llp-button {
 	border: 0;
 	border-radius: 12px;
@@ -199,365 +363,265 @@ $css = <<<'CSS'
 	cursor: pointer;
 	box-sizing: border-box;
 }
-
-.zo-game-root--language-learning-platform .zo-llp-button--primary {
-	background: #2997aa;
-	color: #ffffff;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-button--good {
-	background: #10b981;
-	color: #ffffff;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-button--hint {
-	background: #8b5cf6;
-	color: #ffffff;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-button--neutral {
-	background: #e5e7eb;
-	color: #111827;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-button--admin {
-	background: #f59e0b;
-	color: #ffffff;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-button--danger {
-	background: #dc2626;
-	color: #ffffff;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-button--choice,
-.zo-game-root--language-learning-platform .zo-llp-button--match {
+.zo-game-root--language-learning-platform .zo-llp-tab {
 	background: #eef4fb;
 	color: #1f2937;
 	border: 2px solid #cdd8e5;
 }
-
-.zo-game-root--language-learning-platform .zo-llp-button--choice.is-selected,
-.zo-game-root--language-learning-platform .zo-llp-button--match.is-selected {
-	background: #dbeafe;
-	border-color: #3b82f6;
-	color: #1d4ed8;
+.zo-game-root--language-learning-platform .zo-llp-tab.is-active {
+	background: #2997aa;
+	border-color: #2997aa;
+	color: #fff;
 }
-
-.zo-game-root--language-learning-platform .zo-llp-button--choice.is-correct,
-.zo-game-root--language-learning-platform .zo-llp-button--match.is-correct {
-	background: #dcfce7;
-	border-color: #22c55e;
-	color: #166534;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-button--choice.is-wrong,
-.zo-game-root--language-learning-platform .zo-llp-button--match.is-wrong {
-	background: #fee2e2;
-	border-color: #ef4444;
-	color: #991b1b;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-status {
-	min-height: 24px;
-	margin-bottom: 14px;
-	text-align: center;
-	font-size: 15px;
+.zo-game-root--language-learning-platform .zo-llp-button--primary { background: #2997aa; color: #fff; }
+.zo-game-root--language-learning-platform .zo-llp-button--good { background: #10b981; color: #fff; }
+.zo-game-root--language-learning-platform .zo-llp-button--danger { background: #dc2626; color: #fff; }
+.zo-game-root--language-learning-platform .zo-llp-button--neutral { background: #e5e7eb; color: #111827; }
+.zo-game-root--language-learning-platform .zo-llp-main-panel { display: none; }
+.zo-game-root--language-learning-platform .zo-llp-main-panel.is-active { display: block; }
+.zo-game-root--language-learning-platform .zo-llp-big {
+	font-size: 34px;
 	font-weight: 700;
-	color: #374151;
+	line-height: 1.2;
+	color: #111827;
+	text-align: center;
+	word-break: break-word;
 }
-
-.zo-game-root--language-learning-platform .zo-llp-status.is-good {
-	color: #15803d;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-status.is-bad {
-	color: #dc2626;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-status.is-info {
+.zo-game-root--language-learning-platform .zo-llp-mid {
+	margin-top: 8px;
+	font-size: 18px;
+	font-weight: 700;
+	text-align: center;
 	color: #2563eb;
 }
-
-.zo-game-root--language-learning-platform .zo-llp-status.is-warn {
-	color: #d97706;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-list {
-	display: grid;
-	grid-template-columns: 1fr;
-	gap: 8px;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-list-item {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 10px;
-	padding: 10px 12px;
-	border: 2px solid #dbe4ee;
-	border-radius: 12px;
-	background: #ffffff;
-	font-size: 15px;
-	color: #1f2937;
-}
-
 .zo-game-root--language-learning-platform .zo-llp-mini {
 	font-size: 13px;
 	font-weight: 700;
 	color: #51606f;
 }
-
-.zo-game-root--language-learning-platform .zo-llp-footer {
-	margin-top: 14px;
+.zo-game-root--language-learning-platform .zo-llp-status {
+	min-height: 24px;
+	margin-top: 12px;
+	font-size: 15px;
+	font-weight: 700;
+	text-align: center;
+	color: #374151;
+}
+.zo-game-root--language-learning-platform .zo-llp-status.is-good { color: #15803d; }
+.zo-game-root--language-learning-platform .zo-llp-status.is-bad { color: #dc2626; }
+.zo-game-root--language-learning-platform .zo-llp-status.is-info { color: #2563eb; }
+.zo-game-root--language-learning-platform .zo-llp-list {
 	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: 10px;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-admin-box {
-	display: none;
-	margin-top: 14px;
-	padding: 14px;
-	border: 2px solid #f3d18d;
-	border-radius: 14px;
-	background: #fff8eb;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-admin-box.is-open {
-	display: block;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-admin-password-row {
-	display: grid;
-	grid-template-columns: minmax(0, 1fr) auto;
-	gap: 10px;
-	margin-bottom: 12px;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-admin-form {
-	display: none;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-admin-form.is-open {
-	display: block;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-admin-note {
-	font-size: 13px;
-	line-height: 1.4;
-	color: #7c5a11;
-	text-align: left;
-	margin-bottom: 10px;
-}
-
-.zo-game-root--language-learning-platform .zo-llp-admin-tools {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: 10px;
+	grid-template-columns: 1fr;
+	gap: 8px;
 	margin-top: 12px;
 }
-
+.zo-game-root--language-learning-platform .zo-llp-list-item,
+.zo-game-root--language-learning-platform .zo-llp-review-item {
+	padding: 10px 12px;
+	border: 2px solid #dbe4ee;
+	border-radius: 12px;
+	background: #fff;
+	color: #1f2937;
+}
+.zo-game-root--language-learning-platform .zo-llp-review-item {
+	background: #fff8eb;
+	border-color: #f3d18d;
+}
+.zo-game-root--language-learning-platform .zo-llp-input,
+.zo-game-root--language-learning-platform .zo-llp-select,
+.zo-game-root--language-learning-platform .zo-llp-textarea {
+	width: 100%;
+	padding: 13px 14px;
+	border: 2px solid #c8d4e0;
+	border-radius: 12px;
+	font-size: 16px;
+	background: #fff;
+	color: #111827;
+	box-sizing: border-box;
+}
+.zo-game-root--language-learning-platform .zo-llp-textarea {
+	min-height: 90px;
+	resize: vertical;
+	font-family: Arial, sans-serif;
+}
+.zo-game-root--language-learning-platform .zo-llp-review-wrap {
+	margin-top: 18px;
+}
+.zo-game-root--language-learning-platform .zo-llp-hide {
+	display: none !important;
+}
 @media (max-width: 820px) {
 	.zo-game-root.zo-game-root--language-learning-platform {
 		padding: 16px;
 	}
-
 	.zo-game-root--language-learning-platform .zo-llp-title {
 		font-size: 25px;
 	}
-
 	.zo-game-root--language-learning-platform .zo-llp-top,
 	.zo-game-root--language-learning-platform .zo-llp-tabs,
-	.zo-game-root--language-learning-platform .zo-llp-choice-grid,
-	.zo-game-root--language-learning-platform .zo-llp-match-grid,
-	.zo-game-root--language-learning-platform .zo-llp-settings-grid,
-	.zo-game-root--language-learning-platform .zo-llp-admin-grid,
-	.zo-game-root--language-learning-platform .zo-llp-footer,
-	.zo-game-root--language-learning-platform .zo-llp-admin-password-row,
-	.zo-game-root--language-learning-platform .zo-llp-admin-tools {
+	.zo-game-root--language-learning-platform .zo-llp-settings,
+	.zo-game-root--language-learning-platform .zo-llp-actions,
+	.zo-game-root--language-learning-platform .zo-llp-request-grid,
+	.zo-game-root--language-learning-platform .zo-llp-review-actions {
 		grid-template-columns: 1fr;
 	}
-
-	.zo-game-root--language-learning-platform .zo-llp-input-row {
-		grid-template-columns: 1fr;
-	}
-
 	.zo-game-root--language-learning-platform .zo-llp-big {
 		font-size: 28px;
 	}
 }
 CSS;
 
+$ajax_url = admin_url('admin-ajax.php');
+$nonce    = wp_create_nonce('zo_llp_nonce');
+
 $js = <<<'JS'
 document.addEventListener('DOMContentLoaded', function () {
 	const games = document.querySelectorAll('.zo-game-root--language-learning-platform');
 
 	games.forEach(function (game) {
-		const ADMIN_PASSWORD = 'askerkindle1905';
-
-		const defaultWords = [
-			{ tr: 'elma', en: 'apple', category: 'food', sentence: 'Kırmızı bir meyve.' },
-			{ tr: 'kitap', en: 'book', category: 'school', sentence: 'Okumak için kullanılır.' },
-			{ tr: 'su', en: 'water', category: 'food', sentence: 'İçilir.' },
-			{ tr: 'masa', en: 'table', category: 'home', sentence: 'Üstünde bir şey durur.' },
-			{ tr: 'kedi', en: 'cat', category: 'animal', sentence: 'Miyav der.' },
-			{ tr: 'köpek', en: 'dog', category: 'animal', sentence: 'Hav hav der.' },
-			{ tr: 'okul', en: 'school', category: 'school', sentence: 'Ders yapılan yer.' },
-			{ tr: 'kalem', en: 'pen', category: 'school', sentence: 'Yazı yazmaya yarar.' },
-			{ tr: 'güneş', en: 'sun', category: 'nature', sentence: 'Gökyüzünde parlar.' },
-			{ tr: 'ay', en: 'moon', category: 'nature', sentence: 'Gece görünür.' },
-			{ tr: 'çiçek', en: 'flower', category: 'nature', sentence: 'Bahçede büyür.' },
-			{ tr: 'ev', en: 'house', category: 'home', sentence: 'İçinde yaşanır.' },
-			{ tr: 'kapı', en: 'door', category: 'home', sentence: 'Açılır ve kapanır.' },
-			{ tr: 'ekmek', en: 'bread', category: 'food', sentence: 'Fırından alınır.' },
-			{ tr: 'süt', en: 'milk', category: 'food', sentence: 'Beyaz bir içecektir.' },
-			{ tr: 'kuş', en: 'bird', category: 'animal', sentence: 'Kanatları vardır.' }
-		];
-
-		const storageKey = 'zo-language-learning-platform-words';
+		const ajaxUrl = game.getAttribute('data-ajax-url');
+		const nonce = game.getAttribute('data-nonce');
 
 		const tabs = Array.prototype.slice.call(game.querySelectorAll('.zo-llp-tab'));
-		const panels = Array.prototype.slice.call(game.querySelectorAll('.zo-llp-panel'));
+		const panels = Array.prototype.slice.call(game.querySelectorAll('.zo-llp-main-panel'));
 
 		const learnedEl = game.querySelector('.zo-llp-learned');
 		const scoreEl = game.querySelector('.zo-llp-score');
 		const streakEl = game.querySelector('.zo-llp-streak');
-		const modeEl = game.querySelector('.zo-llp-mode');
+		const totalEl = game.querySelector('.zo-llp-total');
 
 		const flashWordEl = game.querySelector('.zo-llp-flash-word');
-		const flashTranslationEl = game.querySelector('.zo-llp-flash-translation');
-		const flashCategoryEl = game.querySelector('.zo-llp-flash-category');
-		const flashNextButton = game.querySelector('.zo-llp-button--flash-next');
-		const flashFlipButton = game.querySelector('.zo-llp-button--flash-flip');
+		const flashAnswerEl = game.querySelector('.zo-llp-flash-answer');
+		const flashMetaEl = game.querySelector('.zo-llp-flash-meta');
+		const flashStatusEl = game.querySelector('.zo-llp-status--flash');
 
 		const quizPromptEl = game.querySelector('.zo-llp-quiz-prompt');
-		const quizChoicesEl = game.querySelector('.zo-llp-choice-grid');
+		const quizChoicesEl = game.querySelector('.zo-llp-list--quiz');
 		const quizStatusEl = game.querySelector('.zo-llp-status--quiz');
-		const quizNextButton = game.querySelector('.zo-llp-button--quiz-next');
 
-		const typePromptEl = game.querySelector('.zo-llp-type-prompt');
-		const typeInputEl = game.querySelector('.zo-llp-input--type');
-		const typeStatusEl = game.querySelector('.zo-llp-status--type');
-		const typeCheckButton = game.querySelector('.zo-llp-button--type-check');
-		const typeHintButton = game.querySelector('.zo-llp-button--type-hint');
-		const typeNextButton = game.querySelector('.zo-llp-button--type-next');
+		const listWordsEl = game.querySelector('.zo-llp-list--words');
+		const listCategoriesEl = game.querySelector('.zo-llp-list--categories');
 
-		const matchLeftEl = game.querySelector('.zo-llp-match-left');
-		const matchRightEl = game.querySelector('.zo-llp-match-right');
-		const matchStatusEl = game.querySelector('.zo-llp-status--match');
-		const matchNextButton = game.querySelector('.zo-llp-button--match-next');
+		const directionEl = game.querySelector('.zo-llp-select--direction');
+		const categoryEl = game.querySelector('.zo-llp-select--category');
 
-		const settingsDirectionEl = game.querySelector('.zo-llp-select--direction');
-		const settingsCategoryEl = game.querySelector('.zo-llp-select--category');
-		const wordListEl = game.querySelector('.zo-llp-list--words');
-		const applySettingsButton = game.querySelector('.zo-llp-button--apply');
-		const restartAllButton = game.querySelector('.zo-llp-button--restart-all');
+		const wordTrEl = game.querySelector('.zo-llp-input--word-tr');
+		const wordEnEl = game.querySelector('.zo-llp-input--word-en');
+		const wordCategoryEl = game.querySelector('.zo-llp-input--word-category');
+		const wordSentenceEl = game.querySelector('.zo-llp-textarea--word-sentence');
+		const wordRequestStatusEl = game.querySelector('.zo-llp-status--word-request');
 
-		const adminOpenButton = game.querySelector('.zo-llp-button--admin-open');
-		const adminBoxEl = game.querySelector('.zo-llp-admin-box');
-		const adminPasswordEl = game.querySelector('.zo-llp-input--admin-password');
-		const adminUnlockButton = game.querySelector('.zo-llp-button--admin-unlock');
-		const adminStatusEl = game.querySelector('.zo-llp-status--admin');
-		const adminFormEl = game.querySelector('.zo-llp-admin-form');
-		const adminTrEl = game.querySelector('.zo-llp-input--admin-tr');
-		const adminEnEl = game.querySelector('.zo-llp-input--admin-en');
-		const adminCategoryEl = game.querySelector('.zo-llp-input--admin-category');
-		const adminSentenceEl = game.querySelector('.zo-llp-textarea--admin-sentence');
-		const adminAddButton = game.querySelector('.zo-llp-button--admin-add');
-		const adminExportButton = game.querySelector('.zo-llp-button--admin-export');
-		const adminResetWordsButton = game.querySelector('.zo-llp-button--admin-reset-words');
+		const categoryNameEl = game.querySelector('.zo-llp-input--category-name');
+		const categoryRequestStatusEl = game.querySelector('.zo-llp-status--category-request');
+
+		const pendingWrapEl = game.querySelector('.zo-llp-review-wrap');
+		const pendingListEl = game.querySelector('.zo-llp-list--pending');
+		const pendingStatusEl = game.querySelector('.zo-llp-status--pending');
 
 		let words = [];
+		let categories = [];
+		let pending = [];
+		let isAdmin = false;
+
 		let direction = 'tr-en';
-		let category = 'all';
-		let learnedWords = 0;
+		let categoryFilter = 'all';
+		let filteredWords = [];
+
+		let learned = 0;
 		let score = 0;
 		let streak = 0;
-		let activeMode = 'flashcards';
-		let adminUnlocked = false;
-
-		let filteredWords = [];
 		let flashIndex = 0;
-		let flashFlipped = false;
+		let flashShown = false;
+		let quizCurrent = null;
+		let quizAnswered = false;
 
-		let currentQuizWord = null;
-		let currentTypeWord = null;
-		let currentMatchSet = [];
-		let matchSelectedLeft = null;
-		let matchSelectedRight = null;
-		let matchPairsSolved = 0;
-
-		function shuffle(array) {
-			const copy = array.slice();
-			for (let i = copy.length - 1; i > 0; i--) {
-				const j = Math.floor(Math.random() * (i + 1));
-				const temp = copy[i];
-				copy[i] = copy[j];
-				copy[j] = temp;
+		function setStatus(el, text, type) {
+			el.textContent = text;
+			el.className = el.className.replace(/\sis-(good|bad|info)/g, '');
+			if (type) {
+				el.className += ' is-' + type;
 			}
-			return copy;
 		}
 
-		function sample(array, count) {
-			return shuffle(array).slice(0, count);
-		}
-
-		function normalizeText(text) {
+		function normalize(text) {
 			return String(text || '').toLocaleLowerCase('tr-TR').trim();
 		}
 
-		function sanitizeWord(word) {
-			return {
-				tr: String(word.tr || '').trim(),
-				en: String(word.en || '').trim(),
-				category: String(word.category || '').trim(),
-				sentence: String(word.sentence || '').trim()
-			};
+		function request(params) {
+			const body = new URLSearchParams(params);
+			return fetch(ajaxUrl, {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+				body: body.toString()
+			}).then(function (res) {
+				return res.json();
+			});
 		}
 
-		function isValidWord(word) {
-			return word.tr && word.en && word.category;
-		}
+		function applyFilters() {
+			filteredWords = words.filter(function (word) {
+				if (categoryFilter === 'all') {
+					return true;
+				}
+				return normalize(word.category) === categoryFilter;
+			});
 
-		function saveWords() {
-			try {
-				localStorage.setItem(storageKey, JSON.stringify(words));
-				return true;
-			} catch (error) {
-				return false;
+			if (!filteredWords.length) {
+				filteredWords = words.slice();
 			}
 		}
 
-		function loadWords() {
-			try {
-				const raw = localStorage.getItem(storageKey);
-				if (!raw) {
-					words = defaultWords.map(function (word) {
-						return sanitizeWord(word);
-					});
-					saveWords();
-					return;
-				}
+		function updateHeader() {
+			learnedEl.textContent = String(learned);
+			scoreEl.textContent = String(score);
+			streakEl.textContent = String(streak);
+			totalEl.textContent = String(words.length);
+		}
 
-				const parsed = JSON.parse(raw);
-				if (!Array.isArray(parsed)) {
-					throw new Error('Invalid stored words');
-				}
+		function refreshCategorySelect() {
+			const current = categoryFilter;
+			categoryEl.innerHTML = '';
 
-				const cleaned = parsed.map(function (word) {
-					return sanitizeWord(word);
-				}).filter(isValidWord);
+			const all = document.createElement('option');
+			all.value = 'all';
+			all.textContent = 'Tüm Kategoriler';
+			categoryEl.appendChild(all);
 
-				words = cleaned.length ? cleaned : defaultWords.map(function (word) {
-					return sanitizeWord(word);
-				});
-			} catch (error) {
-				words = defaultWords.map(function (word) {
-					return sanitizeWord(word);
-				});
-				saveWords();
+			categories.forEach(function (cat) {
+				const option = document.createElement('option');
+				option.value = normalize(cat);
+				option.textContent = cat;
+				categoryEl.appendChild(option);
+			});
+
+			if (current !== 'all' && categoryEl.querySelector('option[value="' + current + '"]')) {
+				categoryEl.value = current;
+			} else {
+				categoryEl.value = 'all';
+				categoryFilter = 'all';
 			}
+		}
+
+		function refreshWordCategorySuggestions() {
+			const listId = game.id + '-categories';
+			let datalist = game.querySelector('#' + CSS.escape(listId));
+
+			if (!datalist) {
+				datalist = document.createElement('datalist');
+				datalist.id = listId;
+				game.appendChild(datalist);
+			}
+
+			datalist.innerHTML = '';
+
+			categories.forEach(function (cat) {
+				const option = document.createElement('option');
+				option.value = cat;
+				datalist.appendChild(option);
+			});
+
+			wordCategoryEl.setAttribute('list', listId);
 		}
 
 		function getPrompt(word) {
@@ -568,121 +632,291 @@ document.addEventListener('DOMContentLoaded', function () {
 			return direction === 'tr-en' ? word.en : word.tr;
 		}
 
-		function setStatus(element, text, type) {
-			element.textContent = text;
-			element.className = element.className.split(' ').filter(function (item) {
-				return item.indexOf('is-') !== 0;
-			}).join(' ');
-			if (type) {
-				element.className += ' ' + type;
-			}
-		}
-
-		function updateHeader() {
-			learnedEl.textContent = String(learnedWords);
-			scoreEl.textContent = String(score);
-			streakEl.textContent = String(streak);
-			modeEl.textContent = activeMode;
-		}
-
-		function getAllCategories() {
-			const map = {};
-			words.forEach(function (word) {
-				const key = normalizeText(word.category);
-				if (key) {
-					map[key] = word.category;
-				}
-			});
-			return Object.keys(map).sort().map(function (key) {
-				return map[key];
-			});
-		}
-
-		function refreshCategorySelect() {
-			const currentValue = settingsCategoryEl.value;
-			const categories = getAllCategories();
-
-			settingsCategoryEl.innerHTML = '';
-			const allOption = document.createElement('option');
-			allOption.value = 'all';
-			allOption.textContent = 'Tüm Kategoriler';
-			settingsCategoryEl.appendChild(allOption);
-
-			categories.forEach(function (cat) {
-				const option = document.createElement('option');
-				option.value = normalizeText(cat);
-				option.textContent = cat;
-				settingsCategoryEl.appendChild(option);
-			});
-
-			if (currentValue && settingsCategoryEl.querySelector('option[value="' + currentValue + '"]')) {
-				settingsCategoryEl.value = currentValue;
-			} else {
-				settingsCategoryEl.value = 'all';
-			}
-		}
-
-		function applyFilters() {
-			filteredWords = words.filter(function (word) {
-				if (category === 'all') {
-					return true;
-				}
-				return normalizeText(word.category) === category;
-			});
-
-			if (!filteredWords.length) {
-				filteredWords = words.slice();
-			}
-		}
-
-		function renderWordList() {
-			wordListEl.innerHTML = '';
-			filteredWords.forEach(function (word) {
-				const item = document.createElement('div');
-				item.className = 'zo-llp-list-item';
-				item.innerHTML = '<span><strong>' + word.tr + '</strong> → ' + word.en + '<br><span class="zo-llp-mini">' + word.sentence + '</span></span><span class="zo-llp-mini">' + word.category + '</span>';
-				wordListEl.appendChild(item);
-			});
-		}
-
-		function setActiveMode(mode) {
-			activeMode = mode;
-			tabs.forEach(function (tab) {
-				tab.classList.toggle('is-active', tab.getAttribute('data-mode') === mode);
-			});
-			panels.forEach(function (panel) {
-				panel.classList.toggle('is-active', panel.getAttribute('data-mode') === mode);
-			});
-			updateHeader();
-		}
-
-		function loadFlashcard() {
+		function renderFlashcard() {
 			if (!filteredWords.length) {
 				flashWordEl.textContent = '-';
-				flashTranslationEl.textContent = '???';
-				flashCategoryEl.textContent = '-';
+				flashAnswerEl.textContent = '???';
+				flashMetaEl.textContent = '-';
 				return;
 			}
+
 			if (flashIndex >= filteredWords.length) {
 				flashIndex = 0;
 			}
+
 			const word = filteredWords[flashIndex];
-			flashFlipped = false;
+			flashShown = false;
 			flashWordEl.textContent = getPrompt(word);
-			flashTranslationEl.textContent = '???';
-			flashCategoryEl.textContent = word.category;
+			flashAnswerEl.textContent = '???';
+			flashMetaEl.textContent = word.category + ' • ' + (word.sentence || '');
+			setStatus(flashStatusEl, 'Kart hazır.', 'info');
 		}
 
-		function flipFlashcard() {
+		function renderQuiz() {
+			if (!filteredWords.length) {
+				quizPromptEl.textContent = '-';
+				quizChoicesEl.innerHTML = '';
+				return;
+			}
+
+			const current = filteredWords[Math.floor(Math.random() * filteredWords.length)];
+			const correct = getAnswer(current);
+			const wrongPool = words.filter(function (item) {
+				return getAnswer(item) !== correct;
+			}).map(function (item) {
+				return getAnswer(item);
+			});
+
+			const options = [correct];
+			while (wrongPool.length && options.length < 4) {
+				const idx = Math.floor(Math.random() * wrongPool.length);
+				options.push(wrongPool.splice(idx, 1)[0]);
+			}
+
+			options.sort(function () {
+				return Math.random() - 0.5;
+			});
+
+			quizCurrent = current;
+			quizAnswered = false;
+			quizPromptEl.textContent = getPrompt(current);
+			quizChoicesEl.innerHTML = '';
+			setStatus(quizStatusEl, 'Doğru cevabı seç.', 'info');
+
+			options.forEach(function (option) {
+				const btn = document.createElement('button');
+				btn.type = 'button';
+				btn.className = 'zo-llp-button zo-llp-button--neutral';
+				btn.textContent = option;
+				btn.addEventListener('click', function () {
+					if (quizAnswered) {
+						return;
+					}
+					quizAnswered = true;
+
+					if (option === correct) {
+						score += 2;
+						streak += 1;
+						learned += 1;
+						setStatus(quizStatusEl, 'Doğru cevap.', 'good');
+					} else {
+						streak = 0;
+						setStatus(quizStatusEl, 'Yanlış. Doğru cevap: ' + correct, 'bad');
+					}
+
+					updateHeader();
+				});
+				quizChoicesEl.appendChild(btn);
+			});
+		}
+
+		function renderWordsList() {
+			listWordsEl.innerHTML = '';
+			filteredWords.forEach(function (word) {
+				const item = document.createElement('div');
+				item.className = 'zo-llp-list-item';
+				item.innerHTML = '<strong>' + word.tr + '</strong> → ' + word.en + '<br><span class="zo-llp-mini">' + word.category + ' • ' + (word.sentence || '') + '</span>';
+				listWordsEl.appendChild(item);
+			});
+		}
+
+		function renderCategoriesList() {
+			listCategoriesEl.innerHTML = '';
+			categories.forEach(function (cat) {
+				const item = document.createElement('div');
+				item.className = 'zo-llp-list-item';
+				item.innerHTML = '<strong>' + cat + '</strong>';
+				listCategoriesEl.appendChild(item);
+			});
+		}
+
+		function renderPending() {
+			if (!isAdmin) {
+				pendingWrapEl.classList.add('zo-llp-hide');
+				return;
+			}
+
+			pendingWrapEl.classList.remove('zo-llp-hide');
+			pendingListEl.innerHTML = '';
+
+			if (!pending.length) {
+				const item = document.createElement('div');
+				item.className = 'zo-llp-review-item';
+				item.textContent = 'Bekleyen istek yok.';
+				pendingListEl.appendChild(item);
+				return;
+			}
+
+			pending.forEach(function (req) {
+				const item = document.createElement('div');
+				item.className = 'zo-llp-review-item';
+
+				let html = '';
+				if (req.type === 'category') {
+					html = '<strong>Kategori isteği</strong><br>' +
+						'<span class="zo-llp-mini">Kategori: ' + (req.category_name || '') + '</span><br>' +
+						'<span class="zo-llp-mini">Tarih: ' + (req.submitted_at || '') + '</span>';
+				} else {
+					html = '<strong>Kelime isteği</strong><br>' +
+						'<span class="zo-llp-mini">' + (req.tr || '') + ' → ' + (req.en || '') + '</span><br>' +
+						'<span class="zo-llp-mini">Kategori: ' + (req.category || '') + '</span><br>' +
+						'<span class="zo-llp-mini">Açıklama: ' + (req.sentence || '') + '</span><br>' +
+						'<span class="zo-llp-mini">Tarih: ' + (req.submitted_at || '') + '</span>';
+				}
+
+				item.innerHTML = html;
+
+				const actions = document.createElement('div');
+				actions.className = 'zo-llp-review-actions';
+
+				const approve = document.createElement('button');
+				approve.type = 'button';
+				approve.className = 'zo-llp-button zo-llp-button--good';
+				approve.textContent = 'Evet, ekle';
+
+				const reject = document.createElement('button');
+				reject.type = 'button';
+				reject.className = 'zo-llp-button zo-llp-button--danger';
+				reject.textContent = 'Hayır, ekleme';
+
+				approve.addEventListener('click', function () {
+					reviewRequest(req.id, 'approve');
+				});
+
+				reject.addEventListener('click', function () {
+					reviewRequest(req.id, 'reject');
+				});
+
+				actions.appendChild(approve);
+				actions.appendChild(reject);
+				item.appendChild(actions);
+				pendingListEl.appendChild(item);
+			});
+		}
+
+		function renderAll() {
+			applyFilters();
+			refreshCategorySelect();
+			refreshWordCategorySuggestions();
+			updateHeader();
+			renderFlashcard();
+			renderQuiz();
+			renderWordsList();
+			renderCategoriesList();
+			renderPending();
+		}
+
+		function hydrate(payload) {
+			words = Array.isArray(payload.words) ? payload.words : [];
+			categories = Array.isArray(payload.categories) ? payload.categories : [];
+			pending = Array.isArray(payload.pending) ? payload.pending : [];
+			isAdmin = !!payload.is_admin;
+			renderAll();
+		}
+
+		function fetchData() {
+			return request({
+				action: 'zo_llp_get_data',
+				nonce: nonce
+			}).then(function (res) {
+				if (!res.success) {
+					throw new Error('Load failed');
+				}
+				hydrate(res.data);
+			});
+		}
+
+		function submitWordRequest() {
+			request({
+				action: 'zo_llp_submit_request',
+				nonce: nonce,
+				request_type: 'word',
+				tr: wordTrEl.value,
+				en: wordEnEl.value,
+				category: wordCategoryEl.value,
+				sentence: wordSentenceEl.value
+			}).then(function (res) {
+				if (res.success) {
+					wordTrEl.value = '';
+					wordEnEl.value = '';
+					wordCategoryEl.value = '';
+					wordSentenceEl.value = '';
+					setStatus(wordRequestStatusEl, res.data.message, 'good');
+					return fetchData();
+				}
+				setStatus(wordRequestStatusEl, res.data && res.data.message ? res.data.message : 'İstek gönderilemedi.', 'bad');
+			}).catch(function () {
+				setStatus(wordRequestStatusEl, 'İstek gönderilemedi.', 'bad');
+			});
+		}
+
+		function submitCategoryRequest() {
+			request({
+				action: 'zo_llp_submit_request',
+				nonce: nonce,
+				request_type: 'category',
+				category_name: categoryNameEl.value
+			}).then(function (res) {
+				if (res.success) {
+					categoryNameEl.value = '';
+					setStatus(categoryRequestStatusEl, res.data.message, 'good');
+					return fetchData();
+				}
+				setStatus(categoryRequestStatusEl, res.data && res.data.message ? res.data.message : 'İstek gönderilemedi.', 'bad');
+			}).catch(function () {
+				setStatus(categoryRequestStatusEl, 'İstek gönderilemedi.', 'bad');
+			});
+		}
+
+		function reviewRequest(requestId, decision) {
+			request({
+				action: 'zo_llp_review_request',
+				nonce: nonce,
+				request_id: requestId,
+				decision: decision
+			}).then(function (res) {
+				if (!res.success) {
+					setStatus(pendingStatusEl, res.data && res.data.message ? res.data.message : 'İşlem başarısız.', 'bad');
+					return;
+				}
+				setStatus(pendingStatusEl, res.data.message, 'good');
+				hydrate(res.data.data);
+			}).catch(function () {
+				setStatus(pendingStatusEl, 'İşlem başarısız.', 'bad');
+			});
+		}
+
+		tabs.forEach(function (tab) {
+			tab.addEventListener('click', function () {
+				const mode = tab.getAttribute('data-mode');
+				tabs.forEach(function (btn) {
+					btn.classList.toggle('is-active', btn === tab);
+				});
+				panels.forEach(function (panel) {
+					panel.classList.toggle('is-active', panel.getAttribute('data-mode') === mode);
+				});
+			});
+		});
+
+		game.querySelector('.zo-llp-button--flash-show').addEventListener('click', function () {
 			if (!filteredWords.length) {
 				return;
 			}
+			if (flashShown) {
+				renderFlashcard();
+				return;
+			}
 			const word = filteredWords[flashIndex];
-			flashFlipped = !flashFlipped;
-			flashTranslationEl.textContent = flashFlipped ? getAnswer(word) : '???';
-		}
+			flashShown = true;
+			flashAnswerEl.textContent = getAnswer(word);
+			score += 1;
+			learned += 1;
+			streak += 1;
+			updateHeader();
+			setStatus(flashStatusEl, 'Çeviri gösterildi.', 'good');
+		});
 
-		function nextFlashcard() {
+		game.querySelector('.zo-llp-button--flash-next').addEventListener('click', function () {
 			if (!filteredWords.length) {
 				return;
 			}
@@ -690,413 +924,45 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (flashIndex >= filteredWords.length) {
 				flashIndex = 0;
 			}
-			learnedWords += 1;
-			updateHeader();
-			loadFlashcard();
-		}
-
-		function loadQuiz() {
-			if (!filteredWords.length) {
-				return;
-			}
-
-			currentQuizWord = sample(filteredWords, 1)[0];
-			const correct = getAnswer(currentQuizWord);
-			const wrongPool = filteredWords.filter(function (word) {
-				return getAnswer(word) !== correct;
-			});
-			const fallbackPool = words.filter(function (word) {
-				return getAnswer(word) !== correct;
-			});
-			const optionPool = wrongPool.length >= 3 ? wrongPool : fallbackPool;
-			const options = shuffle([correct].concat(sample(optionPool.map(function (word) {
-				return getAnswer(word);
-			}), Math.min(3, optionPool.length))));
-
-			quizPromptEl.textContent = getPrompt(currentQuizWord);
-			quizChoicesEl.innerHTML = '';
-			setStatus(quizStatusEl, 'Doğru cevabı seç.', 'is-info');
-
-			options.forEach(function (option) {
-				const button = document.createElement('button');
-				button.type = 'button';
-				button.className = 'zo-llp-button zo-llp-button--choice';
-				button.textContent = option;
-
-				button.addEventListener('click', function () {
-					if (button.classList.contains('is-correct') || button.classList.contains('is-wrong')) {
-						return;
-					}
-
-					const allButtons = quizChoicesEl.querySelectorAll('.zo-llp-button--choice');
-					allButtons.forEach(function (btn) {
-						btn.disabled = true;
-						if (btn.textContent === correct) {
-							btn.classList.add('is-correct');
-						}
-					});
-
-					if (option === correct) {
-						button.classList.add('is-correct');
-						score += 2;
-						streak += 1;
-						learnedWords += 1;
-						setStatus(quizStatusEl, 'Doğru cevap.', 'is-good');
-					} else {
-						button.classList.add('is-wrong');
-						streak = 0;
-						setStatus(quizStatusEl, 'Yanlış cevap.', 'is-bad');
-					}
-
-					updateHeader();
-				});
-
-				quizChoicesEl.appendChild(button);
-			});
-		}
-
-		function loadTyping() {
-			if (!filteredWords.length) {
-				return;
-			}
-			currentTypeWord = sample(filteredWords, 1)[0];
-			typePromptEl.textContent = getPrompt(currentTypeWord);
-			typeInputEl.value = '';
-			typeInputEl.disabled = false;
-			typeCheckButton.disabled = false;
-			typeHintButton.disabled = false;
-			typeNextButton.disabled = true;
-			setStatus(typeStatusEl, 'Çeviriyi yaz.', 'is-info');
-		}
-
-		function checkTyping() {
-			if (!currentTypeWord) {
-				return;
-			}
-
-			const guess = normalizeText(typeInputEl.value);
-			const answer = normalizeText(getAnswer(currentTypeWord));
-
-			if (!guess) {
-				setStatus(typeStatusEl, 'Bir cevap yaz.', 'is-warn');
-				return;
-			}
-
-			if (guess === answer) {
-				score += 3;
-				streak += 1;
-				learnedWords += 1;
-				typeInputEl.disabled = true;
-				typeCheckButton.disabled = true;
-				typeHintButton.disabled = true;
-				typeNextButton.disabled = false;
-				setStatus(typeStatusEl, 'Doğru yazdın: ' + getAnswer(currentTypeWord), 'is-good');
-			} else {
-				streak = 0;
-				setStatus(typeStatusEl, 'Yanlış. Tekrar dene.', 'is-bad');
-			}
-
-			updateHeader();
-		}
-
-		function hintTyping() {
-			if (!currentTypeWord) {
-				return;
-			}
-			const answer = getAnswer(currentTypeWord);
-			if (!answer) {
-				return;
-			}
-			typeInputEl.value = answer.charAt(0);
-			setStatus(typeStatusEl, 'İpucu verildi.', 'is-warn');
-		}
-
-		function loadMatch() {
-			const source = filteredWords.length >= 4 ? filteredWords : words;
-			currentMatchSet = sample(source, Math.min(4, source.length));
-			matchSelectedLeft = null;
-			matchSelectedRight = null;
-			matchPairsSolved = 0;
-			matchLeftEl.innerHTML = '';
-			matchRightEl.innerHTML = '';
-			setStatus(matchStatusEl, 'Eşleşen kelimeleri bul.', 'is-info');
-
-			const leftWords = currentMatchSet.slice();
-			const rightWords = shuffle(currentMatchSet.slice());
-
-			leftWords.forEach(function (word) {
-				const button = document.createElement('button');
-				button.type = 'button';
-				button.className = 'zo-llp-button zo-llp-button--match';
-				button.textContent = direction === 'tr-en' ? word.tr : word.en;
-				button.addEventListener('click', function () {
-					if (button.disabled) {
-						return;
-					}
-					Array.prototype.forEach.call(matchLeftEl.querySelectorAll('.zo-llp-button--match'), function (btn) {
-						btn.classList.remove('is-selected');
-					});
-					button.classList.add('is-selected');
-					matchSelectedLeft = word;
-					tryMatch();
-				});
-				matchLeftEl.appendChild(button);
-			});
-
-			rightWords.forEach(function (word) {
-				const button = document.createElement('button');
-				button.type = 'button';
-				button.className = 'zo-llp-button zo-llp-button--match';
-				button.textContent = direction === 'tr-en' ? word.en : word.tr;
-				button.addEventListener('click', function () {
-					if (button.disabled) {
-						return;
-					}
-					Array.prototype.forEach.call(matchRightEl.querySelectorAll('.zo-llp-button--match'), function (btn) {
-						btn.classList.remove('is-selected');
-					});
-					button.classList.add('is-selected');
-					matchSelectedRight = word;
-					tryMatch();
-				});
-				matchRightEl.appendChild(button);
-			});
-		}
-
-		function tryMatch() {
-			if (!matchSelectedLeft || !matchSelectedRight) {
-				return;
-			}
-
-			const leftButtons = Array.prototype.slice.call(matchLeftEl.querySelectorAll('.zo-llp-button--match'));
-			const rightButtons = Array.prototype.slice.call(matchRightEl.querySelectorAll('.zo-llp-button--match'));
-
-			if (matchSelectedLeft.tr === matchSelectedRight.tr && matchSelectedLeft.en === matchSelectedRight.en) {
-				leftButtons.forEach(function (btn) {
-					if (btn.textContent === (direction === 'tr-en' ? matchSelectedLeft.tr : matchSelectedLeft.en) && !btn.disabled) {
-						btn.disabled = true;
-						btn.classList.remove('is-selected');
-						btn.classList.add('is-correct');
-					}
-				});
-				rightButtons.forEach(function (btn) {
-					if (btn.textContent === (direction === 'tr-en' ? matchSelectedRight.en : matchSelectedRight.tr) && !btn.disabled) {
-						btn.disabled = true;
-						btn.classList.remove('is-selected');
-						btn.classList.add('is-correct');
-					}
-				});
-
-				score += 2;
-				streak += 1;
-				learnedWords += 1;
-				matchPairsSolved += 1;
-				setStatus(matchStatusEl, 'Doğru eşleşme.', 'is-good');
-
-				if (matchPairsSolved === currentMatchSet.length) {
-					setStatus(matchStatusEl, 'Tüm eşleşmeleri tamamladın.', 'is-good');
-				}
-			} else {
-				streak = 0;
-				setStatus(matchStatusEl, 'Yanlış eşleşme.', 'is-bad');
-				leftButtons.forEach(function (btn) {
-					btn.classList.remove('is-selected');
-				});
-				rightButtons.forEach(function (btn) {
-					btn.classList.remove('is-selected');
-				});
-			}
-
-			matchSelectedLeft = null;
-			matchSelectedRight = null;
-			updateHeader();
-		}
-
-		function refreshAllModes() {
-			applyFilters();
-			renderWordList();
-			flashIndex = 0;
-			loadFlashcard();
-			loadQuiz();
-			loadTyping();
-			loadMatch();
-			updateHeader();
-		}
-
-		function applySettings() {
-			direction = settingsDirectionEl.value;
-			category = settingsCategoryEl.value;
-			refreshAllModes();
-		}
-
-		function restartAll() {
-			learnedWords = 0;
-			score = 0;
-			streak = 0;
-			flashIndex = 0;
-			direction = 'tr-en';
-			category = 'all';
-			settingsDirectionEl.value = direction;
-			refreshCategorySelect();
-			settingsCategoryEl.value = category;
-			refreshAllModes();
-			setActiveMode('flashcards');
-		}
-
-		function unlockAdmin() {
-			const password = adminPasswordEl.value;
-			if (password === ADMIN_PASSWORD) {
-				adminUnlocked = true;
-				adminFormEl.classList.add('is-open');
-				setStatus(adminStatusEl, 'Admin paneli açıldı.', 'is-good');
-				adminPasswordEl.value = '';
-			} else {
-				setStatus(adminStatusEl, 'Şifre yanlış.', 'is-bad');
-			}
-		}
-
-		function addWord() {
-			if (!adminUnlocked) {
-				setStatus(adminStatusEl, 'Önce şifreyi gir.', 'is-bad');
-				return;
-			}
-
-			const word = sanitizeWord({
-				tr: adminTrEl.value,
-				en: adminEnEl.value,
-				category: adminCategoryEl.value,
-				sentence: adminSentenceEl.value || 'Yeni eklenen kelime.'
-			});
-
-			if (!isValidWord(word)) {
-				setStatus(adminStatusEl, 'Türkçe, İngilizce ve kategori gerekli.', 'is-warn');
-				return;
-			}
-
-			const duplicate = words.some(function (item) {
-				return normalizeText(item.tr) === normalizeText(word.tr) &&
-					normalizeText(item.en) === normalizeText(word.en) &&
-					normalizeText(item.category) === normalizeText(word.category);
-			});
-
-			if (duplicate) {
-				setStatus(adminStatusEl, 'Bu kelime zaten var.', 'is-warn');
-				return;
-			}
-
-			words.push(word);
-
-			if (!saveWords()) {
-				setStatus(adminStatusEl, 'Kelime eklendi ama kaydedilemedi.', 'is-bad');
-				return;
-			}
-
-			adminTrEl.value = '';
-			adminEnEl.value = '';
-			adminCategoryEl.value = '';
-			adminSentenceEl.value = '';
-
-			refreshCategorySelect();
-
-			if (category === 'all' || category === normalizeText(word.category)) {
-				refreshAllModes();
-			} else {
-				renderWordList();
-			}
-
-			setStatus(adminStatusEl, 'Yeni kelime eklendi ve kaydedildi.', 'is-good');
-		}
-
-		function exportWords() {
-			if (!adminUnlocked) {
-				setStatus(adminStatusEl, 'Önce şifreyi gir.', 'is-bad');
-				return;
-			}
-
-			const blob = new Blob([JSON.stringify(words, null, 2)], { type: 'application/json' });
-			const url = URL.createObjectURL(blob);
-			const link = document.createElement('a');
-			link.href = url;
-			link.download = 'language-learning-platform-words.json';
-			document.body.appendChild(link);
-			link.click();
-			document.body.removeChild(link);
-			URL.revokeObjectURL(url);
-			setStatus(adminStatusEl, 'Kelime listesi dışa aktarıldı.', 'is-good');
-		}
-
-		function resetSavedWords() {
-			if (!adminUnlocked) {
-				setStatus(adminStatusEl, 'Önce şifreyi gir.', 'is-bad');
-				return;
-			}
-
-			words = defaultWords.map(function (word) {
-				return sanitizeWord(word);
-			});
-			saveWords();
-			refreshCategorySelect();
-			restartAll();
-			setStatus(adminStatusEl, 'Kelime listesi varsayılan hale döndürüldü.', 'is-good');
-		}
-
-		tabs.forEach(function (tab) {
-			tab.addEventListener('click', function () {
-				setActiveMode(tab.getAttribute('data-mode'));
-			});
+			renderFlashcard();
 		});
 
-		flashFlipButton.addEventListener('click', flipFlashcard);
-		flashNextButton.addEventListener('click', nextFlashcard);
-
-		quizNextButton.addEventListener('click', loadQuiz);
-
-		typeCheckButton.addEventListener('click', checkTyping);
-		typeHintButton.addEventListener('click', hintTyping);
-		typeNextButton.addEventListener('click', loadTyping);
-
-		typeInputEl.addEventListener('keydown', function (event) {
-			if (event.key === 'Enter') {
-				checkTyping();
-			}
+		game.querySelector('.zo-llp-button--quiz-next').addEventListener('click', function () {
+			renderQuiz();
 		});
 
-		matchNextButton.addEventListener('click', loadMatch);
-
-		applySettingsButton.addEventListener('click', applySettings);
-		restartAllButton.addEventListener('click', restartAll);
-
-		adminOpenButton.addEventListener('click', function () {
-			adminBoxEl.classList.toggle('is-open');
+		game.querySelector('.zo-llp-button--apply').addEventListener('click', function () {
+			direction = directionEl.value;
+			categoryFilter = categoryEl.value;
+			renderAll();
 		});
 
-		adminUnlockButton.addEventListener('click', unlockAdmin);
-		adminPasswordEl.addEventListener('keydown', function (event) {
-			if (event.key === 'Enter') {
-				unlockAdmin();
-			}
+		game.querySelector('.zo-llp-button--word-request').addEventListener('click', submitWordRequest);
+		game.querySelector('.zo-llp-button--category-request').addEventListener('click', submitCategoryRequest);
+
+		fetchData().catch(function () {
+			setStatus(wordRequestStatusEl, 'Veriler yüklenemedi.', 'bad');
 		});
-
-		adminAddButton.addEventListener('click', addWord);
-		adminExportButton.addEventListener('click', exportWords);
-		adminResetWordsButton.addEventListener('click', resetSavedWords);
-
-		loadWords();
-		refreshCategorySelect();
-		restartAll();
 	});
 });
 JS;
 
 if (!function_exists('zo_game_language_learning_platform_render')) {
 	function zo_game_language_learning_platform_render($post_id = 0, $module = array()) {
+		global $ajax_url, $nonce, $css, $js;
+
 		$instance_id = 'zo-language-learning-platform-' . ($post_id ? absint($post_id) : wp_rand(1000, 999999));
 
 		ob_start();
 		?>
-		<div class="zo-game-root zo-game-root--language-learning-platform" id="<?php echo esc_attr($instance_id); ?>">
+		<div
+			class="zo-game-root zo-game-root--language-learning-platform"
+			id="<?php echo esc_attr($instance_id); ?>"
+			data-ajax-url="<?php echo esc_url($ajax_url); ?>"
+			data-nonce="<?php echo esc_attr($nonce); ?>"
+		>
 			<h2 class="zo-llp-title">Language Learning Platform</h2>
-			<p class="zo-llp-desc">Kelime öğren, test çöz, yazı yaz, eşleştirme yap ve admin panelinden yeni kelimeler ekle.</p>
+			<p class="zo-llp-desc">Yeni kelime ve kategori istekleri WordPress içinde bekler. Yönetici isterse evet deyip ekler, isterse hayır deyip reddeder.</p>
 
 			<div class="zo-llp-top">
 				<div class="zo-llp-stat">
@@ -1112,129 +978,94 @@ if (!function_exists('zo_game_language_learning_platform_render')) {
 					<span class="zo-llp-stat-value zo-llp-streak">0</span>
 				</div>
 				<div class="zo-llp-stat">
-					<span class="zo-llp-stat-label">Mod</span>
-					<span class="zo-llp-stat-value zo-llp-mode">flashcards</span>
+					<span class="zo-llp-stat-label">Toplam Kelime</span>
+					<span class="zo-llp-stat-value zo-llp-total">0</span>
 				</div>
+			</div>
+
+			<div class="zo-llp-settings">
+				<select class="zo-llp-select zo-llp-select--direction">
+					<option value="tr-en">Türkçe → English</option>
+					<option value="en-tr">English → Türkçe</option>
+				</select>
+
+				<select class="zo-llp-select zo-llp-select--category">
+					<option value="all">Tüm Kategoriler</option>
+				</select>
+			</div>
+
+			<div class="zo-llp-actions">
+				<button type="button" class="zo-llp-button zo-llp-button--primary zo-llp-button--apply">Ayarları Uygula</button>
+				<button type="button" class="zo-llp-button zo-llp-button--neutral zo-llp-button--quiz-next">Yeni Quiz Sorusu</button>
 			</div>
 
 			<div class="zo-llp-tabs">
 				<button type="button" class="zo-llp-tab is-active" data-mode="flashcards">Flashcards</button>
 				<button type="button" class="zo-llp-tab" data-mode="quiz">Quiz</button>
-				<button type="button" class="zo-llp-tab" data-mode="typing">Typing</button>
-				<button type="button" class="zo-llp-tab" data-mode="matching">Matching</button>
+				<button type="button" class="zo-llp-tab" data-mode="requests">İstekler</button>
 			</div>
 
-			<div class="zo-llp-main">
-				<div class="zo-llp-panel is-active" data-mode="flashcards">
-					<div class="zo-llp-card">
-						<span class="zo-llp-card-label">Kelime</span>
-						<div class="zo-llp-big zo-llp-flash-word">-</div>
-						<div class="zo-llp-mid zo-llp-flash-translation">???</div>
-						<div class="zo-llp-mini zo-llp-flash-category">-</div>
-					</div>
-
-					<div class="zo-llp-footer">
-						<button type="button" class="zo-llp-button zo-llp-button--hint zo-llp-button--flash-flip">Çeviriyi Göster</button>
-						<button type="button" class="zo-llp-button zo-llp-button--good zo-llp-button--flash-next">Sonraki Kart</button>
-					</div>
-				</div>
-
-				<div class="zo-llp-panel" data-mode="quiz">
-					<div class="zo-llp-card">
-						<span class="zo-llp-card-label">Doğru çeviriyi seç</span>
-						<div class="zo-llp-big zo-llp-quiz-prompt">-</div>
-					</div>
-
-					<div class="zo-llp-choice-grid"></div>
-					<div class="zo-llp-status zo-llp-status--quiz" aria-live="polite"></div>
-					<button type="button" class="zo-llp-button zo-llp-button--good zo-llp-button--quiz-next">Yeni Soru</button>
-				</div>
-
-				<div class="zo-llp-panel" data-mode="typing">
-					<div class="zo-llp-card">
-						<span class="zo-llp-card-label">Çeviriyi yaz</span>
-						<div class="zo-llp-big zo-llp-type-prompt">-</div>
-					</div>
-
-					<div class="zo-llp-input-row">
-						<input type="text" class="zo-llp-input zo-llp-input--type" placeholder="Cevabını yaz" />
-						<button type="button" class="zo-llp-button zo-llp-button--primary zo-llp-button--type-check">Kontrol Et</button>
-						<button type="button" class="zo-llp-button zo-llp-button--hint zo-llp-button--type-hint">İpucu</button>
-					</div>
-
-					<div class="zo-llp-status zo-llp-status--type" aria-live="polite"></div>
-					<button type="button" class="zo-llp-button zo-llp-button--good zo-llp-button--type-next">Yeni Kelime</button>
-				</div>
-
-				<div class="zo-llp-panel" data-mode="matching">
-					<div class="zo-llp-card">
-						<span class="zo-llp-card-label">Eşleşen kelimeleri bul</span>
-						<div class="zo-llp-big">Matching</div>
-					</div>
-
-					<div class="zo-llp-match-grid">
-						<div class="zo-llp-list zo-llp-match-left"></div>
-						<div class="zo-llp-list zo-llp-match-right"></div>
-					</div>
-
-					<div class="zo-llp-status zo-llp-status--match" aria-live="polite"></div>
-					<button type="button" class="zo-llp-button zo-llp-button--good zo-llp-button--match-next">Yeni Eşleştirme</button>
-				</div>
-
+			<div class="zo-llp-main-panel is-active" data-mode="flashcards">
 				<div class="zo-llp-card">
-					<span class="zo-llp-card-label">Ayarlar</span>
+					<div class="zo-llp-big zo-llp-flash-word">-</div>
+					<div class="zo-llp-mid zo-llp-flash-answer">???</div>
+					<div class="zo-llp-mini zo-llp-flash-meta">-</div>
 
-					<div class="zo-llp-settings-grid">
-						<select class="zo-llp-select zo-llp-select--direction">
-							<option value="tr-en">Türkçe → English</option>
-							<option value="en-tr">English → Türkçe</option>
-						</select>
-
-						<select class="zo-llp-select zo-llp-select--category">
-							<option value="all">Tüm Kategoriler</option>
-						</select>
+					<div class="zo-llp-actions">
+						<button type="button" class="zo-llp-button zo-llp-button--good zo-llp-button--flash-show">Çeviriyi Göster</button>
+						<button type="button" class="zo-llp-button zo-llp-button--neutral zo-llp-button--flash-next">Sonraki</button>
 					</div>
 
-					<div class="zo-llp-footer">
-						<button type="button" class="zo-llp-button zo-llp-button--primary zo-llp-button--apply">Ayarları Uygula</button>
-						<button type="button" class="zo-llp-button zo-llp-button--neutral zo-llp-button--restart-all">Baştan Başla</button>
-					</div>
+					<div class="zo-llp-status zo-llp-status--flash" aria-live="polite"></div>
 				</div>
 
-				<div class="zo-llp-card">
-					<span class="zo-llp-card-label">Kelime Listesi</span>
+				<div class="zo-llp-panel-box">
+					<strong>Kelimeler</strong>
 					<div class="zo-llp-list zo-llp-list--words"></div>
+				</div>
 
-					<div class="zo-llp-footer">
-						<button type="button" class="zo-llp-button zo-llp-button--admin zo-llp-button--admin-open">Add Words</button>
+				<div class="zo-llp-panel-box">
+					<strong>Kategoriler</strong>
+					<div class="zo-llp-list zo-llp-list--categories"></div>
+				</div>
+			</div>
+
+			<div class="zo-llp-main-panel" data-mode="quiz">
+				<div class="zo-llp-card">
+					<div class="zo-llp-big zo-llp-quiz-prompt">-</div>
+					<div class="zo-llp-list zo-llp-list--quiz"></div>
+					<div class="zo-llp-status zo-llp-status--quiz" aria-live="polite"></div>
+				</div>
+			</div>
+
+			<div class="zo-llp-main-panel" data-mode="requests">
+				<div class="zo-llp-panel-box">
+					<strong>Yeni kategori isteği</strong>
+					<div class="zo-llp-request-grid" style="margin-top:12px;">
+						<input type="text" class="zo-llp-input zo-llp-input--category-name" placeholder="Kategori adı" />
+						<button type="button" class="zo-llp-button zo-llp-button--primary zo-llp-button--category-request">Kategori isteği gönder</button>
 					</div>
+					<div class="zo-llp-status zo-llp-status--category-request" aria-live="polite"></div>
+				</div>
 
-					<div class="zo-llp-admin-box">
-						<div class="zo-llp-admin-note">Eklenen kelimeler tarayıcıda kalıcı olarak kaydedilir ve sayfa yenilense de durur.</div>
-
-						<div class="zo-llp-admin-password-row">
-							<input type="password" class="zo-llp-input zo-llp-input--admin-password" placeholder="Admin şifresi" />
-							<button type="button" class="zo-llp-button zo-llp-button--admin zo-llp-button--admin-unlock">Aç</button>
-						</div>
-
-						<div class="zo-llp-status zo-llp-status--admin" aria-live="polite"></div>
-
-						<div class="zo-llp-admin-form">
-							<div class="zo-llp-admin-grid">
-								<input type="text" class="zo-llp-input zo-llp-input--admin-tr" placeholder="Türkçe kelime" />
-								<input type="text" class="zo-llp-input zo-llp-input--admin-en" placeholder="English word" />
-								<input type="text" class="zo-llp-input zo-llp-input--admin-category" placeholder="Kategori" />
-								<textarea class="zo-llp-textarea zo-llp-textarea--admin-sentence" placeholder="Açıklama veya ipucu"></textarea>
-							</div>
-
-							<button type="button" class="zo-llp-button zo-llp-button--good zo-llp-button--admin-add">Kelime Ekle</button>
-
-							<div class="zo-llp-admin-tools">
-								<button type="button" class="zo-llp-button zo-llp-button--primary zo-llp-button--admin-export">Kelime Listesini İndir</button>
-								<button type="button" class="zo-llp-button zo-llp-button--danger zo-llp-button--admin-reset-words">Varsayılana Sıfırla</button>
-							</div>
-						</div>
+				<div class="zo-llp-panel-box">
+					<strong>Yeni kelime isteği</strong>
+					<div class="zo-llp-request-grid" style="margin-top:12px;">
+						<input type="text" class="zo-llp-input zo-llp-input--word-tr" placeholder="Türkçe kelime" />
+						<input type="text" class="zo-llp-input zo-llp-input--word-en" placeholder="English word" />
+						<input type="text" class="zo-llp-input zo-llp-input--word-category" placeholder="Kategori" />
+						<textarea class="zo-llp-textarea zo-llp-textarea--word-sentence" placeholder="Açıklama veya örnek cümle"></textarea>
 					</div>
+					<div class="zo-llp-actions">
+						<button type="button" class="zo-llp-button zo-llp-button--primary zo-llp-button--word-request">Kelime isteği gönder</button>
+					</div>
+					<div class="zo-llp-status zo-llp-status--word-request" aria-live="polite"></div>
+				</div>
+
+				<div class="zo-llp-review-wrap zo-llp-panel-box zo-llp-hide">
+					<strong>Yönetici onay paneli</strong>
+					<div class="zo-llp-list zo-llp-list--pending"></div>
+					<div class="zo-llp-status zo-llp-status--pending" aria-live="polite"></div>
 				</div>
 			</div>
 		</div>
@@ -1247,7 +1078,7 @@ return array(
 	'slug'            => 'language-learning-platform',
 	'name'            => 'Language Learning Platform',
 	'author'          => 'Asker',
-	'description'     => 'Flashcards, quiz, typing, matching, and a persistent admin word-adder in one browser-based language learning platform.',
+	'description'     => 'WordPress içinde kelime ve kategori isteklerini yöneticinin evet/hayır onayıyla yöneten dil öğrenme platformu.',
 	'render_callback' => 'zo_game_language_learning_platform_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,
