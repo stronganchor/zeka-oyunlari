@@ -41,7 +41,7 @@ $css = <<<'CSS'
 
 .zo-game-root--tower-defense-paths .tdp-topbar {
 	display: grid;
-	grid-template-columns: repeat(5, 1fr);
+	grid-template-columns: repeat(6, 1fr);
 	gap: 10px;
 	margin-bottom: 16px;
 }
@@ -169,6 +169,10 @@ $css = <<<'CSS'
 	background: #6dbb45;
 }
 
+.zo-game-root--tower-defense-paths .tdp-tower--bank {
+	background: #f59e0b;
+}
+
 .zo-game-root--tower-defense-paths .tdp-enemy {
 	position: absolute;
 	width: 24px;
@@ -239,7 +243,7 @@ $css = <<<'CSS'
 
 .zo-game-root--tower-defense-paths .tdp-tower-buttons {
 	display: grid;
-	grid-template-columns: repeat(2, 1fr);
+	grid-template-columns: repeat(3, 1fr);
 	gap: 10px;
 }
 
@@ -287,7 +291,8 @@ $css = <<<'CSS'
 }
 
 .zo-game-root--tower-defense-paths .tdp-btn--restart,
-.zo-game-root--tower-defense-paths .tdp-btn--wave {
+.zo-game-root--tower-defense-paths .tdp-btn--wave,
+.zo-game-root--tower-defense-paths .tdp-btn--work {
 	background: #0b6e4f;
 	color: #ffffff;
 }
@@ -310,6 +315,10 @@ $css = <<<'CSS'
 	.zo-game-root--tower-defense-paths .tdp-title {
 		font-size: 24px;
 	}
+
+	.zo-game-root--tower-defense-paths .tdp-tower-buttons {
+		grid-template-columns: repeat(2, 1fr);
+	}
 }
 CSS;
 
@@ -323,6 +332,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		const waveEl = game.querySelector('.tdp-wave');
 		const scoreEl = game.querySelector('.tdp-score');
 		const towersEl = game.querySelector('.tdp-towers');
+		const incomeEl = game.querySelector('.tdp-income');
 		const statusEl = game.querySelector('.tdp-status');
 		const boardEl = game.querySelector('.tdp-board');
 		const progressEl = game.querySelector('.tdp-progress');
@@ -331,6 +341,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		const toggleBottomBtn = game.querySelector('.tdp-btn--toggle-bottom');
 		const restartBtn = game.querySelector('.tdp-btn--restart');
 		const waveBtn = game.querySelector('.tdp-btn--wave');
+		const workBtn = game.querySelector('.tdp-btn--work');
 
 		const width = 12;
 		const height = 8;
@@ -351,10 +362,11 @@ document.addEventListener('DOMContentLoaded', function () {
 		};
 
 		const towerTypes = {
-			basic: { name: 'Basic', cost: 50, range: 2.2, fireDelay: 2, damage: 20, className: 'basic' },
-			sniper: { name: 'Sniper', cost: 120, range: 4.8, fireDelay: 4, damage: 38, className: 'sniper' },
-			freeze: { name: 'Freeze', cost: 90, range: 2.4, fireDelay: 3, damage: 8, className: 'freeze' },
-			poison: { name: 'Poison', cost: 110, range: 2.6, fireDelay: 3, damage: 7, className: 'poison' }
+			basic: { name: 'Basic', cost: 50, range: 2.2, fireDelay: 2, damage: 20, className: 'basic', income: 0 },
+			sniper: { name: 'Sniper', cost: 120, range: 4.8, fireDelay: 4, damage: 38, className: 'sniper', income: 0 },
+			freeze: { name: 'Freeze', cost: 90, range: 2.4, fireDelay: 3, damage: 8, className: 'freeze', income: 0 },
+			poison: { name: 'Poison', cost: 110, range: 2.6, fireDelay: 3, damage: 7, className: 'poison', income: 0 },
+			bank: { name: 'Bank', cost: 80, range: 0, fireDelay: 0, damage: 0, className: 'bank', income: 8 }
 		};
 
 		const enemyTypes = {
@@ -380,6 +392,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		let spawnDelay = 12;
 		let gameLoop = null;
 		let ended = false;
+		let workCooldown = 0;
 
 		function key(x, y) {
 			return x + ',' + y;
@@ -395,13 +408,24 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		}
 
+		function getPassiveIncome() {
+			let income = 0;
+			towers.forEach(function (tower) {
+				if (tower.type === 'bank') {
+					income += tower.income;
+				}
+			});
+			return income;
+		}
+
 		function updateStats() {
 			moneyEl.textContent = String(money);
 			livesEl.textContent = String(lives);
 			waveEl.textContent = String(wave);
 			scoreEl.textContent = String(score);
 			towersEl.textContent = String(towers.length);
-			progressEl.textContent = 'Click grass to place towers. Purple buttons block one route.';
+			incomeEl.textContent = String(getPassiveIncome());
+			progressEl.textContent = 'Build Bank towers or press Work for extra money.';
 		}
 
 		function isTopPathCell(x, y) {
@@ -455,12 +479,6 @@ document.addEventListener('DOMContentLoaded', function () {
 					});
 				}
 			}
-		}
-
-		function getCell(x, y) {
-			return boardCells.find(function (cell) {
-				return cell.x === x && cell.y === y;
-			});
 		}
 
 		function towerAt(x, y) {
@@ -621,13 +639,19 @@ document.addEventListener('DOMContentLoaded', function () {
 				range: towerData.range * bonus,
 				damage: towerData.damage,
 				fireDelay: towerData.fireDelay,
-				cooldown: 0
+				cooldown: 0,
+				income: towerData.income || 0
 			});
 
 			money -= cost;
 			updateStats();
 			renderBoard();
-			setStatus(towerData.name + ' tower placed.', 'good');
+
+			if (selectedTowerType === 'bank') {
+				setStatus('Bank tower placed. It will make money over time.', 'good');
+			} else {
+				setStatus(towerData.name + ' tower placed.', 'good');
+			}
 		}
 
 		function getEnemyDistance(tower, enemy) {
@@ -684,8 +708,20 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		}
 
+		function payBanks() {
+			const passiveIncome = getPassiveIncome();
+			if (passiveIncome > 0 && tick % 10 === 0) {
+				money += passiveIncome;
+				setStatus('Your Bank towers made +' + passiveIncome + ' money.', 'good');
+			}
+		}
+
 		function updateTowers() {
 			towers.forEach(function (tower) {
+				if (tower.type === 'bank') {
+					return;
+				}
+
 				if (tower.cooldown > 0) {
 					tower.cooldown -= 1;
 					return;
@@ -759,8 +795,6 @@ document.addEventListener('DOMContentLoaded', function () {
 				return false;
 			}
 
-			const current = path[enemy.step];
-			const next = path[enemy.step + 1];
 			const speedMod = enemy.slowTicks > 0 ? 0.45 : 1;
 			const moveAmount = 0.35 * enemy.speed * speedMod;
 
@@ -837,13 +871,36 @@ document.addEventListener('DOMContentLoaded', function () {
 			updateStats();
 		}
 
+		function doWork() {
+			if (ended) {
+				return;
+			}
+
+			if (workCooldown > 0) {
+				setStatus('Work is cooling down. Wait a little.', 'bad');
+				return;
+			}
+
+			const earned = 25 + (wave * 2);
+			money += earned;
+			workCooldown = 12;
+			updateStats();
+			setStatus('You worked and earned +' + earned + ' money.', 'good');
+		}
+
 		function tickGame() {
 			if (ended) {
 				return;
 			}
 
 			tick += 1;
+
+			if (workCooldown > 0) {
+				workCooldown -= 1;
+			}
+
 			maybeSpawn();
+			payBanks();
 			updatePoison();
 			updateHealers();
 			updateTowers();
@@ -869,6 +926,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			tick = 0;
 			spawnQueue = 16;
 			ended = false;
+			workCooldown = 0;
 
 			if (gameLoop) {
 				clearInterval(gameLoop);
@@ -878,7 +936,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			updateStats();
 			renderTowerSelection();
 			renderBoard();
-			setStatus('Place towers and defend both paths.', '');
+			setStatus('Place towers, build Banks, or press Work for money.', '');
 			gameLoop = setInterval(tickGame, 350);
 		}
 
@@ -928,6 +986,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		waveBtn.addEventListener('click', startWave);
 		restartBtn.addEventListener('click', resetGame);
+		workBtn.addEventListener('click', doWork);
 
 		buildBoard();
 		resetGame();
@@ -944,7 +1003,7 @@ if (!function_exists('zo_game_tower_defense_paths_render')) {
 		<div class="zo-game-root zo-game-root--tower-defense-paths" id="<?php echo esc_attr($instance_id); ?>">
 			<div class="tdp-card">
 				<h2 class="tdp-title">Tower Defense Paths</h2>
-				<p class="tdp-instructions">Place towers on grass. Enemies travel on two routes. Freeze slows, Poison damages over time, Sniper reaches far, and Splitter enemies break into two fast enemies.</p>
+				<p class="tdp-instructions">Place towers on grass. Build Bank towers for passive income, or press Work to earn money manually.</p>
 
 				<div class="tdp-topbar">
 					<div class="tdp-stat">
@@ -967,9 +1026,13 @@ if (!function_exists('zo_game_tower_defense_paths_render')) {
 						<span class="tdp-stat-label">Towers</span>
 						<span class="tdp-stat-value tdp-towers">0</span>
 					</div>
+					<div class="tdp-stat">
+						<span class="tdp-stat-label">Income</span>
+						<span class="tdp-stat-value tdp-income">0</span>
+					</div>
 				</div>
 
-				<div class="tdp-status" aria-live="polite">Place towers and defend both paths.</div>
+				<div class="tdp-status" aria-live="polite">Place towers, build Banks, or press Work for money.</div>
 
 				<div class="tdp-board-wrap">
 					<div class="tdp-board"></div>
@@ -983,6 +1046,7 @@ if (!function_exists('zo_game_tower_defense_paths_render')) {
 							<button type="button" class="tdp-tower-btn" data-type="sniper">Sniper<br>$120</button>
 							<button type="button" class="tdp-tower-btn" data-type="freeze">Freeze<br>$90</button>
 							<button type="button" class="tdp-tower-btn" data-type="poison">Poison<br>$110</button>
+							<button type="button" class="tdp-tower-btn" data-type="bank">Bank<br>$80</button>
 						</div>
 					</div>
 
@@ -992,12 +1056,13 @@ if (!function_exists('zo_game_tower_defense_paths_render')) {
 							<button type="button" class="tdp-btn tdp-btn--toggle-top">Toggle Top Path</button>
 							<button type="button" class="tdp-btn tdp-btn--toggle-bottom">Toggle Bottom Path</button>
 							<button type="button" class="tdp-btn tdp-btn--wave">More Enemies</button>
+							<button type="button" class="tdp-btn tdp-btn--work">Work For Money</button>
 							<button type="button" class="tdp-btn tdp-btn--restart">Restart</button>
 						</div>
 					</div>
 				</div>
 
-				<div class="tdp-progress">Click grass to place towers. Purple buttons block one route.</div>
+				<div class="tdp-progress">Build Bank towers or press Work for extra money.</div>
 			</div>
 		</div>
 		<?php
@@ -1009,7 +1074,7 @@ return array(
 	'slug'            => 'tower-defense-paths',
 	'name'            => 'Tower Defense Paths',
 	'author'          => 'Arslan',
-	'description'     => 'A browser tower defense game with two routes, tower types, status effects, and route blocking.',
+	'description'     => 'A browser tower defense game with two routes, tower types, status effects, route blocking, and extra money actions.',
 	'render_callback' => 'zo_game_tower_defense_paths_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,
