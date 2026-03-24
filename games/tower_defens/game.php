@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 
 $css = <<<'CSS'
 .zo-game-root {
-	max-width: 980px;
+	max-width: 1280px;
 	margin: 0 auto;
 	font-family: Arial, sans-serif;
 }
@@ -87,31 +87,39 @@ $css = <<<'CSS'
 	color: #c81e1e;
 }
 
+.zo-game-root--tower-defense-paths .tdp-layout {
+	display: grid;
+	grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.9fr);
+	gap: 16px;
+	margin-bottom: 14px;
+	align-items: start;
+}
+
 .zo-game-root--tower-defense-paths .tdp-board-wrap {
 	background: #f8fbff;
 	border: 2px solid #d9e2ec;
 	border-radius: 18px;
 	padding: 14px;
-	margin-bottom: 16px;
-	overflow-x: auto;
+	overflow: auto;
+	max-width: 100%;
 }
 
 .zo-game-root--tower-defense-paths .tdp-board {
 	display: grid;
-	grid-template-columns: repeat(12, 52px);
-	grid-template-rows: repeat(8, 52px);
-	gap: 4px;
-	justify-content: center;
+	grid-template-columns: repeat(20, 32px);
+	grid-template-rows: repeat(12, 32px);
+	gap: 3px;
+	justify-content: start;
 	min-width: max-content;
 }
 
 .zo-game-root--tower-defense-paths .tdp-cell {
 	position: relative;
-	width: 52px;
-	height: 52px;
-	border-radius: 10px;
+	width: 32px;
+	height: 32px;
+	border-radius: 6px;
 	background: #86c56d;
-	border: 2px solid rgba(0, 0, 0, 0.08);
+	border: 1px solid rgba(0, 0, 0, 0.08);
 	cursor: pointer;
 	overflow: hidden;
 }
@@ -128,28 +136,24 @@ $css = <<<'CSS'
 
 .zo-game-root--tower-defense-paths .tdp-cell--hill {
 	background: #6fa95f;
-	box-shadow: inset 0 0 0 3px rgba(255, 214, 79, 0.45);
+	box-shadow: inset 0 0 0 2px rgba(255, 214, 79, 0.45);
 }
 
 .zo-game-root--tower-defense-paths .tdp-cell--blocked {
 	background: #6b4a30;
 }
 
-.zo-game-root--tower-defense-paths .tdp-cell--selected {
-	box-shadow: inset 0 0 0 3px #7c3aed;
-}
-
 .zo-game-root--tower-defense-paths .tdp-tower {
 	position: absolute;
-	inset: 7px;
+	inset: 4px;
 	border-radius: 50%;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	font-size: 11px;
+	font-size: 8px;
 	font-weight: 700;
 	color: #ffffff;
-	border: 2px solid rgba(20, 20, 20, 0.45);
+	border: 1px solid rgba(20, 20, 20, 0.45);
 }
 
 .zo-game-root--tower-defense-paths .tdp-tower--basic {
@@ -175,12 +179,12 @@ $css = <<<'CSS'
 
 .zo-game-root--tower-defense-paths .tdp-enemy {
 	position: absolute;
-	width: 24px;
-	height: 24px;
+	width: 14px;
+	height: 14px;
 	border-radius: 50%;
-	border: 2px solid rgba(20, 20, 20, 0.35);
-	top: 14px;
-	left: 14px;
+	border: 1px solid rgba(20, 20, 20, 0.35);
+	top: 8px;
+	left: 8px;
 }
 
 .zo-game-root--tower-defense-paths .tdp-enemy--normal {
@@ -205,10 +209,10 @@ $css = <<<'CSS'
 
 .zo-game-root--tower-defense-paths .tdp-enemy-hp {
 	position: absolute;
-	left: 5px;
-	right: 5px;
-	bottom: 5px;
-	height: 5px;
+	left: 3px;
+	right: 3px;
+	bottom: 3px;
+	height: 4px;
 	border-radius: 999px;
 	background: rgba(255, 255, 255, 0.45);
 	overflow: hidden;
@@ -219,11 +223,9 @@ $css = <<<'CSS'
 	background: #16a34a;
 }
 
-.zo-game-root--tower-defense-paths .tdp-controls {
+.zo-game-root--tower-defense-paths .tdp-side {
 	display: grid;
-	grid-template-columns: 1.2fr 1fr;
 	gap: 14px;
-	margin-bottom: 14px;
 }
 
 .zo-game-root--tower-defense-paths .tdp-panel {
@@ -243,7 +245,7 @@ $css = <<<'CSS'
 
 .zo-game-root--tower-defense-paths .tdp-tower-buttons {
 	display: grid;
-	grid-template-columns: repeat(3, 1fr);
+	grid-template-columns: repeat(2, 1fr);
 	gap: 10px;
 }
 
@@ -297,19 +299,80 @@ $css = <<<'CSS'
 	color: #ffffff;
 }
 
+.zo-game-root--tower-defense-paths .tdp-guide-list {
+	display: grid;
+	gap: 8px;
+}
+
+.zo-game-root--tower-defense-paths .tdp-guide-item {
+	display: grid;
+	grid-template-columns: 18px 1fr;
+	gap: 10px;
+	align-items: start;
+	padding: 10px;
+	border-radius: 10px;
+	background: #ffffff;
+	border: 1px solid #d9e2ec;
+}
+
+.zo-game-root--tower-defense-paths .tdp-guide-dot {
+	width: 18px;
+	height: 18px;
+	border-radius: 50%;
+	margin-top: 2px;
+	border: 1px solid rgba(20,20,20,0.25);
+}
+
+.zo-game-root--tower-defense-paths .tdp-guide-dot--basic {
+	background: #2563eb;
+}
+
+.zo-game-root--tower-defense-paths .tdp-guide-dot--sniper {
+	background: #3250b5;
+}
+
+.zo-game-root--tower-defense-paths .tdp-guide-dot--freeze {
+	background: #67c5e8;
+}
+
+.zo-game-root--tower-defense-paths .tdp-guide-dot--poison {
+	background: #6dbb45;
+}
+
+.zo-game-root--tower-defense-paths .tdp-guide-dot--bank {
+	background: #f59e0b;
+}
+
+.zo-game-root--tower-defense-paths .tdp-guide-name {
+	display: block;
+	font-size: 14px;
+	font-weight: 700;
+	color: #102a43;
+	margin-bottom: 2px;
+}
+
+.zo-game-root--tower-defense-paths .tdp-guide-text {
+	display: block;
+	font-size: 13px;
+	line-height: 1.45;
+	color: #52606d;
+}
+
 .zo-game-root--tower-defense-paths .tdp-progress {
 	text-align: center;
 	font-size: 14px;
 	color: #52606d;
 }
 
+@media (max-width: 980px) {
+	.zo-game-root--tower-defense-paths .tdp-layout {
+		grid-template-columns: 1fr;
+	}
+}
+
 @media (max-width: 760px) {
 	.zo-game-root--tower-defense-paths .tdp-topbar {
 		grid-template-columns: repeat(2, 1fr);
-	}
-
-	.zo-game-root--tower-defense-paths .tdp-controls {
-		grid-template-columns: 1fr;
 	}
 
 	.zo-game-root--tower-defense-paths .tdp-title {
@@ -343,29 +406,30 @@ document.addEventListener('DOMContentLoaded', function () {
 		const waveBtn = game.querySelector('.tdp-btn--wave');
 		const workBtn = game.querySelector('.tdp-btn--work');
 
-		const width = 12;
-		const height = 8;
+		const width = 20;
+		const height = 12;
 
 		const topPath = [
-			[0, 5], [1, 5], [2, 5], [2, 4], [2, 3], [3, 3], [4, 3], [5, 3], [5, 2], [6, 2], [7, 2], [8, 2], [9, 2], [9, 1], [10, 1], [11, 1]
+			[0, 9], [1, 9], [2, 9], [3, 9], [3, 8], [3, 7], [4, 7], [5, 7], [6, 7], [7, 7], [7, 6], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5], [12, 5], [12, 4], [12, 3], [13, 3], [14, 3], [15, 3], [16, 3], [17, 3], [17, 2], [18, 2], [19, 2]
 		];
 
 		const bottomPath = [
-			[0, 5], [1, 5], [2, 5], [2, 6], [3, 6], [4, 6], [5, 6], [5, 5], [6, 5], [7, 5], [8, 5], [8, 4], [9, 4], [10, 4], [10, 3], [11, 1]
+			[0, 9], [1, 9], [2, 9], [3, 9], [3, 10], [4, 10], [5, 10], [6, 10], [7, 10], [8, 10], [8, 9], [8, 8], [9, 8], [10, 8], [11, 8], [12, 8], [13, 8], [13, 7], [14, 7], [15, 7], [16, 7], [17, 7], [17, 6], [17, 5], [18, 5], [18, 4], [19, 2]
 		];
 
 		const hillCells = {
-			'4,2': 1.35,
-			'7,3': 1.4,
-			'8,5': 1.3,
-			'10,2': 1.35
+			'5,6': 1.3,
+			'9,4': 1.4,
+			'11,7': 1.35,
+			'15,2': 1.45,
+			'16,6': 1.3
 		};
 
 		const towerTypes = {
-			basic: { name: 'Basic', cost: 50, range: 2.2, fireDelay: 2, damage: 20, className: 'basic', income: 0 },
-			sniper: { name: 'Sniper', cost: 120, range: 4.8, fireDelay: 4, damage: 38, className: 'sniper', income: 0 },
-			freeze: { name: 'Freeze', cost: 90, range: 2.4, fireDelay: 3, damage: 8, className: 'freeze', income: 0 },
-			poison: { name: 'Poison', cost: 110, range: 2.6, fireDelay: 3, damage: 7, className: 'poison', income: 0 },
+			basic: { name: 'Basic', cost: 50, range: 2.6, fireDelay: 2, damage: 20, className: 'basic', income: 0 },
+			sniper: { name: 'Sniper', cost: 120, range: 6.2, fireDelay: 5, damage: 42, className: 'sniper', income: 0 },
+			freeze: { name: 'Freeze', cost: 90, range: 2.8, fireDelay: 3, damage: 8, className: 'freeze', income: 0 },
+			poison: { name: 'Poison', cost: 110, range: 3.1, fireDelay: 3, damage: 7, className: 'poison', income: 0 },
 			bank: { name: 'Bank', cost: 80, range: 0, fireDelay: 0, damage: 0, className: 'bank', income: 8 }
 		};
 
@@ -389,7 +453,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		let boardCells = [];
 		let tick = 0;
 		let spawnQueue = 0;
-		let spawnDelay = 12;
+		let spawnDelay = 10;
 		let gameLoop = null;
 		let ended = false;
 		let workCooldown = 0;
@@ -425,7 +489,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			scoreEl.textContent = String(score);
 			towersEl.textContent = String(towers.length);
 			incomeEl.textContent = String(getPassiveIncome());
-			progressEl.textContent = 'Build Bank towers or press Work for extra money.';
+			progressEl.textContent = 'Big map. Small squares. Build Bank towers or press Work for money.';
 		}
 
 		function isTopPathCell(x, y) {
@@ -648,7 +712,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			renderBoard();
 
 			if (selectedTowerType === 'bank') {
-				setStatus('Bank tower placed. It will make money over time.', 'good');
+				setStatus('Bank tower placed. It makes money over time.', 'good');
 			} else {
 				setStatus(towerData.name + ' tower placed.', 'good');
 			}
@@ -1003,7 +1067,7 @@ if (!function_exists('zo_game_tower_defense_paths_render')) {
 		<div class="zo-game-root zo-game-root--tower-defense-paths" id="<?php echo esc_attr($instance_id); ?>">
 			<div class="tdp-card">
 				<h2 class="tdp-title">Tower Defense Paths</h2>
-				<p class="tdp-instructions">Place towers on grass. Build Bank towers for passive income, or press Work to earn money manually.</p>
+				<p class="tdp-instructions">The map is bigger now and the squares are smaller. Build towers on grass, defend both paths, and use the guide to see what each tower does.</p>
 
 				<div class="tdp-topbar">
 					<div class="tdp-stat">
@@ -1034,35 +1098,78 @@ if (!function_exists('zo_game_tower_defense_paths_render')) {
 
 				<div class="tdp-status" aria-live="polite">Place towers, build Banks, or press Work for money.</div>
 
-				<div class="tdp-board-wrap">
-					<div class="tdp-board"></div>
-				</div>
-
-				<div class="tdp-controls">
-					<div class="tdp-panel">
-						<h3 class="tdp-panel-title">Towers</h3>
-						<div class="tdp-tower-buttons">
-							<button type="button" class="tdp-tower-btn is-active" data-type="basic">Basic<br>$50</button>
-							<button type="button" class="tdp-tower-btn" data-type="sniper">Sniper<br>$120</button>
-							<button type="button" class="tdp-tower-btn" data-type="freeze">Freeze<br>$90</button>
-							<button type="button" class="tdp-tower-btn" data-type="poison">Poison<br>$110</button>
-							<button type="button" class="tdp-tower-btn" data-type="bank">Bank<br>$80</button>
-						</div>
+				<div class="tdp-layout">
+					<div class="tdp-board-wrap">
+						<div class="tdp-board"></div>
 					</div>
 
-					<div class="tdp-panel">
-						<h3 class="tdp-panel-title">Actions</h3>
-						<div class="tdp-actions">
-							<button type="button" class="tdp-btn tdp-btn--toggle-top">Toggle Top Path</button>
-							<button type="button" class="tdp-btn tdp-btn--toggle-bottom">Toggle Bottom Path</button>
-							<button type="button" class="tdp-btn tdp-btn--wave">More Enemies</button>
-							<button type="button" class="tdp-btn tdp-btn--work">Work For Money</button>
-							<button type="button" class="tdp-btn tdp-btn--restart">Restart</button>
+					<div class="tdp-side">
+						<div class="tdp-panel">
+							<h3 class="tdp-panel-title">Towers</h3>
+							<div class="tdp-tower-buttons">
+								<button type="button" class="tdp-tower-btn is-active" data-type="basic">Basic<br>$50</button>
+								<button type="button" class="tdp-tower-btn" data-type="sniper">Sniper<br>$120</button>
+								<button type="button" class="tdp-tower-btn" data-type="freeze">Freeze<br>$90</button>
+								<button type="button" class="tdp-tower-btn" data-type="poison">Poison<br>$110</button>
+								<button type="button" class="tdp-tower-btn" data-type="bank">Bank<br>$80</button>
+							</div>
+						</div>
+
+						<div class="tdp-panel">
+							<h3 class="tdp-panel-title">What Towers Do</h3>
+							<div class="tdp-guide-list">
+								<div class="tdp-guide-item">
+									<div class="tdp-guide-dot tdp-guide-dot--basic"></div>
+									<div>
+										<span class="tdp-guide-name">Basic</span>
+										<span class="tdp-guide-text">Cheap all-around tower. Medium range. Good starter tower.</span>
+									</div>
+								</div>
+								<div class="tdp-guide-item">
+									<div class="tdp-guide-dot tdp-guide-dot--sniper"></div>
+									<div>
+										<span class="tdp-guide-name">Sniper</span>
+										<span class="tdp-guide-text">Very long range. Hits hard. Shoots slower.</span>
+									</div>
+								</div>
+								<div class="tdp-guide-item">
+									<div class="tdp-guide-dot tdp-guide-dot--freeze"></div>
+									<div>
+										<span class="tdp-guide-name">Freeze</span>
+										<span class="tdp-guide-text">Low damage, but slows enemies so other towers can hit them more.</span>
+									</div>
+								</div>
+								<div class="tdp-guide-item">
+									<div class="tdp-guide-dot tdp-guide-dot--poison"></div>
+									<div>
+										<span class="tdp-guide-name">Poison</span>
+										<span class="tdp-guide-text">Damages enemies and keeps hurting them over time.</span>
+									</div>
+								</div>
+								<div class="tdp-guide-item">
+									<div class="tdp-guide-dot tdp-guide-dot--bank"></div>
+									<div>
+										<span class="tdp-guide-name">Bank</span>
+										<span class="tdp-guide-text">Does not attack. Makes money again and again while it stays on the map.</span>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<div class="tdp-panel">
+							<h3 class="tdp-panel-title">Actions</h3>
+							<div class="tdp-actions">
+								<button type="button" class="tdp-btn tdp-btn--toggle-top">Toggle Top Path</button>
+								<button type="button" class="tdp-btn tdp-btn--toggle-bottom">Toggle Bottom Path</button>
+								<button type="button" class="tdp-btn tdp-btn--wave">More Enemies</button>
+								<button type="button" class="tdp-btn tdp-btn--work">Work For Money</button>
+								<button type="button" class="tdp-btn tdp-btn--restart">Restart</button>
+							</div>
 						</div>
 					</div>
 				</div>
 
-				<div class="tdp-progress">Build Bank towers or press Work for extra money.</div>
+				<div class="tdp-progress">Big map. Small squares. Build Bank towers or press Work for money.</div>
 			</div>
 		</div>
 		<?php
@@ -1074,7 +1181,7 @@ return array(
 	'slug'            => 'tower-defense-paths',
 	'name'            => 'Tower Defense Paths',
 	'author'          => 'Arslan',
-	'description'     => 'A browser tower defense game with two routes, tower types, status effects, route blocking, and extra money actions.',
+	'description'     => 'A bigger tower defense map with smaller squares, tower guide, route blocking, and money actions.',
 	'render_callback' => 'zo_game_tower_defense_paths_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,
