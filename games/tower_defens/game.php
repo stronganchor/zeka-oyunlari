@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 
 $css = <<<'CSS'
 .zo-game-root {
-	max-width: 1280px;
+	max-width: 1480px;
 	margin: 0 auto;
 	font-family: Arial, sans-serif;
 }
@@ -89,7 +89,7 @@ $css = <<<'CSS'
 
 .zo-game-root--tower-defense-paths .tdp-layout {
 	display: grid;
-	grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.9fr);
+	grid-template-columns: minmax(0, 1.75fr) minmax(320px, 0.85fr);
 	gap: 16px;
 	margin-bottom: 14px;
 	align-items: start;
@@ -106,22 +106,23 @@ $css = <<<'CSS'
 
 .zo-game-root--tower-defense-paths .tdp-board {
 	display: grid;
-	grid-template-columns: repeat(20, 32px);
-	grid-template-rows: repeat(12, 32px);
-	gap: 3px;
+	grid-template-columns: repeat(40, 20px);
+	grid-template-rows: repeat(24, 20px);
+	gap: 2px;
 	justify-content: start;
 	min-width: max-content;
 }
 
 .zo-game-root--tower-defense-paths .tdp-cell {
 	position: relative;
-	width: 32px;
-	height: 32px;
-	border-radius: 6px;
+	width: 20px;
+	height: 20px;
+	border-radius: 4px;
 	background: #86c56d;
 	border: 1px solid rgba(0, 0, 0, 0.08);
 	cursor: pointer;
 	overflow: hidden;
+	padding: 0;
 }
 
 .zo-game-root--tower-defense-paths .tdp-cell:hover,
@@ -145,12 +146,12 @@ $css = <<<'CSS'
 
 .zo-game-root--tower-defense-paths .tdp-tower {
 	position: absolute;
-	inset: 4px;
+	inset: 2px;
 	border-radius: 50%;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	font-size: 8px;
+	font-size: 6px;
 	font-weight: 700;
 	color: #ffffff;
 	border: 1px solid rgba(20, 20, 20, 0.45);
@@ -179,12 +180,12 @@ $css = <<<'CSS'
 
 .zo-game-root--tower-defense-paths .tdp-enemy {
 	position: absolute;
-	width: 14px;
-	height: 14px;
+	width: 8px;
+	height: 8px;
 	border-radius: 50%;
 	border: 1px solid rgba(20, 20, 20, 0.35);
-	top: 8px;
-	left: 8px;
+	top: 5px;
+	left: 5px;
 }
 
 .zo-game-root--tower-defense-paths .tdp-enemy--normal {
@@ -209,10 +210,10 @@ $css = <<<'CSS'
 
 .zo-game-root--tower-defense-paths .tdp-enemy-hp {
 	position: absolute;
-	left: 3px;
-	right: 3px;
-	bottom: 3px;
-	height: 4px;
+	left: 2px;
+	right: 2px;
+	bottom: 2px;
+	height: 3px;
 	border-radius: 999px;
 	background: rgba(255, 255, 255, 0.45);
 	overflow: hidden;
@@ -364,7 +365,7 @@ $css = <<<'CSS'
 	color: #52606d;
 }
 
-@media (max-width: 980px) {
+@media (max-width: 1100px) {
 	.zo-game-root--tower-defense-paths .tdp-layout {
 		grid-template-columns: 1fr;
 	}
@@ -406,31 +407,48 @@ document.addEventListener('DOMContentLoaded', function () {
 		const waveBtn = game.querySelector('.tdp-btn--wave');
 		const workBtn = game.querySelector('.tdp-btn--work');
 
-		const width = 20;
-		const height = 12;
+		const width = 40;
+		const height = 24;
 
 		const topPath = [
-			[0, 9], [1, 9], [2, 9], [3, 9], [3, 8], [3, 7], [4, 7], [5, 7], [6, 7], [7, 7], [7, 6], [7, 5], [8, 5], [9, 5], [10, 5], [11, 5], [12, 5], [12, 4], [12, 3], [13, 3], [14, 3], [15, 3], [16, 3], [17, 3], [17, 2], [18, 2], [19, 2]
+			[0,18],[1,18],[2,18],[3,18],[4,18],[5,18],[6,18],[6,17],[6,16],[6,15],[6,14],
+			[7,14],[8,14],[9,14],[10,14],[11,14],[12,14],[13,14],[14,14],
+			[14,13],[14,12],[14,11],[14,10],
+			[15,10],[16,10],[17,10],[18,10],[19,10],[20,10],[21,10],[22,10],[23,10],[24,10],
+			[24,9],[24,8],[24,7],[24,6],
+			[25,6],[26,6],[27,6],[28,6],[29,6],[30,6],[31,6],[32,6],[33,6],[34,6],
+			[34,5],[34,4],
+			[35,4],[36,4],[37,4],[38,4],[39,4]
 		];
 
 		const bottomPath = [
-			[0, 9], [1, 9], [2, 9], [3, 9], [3, 10], [4, 10], [5, 10], [6, 10], [7, 10], [8, 10], [8, 9], [8, 8], [9, 8], [10, 8], [11, 8], [12, 8], [13, 8], [13, 7], [14, 7], [15, 7], [16, 7], [17, 7], [17, 6], [17, 5], [18, 5], [18, 4], [19, 2]
+			[0,18],[1,18],[2,18],[3,18],[4,18],[5,18],[6,18],
+			[6,19],[6,20],
+			[7,20],[8,20],[9,20],[10,20],[11,20],[12,20],[13,20],[14,20],[15,20],[16,20],
+			[16,19],[16,18],[16,17],[16,16],
+			[17,16],[18,16],[19,16],[20,16],[21,16],[22,16],[23,16],[24,16],[25,16],[26,16],
+			[26,15],[26,14],
+			[27,14],[28,14],[29,14],[30,14],[31,14],[32,14],[33,14],[34,14],
+			[34,13],[34,12],[34,11],[34,10],
+			[35,10],[36,10],[36,9],[36,8],[37,8],[38,8],[38,7],[38,6],[39,4]
 		];
 
 		const hillCells = {
-			'5,6': 1.3,
-			'9,4': 1.4,
-			'11,7': 1.35,
-			'15,2': 1.45,
-			'16,6': 1.3
+			'10,12': 1.3,
+			'18,9': 1.4,
+			'22,15': 1.35,
+			'30,6': 1.45,
+			'33,13': 1.3,
+			'12,19': 1.3,
+			'27,12': 1.35
 		};
 
 		const towerTypes = {
-			basic: { name: 'Basic', cost: 50, range: 2.6, fireDelay: 2, damage: 20, className: 'basic', income: 0 },
-			sniper: { name: 'Sniper', cost: 120, range: 6.2, fireDelay: 5, damage: 42, className: 'sniper', income: 0 },
-			freeze: { name: 'Freeze', cost: 90, range: 2.8, fireDelay: 3, damage: 8, className: 'freeze', income: 0 },
-			poison: { name: 'Poison', cost: 110, range: 3.1, fireDelay: 3, damage: 7, className: 'poison', income: 0 },
-			bank: { name: 'Bank', cost: 80, range: 0, fireDelay: 0, damage: 0, className: 'bank', income: 8 }
+			basic: { name: 'Basic', cost: 50, range: 3.2, fireDelay: 2, damage: 20, className: 'basic', income: 0 },
+			sniper: { name: 'Sniper', cost: 120, range: 7.5, fireDelay: 5, damage: 42, className: 'sniper', income: 0 },
+			freeze: { name: 'Freeze', cost: 90, range: 3.5, fireDelay: 3, damage: 8, className: 'freeze', income: 0 },
+			poison: { name: 'Poison', cost: 110, range: 3.9, fireDelay: 3, damage: 7, className: 'poison', income: 0 },
+			bank: { name: 'Bank', cost: 110, range: 0, fireDelay: 0, damage: 0, className: 'bank', income: 8 }
 		};
 
 		const enemyTypes = {
@@ -453,7 +471,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		let boardCells = [];
 		let tick = 0;
 		let spawnQueue = 0;
-		let spawnDelay = 10;
 		let gameLoop = null;
 		let ended = false;
 		let workCooldown = 0;
@@ -489,7 +506,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			scoreEl.textContent = String(score);
 			towersEl.textContent = String(towers.length);
 			incomeEl.textContent = String(getPassiveIncome());
-			progressEl.textContent = 'Big map. Small squares. Build Bank towers or press Work for money.';
+			progressEl.textContent = 'Every 5 seconds the game sends 1 enemy. More Enemies sends 2.';
 		}
 
 		function isTopPathCell(x, y) {
@@ -712,7 +729,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			renderBoard();
 
 			if (selectedTowerType === 'bank') {
-				setStatus('Bank tower placed. It makes money over time.', 'good');
+				setStatus('Bank tower placed for $110. It makes money over time.', 'good');
 			} else {
 				setStatus(towerData.name + ' tower placed.', 'good');
 			}
@@ -725,10 +742,10 @@ document.addEventListener('DOMContentLoaded', function () {
 		function applyTowerAttack(tower, enemy) {
 			if (tower.type === 'freeze') {
 				enemy.hp -= tower.damage;
-				enemy.slowTicks = Math.max(enemy.slowTicks, 5);
+				enemy.slowTicks = Math.max(enemy.slowTicks, 6);
 			} else if (tower.type === 'poison') {
 				enemy.hp -= tower.damage;
-				enemy.poisonTicks = Math.max(enemy.poisonTicks, 8);
+				enemy.poisonTicks = Math.max(enemy.poisonTicks, 10);
 				enemy.poisonDamage = Math.max(enemy.poisonDamage, 4);
 			} else {
 				enemy.hp -= tower.damage;
@@ -819,7 +836,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 				enemy.healTicks += 1;
 
-				if (enemy.healTicks < 6) {
+				if (enemy.healTicks < 8) {
 					return;
 				}
 
@@ -831,7 +848,7 @@ document.addEventListener('DOMContentLoaded', function () {
 					}
 
 					const dist = Math.hypot(other.displayX - enemy.displayX, other.displayY - enemy.displayY);
-					if (dist <= 1.6) {
+					if (dist <= 2.2) {
 						other.hp = Math.min(other.maxHp, other.hp + 8);
 					}
 				});
@@ -860,7 +877,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			const speedMod = enemy.slowTicks > 0 ? 0.45 : 1;
-			const moveAmount = 0.35 * enemy.speed * speedMod;
+			const moveAmount = 0.34 * enemy.speed * speedMod;
 
 			enemy.progress += moveAmount;
 
@@ -902,26 +919,26 @@ document.addEventListener('DOMContentLoaded', function () {
 				return;
 			}
 
-			spawnQueue += 10 + (wave * 3);
-			setStatus('New wave started.', 'good');
+			spawnQueue += 2;
+			setStatus('More Enemies added 2 enemies.', 'good');
 		}
 
 		function maybeSpawn() {
-			if (spawnQueue <= 0) {
+			if (tick % 20 !== 0) {
 				return;
 			}
 
-			if (tick % spawnDelay !== 0) {
-				return;
+			if (spawnQueue > 0) {
+				spawnEnemy(chooseEnemyType());
+				spawnQueue -= 1;
+			} else {
+				spawnEnemy(chooseEnemyType());
 			}
-
-			spawnEnemy(chooseEnemyType());
-			spawnQueue -= 1;
 		}
 
 		function updateWave() {
-			if (score > 0 && score % 12 === 0) {
-				wave = Math.max(wave, 1 + Math.floor(score / 12));
+			if (score > 0 && score % 15 === 0) {
+				wave = Math.max(wave, 1 + Math.floor(score / 15));
 			}
 		}
 
@@ -988,7 +1005,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			towers = [];
 			enemies = [];
 			tick = 0;
-			spawnQueue = 16;
+			spawnQueue = 0;
 			ended = false;
 			workCooldown = 0;
 
@@ -1000,8 +1017,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			updateStats();
 			renderTowerSelection();
 			renderBoard();
-			setStatus('Place towers, build Banks, or press Work for money.', '');
-			gameLoop = setInterval(tickGame, 350);
+			setStatus('Bank towers now cost $110.', '');
+			gameLoop = setInterval(tickGame, 250);
 		}
 
 		towerButtons.forEach(function (button) {
@@ -1067,7 +1084,7 @@ if (!function_exists('zo_game_tower_defense_paths_render')) {
 		<div class="zo-game-root zo-game-root--tower-defense-paths" id="<?php echo esc_attr($instance_id); ?>">
 			<div class="tdp-card">
 				<h2 class="tdp-title">Tower Defense Paths</h2>
-				<p class="tdp-instructions">The map is bigger now and the squares are smaller. Build towers on grass, defend both paths, and use the guide to see what each tower does.</p>
+				<p class="tdp-instructions">This version has a map that is 4 times bigger, smaller squares, automatic enemy spawning every 5 seconds, More Enemies adds 2 enemies, and Bank towers now cost $110.</p>
 
 				<div class="tdp-topbar">
 					<div class="tdp-stat">
@@ -1096,7 +1113,7 @@ if (!function_exists('zo_game_tower_defense_paths_render')) {
 					</div>
 				</div>
 
-				<div class="tdp-status" aria-live="polite">Place towers, build Banks, or press Work for money.</div>
+				<div class="tdp-status" aria-live="polite">Bank towers now cost $110.</div>
 
 				<div class="tdp-layout">
 					<div class="tdp-board-wrap">
@@ -1111,7 +1128,7 @@ if (!function_exists('zo_game_tower_defense_paths_render')) {
 								<button type="button" class="tdp-tower-btn" data-type="sniper">Sniper<br>$120</button>
 								<button type="button" class="tdp-tower-btn" data-type="freeze">Freeze<br>$90</button>
 								<button type="button" class="tdp-tower-btn" data-type="poison">Poison<br>$110</button>
-								<button type="button" class="tdp-tower-btn" data-type="bank">Bank<br>$80</button>
+								<button type="button" class="tdp-tower-btn" data-type="bank">Bank<br>$110</button>
 							</div>
 						</div>
 
@@ -1150,7 +1167,7 @@ if (!function_exists('zo_game_tower_defense_paths_render')) {
 									<div class="tdp-guide-dot tdp-guide-dot--bank"></div>
 									<div>
 										<span class="tdp-guide-name">Bank</span>
-										<span class="tdp-guide-text">Does not attack. Makes money again and again while it stays on the map.</span>
+										<span class="tdp-guide-text">Does not attack. Costs $110. Makes money again and again while it stays on the map.</span>
 									</div>
 								</div>
 							</div>
@@ -1169,7 +1186,7 @@ if (!function_exists('zo_game_tower_defense_paths_render')) {
 					</div>
 				</div>
 
-				<div class="tdp-progress">Big map. Small squares. Build Bank towers or press Work for money.</div>
+				<div class="tdp-progress">Every 5 seconds the game sends 1 enemy. More Enemies sends 2.</div>
 			</div>
 		</div>
 		<?php
@@ -1181,7 +1198,7 @@ return array(
 	'slug'            => 'tower-defense-paths',
 	'name'            => 'Tower Defense Paths',
 	'author'          => 'Arslan',
-	'description'     => 'A bigger tower defense map with smaller squares, tower guide, route blocking, and money actions.',
+	'description'     => 'A much bigger tower defense map with smaller squares, automatic enemy spawning, and Bank towers costing $110.',
 	'render_callback' => 'zo_game_tower_defense_paths_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,
