@@ -185,18 +185,25 @@ document.addEventListener('DOMContentLoaded', function () {
 		canvas.height = HEIGHT;
 
 		const LEVELS = [
-			{ rows: 3, cols: 7, brickWidth: 100, brickHeight: 28, gap: 10, speed: 4.5 },
-			{ rows: 4, cols: 8, brickWidth: 92, brickHeight: 28, gap: 8, speed: 5.1 },
-			{ rows: 5, cols: 9, brickWidth: 84, brickHeight: 26, gap: 8, speed: 5.8 }
+			{ rows: 3, cols: 6, brickWidth: 120, brickHeight: 28, gap: 10, speed: 4.2 },
+			{ rows: 3, cols: 7, brickWidth: 102, brickHeight: 28, gap: 10, speed: 4.5 },
+			{ rows: 4, cols: 7, brickWidth: 102, brickHeight: 26, gap: 8, speed: 4.8 },
+			{ rows: 4, cols: 8, brickWidth: 90, brickHeight: 26, gap: 8, speed: 5.0 },
+			{ rows: 5, cols: 8, brickWidth: 90, brickHeight: 24, gap: 8, speed: 5.2 },
+			{ rows: 5, cols: 9, brickWidth: 80, brickHeight: 24, gap: 8, speed: 5.4 },
+			{ rows: 6, cols: 9, brickWidth: 80, brickHeight: 22, gap: 7, speed: 5.6 },
+			{ rows: 6, cols: 10, brickWidth: 71, brickHeight: 22, gap: 7, speed: 5.8 },
+			{ rows: 7, cols: 10, brickWidth: 71, brickHeight: 20, gap: 6, speed: 6.0 },
+			{ rows: 8, cols: 10, brickWidth: 71, brickHeight: 18, gap: 6, speed: 6.2 }
 		];
 
-		const COLORS = ['#ef4444', '#f97316', '#facc15', '#22c55e', '#38bdf8', '#a855f7'];
+		const COLORS = ['#ef4444', '#f97316', '#facc15', '#22c55e', '#38bdf8', '#a855f7', '#ec4899', '#14b8a6'];
 
 		let paddle = null;
 		let ball = null;
 		let bricks = [];
 		let score = 0;
-		let lives = 3;
+		let lives = 15;
 		let level = 1;
 		let playing = false;
 		let gameEnded = false;
@@ -243,7 +250,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			const cfg = LEVELS[levelIndex];
 			const totalWidth = (cfg.cols * cfg.brickWidth) + ((cfg.cols - 1) * cfg.gap);
 			const startX = (WIDTH - totalWidth) / 2;
-			const topOffset = 70;
+			const topOffset = 60;
 			const list = [];
 
 			for (let row = 0; row < cfg.rows; row++) {
@@ -278,7 +285,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function restartWholeGame() {
 			score = 0;
-			lives = 3;
+			lives = 15;
 			playing = false;
 			gameEnded = false;
 			loadLevel(1);
@@ -456,14 +463,14 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			if (bricks.length === 0) {
-				if (level < 3) {
+				if (level < 10) {
 					playing = false;
 					setStatus('Seviye ' + level + ' bitti. Şimdi seviye ' + (level + 1) + '.', 'good');
 					loadLevel(level + 1);
 				} else {
 					playing = false;
 					gameEnded = true;
-					setStatus('Seviye 3 bitti. Oyunu kazandın.', 'good');
+					setStatus('Seviye 10 bitti. Oyunu kazandın.', 'good');
 				}
 			}
 		}
@@ -561,7 +568,7 @@ if (!function_exists('zo_game_breakout_levels_render')) {
 		?>
 		<div class="zo-game-root zo-game-root--breakout-levels" id="<?php echo esc_attr($instance_id); ?>">
 			<h2 class="zo-bl-title">Breakout Levels</h2>
-			<p class="zo-bl-desc">Top ile blokları kır. Seviye 1 kolay, seviye 2 daha çok blok, seviye 3 en çok blok. Seviye 3 bitince kazanırsın.</p>
+			<p class="zo-bl-desc">Top ile blokları kır. Toplam 10 seviye var. Her seviyede daha çok blok var. 10. seviye bitince kazanırsın.</p>
 
 			<div class="zo-bl-top">
 				<div class="zo-bl-stat">
@@ -574,7 +581,7 @@ if (!function_exists('zo_game_breakout_levels_render')) {
 				</div>
 				<div class="zo-bl-stat">
 					<span class="zo-bl-stat-label">Can</span>
-					<span class="zo-bl-stat-value zo-bl-lives">3</span>
+					<span class="zo-bl-stat-value zo-bl-lives">15</span>
 				</div>
 				<div class="zo-bl-stat">
 					<span class="zo-bl-stat-label">Kalan Blok</span>
@@ -605,7 +612,7 @@ return array(
 	'slug'            => 'breakout-levels',
 	'name'            => 'Breakout Levels',
 	'author'          => 'Asker',
-	'description'     => 'Üç seviyeli breakout oyunu. Her seviyede daha fazla blok var. Seviye 3 bitince kazanırsın.',
+	'description'     => '10 seviyeli breakout oyunu. Her seviyede daha fazla blok var. 15 can ile oynanır.',
 	'render_callback' => 'zo_game_breakout_levels_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,

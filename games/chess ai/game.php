@@ -94,6 +94,22 @@ $css = <<<'CSS'
 	filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.22));
 }
 
+.zo-game-root--chess-ai .zo-chess-square .zo-piece--white {
+	color: #ffffff;
+	text-shadow:
+		0 0 1px #000,
+		0 1px 0 #000,
+		1px 0 0 #000,
+		-1px 0 0 #000,
+		0 -1px 0 #000;
+}
+
+.zo-game-root--chess-ai .zo-chess-square .zo-piece--black {
+	color: #111111;
+	text-shadow:
+		0 1px 0 rgba(255,255,255,0.18);
+}
+
 .zo-game-root--chess-ai .zo-chess-square .zo-label {
 	position: absolute;
 	font-size: 10px;
@@ -326,7 +342,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			[0,0,5,5,5,5,0,-5],
 			[-10,5,5,5,5,5,0,-10],
 			[-10,0,5,0,0,0,0,-10],
-			[-20,-10,-10,-5,-5,-10,-10,-20]
+			[-20,-10,-10,-5,-5,-10,-20]
 		];
 
 		const kingTable = [
@@ -394,30 +410,16 @@ document.addEventListener('DOMContentLoaded', function () {
 			};
 		}
 
-		function cloneState(obj) {
+		function cloneMove(move) {
 			return {
-				board: obj.board.map(function (row) { return row.slice(); }),
-				turn: obj.turn,
-				human: obj.human,
-				ai: obj.ai,
-				selected: obj.selected ? { r: obj.selected.r, c: obj.selected.c } : null,
-				legalMoves: obj.legalMoves.map(function (m) { return cloneMove(m); }),
-				lastMove: obj.lastMove ? cloneMove(obj.lastMove) : null,
-				status: obj.status,
-				thinking: obj.thinking,
-				gameOver: obj.gameOver,
-				winner: obj.winner,
-				moveHistory: obj.moveHistory.slice(),
-				historyStates: obj.historyStates.map(function (h) { return serializeHistoryState(h); }),
-				castling: {
-					wk: obj.castling.wk,
-					wq: obj.castling.wq,
-					bk: obj.castling.bk,
-					bq: obj.castling.bq
-				},
-				enPassant: obj.enPassant ? { r: obj.enPassant.r, c: obj.enPassant.c } : null,
-				halfmove: obj.halfmove,
-				fullmove: obj.fullmove
+				from: { r: move.from.r, c: move.from.c },
+				to: { r: move.to.r, c: move.to.c },
+				piece: move.piece,
+				capture: move.capture || null,
+				promotion: move.promotion || null,
+				enPassant: !!move.enPassant,
+				castle: move.castle || null,
+				doubleStep: !!move.doubleStep
 			};
 		}
 
@@ -466,19 +468,6 @@ document.addEventListener('DOMContentLoaded', function () {
 				legalMoves: [],
 				thinking: false,
 				historyStates: state.historyStates.slice(0, Math.max(0, state.historyStates.length - 1))
-			};
-		}
-
-		function cloneMove(move) {
-			return {
-				from: { r: move.from.r, c: move.from.c },
-				to: { r: move.to.r, c: move.to.c },
-				piece: move.piece,
-				capture: move.capture || null,
-				promotion: move.promotion || null,
-				enPassant: !!move.enPassant,
-				castle: move.castle || null,
-				doubleStep: !!move.doubleStep
 			};
 		}
 
@@ -566,7 +555,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 					if (piece) {
 						const pieceSpan = document.createElement('span');
-						pieceSpan.className = 'zo-piece';
+						pieceSpan.className = 'zo-piece zo-piece--' + (pieceColor(piece) === 'w' ? 'white' : 'black');
 						pieceSpan.textContent = pieceSymbols[piece] || '';
 						square.appendChild(pieceSpan);
 					}
@@ -1190,16 +1179,16 @@ document.addEventListener('DOMContentLoaded', function () {
 				gameState.castling.bk = false;
 				gameState.castling.bq = false;
 			}
-			if (move.from.r === 7 && move.from.c === 0 || move.to.r === 7 && move.to.c === 0) {
+			if ((move.from.r === 7 && move.from.c === 0) || (move.to.r === 7 && move.to.c === 0)) {
 				gameState.castling.wq = false;
 			}
-			if (move.from.r === 7 && move.from.c === 7 || move.to.r === 7 && move.to.c === 7) {
+			if ((move.from.r === 7 && move.from.c === 7) || (move.to.r === 7 && move.to.c === 7)) {
 				gameState.castling.wk = false;
 			}
-			if (move.from.r === 0 && move.from.c === 0 || move.to.r === 0 && move.to.c === 0) {
+			if ((move.from.r === 0 && move.from.c === 0) || (move.to.r === 0 && move.to.c === 0)) {
 				gameState.castling.bq = false;
 			}
-			if (move.from.r === 0 && move.from.c === 7 || move.to.r === 0 && move.to.c === 7) {
+			if ((move.from.r === 0 && move.from.c === 7) || (move.to.r === 0 && move.to.c === 7)) {
 				gameState.castling.bk = false;
 			}
 
