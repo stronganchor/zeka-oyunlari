@@ -74,17 +74,27 @@ $css = <<<'CSS'
 .zo-game-root--mini-paint .mini-paint__select,
 .zo-game-root--mini-paint .mini-paint__range,
 .zo-game-root--mini-paint .mini-paint__file,
-.zo-game-root--mini-paint .mini-paint__color {
+.zo-game-root--mini-paint .mini-paint__color,
+.zo-game-root--mini-paint .mini-paint__text-input {
 	border-radius: 10px;
 }
 
 .zo-game-root--mini-paint .mini-paint__button,
-.zo-game-root--mini-paint .mini-paint__select {
+.zo-game-root--mini-paint .mini-paint__select,
+.zo-game-root--mini-paint .mini-paint__text-input {
 	border: 1px solid #cfd5e3;
 	background: #ffffff;
 	color: #222;
 	padding: 10px 12px;
 	font-size: 14px;
+}
+
+.zo-game-root--mini-paint .mini-paint__text-input {
+	min-width: 180px;
+}
+
+.zo-game-root--mini-paint .mini-paint__button,
+.zo-game-root--mini-paint .mini-paint__select {
 	cursor: pointer;
 	transition: background 0.15s ease, transform 0.15s ease;
 }
@@ -187,6 +197,10 @@ $css = <<<'CSS'
 		width: 100%;
 		justify-content: center;
 	}
+
+	.zo-game-root--mini-paint .mini-paint__text-input {
+		min-width: 100%;
+	}
 }
 CSS;
 
@@ -216,6 +230,12 @@ document.addEventListener('DOMContentLoaded', function () {
 		const uploadInput = game.querySelector('.mini-paint__file');
 		const bgWhiteButton = game.querySelector('[data-bg="white"]');
 		const bgTransparentButton = game.querySelector('[data-bg="transparent"]');
+		const textInput = game.querySelector('.mini-paint__text-input');
+		const textSizeInput = game.querySelector('.mini-paint__text-size');
+		const textSizeValue = game.querySelector('.mini-paint__text-size-value');
+		const fontSelect = game.querySelector('.mini-paint__font-select');
+		const boldToggle = game.querySelector('[data-text-style="bold"]');
+		const italicToggle = game.querySelector('[data-text-style="italic"]');
 		const status = game.querySelector('.mini-paint__status');
 
 		let currentTool = 'brush';
@@ -232,71 +252,16 @@ document.addEventListener('DOMContentLoaded', function () {
 		let snapshotBeforeShape = null;
 		let history = [];
 		let historyIndex = -1;
+		let textSize = textSizeInput ? parseInt(textSizeInput.value, 10) : 32;
+		let textFont = fontSelect ? fontSelect.value : 'Arial';
+		let textBold = false;
+		let textItalic = false;
 		const maxHistory = 40;
 
 		function setStatus(text) {
 			if (status) {
 				status.textContent = text;
 			}
-		}
-
-		function resizeCanvasForDisplay() {
-			const stored = document.createElement('canvas');
-			stored.width = canvas.width;
-			stored.height = canvas.height;
-			const storedCtx = stored.getContext('2d');
-			storedCtx.drawImage(canvas, 0, 0);
-
-			const wrap = game.querySelector('.mini-paint__canvas-wrap');
-			if (!wrap) {
-				return;
-			}
-
-			const maxWidth = Math.min(wrap.clientWidth - 24, 960);
-			const targetWidth = maxWidth > 320 ? maxWidth : 320;
-			const ratio = 0.625;
-			const targetHeight = Math.round(targetWidth * ratio);
-
-			canvas.width = targetWidth;
-			canvas.height = targetHeight;
-			canvas.style.width = targetWidth + 'px';
-			canvas.style.height = targetHeight + 'px';
-
-			if (!hasTransparentBackground) {
-				ctx.fillStyle = '#ffffff';
-				ctx.fillRect(0, 0, canvas.width, canvas.height);
-			} else {
-				ctx.clearRect(0, 0, canvas.width, canvas.height);
-			}
-
-			ctx.drawImage(stored, 0, 0, stored.width, stored.height, 0, 0, canvas.width, canvas.height);
-			saveHistoryState(true);
-		}
-
-		function setCanvasBackground(transparent) {
-			hasTransparentBackground = !!transparent;
-			if (transparent) {
-				const current = ctx.getImageData(0, 0, canvas.width, canvas.height);
-				const temp = document.createElement('canvas');
-				temp.width = canvas.width;
-				temp.height = canvas.height;
-				const tempCtx = temp.getContext('2d');
-				tempCtx.putImageData(current, 0, 0);
-				ctx.clearRect(0, 0, canvas.width, canvas.height);
-				ctx.drawImage(temp, 0, 0);
-				setStatus('Transparent background selected');
-			} else {
-				const temp = document.createElement('canvas');
-				temp.width = canvas.width;
-				temp.height = canvas.height;
-				const tempCtx = temp.getContext('2d');
-				tempCtx.drawImage(canvas, 0, 0);
-				ctx.fillStyle = '#ffffff';
-				ctx.fillRect(0, 0, canvas.width, canvas.height);
-				ctx.drawImage(temp, 0, 0);
-				setStatus('White background selected');
-			}
-			saveHistoryState();
 		}
 
 		function initializeCanvas() {
@@ -313,7 +278,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			saveHistoryState();
 		}
 
-		function saveHistoryState(skipTrim) {
+		function saveHistoryState() {
 			try {
 				const data = canvas.toDataURL('image/png');
 				if (historyIndex >= 0 && history[historyIndex] === data) {
@@ -321,7 +286,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				}
 				history = history.slice(0, historyIndex + 1);
 				history.push(data);
-				if (!skipTrim && history.length > maxHistory) {
+				if (history.length > maxHistory) {
 					history.shift();
 				}
 				historyIndex = history.length - 1;
@@ -411,14 +376,12 @@ document.addEventListener('DOMContentLoaded', function () {
 					ctx.strokeRect(startX, startY, width, height);
 				}
 			} else if (currentShape === 'square') {
-				const sqX = startX;
-				const sqY = startY;
 				const sqW = size * dirX;
 				const sqH = size * dirY;
 				if (fillShapes) {
-					ctx.fillRect(sqX, sqY, sqW, sqH);
+					ctx.fillRect(startX, startY, sqW, sqH);
 				} else {
-					ctx.strokeRect(sqX, sqY, sqW, sqH);
+					ctx.strokeRect(startX, startY, sqW, sqH);
 				}
 			} else if (currentShape === 'circle') {
 				const radius = Math.sqrt((width * width) + (height * height));
@@ -517,6 +480,43 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		}
 
+		function getTextFontString() {
+			const parts = [];
+			if (textItalic) {
+				parts.push('italic');
+			}
+			if (textBold) {
+				parts.push('bold');
+			}
+			parts.push(textSize + 'px');
+			parts.push(textFont);
+			return parts.join(' ');
+		}
+
+		function placeText(x, y) {
+			const text = textInput ? textInput.value.trim() : '';
+			if (!text) {
+				setStatus('Type some text first');
+				return;
+			}
+
+			ctx.save();
+			ctx.fillStyle = currentColor;
+			ctx.font = getTextFontString();
+			ctx.textBaseline = 'top';
+
+			const lines = text.split(/\r?\n/);
+			const lineHeight = Math.round(textSize * 1.25);
+
+			lines.forEach(function (line, index) {
+				ctx.fillText(line, x, y + (index * lineHeight));
+			});
+
+			ctx.restore();
+			saveHistoryState();
+			setStatus('Text added');
+		}
+
 		function setTool(tool) {
 			currentTool = tool;
 			toolButtons.forEach(function (button) {
@@ -549,6 +549,9 @@ document.addEventListener('DOMContentLoaded', function () {
 				isDrawing = false;
 				saveHistoryState();
 				setStatus('Stamped shape');
+			} else if (currentTool === 'text') {
+				placeText(pos.x, pos.y);
+				isDrawing = false;
 			}
 		}
 
@@ -603,8 +606,11 @@ document.addEventListener('DOMContentLoaded', function () {
 				snapshotBeforeShape = null;
 			}
 
+			if (currentTool === 'brush' || currentTool === 'eraser' || currentTool === 'shape') {
+				saveHistoryState();
+			}
+
 			isDrawing = false;
-			saveHistoryState();
 		}
 
 		function clearCanvas() {
@@ -688,6 +694,26 @@ document.addEventListener('DOMContentLoaded', function () {
 			event.target.value = '';
 		}
 
+		function setCanvasBackground(transparent) {
+			hasTransparentBackground = !!transparent;
+
+			if (transparent) {
+				setStatus('Transparent background selected');
+			} else {
+				const temp = document.createElement('canvas');
+				temp.width = canvas.width;
+				temp.height = canvas.height;
+				const tempCtx = temp.getContext('2d');
+				tempCtx.drawImage(canvas, 0, 0);
+				ctx.fillStyle = '#ffffff';
+				ctx.fillRect(0, 0, canvas.width, canvas.height);
+				ctx.drawImage(temp, 0, 0);
+				setStatus('White background selected');
+			}
+
+			saveHistoryState();
+		}
+
 		toolButtons.forEach(function (button) {
 			button.addEventListener('click', function () {
 				setTool(button.getAttribute('data-tool'));
@@ -723,6 +749,38 @@ document.addEventListener('DOMContentLoaded', function () {
 				fillToggle.classList.toggle('is-active', fillShapes);
 				fillToggle.textContent = fillShapes ? 'Filled shapes: On' : 'Filled shapes: Off';
 				setStatus(fillShapes ? 'Filled shapes on' : 'Filled shapes off');
+			});
+		}
+
+		if (textSizeInput) {
+			textSizeInput.addEventListener('input', function () {
+				textSize = parseInt(textSizeInput.value, 10);
+				if (textSizeValue) {
+					textSizeValue.textContent = textSize + 'px';
+				}
+			});
+		}
+
+		if (fontSelect) {
+			fontSelect.addEventListener('change', function () {
+				textFont = fontSelect.value;
+				setStatus('Font changed');
+			});
+		}
+
+		if (boldToggle) {
+			boldToggle.addEventListener('click', function () {
+				textBold = !textBold;
+				boldToggle.classList.toggle('is-active', textBold);
+				setStatus(textBold ? 'Bold on' : 'Bold off');
+			});
+		}
+
+		if (italicToggle) {
+			italicToggle.addEventListener('click', function () {
+				textItalic = !textItalic;
+				italicToggle.classList.toggle('is-active', textItalic);
+				setStatus(textItalic ? 'Italic on' : 'Italic off');
 			});
 		}
 
@@ -774,14 +832,15 @@ document.addEventListener('DOMContentLoaded', function () {
 		canvas.addEventListener('touchmove', moveDrawing, { passive: false });
 		window.addEventListener('touchend', endDrawing, { passive: false });
 
-		window.addEventListener('resize', function () {
-			// kept lightweight on purpose
-		});
-
 		initializeCanvas();
 		setTool('brush');
+
 		if (sizeValue) {
 			sizeValue.textContent = currentSize + 'px';
+		}
+
+		if (textSizeValue) {
+			textSizeValue.textContent = textSize + 'px';
 		}
 	});
 });
@@ -798,8 +857,8 @@ if (!function_exists('zo_game_mini_paint_render')) {
 				<div class="mini-paint__top">
 					<h2 class="mini-paint__title">Mini Paint Studio</h2>
 					<div class="mini-paint__help">
-						Draw like a simple Paint app. Use brush, eraser, fill bucket, and shapes.
-						You can upload a picture, draw on top of it, then save as PNG or JPG.
+						Draw like a simple Paint app. Use brush, eraser, fill bucket, shapes, and text.
+						You can upload a picture, draw on top of it, add text, then save as PNG or JPG.
 					</div>
 				</div>
 
@@ -811,6 +870,7 @@ if (!function_exists('zo_game_mini_paint_render')) {
 						<button type="button" class="mini-paint__button" data-tool="fill">Fill</button>
 						<button type="button" class="mini-paint__button" data-tool="shape">Shape Drag</button>
 						<button type="button" class="mini-paint__button" data-tool="stamp">Shape Stamp</button>
+						<button type="button" class="mini-paint__button" data-tool="text">Text</button>
 					</div>
 
 					<div class="mini-paint__group">
@@ -832,6 +892,24 @@ if (!function_exists('zo_game_mini_paint_render')) {
 							<option value="circle">Circle</option>
 						</select>
 						<button type="button" class="mini-paint__button" data-fill-toggle>Filled shapes: Off</button>
+					</div>
+
+					<div class="mini-paint__group">
+						<span class="mini-paint__label">Text</span>
+						<input type="text" class="mini-paint__text-input" placeholder="Type text here" aria-label="Text input">
+						<input type="range" class="mini-paint__range mini-paint__text-size" min="8" max="120" value="32" aria-label="Text size">
+						<span class="mini-paint__value mini-paint__text-size-value">32px</span>
+						<select class="mini-paint__select mini-paint__font-select" aria-label="Font picker">
+							<option value="Arial">Arial</option>
+							<option value="Verdana">Verdana</option>
+							<option value="Tahoma">Tahoma</option>
+							<option value="'Trebuchet MS'">Trebuchet</option>
+							<option value="'Times New Roman'">Times New Roman</option>
+							<option value="Georgia">Georgia</option>
+							<option value="'Courier New'">Courier New</option>
+						</select>
+						<button type="button" class="mini-paint__button" data-text-style="bold">Bold</button>
+						<button type="button" class="mini-paint__button" data-text-style="italic">Italic</button>
 					</div>
 
 					<div class="mini-paint__group">
@@ -862,7 +940,7 @@ if (!function_exists('zo_game_mini_paint_render')) {
 				<div class="mini-paint__status" aria-live="polite">Ready to draw</div>
 
 				<div class="mini-paint__footer">
-					Simple paint program with drawing, erasing, shape tools, upload, undo, redo, and save.
+					Simple paint program with drawing, erasing, shape tools, text, upload, undo, redo, and save.
 				</div>
 			</div>
 		</div>
@@ -875,7 +953,7 @@ return array(
 	'slug'            => 'mini-paint',
 	'name'            => 'Mini Paint Studio',
 	'author'          => 'Asker',
-	'description'     => 'A simple Paint-style image editor with drawing, shapes, upload, and PNG/JPG saving.',
+	'description'     => 'A simple Paint-style image editor with drawing, shapes, text, upload, and PNG/JPG saving.',
 	'render_callback' => 'zo_game_mini_paint_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,
