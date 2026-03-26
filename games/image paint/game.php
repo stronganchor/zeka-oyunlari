@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 
 $css = <<<'CSS'
 .zo-game-root {
-	max-width: 1100px;
+	max-width: 1180px;
 	margin: 0 auto;
 	font-family: Arial, sans-serif;
 }
@@ -89,10 +89,6 @@ $css = <<<'CSS'
 	font-size: 14px;
 }
 
-.zo-game-root--mini-paint .mini-paint__text-input {
-	min-width: 180px;
-}
-
 .zo-game-root--mini-paint .mini-paint__button,
 .zo-game-root--mini-paint .mini-paint__select {
 	cursor: pointer;
@@ -135,6 +131,10 @@ $css = <<<'CSS'
 	color: #333;
 }
 
+.zo-game-root--mini-paint .mini-paint__text-input {
+	min-width: 180px;
+}
+
 .zo-game-root--mini-paint .mini-paint__canvas-wrap {
 	display: flex;
 	justify-content: center;
@@ -150,17 +150,40 @@ $css = <<<'CSS'
 	border-radius: 16px;
 	padding: 12px;
 	overflow: auto;
+	position: relative;
+}
+
+.zo-game-root--mini-paint .mini-paint__canvas-stack {
+	position: relative;
+	width: 900px;
+	height: 560px;
+	max-width: 100%;
+	flex: 0 0 auto;
+}
+
+.zo-game-root--mini-paint .mini-paint__canvas,
+.zo-game-root--mini-paint .mini-paint__overlay {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 900px;
+	height: 560px;
+	max-width: 100%;
+	display: block;
+	border-radius: 12px;
 }
 
 .zo-game-root--mini-paint .mini-paint__canvas {
 	background: #ffffff;
 	border: 1px solid #cfd5e3;
-	border-radius: 12px;
 	touch-action: none;
-	max-width: 100%;
-	height: auto;
-	display: block;
 	cursor: crosshair;
+	z-index: 1;
+}
+
+.zo-game-root--mini-paint .mini-paint__overlay {
+	pointer-events: none;
+	z-index: 2;
 }
 
 .zo-game-root--mini-paint .mini-paint__status {
@@ -177,9 +200,28 @@ $css = <<<'CSS'
 	text-align: center;
 	font-size: 12px;
 	color: #666;
+	line-height: 1.5;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 980px) {
+	.zo-game-root--mini-paint .mini-paint__canvas-stack,
+	.zo-game-root--mini-paint .mini-paint__canvas,
+	.zo-game-root--mini-paint .mini-paint__overlay {
+		width: 800px;
+		height: 500px;
+	}
+}
+
+@media (max-width: 860px) {
+	.zo-game-root--mini-paint .mini-paint__canvas-stack,
+	.zo-game-root--mini-paint .mini-paint__canvas,
+	.zo-game-root--mini-paint .mini-paint__overlay {
+		width: 680px;
+		height: 424px;
+	}
+}
+
+@media (max-width: 720px) {
 	.zo-game-root--mini-paint .mini-paint {
 		padding: 10px;
 	}
@@ -201,6 +243,22 @@ $css = <<<'CSS'
 	.zo-game-root--mini-paint .mini-paint__text-input {
 		min-width: 100%;
 	}
+
+	.zo-game-root--mini-paint .mini-paint__canvas-stack,
+	.zo-game-root--mini-paint .mini-paint__canvas,
+	.zo-game-root--mini-paint .mini-paint__overlay {
+		width: 520px;
+		height: 325px;
+	}
+}
+
+@media (max-width: 560px) {
+	.zo-game-root--mini-paint .mini-paint__canvas-stack,
+	.zo-game-root--mini-paint .mini-paint__canvas,
+	.zo-game-root--mini-paint .mini-paint__overlay {
+		width: 360px;
+		height: 225px;
+	}
 }
 CSS;
 
@@ -210,17 +268,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	games.forEach(function (game) {
 		const canvas = game.querySelector('.mini-paint__canvas');
+		const overlay = game.querySelector('.mini-paint__overlay');
 		const ctx = canvas ? canvas.getContext('2d') : null;
+		const overlayCtx = overlay ? overlay.getContext('2d') : null;
 
-		if (!canvas || !ctx) {
+		if (!canvas || !overlay || !ctx || !overlayCtx) {
 			return;
 		}
 
 		const toolButtons = game.querySelectorAll('[data-tool]');
 		const colorInput = game.querySelector('.mini-paint__color');
-		const sizeInput = game.querySelector('.mini-paint__range');
-		const sizeValue = game.querySelector('.mini-paint__value');
-		const shapeSelect = game.querySelector('.mini-paint__select');
+		const sizeInput = game.querySelector('.mini-paint__brush-size');
+		const sizeValue = game.querySelector('.mini-paint__brush-size-value');
+		const shapeSelect = game.querySelector('.mini-paint__shape-select');
 		const fillToggle = game.querySelector('[data-fill-toggle]');
 		const clearButton = game.querySelector('[data-action="clear"]');
 		const undoButton = game.querySelector('[data-action="undo"]');
@@ -236,6 +296,14 @@ document.addEventListener('DOMContentLoaded', function () {
 		const fontSelect = game.querySelector('.mini-paint__font-select');
 		const boldToggle = game.querySelector('[data-text-style="bold"]');
 		const italicToggle = game.querySelector('[data-text-style="italic"]');
+		const stickerSelect = game.querySelector('.mini-paint__sticker-select');
+		const emojiSelect = game.querySelector('.mini-paint__emoji-select');
+		const frameSelect = game.querySelector('.mini-paint__frame-select');
+		const applyFrameButton = game.querySelector('[data-action="apply-frame"]');
+		const flipHButton = game.querySelector('[data-action="flip-h"]');
+		const flipVButton = game.querySelector('[data-action="flip-v"]');
+		const rotateLeftButton = game.querySelector('[data-action="rotate-left"]');
+		const rotateRightButton = game.querySelector('[data-action="rotate-right"]');
 		const status = game.querySelector('.mini-paint__status');
 
 		let currentTool = 'brush';
@@ -256,7 +324,13 @@ document.addEventListener('DOMContentLoaded', function () {
 		let textFont = fontSelect ? fontSelect.value : 'Arial';
 		let textBold = false;
 		let textItalic = false;
-		const maxHistory = 40;
+		let selection = null;
+		let selectionImage = null;
+		let selectionDragOffsetX = 0;
+		let selectionDragOffsetY = 0;
+		let movingSelection = false;
+		let isMakingSelection = false;
+		const maxHistory = 50;
 
 		function setStatus(text) {
 			if (status) {
@@ -267,15 +341,43 @@ document.addEventListener('DOMContentLoaded', function () {
 		function initializeCanvas() {
 			canvas.width = 900;
 			canvas.height = 560;
-			canvas.style.width = '100%';
-			canvas.style.maxWidth = '900px';
-			canvas.style.height = 'auto';
+			overlay.width = 900;
+			overlay.height = 560;
 			ctx.lineCap = 'round';
 			ctx.lineJoin = 'round';
 			ctx.fillStyle = '#ffffff';
 			ctx.fillRect(0, 0, canvas.width, canvas.height);
-			setStatus('Ready to draw');
+			clearOverlay();
 			saveHistoryState();
+			setStatus('Ready to draw');
+		}
+
+		function clearOverlay() {
+			overlayCtx.clearRect(0, 0, overlay.width, overlay.height);
+		}
+
+		function drawSelectionOverlay() {
+			clearOverlay();
+
+			if (!selection) {
+				return;
+			}
+
+			overlayCtx.save();
+			overlayCtx.setLineDash([8, 4]);
+			overlayCtx.lineWidth = 2;
+			overlayCtx.strokeStyle = '#1f70ff';
+			overlayCtx.strokeRect(selection.x, selection.y, selection.width, selection.height);
+			overlayCtx.restore();
+		}
+
+		function normalizeRect(x1, y1, x2, y2) {
+			return {
+				x: Math.min(x1, x2),
+				y: Math.min(y1, y2),
+				width: Math.abs(x2 - x1),
+				height: Math.abs(y2 - y1)
+			};
 		}
 
 		function saveHistoryState() {
@@ -307,6 +409,9 @@ document.addEventListener('DOMContentLoaded', function () {
 					ctx.fillRect(0, 0, canvas.width, canvas.height);
 				}
 				ctx.drawImage(img, 0, 0);
+				selection = null;
+				selectionImage = null;
+				clearOverlay();
 			};
 			img.src = history[index];
 		}
@@ -341,6 +446,16 @@ document.addEventListener('DOMContentLoaded', function () {
 			};
 		}
 
+		function pointInSelection(x, y) {
+			if (!selection) {
+				return false;
+			}
+			return x >= selection.x &&
+				x <= selection.x + selection.width &&
+				y >= selection.y &&
+				y <= selection.y + selection.height;
+		}
+
 		function applyStrokeStyle() {
 			ctx.strokeStyle = currentColor;
 			ctx.fillStyle = currentColor;
@@ -355,6 +470,110 @@ document.addEventListener('DOMContentLoaded', function () {
 			ctx.stroke();
 		}
 
+		function drawTriangle(x, y, width, height, fill) {
+			ctx.beginPath();
+			ctx.moveTo(x + width / 2, y);
+			ctx.lineTo(x + width, y + height);
+			ctx.lineTo(x, y + height);
+			ctx.closePath();
+			if (fill) {
+				ctx.fill();
+			} else {
+				ctx.stroke();
+			}
+		}
+
+		function drawStar(cx, cy, outerRadius, innerRadius, fill) {
+			let rot = Math.PI / 2 * 3;
+			const spikes = 5;
+			const step = Math.PI / spikes;
+
+			ctx.beginPath();
+			ctx.moveTo(cx, cy - outerRadius);
+
+			for (let i = 0; i < spikes; i++) {
+				ctx.lineTo(cx + Math.cos(rot) * outerRadius, cy + Math.sin(rot) * outerRadius);
+				rot += step;
+
+				ctx.lineTo(cx + Math.cos(rot) * innerRadius, cy + Math.sin(rot) * innerRadius);
+				rot += step;
+			}
+
+			ctx.closePath();
+			if (fill) {
+				ctx.fill();
+			} else {
+				ctx.stroke();
+			}
+		}
+
+		function drawHeart(x, y, width, height, fill) {
+			const topCurveHeight = height * 0.3;
+			ctx.beginPath();
+			ctx.moveTo(x + width / 2, y + height);
+			ctx.bezierCurveTo(
+				x + width / 2, y + height - topCurveHeight,
+				x, y + height - topCurveHeight,
+				x, y + topCurveHeight
+			);
+			ctx.bezierCurveTo(
+				x, y,
+				x + width / 4, y,
+				x + width / 2, y + topCurveHeight
+			);
+			ctx.bezierCurveTo(
+				x + width * 0.75, y,
+				x + width, y,
+				x + width, y + topCurveHeight
+			);
+			ctx.bezierCurveTo(
+				x + width, y + height - topCurveHeight,
+				x + width / 2, y + height - topCurveHeight,
+				x + width / 2, y + height
+			);
+			ctx.closePath();
+			if (fill) {
+				ctx.fill();
+			} else {
+				ctx.stroke();
+			}
+		}
+
+		function drawShapeByType(shape, x, y, width, height, fill) {
+			const absWidth = width;
+			const absHeight = height;
+
+			if (shape === 'rectangle') {
+				if (fill) {
+					ctx.fillRect(x, y, absWidth, absHeight);
+				} else {
+					ctx.strokeRect(x, y, absWidth, absHeight);
+				}
+			} else if (shape === 'square') {
+				const size = Math.min(absWidth, absHeight);
+				if (fill) {
+					ctx.fillRect(x, y, size, size);
+				} else {
+					ctx.strokeRect(x, y, size, size);
+				}
+			} else if (shape === 'circle') {
+				ctx.beginPath();
+				ctx.ellipse(x + absWidth / 2, y + absHeight / 2, absWidth / 2, absHeight / 2, 0, 0, Math.PI * 2);
+				if (fill) {
+					ctx.fill();
+				} else {
+					ctx.stroke();
+				}
+			} else if (shape === 'triangle') {
+				drawTriangle(x, y, absWidth, absHeight, fill);
+			} else if (shape === 'star') {
+				const radius = Math.min(absWidth, absHeight) / 2;
+				drawStar(x + absWidth / 2, y + absHeight / 2, radius, radius * 0.45, fill);
+			} else if (shape === 'heart') {
+				drawHeart(x, y, absWidth, absHeight, fill);
+			}
+		}
+
 		function drawPreviewShape(x, y) {
 			if (!snapshotBeforeShape) {
 				return;
@@ -363,36 +582,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			ctx.putImageData(snapshotBeforeShape, 0, 0);
 			applyStrokeStyle();
 
-			const width = x - startX;
-			const height = y - startY;
-			const size = Math.max(Math.abs(width), Math.abs(height));
-			const dirX = width < 0 ? -1 : 1;
-			const dirY = height < 0 ? -1 : 1;
-
-			if (currentShape === 'rectangle') {
-				if (fillShapes) {
-					ctx.fillRect(startX, startY, width, height);
-				} else {
-					ctx.strokeRect(startX, startY, width, height);
-				}
-			} else if (currentShape === 'square') {
-				const sqW = size * dirX;
-				const sqH = size * dirY;
-				if (fillShapes) {
-					ctx.fillRect(startX, startY, sqW, sqH);
-				} else {
-					ctx.strokeRect(startX, startY, sqW, sqH);
-				}
-			} else if (currentShape === 'circle') {
-				const radius = Math.sqrt((width * width) + (height * height));
-				ctx.beginPath();
-				ctx.arc(startX, startY, radius, 0, Math.PI * 2);
-				if (fillShapes) {
-					ctx.fill();
-				} else {
-					ctx.stroke();
-				}
-			}
+			const rect = normalizeRect(startX, startY, x, y);
+			drawShapeByType(currentShape, rect.x, rect.y, rect.width, rect.height, fillShapes);
 		}
 
 		function floodFill(startXFill, startYFill, fillColorHex) {
@@ -455,29 +646,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function stampShape(x, y) {
 			applyStrokeStyle();
-			const stampSize = Math.max(currentSize * 3, 16);
-
-			if (currentShape === 'rectangle') {
-				if (fillShapes) {
-					ctx.fillRect(x - stampSize / 2, y - stampSize / 2, stampSize, stampSize * 0.7);
-				} else {
-					ctx.strokeRect(x - stampSize / 2, y - stampSize / 2, stampSize, stampSize * 0.7);
-				}
-			} else if (currentShape === 'square') {
-				if (fillShapes) {
-					ctx.fillRect(x - stampSize / 2, y - stampSize / 2, stampSize, stampSize);
-				} else {
-					ctx.strokeRect(x - stampSize / 2, y - stampSize / 2, stampSize, stampSize);
-				}
-			} else {
-				ctx.beginPath();
-				ctx.arc(x, y, stampSize / 2, 0, Math.PI * 2);
-				if (fillShapes) {
-					ctx.fill();
-				} else {
-					ctx.stroke();
-				}
-			}
+			const size = Math.max(currentSize * 4, 24);
+			drawShapeByType(currentShape, x - size / 2, y - size / 2, size, size, fillShapes);
 		}
 
 		function getTextFontString() {
@@ -517,6 +687,127 @@ document.addEventListener('DOMContentLoaded', function () {
 			setStatus('Text added');
 		}
 
+		function drawSticker(type, x, y) {
+			const size = Math.max(currentSize * 5, 40);
+
+			ctx.save();
+			ctx.translate(x, y);
+			ctx.lineWidth = 3;
+			ctx.strokeStyle = currentColor;
+			ctx.fillStyle = currentColor;
+
+			if (type === 'star') {
+				drawStar(0, 0, size / 2, size / 4, true);
+			} else if (type === 'heart') {
+				drawHeart(-size / 2, -size / 2, size, size, true);
+			} else if (type === 'flower') {
+				for (let i = 0; i < 6; i++) {
+					const angle = (Math.PI * 2 / 6) * i;
+					ctx.beginPath();
+					ctx.arc(Math.cos(angle) * size * 0.22, Math.sin(angle) * size * 0.22, size * 0.16, 0, Math.PI * 2);
+					ctx.fill();
+				}
+				ctx.beginPath();
+				ctx.fillStyle = '#ffd54f';
+				ctx.arc(0, 0, size * 0.14, 0, Math.PI * 2);
+				ctx.fill();
+			} else if (type === 'crown') {
+				ctx.beginPath();
+				ctx.moveTo(-size / 2, size / 4);
+				ctx.lineTo(-size / 3, -size / 4);
+				ctx.lineTo(-size / 8, size / 8);
+				ctx.lineTo(0, -size / 3);
+				ctx.lineTo(size / 8, size / 8);
+				ctx.lineTo(size / 3, -size / 4);
+				ctx.lineTo(size / 2, size / 4);
+				ctx.closePath();
+				ctx.fill();
+			} else if (type === 'lightning') {
+				ctx.beginPath();
+				ctx.moveTo(-size * 0.1, -size / 2);
+				ctx.lineTo(size * 0.15, -size * 0.1);
+				ctx.lineTo(0, -size * 0.1);
+				ctx.lineTo(size * 0.1, size / 2);
+				ctx.lineTo(-size * 0.15, size * 0.05);
+				ctx.lineTo(0, size * 0.05);
+				ctx.closePath();
+				ctx.fill();
+			}
+
+			ctx.restore();
+			saveHistoryState();
+			setStatus('Sticker added');
+		}
+
+		function placeEmoji(x, y) {
+			const emoji = emojiSelect ? emojiSelect.value : '😀';
+			ctx.save();
+			ctx.font = textSize + 'px Arial';
+			ctx.textBaseline = 'top';
+			ctx.fillText(emoji, x, y);
+			ctx.restore();
+			saveHistoryState();
+			setStatus('Emoji added');
+		}
+
+		function applyFrame() {
+			const frameType = frameSelect ? frameSelect.value : 'none';
+			if (frameType === 'none') {
+				setStatus('Choose a frame first');
+				return;
+			}
+
+			ctx.save();
+
+			if (frameType === 'simple') {
+				ctx.lineWidth = 12;
+				ctx.strokeStyle = currentColor;
+				ctx.strokeRect(6, 6, canvas.width - 12, canvas.height - 12);
+			} else if (frameType === 'double') {
+				ctx.lineWidth = 10;
+				ctx.strokeStyle = currentColor;
+				ctx.strokeRect(8, 8, canvas.width - 16, canvas.height - 16);
+				ctx.lineWidth = 4;
+				ctx.strokeRect(28, 28, canvas.width - 56, canvas.height - 56);
+			} else if (frameType === 'dashed') {
+				ctx.lineWidth = 8;
+				ctx.strokeStyle = currentColor;
+				ctx.setLineDash([18, 10]);
+				ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+			} else if (frameType === 'photo') {
+				ctx.fillStyle = '#ffffff';
+				ctx.fillRect(0, 0, canvas.width, 30);
+				ctx.fillRect(0, canvas.height - 30, canvas.width, 30);
+				ctx.fillRect(0, 0, 30, canvas.height);
+				ctx.fillRect(canvas.width - 30, 0, 30, canvas.height);
+
+				ctx.lineWidth = 2;
+				ctx.strokeStyle = '#cccccc';
+				ctx.strokeRect(15, 15, canvas.width - 30, canvas.height - 30);
+			}
+
+			ctx.restore();
+			saveHistoryState();
+			setStatus('Frame applied');
+		}
+
+		function commitSelectionMove() {
+			if (!selection || !selectionImage) {
+				return;
+			}
+
+			if (!hasTransparentBackground) {
+				ctx.fillStyle = '#ffffff';
+				ctx.fillRect(selection.x, selection.y, selection.width, selection.height);
+			} else {
+				ctx.clearRect(selection.x, selection.y, selection.width, selection.height);
+			}
+
+			ctx.drawImage(selectionImage, selection.x, selection.y, selection.width, selection.height);
+			saveHistoryState();
+			drawSelectionOverlay();
+		}
+
 		function setTool(tool) {
 			currentTool = tool;
 			toolButtons.forEach(function (button) {
@@ -525,95 +816,82 @@ document.addEventListener('DOMContentLoaded', function () {
 			setStatus('Tool: ' + tool);
 		}
 
-		function startDrawing(event) {
-			event.preventDefault();
-			const pos = getPointerPos(event);
-			startX = pos.x;
-			startY = pos.y;
-			lastX = pos.x;
-			lastY = pos.y;
-			isDrawing = true;
+		function flipCanvas(horizontal) {
+			const temp = document.createElement('canvas');
+			temp.width = canvas.width;
+			temp.height = canvas.height;
+			const tctx = temp.getContext('2d');
+			tctx.drawImage(canvas, 0, 0);
 
-			if (currentTool === 'brush' || currentTool === 'eraser') {
-				ctx.beginPath();
-				ctx.moveTo(lastX, lastY);
-			} else if (currentTool === 'shape') {
-				snapshotBeforeShape = ctx.getImageData(0, 0, canvas.width, canvas.height);
-			} else if (currentTool === 'fill') {
-				floodFill(pos.x, pos.y, currentColor);
-				isDrawing = false;
-				saveHistoryState();
-				setStatus('Filled area');
-			} else if (currentTool === 'stamp') {
-				stampShape(pos.x, pos.y);
-				isDrawing = false;
-				saveHistoryState();
-				setStatus('Stamped shape');
-			} else if (currentTool === 'text') {
-				placeText(pos.x, pos.y);
-				isDrawing = false;
+			ctx.save();
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+			if (!hasTransparentBackground) {
+				ctx.fillStyle = '#ffffff';
+				ctx.fillRect(0, 0, canvas.width, canvas.height);
 			}
+
+			if (horizontal) {
+				ctx.translate(canvas.width, 0);
+				ctx.scale(-1, 1);
+			} else {
+				ctx.translate(0, canvas.height);
+				ctx.scale(1, -1);
+			}
+
+			ctx.drawImage(temp, 0, 0);
+			ctx.restore();
+			saveHistoryState();
+			setStatus(horizontal ? 'Flipped horizontally' : 'Flipped vertically');
 		}
 
-		function moveDrawing(event) {
-			if (!isDrawing) {
-				return;
+		function rotateCanvas(clockwise) {
+			const temp = document.createElement('canvas');
+			temp.width = canvas.width;
+			temp.height = canvas.height;
+			const tctx = temp.getContext('2d');
+			tctx.drawImage(canvas, 0, 0);
+
+			const rotated = document.createElement('canvas');
+			rotated.width = canvas.height;
+			rotated.height = canvas.width;
+			const rctx = rotated.getContext('2d');
+
+			rctx.save();
+			if (clockwise) {
+				rctx.translate(rotated.width, 0);
+				rctx.rotate(Math.PI / 2);
+			} else {
+				rctx.translate(0, rotated.height);
+				rctx.rotate(-Math.PI / 2);
+			}
+			rctx.drawImage(temp, 0, 0);
+			rctx.restore();
+
+			ctx.save();
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			if (!hasTransparentBackground) {
+				ctx.fillStyle = '#ffffff';
+				ctx.fillRect(0, 0, canvas.width, canvas.height);
 			}
 
-			event.preventDefault();
-			const pos = getPointerPos(event);
+			const scale = Math.min(canvas.width / rotated.width, canvas.height / rotated.height);
+			const drawWidth = rotated.width * scale;
+			const drawHeight = rotated.height * scale;
+			const drawX = (canvas.width - drawWidth) / 2;
+			const drawY = (canvas.height - drawHeight) / 2;
 
-			if (currentTool === 'brush') {
-				applyStrokeStyle();
-				drawLine(lastX, lastY, pos.x, pos.y);
-				lastX = pos.x;
-				lastY = pos.y;
-			} else if (currentTool === 'eraser') {
-				ctx.save();
-				ctx.globalCompositeOperation = hasTransparentBackground ? 'destination-out' : 'source-over';
-				if (!hasTransparentBackground) {
-					ctx.strokeStyle = '#ffffff';
-				} else {
-					ctx.strokeStyle = 'rgba(0,0,0,1)';
-				}
-				ctx.lineWidth = currentSize;
-				ctx.lineCap = 'round';
-				ctx.lineJoin = 'round';
-				ctx.beginPath();
-				ctx.moveTo(lastX, lastY);
-				ctx.lineTo(pos.x, pos.y);
-				ctx.stroke();
-				ctx.restore();
-				lastX = pos.x;
-				lastY = pos.y;
-			} else if (currentTool === 'shape') {
-				drawPreviewShape(pos.x, pos.y);
-			}
-		}
-
-		function endDrawing(event) {
-			if (!isDrawing) {
-				return;
-			}
-
-			if (event) {
-				event.preventDefault();
-			}
-
-			if (currentTool === 'shape') {
-				const pos = event ? getPointerPos(event) : { x: lastX, y: lastY };
-				drawPreviewShape(pos.x, pos.y);
-				snapshotBeforeShape = null;
-			}
-
-			if (currentTool === 'brush' || currentTool === 'eraser' || currentTool === 'shape') {
-				saveHistoryState();
-			}
-
-			isDrawing = false;
+			ctx.drawImage(rotated, drawX, drawY, drawWidth, drawHeight);
+			ctx.restore();
+			saveHistoryState();
+			setStatus(clockwise ? 'Rotated right' : 'Rotated left');
 		}
 
 		function clearCanvas() {
+			selection = null;
+			selectionImage = null;
+			clearOverlay();
+
 			if (hasTransparentBackground) {
 				ctx.clearRect(0, 0, canvas.width, canvas.height);
 			} else {
@@ -697,9 +975,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		function setCanvasBackground(transparent) {
 			hasTransparentBackground = !!transparent;
 
-			if (transparent) {
-				setStatus('Transparent background selected');
-			} else {
+			if (!transparent) {
 				const temp = document.createElement('canvas');
 				temp.width = canvas.width;
 				temp.height = canvas.height;
@@ -708,10 +984,217 @@ document.addEventListener('DOMContentLoaded', function () {
 				ctx.fillStyle = '#ffffff';
 				ctx.fillRect(0, 0, canvas.width, canvas.height);
 				ctx.drawImage(temp, 0, 0);
-				setStatus('White background selected');
 			}
 
 			saveHistoryState();
+			setStatus(transparent ? 'Transparent background selected' : 'White background selected');
+		}
+
+		function startDrawing(event) {
+			event.preventDefault();
+			const pos = getPointerPos(event);
+			startX = pos.x;
+			startY = pos.y;
+			lastX = pos.x;
+			lastY = pos.y;
+			isDrawing = true;
+
+			if (currentTool === 'brush' || currentTool === 'eraser') {
+				ctx.beginPath();
+				ctx.moveTo(lastX, lastY);
+				return;
+			}
+
+			if (currentTool === 'shape') {
+				snapshotBeforeShape = ctx.getImageData(0, 0, canvas.width, canvas.height);
+				return;
+			}
+
+			if (currentTool === 'fill') {
+				floodFill(pos.x, pos.y, currentColor);
+				isDrawing = false;
+				saveHistoryState();
+				setStatus('Filled area');
+				return;
+			}
+
+			if (currentTool === 'stamp') {
+				stampShape(pos.x, pos.y);
+				isDrawing = false;
+				saveHistoryState();
+				setStatus('Stamped shape');
+				return;
+			}
+
+			if (currentTool === 'text') {
+				placeText(pos.x, pos.y);
+				isDrawing = false;
+				return;
+			}
+
+			if (currentTool === 'sticker') {
+				drawSticker(stickerSelect ? stickerSelect.value : 'star', pos.x, pos.y);
+				isDrawing = false;
+				return;
+			}
+
+			if (currentTool === 'emoji') {
+				placeEmoji(pos.x, pos.y);
+				isDrawing = false;
+				return;
+			}
+
+			if (currentTool === 'select') {
+				if (selection && pointInSelection(pos.x, pos.y) && selectionImage) {
+					movingSelection = true;
+					selectionDragOffsetX = pos.x - selection.x;
+					selectionDragOffsetY = pos.y - selection.y;
+					return;
+				}
+
+				selection = null;
+				selectionImage = null;
+				isMakingSelection = true;
+				drawSelectionOverlay();
+				return;
+			}
+
+			if (currentTool === 'crop') {
+				selection = null;
+				selectionImage = null;
+				isMakingSelection = true;
+				drawSelectionOverlay();
+			}
+		}
+
+		function moveDrawing(event) {
+			if (!isDrawing) {
+				return;
+			}
+
+			event.preventDefault();
+			const pos = getPointerPos(event);
+
+			if (currentTool === 'brush') {
+				applyStrokeStyle();
+				drawLine(lastX, lastY, pos.x, pos.y);
+				lastX = pos.x;
+				lastY = pos.y;
+				return;
+			}
+
+			if (currentTool === 'eraser') {
+				ctx.save();
+				ctx.globalCompositeOperation = hasTransparentBackground ? 'destination-out' : 'source-over';
+				ctx.strokeStyle = hasTransparentBackground ? 'rgba(0,0,0,1)' : '#ffffff';
+				ctx.lineWidth = currentSize;
+				ctx.lineCap = 'round';
+				ctx.lineJoin = 'round';
+				ctx.beginPath();
+				ctx.moveTo(lastX, lastY);
+				ctx.lineTo(pos.x, pos.y);
+				ctx.stroke();
+				ctx.restore();
+				lastX = pos.x;
+				lastY = pos.y;
+				return;
+			}
+
+			if (currentTool === 'shape') {
+				drawPreviewShape(pos.x, pos.y);
+				return;
+			}
+
+			if ((currentTool === 'select' || currentTool === 'crop') && isMakingSelection) {
+				selection = normalizeRect(startX, startY, pos.x, pos.y);
+				drawSelectionOverlay();
+				return;
+			}
+
+			if (currentTool === 'select' && movingSelection && selection) {
+				selection.x = Math.max(0, Math.min(canvas.width - selection.width, pos.x - selectionDragOffsetX));
+				selection.y = Math.max(0, Math.min(canvas.height - selection.height, pos.y - selectionDragOffsetY));
+				drawSelectionOverlay();
+			}
+		}
+
+		function endDrawing(event) {
+			if (!isDrawing) {
+				return;
+			}
+
+			if (event) {
+				event.preventDefault();
+			}
+
+			if (currentTool === 'shape') {
+				const pos = event ? getPointerPos(event) : { x: lastX, y: lastY };
+				drawPreviewShape(pos.x, pos.y);
+				snapshotBeforeShape = null;
+				saveHistoryState();
+			}
+
+			if (currentTool === 'brush' || currentTool === 'eraser') {
+				saveHistoryState();
+			}
+
+			if (currentTool === 'select') {
+				if (isMakingSelection && selection && selection.width > 1 && selection.height > 1) {
+					const temp = document.createElement('canvas');
+					temp.width = selection.width;
+					temp.height = selection.height;
+					const tctx = temp.getContext('2d');
+					tctx.drawImage(
+						canvas,
+						selection.x, selection.y, selection.width, selection.height,
+						0, 0, selection.width, selection.height
+					);
+					selectionImage = temp;
+					drawSelectionOverlay();
+					setStatus('Selection ready. Drag it to move.');
+				} else if (movingSelection) {
+					commitSelectionMove();
+					setStatus('Selection moved');
+				}
+				isMakingSelection = false;
+				movingSelection = false;
+			}
+
+			if (currentTool === 'crop') {
+				if (isMakingSelection && selection && selection.width > 1 && selection.height > 1) {
+					const cropped = document.createElement('canvas');
+					cropped.width = selection.width;
+					cropped.height = selection.height;
+					const cctx = cropped.getContext('2d');
+					cctx.drawImage(
+						canvas,
+						selection.x, selection.y, selection.width, selection.height,
+						0, 0, selection.width, selection.height
+					);
+
+					ctx.clearRect(0, 0, canvas.width, canvas.height);
+					if (!hasTransparentBackground) {
+						ctx.fillStyle = '#ffffff';
+						ctx.fillRect(0, 0, canvas.width, canvas.height);
+					}
+
+					const scale = Math.min(canvas.width / cropped.width, canvas.height / cropped.height);
+					const drawWidth = cropped.width * scale;
+					const drawHeight = cropped.height * scale;
+					const drawX = (canvas.width - drawWidth) / 2;
+					const drawY = (canvas.height - drawHeight) / 2;
+
+					ctx.drawImage(cropped, drawX, drawY, drawWidth, drawHeight);
+					saveHistoryState();
+					setStatus('Image cropped');
+				}
+				selection = null;
+				selectionImage = null;
+				isMakingSelection = false;
+				clearOverlay();
+			}
+
+			isDrawing = false;
 		}
 
 		toolButtons.forEach(function (button) {
@@ -747,7 +1230,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			fillToggle.addEventListener('click', function () {
 				fillShapes = !fillShapes;
 				fillToggle.classList.toggle('is-active', fillShapes);
-				fillToggle.textContent = fillShapes ? 'Filled shapes: On' : 'Filled shapes: Off';
+				fillToggle.textContent = fillShapes ? 'Filled: On' : 'Filled: Off';
 				setStatus(fillShapes ? 'Filled shapes on' : 'Filled shapes off');
 			});
 		}
@@ -824,6 +1307,34 @@ document.addEventListener('DOMContentLoaded', function () {
 			});
 		}
 
+		if (applyFrameButton) {
+			applyFrameButton.addEventListener('click', applyFrame);
+		}
+
+		if (flipHButton) {
+			flipHButton.addEventListener('click', function () {
+				flipCanvas(true);
+			});
+		}
+
+		if (flipVButton) {
+			flipVButton.addEventListener('click', function () {
+				flipCanvas(false);
+			});
+		}
+
+		if (rotateLeftButton) {
+			rotateLeftButton.addEventListener('click', function () {
+				rotateCanvas(false);
+			});
+		}
+
+		if (rotateRightButton) {
+			rotateRightButton.addEventListener('click', function () {
+				rotateCanvas(true);
+			});
+		}
+
 		canvas.addEventListener('mousedown', startDrawing);
 		canvas.addEventListener('mousemove', moveDrawing);
 		window.addEventListener('mouseup', endDrawing);
@@ -831,6 +1342,66 @@ document.addEventListener('DOMContentLoaded', function () {
 		canvas.addEventListener('touchstart', startDrawing, { passive: false });
 		canvas.addEventListener('touchmove', moveDrawing, { passive: false });
 		window.addEventListener('touchend', endDrawing, { passive: false });
+
+		game.addEventListener('keydown', function (event) {
+			const key = event.key.toLowerCase();
+
+			if ((event.ctrlKey || event.metaKey) && key === 'z') {
+				event.preventDefault();
+				if (event.shiftKey) {
+					redo();
+				} else {
+					undo();
+				}
+				return;
+			}
+
+			if ((event.ctrlKey || event.metaKey) && key === 'y') {
+				event.preventDefault();
+				redo();
+				return;
+			}
+
+			if ((event.ctrlKey || event.metaKey) && key === 's') {
+				event.preventDefault();
+				saveImage('png');
+				return;
+			}
+
+			if (key === 'b') {
+				setTool('brush');
+			} else if (key === 'e') {
+				setTool('eraser');
+			} else if (key === 'f') {
+				setTool('fill');
+			} else if (key === 't') {
+				setTool('text');
+			} else if (key === 'm') {
+				setTool('select');
+			} else if (key === 'c') {
+				setTool('crop');
+			} else if (key === 's' && !event.ctrlKey && !event.metaKey) {
+				setTool('shape');
+			} else if (key === 'k') {
+				setTool('sticker');
+			} else if (key === 'j') {
+				setTool('emoji');
+			} else if (key === 'delete' && selection) {
+				if (!hasTransparentBackground) {
+					ctx.fillStyle = '#ffffff';
+					ctx.fillRect(selection.x, selection.y, selection.width, selection.height);
+				} else {
+					ctx.clearRect(selection.x, selection.y, selection.width, selection.height);
+				}
+				saveHistoryState();
+				selection = null;
+				selectionImage = null;
+				clearOverlay();
+				setStatus('Selection deleted');
+			}
+		});
+
+		game.setAttribute('tabindex', '0');
 
 		initializeCanvas();
 		setTool('brush');
@@ -857,8 +1428,7 @@ if (!function_exists('zo_game_mini_paint_render')) {
 				<div class="mini-paint__top">
 					<h2 class="mini-paint__title">Mini Paint Studio</h2>
 					<div class="mini-paint__help">
-						Draw like a simple Paint app. Use brush, eraser, fill bucket, shapes, and text.
-						You can upload a picture, draw on top of it, add text, then save as PNG or JPG.
+						Paint style editor with drawing, text, stickers, emoji, selection, crop, flip, rotate, and frames.
 					</div>
 				</div>
 
@@ -871,6 +1441,10 @@ if (!function_exists('zo_game_mini_paint_render')) {
 						<button type="button" class="mini-paint__button" data-tool="shape">Shape Drag</button>
 						<button type="button" class="mini-paint__button" data-tool="stamp">Shape Stamp</button>
 						<button type="button" class="mini-paint__button" data-tool="text">Text</button>
+						<button type="button" class="mini-paint__button" data-tool="select">Select</button>
+						<button type="button" class="mini-paint__button" data-tool="crop">Crop</button>
+						<button type="button" class="mini-paint__button" data-tool="sticker">Sticker</button>
+						<button type="button" class="mini-paint__button" data-tool="emoji">Emoji</button>
 					</div>
 
 					<div class="mini-paint__group">
@@ -879,19 +1453,22 @@ if (!function_exists('zo_game_mini_paint_render')) {
 					</div>
 
 					<div class="mini-paint__group">
-						<span class="mini-paint__label">Brush Size</span>
-						<input type="range" class="mini-paint__range" min="1" max="60" value="8" aria-label="Brush size">
-						<span class="mini-paint__value">8px</span>
+						<span class="mini-paint__label">Brush</span>
+						<input type="range" class="mini-paint__range mini-paint__brush-size" min="1" max="60" value="8" aria-label="Brush size">
+						<span class="mini-paint__value mini-paint__brush-size-value">8px</span>
 					</div>
 
 					<div class="mini-paint__group">
 						<span class="mini-paint__label">Shape</span>
-						<select class="mini-paint__select" aria-label="Shape picker">
+						<select class="mini-paint__select mini-paint__shape-select" aria-label="Shape picker">
 							<option value="rectangle">Rectangle</option>
 							<option value="square">Square</option>
 							<option value="circle">Circle</option>
+							<option value="triangle">Triangle</option>
+							<option value="star">Star</option>
+							<option value="heart">Heart</option>
 						</select>
-						<button type="button" class="mini-paint__button" data-fill-toggle>Filled shapes: Off</button>
+						<button type="button" class="mini-paint__button" data-fill-toggle>Filled: Off</button>
 					</div>
 
 					<div class="mini-paint__group">
@@ -913,14 +1490,59 @@ if (!function_exists('zo_game_mini_paint_render')) {
 					</div>
 
 					<div class="mini-paint__group">
+						<span class="mini-paint__label">Sticker</span>
+						<select class="mini-paint__select mini-paint__sticker-select" aria-label="Sticker picker">
+							<option value="star">Star</option>
+							<option value="heart">Heart</option>
+							<option value="flower">Flower</option>
+							<option value="crown">Crown</option>
+							<option value="lightning">Lightning</option>
+						</select>
+					</div>
+
+					<div class="mini-paint__group">
+						<span class="mini-paint__label">Emoji</span>
+						<select class="mini-paint__select mini-paint__emoji-select" aria-label="Emoji picker">
+							<option value="😀">😀</option>
+							<option value="😎">😎</option>
+							<option value="🔥">🔥</option>
+							<option value="⭐">⭐</option>
+							<option value="❤️">❤️</option>
+							<option value="🎉">🎉</option>
+							<option value="🚀">🚀</option>
+							<option value="👑">👑</option>
+						</select>
+					</div>
+
+					<div class="mini-paint__group">
+						<span class="mini-paint__label">Frame</span>
+						<select class="mini-paint__select mini-paint__frame-select" aria-label="Frame picker">
+							<option value="none">Choose</option>
+							<option value="simple">Simple</option>
+							<option value="double">Double</option>
+							<option value="dashed">Dashed</option>
+							<option value="photo">Photo</option>
+						</select>
+						<button type="button" class="mini-paint__button" data-action="apply-frame">Apply Frame</button>
+					</div>
+
+					<div class="mini-paint__group">
+						<span class="mini-paint__label">Image</span>
+						<input type="file" class="mini-paint__file" accept="image/png,image/jpeg,image/webp" aria-label="Upload image">
+					</div>
+
+					<div class="mini-paint__group">
 						<span class="mini-paint__label">Background</span>
 						<button type="button" class="mini-paint__button" data-bg="white">White</button>
 						<button type="button" class="mini-paint__button" data-bg="transparent">Transparent</button>
 					</div>
 
 					<div class="mini-paint__group">
-						<span class="mini-paint__label">Image</span>
-						<input type="file" class="mini-paint__file" accept="image/png,image/jpeg,image/webp" aria-label="Upload image">
+						<span class="mini-paint__label">Transform</span>
+						<button type="button" class="mini-paint__button" data-action="flip-h">Flip H</button>
+						<button type="button" class="mini-paint__button" data-action="flip-v">Flip V</button>
+						<button type="button" class="mini-paint__button" data-action="rotate-left">Rotate Left</button>
+						<button type="button" class="mini-paint__button" data-action="rotate-right">Rotate Right</button>
 					</div>
 
 					<div class="mini-paint__group">
@@ -934,13 +1556,16 @@ if (!function_exists('zo_game_mini_paint_render')) {
 				</div>
 
 				<div class="mini-paint__canvas-wrap">
-					<canvas class="mini-paint__canvas" width="900" height="560" aria-label="Drawing canvas"></canvas>
+					<div class="mini-paint__canvas-stack">
+						<canvas class="mini-paint__canvas" width="900" height="560" aria-label="Drawing canvas"></canvas>
+						<canvas class="mini-paint__overlay" width="900" height="560" aria-hidden="true"></canvas>
+					</div>
 				</div>
 
 				<div class="mini-paint__status" aria-live="polite">Ready to draw</div>
 
 				<div class="mini-paint__footer">
-					Simple paint program with drawing, erasing, shape tools, text, upload, undo, redo, and save.
+					Shortcuts: B brush, E eraser, F fill, S shape, T text, M select, C crop, K sticker, J emoji, Ctrl+Z undo, Ctrl+Y redo, Ctrl+S save PNG, Delete removes selection.
 				</div>
 			</div>
 		</div>
@@ -953,7 +1578,7 @@ return array(
 	'slug'            => 'mini-paint',
 	'name'            => 'Mini Paint Studio',
 	'author'          => 'Asker',
-	'description'     => 'A simple Paint-style image editor with drawing, shapes, text, upload, and PNG/JPG saving.',
+	'description'     => 'A simple Paint-style image editor with shapes, text, selection, crop, stickers, emoji, frames, flip, rotate, and keyboard shortcuts.',
 	'render_callback' => 'zo_game_mini_paint_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,
