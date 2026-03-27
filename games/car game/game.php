@@ -145,7 +145,7 @@ function render_car_game(){
 </div>
 <?php return ob_get_clean();
 }
-<p style="font-size:12px;opacity:0.7;">by Asker</p>
+
 return [
  'slug' => 'car-lane-switch',
  'name' => 'Car Lane Switch',
