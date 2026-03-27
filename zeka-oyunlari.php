@@ -16,107 +16,10 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-define('ZO_PLUGIN_VERSION', '1.2.0.0');
+define('ZO_PLUGIN_VERSION', '1.0.5');
 define('ZO_PLUGIN_FILE', __FILE__);
 define('ZO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('ZO_PLUGIN_URL', plugin_dir_url(__FILE__));
-
-<?php
-/**
- * Plugin Name: Zekâ Oyunları
- * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
- * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.1.10.0
- * Update URI: https://github.com/stronganchor/zeka-oyunlari
- * Author: Anadolu Tasarım
- * Author URI: https://github.com/stronganchor/zeka-oyunlari
- * Text Domain: zeka-oyunlari
- * Requires at least: 6.0
- * Requires PHP: 7.4
- */
-
-if (!defined('ABSPATH')) {
-	exit;
-}
-
-define('ZO_PLUGIN_VERSION', '1.0.6');
-define('ZO_PLUGIN_FILE', __FILE__);
-define('ZO_PLUGIN_DIR', plugin_dir_path(__FILE__));
-define('ZO_PLUGIN_URL', plugin_dir_url(__FILE__));
-
-function zo_normalize_game_module($module, $file) {
-	if (!is_array($module)) {
-		return null;
-	}
-
-	if (empty($module['slug']) || empty($module['name'])) {
-		return null;
-	}
-
-	$slug          = sanitize_title($module['slug']);
-	$folder        = basename(dirname($file));
-	$author        = '';
-	$inline_style  = '';
-	$inline_script = '';
-
-	if (!empty($module['author']) && is_string($module['author'])) {
-		$author = trim(wp_strip_all_tags($module['author']));
-	}
-
-	if (!empty($module['inline_style']) && is_string($module['inline_style'])) {
-		$inline_style = trim($module['inline_style']);
-	}
-
-	if (!empty($module['inline_script']) && is_string($module['inline_script'])) {
-		$inline_script = trim($module['inline_script']);
-	}
-
-	$module['slug']          = $slug;
-	$module['folder']        = $folder;
-	$module['dir']           = trailingslashit(ZO_PLUGIN_DIR . 'games/' . $folder);
-	$module['url']           = trailingslashit(ZO_PLUGIN_URL . 'games/' . $folder);
-	$module['author']        = $author;
-	$module['author_key']    = $author !== '' ? sanitize_title($author) : '';
-	$module['inline_style']  = $inline_style;
-	$module['inline_script'] = $inline_script;
-
-	return $module;
-}
-
-function zo_bootstrap_all_game_modules() {
-	global $zo_bootstrapped_game_modules, $zo_bootstrapped_game_files;
-
-	if (isset($zo_bootstrapped_game_modules) && is_array($zo_bootstrapped_game_modules)) {
-		return $zo_bootstrapped_game_modules;
-	}
-
-	$zo_bootstrapped_game_modules = array();
-	$zo_bootstrapped_game_files   = array();
-
-	$files = glob(ZO_PLUGIN_DIR . 'games/*/game.php');
-
-	if (empty($files)) {
-		return $zo_bootstrapped_game_modules;
-	}
-
-	foreach ($files as $file) {
-		$returned = require_once $file;
-
-		$zo_bootstrapped_game_files[$file] = true;
-
-		$module = zo_normalize_game_module($returned, $file);
-
-		if ($module) {
-			$zo_bootstrapped_game_modules[$module['slug']] = $module;
-		}
-	}
-
-	ksort($zo_bootstrapped_game_modules);
-
-	return $zo_bootstrapped_game_modules;
-}
-
-add_action('plugins_loaded', 'zo_bootstrap_all_game_modules', 1);
 
 function zo_get_update_branch() {
 	$branch = 'main';
@@ -185,49 +88,68 @@ function zo_plugin_deactivate() {
 	flush_rewrite_rules();
 }
 
-function zo_get_game_modules() {
+function zo_load_game_modules() {
 	static $modules = null;
 
 	if ($modules !== null) {
 		return $modules;
 	}
 
-	global $zo_bootstrapped_game_modules, $zo_bootstrapped_game_files;
-
 	$modules = array();
-
-	if (!isset($zo_bootstrapped_game_modules) || !is_array($zo_bootstrapped_game_modules)) {
-		zo_bootstrap_all_game_modules();
-	}
-
-	if (isset($zo_bootstrapped_game_modules) && is_array($zo_bootstrapped_game_modules)) {
-		$modules = $zo_bootstrapped_game_modules;
-	}
-
-	$files = glob(ZO_PLUGIN_DIR . 'games/*/game.php');
+	$files   = glob(ZO_PLUGIN_DIR . 'games/*/game.php');
 
 	if (empty($files)) {
 		return $modules;
 	}
 
 	foreach ($files as $file) {
-		if (!empty($zo_bootstrapped_game_files[$file])) {
+		$module = require $file;
+
+		if (!is_array($module)) {
 			continue;
 		}
 
-		$module = include $file;
-		$module = zo_normalize_game_module($module, $file);
-
-		if ($module) {
-			$modules[$module['slug']] = $module;
+		if (empty($module['slug']) || empty($module['name'])) {
+			continue;
 		}
+
+		$slug          = sanitize_title($module['slug']);
+		$folder        = basename(dirname($file));
+		$author        = '';
+		$inline_style  = '';
+		$inline_script = '';
+
+		if (!empty($module['author']) && is_string($module['author'])) {
+			$author = trim(wp_strip_all_tags($module['author']));
+		}
+
+		if (!empty($module['inline_style']) && is_string($module['inline_style'])) {
+			$inline_style = trim($module['inline_style']);
+		}
+
+		if (!empty($module['inline_script']) && is_string($module['inline_script'])) {
+			$inline_script = trim($module['inline_script']);
+		}
+
+		$module['slug']          = $slug;
+		$module['folder']        = $folder;
+		$module['dir']           = trailingslashit(ZO_PLUGIN_DIR . 'games/' . $folder);
+		$module['url']           = trailingslashit(ZO_PLUGIN_URL . 'games/' . $folder);
+		$module['author']        = $author;
+		$module['author_key']    = $author !== '' ? sanitize_title($author) : '';
+		$module['inline_style']  = $inline_style;
+		$module['inline_script'] = $inline_script;
+
+		$modules[$slug] = $module;
 	}
 
 	ksort($modules);
 
-	$zo_bootstrapped_game_modules = $modules;
-
 	return $modules;
+}
+
+function zo_get_game_modules() {
+	return zo_load_game_modules();
 }
 
 function zo_get_game_module($slug) {
@@ -335,13 +257,13 @@ function zo_sync_game_module_posts() {
 
 	$posts = get_posts(
 		array(
-			'post_type'              => 'zeka_oyunu',
-			'post_status'            => array('publish', 'draft', 'pending', 'future', 'private'),
-			'posts_per_page'         => -1,
-			'orderby'                => 'date',
-			'order'                  => 'DESC',
-			'suppress_filters'       => true,
-			'no_found_rows'          => true,
+			'post_type'           => 'zeka_oyunu',
+			'post_status'         => array('publish', 'draft', 'pending', 'future', 'private'),
+			'posts_per_page'      => -1,
+			'orderby'             => 'date',
+			'order'               => 'DESC',
+			'suppress_filters'    => true,
+			'no_found_rows'       => true,
 			'update_post_meta_cache' => false,
 			'update_post_term_cache' => false,
 		)
