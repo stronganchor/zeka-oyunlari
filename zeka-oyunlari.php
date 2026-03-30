@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.2.0.1
+ * Version: 1.2.0.2
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-define('ZO_PLUGIN_VERSION', '1.0.5');
+define('ZO_PLUGIN_VERSION', '1.2.0.2');
 define('ZO_PLUGIN_FILE', __FILE__);
 define('ZO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('ZO_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -88,6 +88,48 @@ function zo_plugin_deactivate() {
 	flush_rewrite_rules();
 }
 
+function zo_load_game_module_file($file) {
+	static $loaded_modules = array();
+
+	$file = (string) $file;
+
+	if ($file === '') {
+		return null;
+	}
+
+	if (array_key_exists($file, $loaded_modules)) {
+		return $loaded_modules[$file];
+	}
+
+	try {
+		$module = require $file;
+	} catch (Throwable $throwable) {
+		error_log(
+			sprintf(
+				'[Zeka Oyunlari] Skipping broken game module "%1$s": %2$s in %3$s on line %4$d',
+				basename(dirname($file)),
+				$throwable->getMessage(),
+				$throwable->getFile(),
+				(int) $throwable->getLine()
+			)
+		);
+
+		$loaded_modules[$file] = null;
+
+		return null;
+	}
+
+	if (!is_array($module)) {
+		$loaded_modules[$file] = null;
+
+		return null;
+	}
+
+	$loaded_modules[$file] = $module;
+
+	return $loaded_modules[$file];
+}
+
 function zo_load_game_modules() {
 	static $modules = null;
 
@@ -102,10 +144,12 @@ function zo_load_game_modules() {
 		return $modules;
 	}
 
-	foreach ($files as $file) {
-		$module = require $file;
+	sort($files);
 
-		if (!is_array($module)) {
+	foreach ($files as $file) {
+		$module = zo_load_game_module_file($file);
+
+		if (!$module) {
 			continue;
 		}
 
@@ -147,6 +191,7 @@ function zo_load_game_modules() {
 
 	return $modules;
 }
+add_action('plugins_loaded', 'zo_load_game_modules', 1);
 
 function zo_get_game_modules() {
 	return zo_load_game_modules();
