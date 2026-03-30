@@ -386,11 +386,11 @@ $css = <<<'CSS'
 	z-index: 9;
 	background: linear-gradient(180deg, #ff5757 0%, #d71f1f 100%);
 	box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.26), 0 8px 16px rgba(0, 0, 0, 0.22);
-	transition: left 0.14s ease, transform 0.14s ease, filter 0.14s ease;
+	transition: left 0.18s ease, transform 0.18s ease, filter 0.14s ease;
 }
 
 .zo-game-root--car-lane-switch .zo-car-player.is-drifting {
-	transition: left 0.09s ease, transform 0.09s ease, filter 0.14s ease;
+	transition: left 0.14s ease, transform 0.14s ease, filter 0.14s ease;
 }
 
 .zo-game-root--car-lane-switch .zo-car-player.is-drift-left {
@@ -450,18 +450,6 @@ $css = <<<'CSS'
 
 .zo-game-root--car-lane-switch .zo-car-obstacle--truck {
 	background: linear-gradient(180deg, #ffa643 0%, #d76c00 100%);
-}
-
-.zo-game-root--car-lane-switch .zo-car-obstacle--oil {
-	background: linear-gradient(180deg, #2a2a2a 0%, #000 100%);
-	border-radius: 50%;
-	aspect-ratio: 1 / 1;
-	font-size: 26px;
-}
-
-.zo-game-root--car-lane-switch .zo-car-obstacle--oil::before,
-.zo-game-root--car-lane-switch .zo-car-obstacle--oil::after {
-	display: none;
 }
 
 .zo-game-root--car-lane-switch .zo-car-coin,
@@ -762,12 +750,13 @@ document.addEventListener('DOMContentLoaded', function () {
 		const activePowers = game.querySelector('.zo-car-active-powers');
 
 		const lanePercents = [16.66, 50, 83.33];
-		const obstacleTypes = ['car', 'truck', 'oil'];
+		const obstacleTypes = ['car', 'truck'];
 		const powerTypes = ['shield', 'slow', 'magnet', 'turbo'];
 		const storageKeys = {
-			best: 'zo_car_lane_switch_best_v3',
-			unlocks: 'zo_car_lane_switch_unlocks_v3',
-			bestRun: 'zo_car_lane_switch_best_run_v3'
+			best: 'zo_car_lane_switch_best_v4',
+			unlocks: 'zo_car_lane_switch_unlocks_v4',
+			bestRun: 'zo_car_lane_switch_best_run_v4',
+			totalCoins: 'zo_car_lane_switch_total_coins_v4'
 		};
 
 		const translations = {
@@ -815,13 +804,12 @@ document.addEventListener('DOMContentLoaded', function () {
 				pausedTitle: 'Paused',
 				pausedText: 'Tap Resume or press Pause again to continue.',
 				parentTitle: 'Parent Menu',
-				parentStats: 'Best score: {best} | Unlocked maps: {maps}',
+				parentStats: 'Best score: {best} | Unlocked maps: {maps} | Total coins: {coins}',
 				resetScores: 'Reset Scores',
 				resetUnlocks: 'Reset Unlocks',
 				close: 'Close',
 				gameOverTitle: 'Game Over',
 				gameOverText: 'Score: {score} | Coins: {coins} | Best: {best} | Medal: {medal}',
-				heartsDisplay: '❤'.repeat(3),
 				medals: { none: 'None', bronze: 'Bronze', silver: 'Silver', gold: 'Gold' },
 				pills: {
 					shield: '🛡 Shield',
@@ -874,13 +862,12 @@ document.addEventListener('DOMContentLoaded', function () {
 				pausedTitle: 'Duraklatıldı',
 				pausedText: 'Devam Et’e dokun ya da yeniden Duraklat düğmesine bas.',
 				parentTitle: 'Ebeveyn Menüsü',
-				parentStats: 'En iyi skor: {best} | Açık harita: {maps}',
+				parentStats: 'En iyi skor: {best} | Açık harita: {maps} | Toplam para: {coins}',
 				resetScores: 'Skorları Sıfırla',
 				resetUnlocks: 'Kilitleri Sıfırla',
 				close: 'Kapat',
 				gameOverTitle: 'Oyun Bitti',
 				gameOverText: 'Skor: {score} | Para: {coins} | En iyi: {best} | Madalya: {medal}',
-				heartsDisplay: '❤'.repeat(3),
 				medals: { none: 'Yok', bronze: 'Bronz', silver: 'Gümüş', gold: 'Altın' },
 				pills: {
 					shield: '🛡 Kalkan',
@@ -933,13 +920,12 @@ document.addEventListener('DOMContentLoaded', function () {
 				pausedTitle: 'Pausiert',
 				pausedText: 'Tippe auf Weiter oder drücke Pause erneut.',
 				parentTitle: 'Elternmenü',
-				parentStats: 'Bestwert: {best} | Freigeschaltete Karten: {maps}',
+				parentStats: 'Bestwert: {best} | Freigeschaltete Karten: {maps} | Gesamtmünzen: {coins}',
 				resetScores: 'Punkte Löschen',
 				resetUnlocks: 'Freischaltungen Löschen',
 				close: 'Schließen',
 				gameOverTitle: 'Spiel Vorbei',
 				gameOverText: 'Punkte: {score} | Münzen: {coins} | Bestwert: {best} | Medaille: {medal}',
-				heartsDisplay: '❤'.repeat(3),
 				medals: { none: 'Keine', bronze: 'Bronze', silver: 'Silber', gold: 'Gold' },
 				pills: {
 					shield: '🛡 Schild',
@@ -992,13 +978,12 @@ document.addEventListener('DOMContentLoaded', function () {
 				pausedTitle: 'En Pausa',
 				pausedText: 'Pulsa Seguir o vuelve a pulsar Pausa.',
 				parentTitle: 'Menú Padres',
-				parentStats: 'Mejor puntuación: {best} | Mapas desbloqueados: {maps}',
+				parentStats: 'Mejor puntuación: {best} | Mapas desbloqueados: {maps} | Monedas totales: {coins}',
 				resetScores: 'Borrar Puntos',
 				resetUnlocks: 'Borrar Desbloqueos',
 				close: 'Cerrar',
 				gameOverTitle: 'Fin del Juego',
 				gameOverText: 'Puntos: {score} | Monedas: {coins} | Mejor: {best} | Medalla: {medal}',
-				heartsDisplay: '❤'.repeat(3),
 				medals: { none: 'Ninguna', bronze: 'Bronce', silver: 'Plata', gold: 'Oro' },
 				pills: {
 					shield: '🛡 Escudo',
@@ -1011,25 +996,25 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		const difficultySettings = {
 			easy: {
-				baseSpeed: 220,
-				spawnGap: 1.28,
-				speedGain: 4.2,
-				coinGap: 1.35,
-				powerGap: 6.6
+				baseSpeed: 120,
+				spawnGap: 1.9,
+				speedGain: 1.8,
+				coinGap: 1.05,
+				powerGap: 6.2
 			},
 			medium: {
-				baseSpeed: 270,
-				spawnGap: 1.05,
-				speedGain: 6.0,
-				coinGap: 1.15,
-				powerGap: 5.8
+				baseSpeed: 150,
+				spawnGap: 1.6,
+				speedGain: 2.2,
+				coinGap: 1.0,
+				powerGap: 5.7
 			},
 			hard: {
-				baseSpeed: 330,
-				spawnGap: 0.86,
-				speedGain: 8.2,
-				coinGap: 1.0,
-				powerGap: 5.0
+				baseSpeed: 185,
+				spawnGap: 1.3,
+				speedGain: 2.8,
+				coinGap: 0.95,
+				powerGap: 5.2
 			}
 		};
 
@@ -1048,7 +1033,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			},
 			purple: {
 				emoji: '🚘',
-				ground: 'linear-gradient(180deg, #b07bff 0%, #6f38d0 100%)',
 				background: 'linear-gradient(180deg, #b07bff 0%, #6f38d0 100%)'
 			}
 		};
@@ -1062,6 +1046,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		};
 
 		let bestScore = 0;
+		let totalCoins = 0;
 		let unlocks = {
 			city: true,
 			desert: true,
@@ -1075,6 +1060,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			bestScore = parseInt(window.localStorage.getItem(storageKeys.best), 10) || 0;
 		} catch (err) {
 			bestScore = 0;
+		}
+
+		try {
+			totalCoins = parseInt(window.localStorage.getItem(storageKeys.totalCoins), 10) || 0;
+		} catch (err) {
+			totalCoins = 0;
 		}
 
 		try {
@@ -1107,7 +1098,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		let ended = false;
 		let paused = false;
 		let score = 0;
-		let coinScore = 0;
 		let speed = difficultySettings.medium.baseSpeed;
 		let countdownTimer = null;
 		let soundEnabled = false;
@@ -1122,11 +1112,9 @@ document.addEventListener('DOMContentLoaded', function () {
 		let eventState = {
 			type: '',
 			timer: 0,
-			cooldown: 8
+			cooldown: 10
 		};
 		let driftTimer = 0;
-		let driftDir = '';
-		let nearMissActive = {};
 		let currentRunPath = [];
 		let runTime = 0;
 
@@ -1293,8 +1281,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function updateHud() {
 			scoreValue.textContent = String(score);
-			coinValue.textContent = String(coinScore);
-			speedValue.textContent = String(Math.round(speed / 26));
+			coinValue.textContent = String(totalCoins);
+			speedValue.textContent = String(Math.round(speed / 20));
 			bestValue.textContent = String(bestScore);
 			heartValue.textContent = '❤'.repeat(Math.max(0, lives));
 			const medalKey = getMedal(score);
@@ -1315,9 +1303,15 @@ document.addEventListener('DOMContentLoaded', function () {
 			} catch (err) {}
 		}
 
+		function saveTotalCoins() {
+			try {
+				window.localStorage.setItem(storageKeys.totalCoins, String(totalCoins));
+			} catch (err) {}
+		}
+
 		function unlockMapsByCoins() {
 			Object.keys(mapUnlockCosts).forEach(function (mapName) {
-				if (!unlocks[mapName] && coinScore >= mapUnlockCosts[mapName]) {
+				if (!unlocks[mapName] && totalCoins >= mapUnlockCosts[mapName]) {
 					unlocks[mapName] = true;
 				}
 			});
@@ -1436,7 +1430,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		function getOpenLanes() {
 			const blocked = {};
 			obstacles.forEach(function (item) {
-				if (item.y < 120) {
+				if (item.y < 140) {
 					blocked[item.lane] = true;
 				}
 			});
@@ -1460,9 +1454,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (type === 'truck') {
 				obstacle.classList.add('zo-car-obstacle--truck');
 				obstacle.textContent = '🚚';
-			} else if (type === 'oil') {
-				obstacle.classList.add('zo-car-obstacle--oil');
-				obstacle.textContent = '🛞';
 			} else {
 				obstacle.textContent = '🚙';
 			}
@@ -1479,7 +1470,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				y: -90,
 				passed: false,
 				nearBonusGiven: false,
-				height: type === 'oil' ? 52 : 86,
+				height: 86,
 				type: type
 			});
 		}
@@ -1551,7 +1542,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		function stopEvent() {
 			eventState.type = '';
 			eventState.timer = 0;
-			eventState.cooldown = 8 + Math.random() * 6;
+			eventState.cooldown = 10 + Math.random() * 6;
 			setEventBanner('');
 		}
 
@@ -1559,7 +1550,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			eventState.cooldown = Math.max(0, eventState.cooldown - delta);
 
 			if (!eventState.type) {
-				if (Math.random() < 0.0025) {
+				if (Math.random() < 0.0015) {
 					maybeStartEvent();
 				}
 				return;
@@ -1587,10 +1578,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			window.setTimeout(function () {
 				updatePowerClasses();
 			}, 180);
-
-			if (lives <= 0) {
-				clearSavedPowers();
-			}
 		}
 
 		function endGame(message) {
@@ -1637,7 +1624,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				t().gameOverTitle,
 				replaceTokens(t().gameOverText, {
 					score: score,
-					coins: coinScore,
+					coins: totalCoins,
 					best: bestScore,
 					medal: t().medals[medalKey]
 				}),
@@ -1654,7 +1641,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			}).length;
 			parentStats.textContent = replaceTokens(t().parentStats, {
 				best: bestScore,
-				maps: count
+				maps: count,
+				coins: totalCoins
 			});
 		}
 
@@ -1676,16 +1664,14 @@ document.addEventListener('DOMContentLoaded', function () {
 			coinTimer = 0;
 			powerTimer = 0;
 			score = 0;
-			coinScore = 0;
 			lives = 3;
 			laneIndex = 1;
 			runTime = 0;
 			currentRunPath = [{ time: 0, lane: laneIndex }];
 			eventState.type = '';
 			eventState.timer = 0;
-			eventState.cooldown = 6;
+			eventState.cooldown = 10;
 			driftTimer = 0;
-			driftDir = '';
 
 			const settings = getSettings();
 			speed = settings.baseSpeed;
@@ -1708,7 +1694,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		function reallyStartGame() {
 			clearAllFalling();
 			score = 0;
-			coinScore = 0;
 			lives = 3;
 			spawnTimer = 0;
 			coinTimer = 0;
@@ -1721,9 +1706,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			paused = false;
 			eventState.type = '';
 			eventState.timer = 0;
-			eventState.cooldown = 5 + Math.random() * 4;
+			eventState.cooldown = 8 + Math.random() * 5;
 			driftTimer = 0;
-			driftDir = '';
 			laneIndex = 1;
 			speed = getSettings().baseSpeed;
 
@@ -1812,7 +1796,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function markLaneChange(direction) {
 			driftTimer = 0.18;
-			driftDir = direction;
 			player.classList.add('is-drifting');
 			player.classList.remove('is-drift-left', 'is-drift-right');
 			player.classList.add(direction === 'left' ? 'is-drift-left' : 'is-drift-right');
@@ -1856,8 +1839,9 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function collectCoin(item, index) {
-			coinScore += 1;
+			totalCoins += 1;
 			score += savedPowers.turbo ? 2 : 1;
+			saveTotalCoins();
 			unlockMapsByCoins();
 			updateHud();
 			playTone('coin');
@@ -2006,6 +1990,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			resetScoresBtn.textContent = dict.resetScores;
 			resetUnlocksBtn.textContent = dict.resetUnlocks;
 			closeParentBtn.textContent = dict.close;
+			soundToggle.textContent = soundEnabled ? dict.soundOn : dict.soundOff;
 
 			updateHud();
 			updatePowerPills();
@@ -2036,16 +2021,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			const settings = getSettings();
 			const slowFactor = savedPowers.slow ? 0.72 : 1;
-			const turboBonus = savedPowers.turbo ? 68 : 0;
+			const turboBonus = savedPowers.turbo ? 28 : 0;
 
-			speed += delta * settings.speedGain * (savedPowers.turbo ? 1.2 : 1);
+			speed += delta * settings.speedGain * (savedPowers.turbo ? 1.08 : 1);
 			const moveSpeed = (speed + turboBonus) * slowFactor;
 
 			spawnTimer += delta;
 			coinTimer += delta;
 			powerTimer += delta;
 
-			let obstacleGap = Math.max(0.45, settings.spawnGap - score * 0.008);
+			let obstacleGap = Math.max(1.05, settings.spawnGap - score * 0.002);
 			let coinGap = settings.coinGap;
 			let powerGap = settings.powerGap;
 
@@ -2053,13 +2038,13 @@ document.addEventListener('DOMContentLoaded', function () {
 				coinGap = 0.35;
 			}
 			if (eventState.type === 'roadwork') {
-				obstacleGap *= 0.72;
+				obstacleGap *= 0.88;
 			}
 
 			if (spawnTimer >= obstacleGap) {
 				spawnTimer = 0;
 				spawnObstacle();
-				if (eventState.type === 'roadwork' && Math.random() < 0.5) {
+				if (eventState.type === 'roadwork' && Math.random() < 0.25) {
 					spawnObstacle();
 				}
 			}
@@ -2139,7 +2124,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				if (savedPowers.magnet) {
 					const targetLeft = playerCenterLaneX;
 					const currentLeft = parseFloat(item.el.style.left);
-					const nextLeft = currentLeft + (targetLeft - currentLeft) * Math.min(1, delta * 5.5);
+					const nextLeft = currentLeft + (targetLeft - currentLeft) * Math.min(1, delta * 4.2);
 					item.el.style.left = nextLeft + '%';
 					item.lane = Math.abs(nextLeft - playerCenterLaneX) < 8 ? laneIndex : item.lane;
 				}
@@ -2181,7 +2166,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				}
 			}
 
-			if (Math.random() < 0.02) {
+			if (Math.random() < 0.015) {
 				playMusicStep();
 			}
 
@@ -2224,10 +2209,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		resetScoresBtn.addEventListener('click', function () {
 			bestScore = 0;
+			totalCoins = 0;
 			bestRun = null;
 			try {
 				window.localStorage.removeItem(storageKeys.best);
 				window.localStorage.removeItem(storageKeys.bestRun);
+				window.localStorage.removeItem(storageKeys.totalCoins);
 			} catch (err) {}
 			updateHud();
 			updateParentStats();
@@ -2464,7 +2451,7 @@ if (!function_exists('zo_game_car_lane_switch_render')) {
 								</div>
 
 								<div class="zo-car-parent-box" hidden>
-									<div class="zo-car-parent-stats">Best score: 0 | Unlocked maps: 2</div>
+									<div class="zo-car-parent-stats">Best score: 0 | Unlocked maps: 2 | Total coins: 0</div>
 									<div class="zo-car-buttons">
 										<button type="button" class="zo-car-btn zo-car-reset-scores">Reset Scores</button>
 										<button type="button" class="zo-car-btn zo-car-btn--gold zo-car-reset-unlocks">Reset Unlocks</button>
@@ -2505,7 +2492,7 @@ return array(
 	'slug'            => 'car-lane-switch',
 	'name'            => 'Car Lane Switch',
 	'author'          => 'Asker',
-	'description'     => 'A lane-switching driving game with lives, languages, unlockable maps, ghost replay, medals, events, and saved power-ups.',
+	'description'     => 'A slower lane-switching driving game with persistent coins, unlockable maps, ghost replay, medals, events, and saved power-ups.',
 	'render_callback' => 'zo_game_car_lane_switch_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,
