@@ -25,31 +25,31 @@ $css = <<<'CSS'
 	height: 680px;
 	overflow: hidden;
 	background:
-		radial-gradient(circle at 50% 18%, rgba(255, 230, 165, 0.95) 0%, rgba(255, 206, 120, 0.65) 10%, rgba(255, 186, 120, 0.08) 24%, transparent 30%),
+		radial-gradient(circle at 50% 16%, rgba(255, 230, 165, 0.95) 0%, rgba(255, 206, 120, 0.65) 10%, rgba(255, 186, 120, 0.08) 24%, transparent 30%),
 		linear-gradient(180deg, #8ea1c2 0%, #f3c3a0 17%, #f4bf8f 26%, #7f7c85 27%, #494d54 100%);
 }
 
 .zo-game-root--car-lane-switch .zo-car-game[data-theme="night"] .zo-car-screen {
 	background:
-		radial-gradient(circle at 50% 20%, rgba(255, 238, 170, 0.75) 0%, rgba(255, 216, 122, 0.25) 12%, rgba(255, 216, 122, 0.06) 22%, transparent 28%),
+		radial-gradient(circle at 50% 18%, rgba(255, 238, 170, 0.75) 0%, rgba(255, 216, 122, 0.25) 12%, rgba(255, 216, 122, 0.06) 22%, transparent 28%),
 		linear-gradient(180deg, #111b33 0%, #2b3554 18%, #3d3f48 18%, #30333a 100%);
 }
 
 .zo-game-root--car-lane-switch .zo-car-game[data-theme="snow"] .zo-car-screen {
 	background:
-		radial-gradient(circle at 50% 18%, rgba(255, 244, 199, 0.85) 0%, rgba(255, 220, 165, 0.35) 12%, transparent 24%),
+		radial-gradient(circle at 50% 16%, rgba(255, 244, 199, 0.85) 0%, rgba(255, 220, 165, 0.35) 12%, transparent 24%),
 		linear-gradient(180deg, #b5d2e6 0%, #f5dcc6 18%, #7f8c98 18%, #59616c 100%);
 }
 
 .zo-game-root--car-lane-switch .zo-car-game[data-theme="desert"] .zo-car-screen {
 	background:
-		radial-gradient(circle at 50% 18%, rgba(255, 236, 160, 0.9) 0%, rgba(255, 208, 109, 0.45) 12%, transparent 24%),
+		radial-gradient(circle at 50% 16%, rgba(255, 236, 160, 0.9) 0%, rgba(255, 208, 109, 0.45) 12%, transparent 24%),
 		linear-gradient(180deg, #b6a5a1 0%, #f0c38e 18%, #76645b 18%, #5b4c45 100%);
 }
 
 .zo-game-root--car-lane-switch .zo-car-game[data-theme="mountain"] .zo-car-screen {
 	background:
-		radial-gradient(circle at 50% 18%, rgba(255, 235, 175, 0.9) 0%, rgba(255, 207, 125, 0.42) 12%, transparent 24%),
+		radial-gradient(circle at 50% 16%, rgba(255, 235, 175, 0.9) 0%, rgba(255, 207, 125, 0.42) 12%, transparent 24%),
 		linear-gradient(180deg, #92a7c6 0%, #f0c39f 18%, #6d7178 18%, #4c5158 100%);
 }
 
@@ -61,10 +61,10 @@ $css = <<<'CSS'
 .zo-game-root--car-lane-switch .zo-car-skyline {
 	position: absolute;
 	left: 50%;
-	bottom: 50%;
+	bottom: 55%;
 	transform: translateX(-50%);
-	width: 44%;
-	height: 14%;
+	width: 48%;
+	height: 13%;
 	display: flex;
 	align-items: flex-end;
 	gap: 4px;
@@ -81,8 +81,8 @@ $css = <<<'CSS'
 	position: absolute;
 	left: 0;
 	right: 0;
-	bottom: 50%;
-	height: 16%;
+	bottom: 54%;
+	height: 15%;
 	pointer-events: none;
 }
 
@@ -98,8 +98,8 @@ $css = <<<'CSS'
 	position: absolute;
 	left: 0;
 	right: 0;
-	bottom: 47%;
-	height: 5%;
+	bottom: 52%;
+	height: 4%;
 	background: linear-gradient(180deg, rgba(114, 130, 167, 0.5) 0%, rgba(90, 98, 123, 0.18) 100%);
 }
 
@@ -165,9 +165,9 @@ $css = <<<'CSS'
 	left: 50%;
 	bottom: 0;
 	transform: translateX(-50%);
-	width: 78%;
-	height: 73%;
-	clip-path: polygon(30% 0, 70% 0, 100% 100%, 0 100%);
+	width: 86%;
+	height: 82%;
+	clip-path: polygon(34% 0, 66% 0, 100% 100%, 0 100%);
 	background: linear-gradient(180deg, #5a5d65 0%, #43464d 18%, #3f4248 100%);
 	box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.04);
 }
@@ -176,20 +176,20 @@ $css = <<<'CSS'
 .zo-game-root--car-lane-switch .zo-car-road-edge-right {
 	position: absolute;
 	bottom: 0;
-	height: 72%;
-	width: 26%;
+	height: 80%;
+	width: 24%;
 	background: linear-gradient(180deg, #867264 0%, #575e66 22%, #40454d 100%);
 	z-index: 1;
 }
 
 .zo-game-root--car-lane-switch .zo-car-road-edge-left {
 	left: 0;
-	clip-path: polygon(100% 0, 100% 100%, 0 100%, 0 82%);
+	clip-path: polygon(100% 0, 100% 100%, 0 100%, 0 78%);
 }
 
 .zo-game-root--car-lane-switch .zo-car-road-edge-right {
 	right: 0;
-	clip-path: polygon(0 0, 100% 82%, 100% 100%, 0 100%);
+	clip-path: polygon(0 0, 100% 78%, 100% 100%, 0 100%);
 }
 
 .zo-game-root--car-lane-switch .zo-car-guard {
@@ -202,17 +202,17 @@ $css = <<<'CSS'
 }
 
 .zo-game-root--car-lane-switch .zo-car-guard--left {
-	left: 9%;
-	bottom: 34%;
-	width: 32%;
-	transform: rotate(-14deg);
+	left: 6%;
+	bottom: 39%;
+	width: 34%;
+	transform: rotate(-15deg);
 }
 
 .zo-game-root--car-lane-switch .zo-car-guard--right {
-	right: 9%;
-	bottom: 34%;
-	width: 32%;
-	transform: rotate(14deg);
+	right: 6%;
+	bottom: 39%;
+	width: 34%;
+	transform: rotate(15deg);
 }
 
 .zo-game-root--car-lane-switch .zo-car-road-lanes {
@@ -223,34 +223,31 @@ $css = <<<'CSS'
 
 .zo-game-root--car-lane-switch .zo-car-lane-line {
 	position: absolute;
-	top: 17%;
+	top: 10%;
 	bottom: 0;
-	width: 2%;
+	width: 1.5%;
 	transform: translateX(-50%);
 	background:
 		repeating-linear-gradient(
 			180deg,
-			rgba(255, 255, 255, 0.96) 0 58px,
-			transparent 58px 118px
+			rgba(255, 255, 255, 0.96) 0 52px,
+			transparent 52px 108px
 		);
 	filter: blur(0.2px);
 	opacity: 0.95;
 }
 
-.zo-game-root--car-lane-switch .zo-car-lane-line--1 {
-	left: 33.33%;
-}
-
-.zo-game-root--car-lane-switch .zo-car-lane-line--2 {
-	left: 66.66%;
-}
+.zo-game-root--car-lane-switch .zo-car-lane-line--1 { left: 20%; }
+.zo-game-root--car-lane-switch .zo-car-lane-line--2 { left: 40%; }
+.zo-game-root--car-lane-switch .zo-car-lane-line--3 { left: 60%; }
+.zo-game-root--car-lane-switch .zo-car-lane-line--4 { left: 80%; }
 
 .zo-game-root--car-lane-switch .zo-car-sign-bridge {
 	position: absolute;
 	left: 50%;
-	top: 20%;
+	top: 18%;
 	transform: translateX(-50%);
-	width: 54%;
+	width: 58%;
 	height: 10px;
 	background: #535252;
 	border-radius: 999px;
@@ -267,13 +264,8 @@ $css = <<<'CSS'
 	background: linear-gradient(180deg, #666 0%, #444 100%);
 }
 
-.zo-game-root--car-lane-switch .zo-car-sign-bridge::before {
-	left: 0;
-}
-
-.zo-game-root--car-lane-switch .zo-car-sign-bridge::after {
-	right: 0;
-}
+.zo-game-root--car-lane-switch .zo-car-sign-bridge::before { left: 0; }
+.zo-game-root--car-lane-switch .zo-car-sign-bridge::after { right: 0; }
 
 .zo-game-root--car-lane-switch .zo-car-sign {
 	position: absolute;
@@ -291,13 +283,8 @@ $css = <<<'CSS'
 	box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.12);
 }
 
-.zo-game-root--car-lane-switch .zo-car-sign--left {
-	left: 17%;
-}
-
-.zo-game-root--car-lane-switch .zo-car-sign--right {
-	right: 17%;
-}
+.zo-game-root--car-lane-switch .zo-car-sign--left { left: 17%; }
+.zo-game-root--car-lane-switch .zo-car-sign--right { right: 17%; }
 
 .zo-game-root--car-lane-switch .zo-car-sign-arrow {
 	display: block;
@@ -311,8 +298,8 @@ $css = <<<'CSS'
 	left: 50%;
 	bottom: 0;
 	transform: translateX(-50%);
-	width: 62%;
-	height: 74%;
+	width: 70%;
+	height: 82%;
 	z-index: 8;
 }
 
@@ -329,11 +316,11 @@ $css = <<<'CSS'
 .zo-game-root--car-lane-switch .zo-car-player,
 .zo-game-root--car-lane-switch .zo-car-obstacle,
 .zo-game-root--car-lane-switch .zo-car-ghost {
-	width: 19%;
-	max-width: 120px;
-	min-width: 72px;
+	width: 14%;
+	max-width: 96px;
+	min-width: 54px;
 	aspect-ratio: 0.94 / 1.3;
-	border-radius: 22px 22px 18px 18px;
+	border-radius: 18px 18px 14px 14px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -386,7 +373,7 @@ $css = <<<'CSS'
 }
 
 .zo-game-root--car-lane-switch .zo-car-player {
-	bottom: 22px;
+	bottom: 28px;
 	z-index: 12;
 	transition: left 0.18s ease, transform 0.18s ease, filter 0.18s ease;
 }
@@ -408,7 +395,7 @@ $css = <<<'CSS'
 }
 
 .zo-game-root--car-lane-switch .zo-car-ghost {
-	bottom: 22px;
+	bottom: 28px;
 	z-index: 7;
 	opacity: 0.22;
 	filter: grayscale(1);
@@ -429,19 +416,19 @@ $css = <<<'CSS'
 }
 
 .zo-game-root--car-lane-switch .zo-car-coin {
-	width: 42px;
-	height: 42px;
+	width: 36px;
+	height: 36px;
 	border-radius: 50%;
-	font-size: 28px;
+	font-size: 24px;
 	background: radial-gradient(circle at 35% 35%, #fff9c5 0%, #ffd95d 45%, #e0a700 100%);
 	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.18);
 }
 
 .zo-game-root--car-lane-switch .zo-car-powerup {
-	width: 48px;
-	height: 48px;
+	width: 44px;
+	height: 44px;
 	border-radius: 50%;
-	font-size: 25px;
+	font-size: 22px;
 	background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(221, 243, 255, 0.96) 100%);
 	box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
 	border: 3px solid rgba(255, 255, 255, 0.92);
@@ -472,10 +459,7 @@ $css = <<<'CSS'
 	top: 34px;
 }
 
-.zo-game-root--car-lane-switch .zo-car-panel-stack--left {
-	left: 28px;
-}
-
+.zo-game-root--car-lane-switch .zo-car-panel-stack--left { left: 28px; }
 .zo-game-root--car-lane-switch .zo-car-panel-stack--right {
 	right: 28px;
 	align-items: flex-end;
@@ -586,6 +570,15 @@ $css = <<<'CSS'
 .zo-game-root--car-lane-switch .zo-car-circle-btn--ability {
 	font-size: 54px;
 	color: #74d3ff;
+	opacity: 0.42;
+	border-color: rgba(112, 210, 255, 0.28);
+	box-shadow: 0 0 0 3px rgba(107, 211, 255, 0.04), inset 0 0 20px rgba(30, 111, 160, 0.06);
+}
+
+.zo-game-root--car-lane-switch .zo-car-circle-btn--ability.is-ready {
+	opacity: 1;
+	border-color: rgba(112, 210, 255, 0.9);
+	box-shadow: 0 0 0 3px rgba(107, 211, 255, 0.12), 0 0 28px rgba(86, 200, 255, 0.52), inset 0 0 20px rgba(30, 111, 160, 0.2);
 }
 
 .zo-game-root--car-lane-switch .zo-car-circle-btn--small {
@@ -796,13 +789,8 @@ $css = <<<'CSS'
 		gap: 8px;
 	}
 
-	.zo-game-root--car-lane-switch .zo-car-panel-stack--left {
-		left: 12px;
-	}
-
-	.zo-game-root--car-lane-switch .zo-car-panel-stack--right {
-		right: 12px;
-	}
+	.zo-game-root--car-lane-switch .zo-car-panel-stack--left { left: 12px; }
+	.zo-game-root--car-lane-switch .zo-car-panel-stack--right { right: 12px; }
 
 	.zo-game-root--car-lane-switch .zo-car-hud-panel {
 		min-width: 118px;
@@ -918,20 +906,20 @@ document.addEventListener('DOMContentLoaded', function () {
 		const hills = game.querySelector('.zo-car-horizon-hills');
 		const palms = game.querySelector('.zo-car-palms');
 
-		const lanePercents = [16.66, 50, 83.33];
+		const lanePercents = [10, 30, 50, 70, 90];
 		const obstacleTypes = ['car', 'truck'];
 		const powerTypes = ['shield', 'slow', 'magnet', 'turbo'];
 		const storageKeys = {
-			best: 'zo_car_lane_switch_best_v5',
-			unlocks: 'zo_car_lane_switch_unlocks_v5',
-			bestRun: 'zo_car_lane_switch_best_run_v5',
-			totalCoins: 'zo_car_lane_switch_total_coins_v5'
+			best: 'zo_car_lane_switch_best_v6',
+			unlocks: 'zo_car_lane_switch_unlocks_v6',
+			bestRun: 'zo_car_lane_switch_best_run_v6',
+			totalCoins: 'zo_car_lane_switch_total_coins_v6'
 		};
 
 		const translations = {
 			en: {
 				title: 'Car Lane Switch',
-				instructions: 'Switch lanes with arrow keys or buttons. Dodge traffic, collect coins, and save power-ups.',
+				instructions: 'Use arrow keys or buttons. Five lanes. Turbo button lights only when turbo is ready.',
 				skin: { red: 'Red Car', blue: 'Blue Car', green: 'Green Car', purple: 'Purple Car' },
 				difficulty: { easy: 'Easy', medium: 'Medium', hard: 'Hard' },
 				theme: { city: 'City', desert: 'Desert', snow: 'Snow', night: 'Night', mountain: 'Mountain' },
@@ -961,13 +949,15 @@ document.addEventListener('DOMContentLoaded', function () {
 				statusGameOver: 'Game over. Try again.',
 				statusNearMiss: 'Near miss bonus.',
 				statusPowerSaved: 'Power-up saved until all lives are gone.',
+				statusTurboReady: 'Turbo ready. Press the lightning button.',
+				statusTurboUsed: 'Turbo used. Side movement is faster for a short time.',
 				statusResetScores: 'Scores reset.',
 				statusResetUnlocks: 'Unlocks reset.',
 				eventCoinRain: 'Event: Coin Rain',
 				eventRoadwork: 'Event: Roadwork',
 				getReady: 'Get Ready',
 				countdownText: 'The race starts after the countdown.',
-				overlaySetup: 'Use a slower style like the preview image. Turbo only makes side movement faster.',
+				overlaySetup: 'Higher camera view. Five lanes. Turbo is now a real use button.',
 				pausedTitle: 'Paused',
 				pausedText: 'Press Resume or pause again to continue.',
 				parentTitle: 'Parent Menu',
@@ -981,14 +971,14 @@ document.addEventListener('DOMContentLoaded', function () {
 					shield: '🛡 Shield',
 					slow: '🐢 Slow',
 					magnet: '🧲 Magnet',
-					turbo: '⚡ Side Turbo'
+					turbo: '⚡ Turbo Ready'
 				},
 				signLeft: 'DOWNTOWN',
 				signRight: 'BEACH ROAD'
 			},
 			tr: {
 				title: 'Araba Şerit Değiştir',
-				instructions: 'Ok tuşları veya düğmelerle şerit değiştir. Trafikten kaç, para topla ve güçleri sakla.',
+				instructions: 'Ok tuşları veya düğmelerle oynanır. Beş şerit. Turbo düğmesi sadece hazırken parlar.',
 				skin: { red: 'Kırmızı Araba', blue: 'Mavi Araba', green: 'Yeşil Araba', purple: 'Mor Araba' },
 				difficulty: { easy: 'Kolay', medium: 'Orta', hard: 'Zor' },
 				theme: { city: 'Şehir', desert: 'Çöl', snow: 'Kar', night: 'Gece', mountain: 'Dağ' },
@@ -1018,13 +1008,15 @@ document.addEventListener('DOMContentLoaded', function () {
 				statusGameOver: 'Oyun bitti. Tekrar dene.',
 				statusNearMiss: 'Kıl payı bonusu.',
 				statusPowerSaved: 'Güç canlar bitene kadar saklanır.',
+				statusTurboReady: 'Turbo hazır. Şimşek düğmesine bas.',
+				statusTurboUsed: 'Turbo kullanıldı. Bir süre sağa sola daha hızlı gidersin.',
 				statusResetScores: 'Skorlar sıfırlandı.',
 				statusResetUnlocks: 'Kilitler sıfırlandı.',
 				eventCoinRain: 'Etkinlik: Para Yağmuru',
 				eventRoadwork: 'Etkinlik: Yol Çalışması',
 				getReady: 'Hazır Ol',
 				countdownText: 'Yarış geri sayımdan sonra başlar.',
-				overlaySetup: 'Önizleme resmine benzer daha yavaş bir stil kullanır. Turbo sadece sağa sola daha hızlı götürür.',
+				overlaySetup: 'Kamera daha yukarıda. Beş şerit var. Turbo artık gerçek bir kullanım düğmesi.',
 				pausedTitle: 'Duraklatıldı',
 				pausedText: 'Devam Et’e bas ya da tekrar duraklat.',
 				parentTitle: 'Ebeveyn Menüsü',
@@ -1038,14 +1030,14 @@ document.addEventListener('DOMContentLoaded', function () {
 					shield: '🛡 Kalkan',
 					slow: '🐢 Yavaş',
 					magnet: '🧲 Mıknatıs',
-					turbo: '⚡ Yan Turbo'
+					turbo: '⚡ Turbo Hazır'
 				},
 				signLeft: 'MERKEZ',
 				signRight: 'SAHİL YOLU'
 			},
 			de: {
 				title: 'Auto Spurwechsel',
-				instructions: 'Wechsle mit Pfeiltasten oder Knöpfen die Spur. Weiche aus, sammle Münzen und speichere Power-ups.',
+				instructions: 'Mit Pfeiltasten oder Knöpfen spielen. Fünf Spuren. Turbo leuchtet nur wenn es bereit ist.',
 				skin: { red: 'Rotes Auto', blue: 'Blaues Auto', green: 'Grünes Auto', purple: 'Lila Auto' },
 				difficulty: { easy: 'Leicht', medium: 'Mittel', hard: 'Schwer' },
 				theme: { city: 'Stadt', desert: 'Wüste', snow: 'Schnee', night: 'Nacht', mountain: 'Berg' },
@@ -1075,13 +1067,15 @@ document.addEventListener('DOMContentLoaded', function () {
 				statusGameOver: 'Spiel vorbei. Versuch es erneut.',
 				statusNearMiss: 'Beinahe-Unfall Bonus.',
 				statusPowerSaved: 'Power-up bleibt bis alle Leben weg sind.',
+				statusTurboReady: 'Turbo bereit. Drücke den Blitzknopf.',
+				statusTurboUsed: 'Turbo benutzt. Seitliche Bewegung ist kurz schneller.',
 				statusResetScores: 'Punkte zurückgesetzt.',
 				statusResetUnlocks: 'Freischaltungen zurückgesetzt.',
 				eventCoinRain: 'Event: Münzregen',
 				eventRoadwork: 'Event: Baustelle',
 				getReady: 'Bereit',
 				countdownText: 'Das Rennen startet nach dem Countdown.',
-				overlaySetup: 'Langsamer Stil wie im Vorschaubild. Turbo macht nur Spurwechsel schneller.',
+				overlaySetup: 'Höhere Kamerasicht. Fünf Spuren. Turbo ist jetzt ein echter Knopf.',
 				pausedTitle: 'Pausiert',
 				pausedText: 'Drücke Weiter oder Pause erneut.',
 				parentTitle: 'Elternmenü',
@@ -1095,14 +1089,14 @@ document.addEventListener('DOMContentLoaded', function () {
 					shield: '🛡 Schild',
 					slow: '🐢 Langsam',
 					magnet: '🧲 Magnet',
-					turbo: '⚡ Seiten-Turbo'
+					turbo: '⚡ Turbo Bereit'
 				},
 				signLeft: 'INNENSTADT',
 				signRight: 'STRANDSTRASSE'
 			},
 			es: {
 				title: 'Cambio de Carril',
-				instructions: 'Cambia de carril con flechas o botones. Esquiva coches, recoge monedas y guarda poderes.',
+				instructions: 'Usa flechas o botones. Cinco carriles. Turbo solo se enciende cuando está listo.',
 				skin: { red: 'Coche Rojo', blue: 'Coche Azul', green: 'Coche Verde', purple: 'Coche Morado' },
 				difficulty: { easy: 'Fácil', medium: 'Medio', hard: 'Difícil' },
 				theme: { city: 'Ciudad', desert: 'Desierto', snow: 'Nieve', night: 'Noche', mountain: 'Montaña' },
@@ -1132,13 +1126,15 @@ document.addEventListener('DOMContentLoaded', function () {
 				statusGameOver: 'Fin del juego. Inténtalo otra vez.',
 				statusNearMiss: 'Bono por casi chocar.',
 				statusPowerSaved: 'El poder queda guardado hasta perder todas las vidas.',
+				statusTurboReady: 'Turbo listo. Pulsa el botón del rayo.',
+				statusTurboUsed: 'Turbo usado. El movimiento lateral es más rápido por un momento.',
 				statusResetScores: 'Puntuaciones borradas.',
 				statusResetUnlocks: 'Desbloqueos borrados.',
 				eventCoinRain: 'Evento: Lluvia de Monedas',
 				eventRoadwork: 'Evento: Obras',
 				getReady: 'Prepárate',
 				countdownText: 'La carrera empieza después de la cuenta atrás.',
-				overlaySetup: 'Estilo más lento como en la imagen. Turbo solo acelera el movimiento lateral.',
+				overlaySetup: 'Vista más alta. Cinco carriles. Turbo ahora es un botón real.',
 				pausedTitle: 'En Pausa',
 				pausedText: 'Pulsa Seguir o Pausa otra vez.',
 				parentTitle: 'Menú Padres',
@@ -1152,7 +1148,7 @@ document.addEventListener('DOMContentLoaded', function () {
 					shield: '🛡 Escudo',
 					slow: '🐢 Lento',
 					magnet: '🧲 Imán',
-					turbo: '⚡ Turbo Lateral'
+					turbo: '⚡ Turbo Listo'
 				},
 				signLeft: 'CENTRO',
 				signRight: 'CAMINO PLAYA'
@@ -1240,7 +1236,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			bestRun = null;
 		}
 
-		let laneIndex = 1;
+		let laneIndex = 2;
 		let obstacles = [];
 		let coins = [];
 		let powerups = [];
@@ -1266,6 +1262,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			magnet: false,
 			turbo: false
 		};
+		let turboActiveTimer = 0;
 		let eventState = {
 			type: '',
 			timer: 0,
@@ -1294,8 +1291,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function updateMoveDuration() {
 			const base = getSettings().sideMoveDuration;
-			currentSideMoveDuration = savedPowers.turbo ? Math.max(0.08, base * 0.5) : base;
+			currentSideMoveDuration = turboActiveTimer > 0 ? Math.max(0.08, base * 0.45) : base;
 			player.style.transitionDuration = currentSideMoveDuration + 's, ' + currentSideMoveDuration + 's, 0.18s';
+		}
+
+		function updateTurboButton() {
+			const isReady = savedPowers.turbo;
+			turboBtn.classList.toggle('is-ready', !!isReady);
+			turboBtn.disabled = !isReady;
+			turboBtn.setAttribute('aria-pressed', turboActiveTimer > 0 ? 'true' : 'false');
 		}
 
 		function ensureAudio() {
@@ -1359,6 +1363,10 @@ document.addEventListener('DOMContentLoaded', function () {
 				frequency = 960;
 				duration = 0.07;
 				wave = 'triangle';
+			} else if (type === 'turbo') {
+				frequency = 760;
+				duration = 0.12;
+				wave = 'sawtooth';
 			}
 
 			osc.type = wave;
@@ -1528,8 +1536,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function updatePowerClasses() {
 			const hasSavedPower = savedPowers.shield || savedPowers.slow || savedPowers.magnet || savedPowers.turbo;
-			player.classList.toggle('is-powerup', hasSavedPower);
+			player.classList.toggle('is-powerup', hasSavedPower || turboActiveTimer > 0);
 			updateMoveDuration();
+			updateTurboButton();
 		}
 
 		function updatePowerPills() {
@@ -1567,7 +1576,13 @@ document.addEventListener('DOMContentLoaded', function () {
 			savedPowers[type] = true;
 			updatePowerClasses();
 			updatePowerPills();
-			setStatus(t().statusPowerSaved, false);
+
+			if (type === 'turbo') {
+				setStatus(t().statusTurboReady, false);
+			} else {
+				setStatus(t().statusPowerSaved, false);
+			}
+
 			playTone('power');
 		}
 
@@ -1576,8 +1591,21 @@ document.addEventListener('DOMContentLoaded', function () {
 			savedPowers.slow = false;
 			savedPowers.magnet = false;
 			savedPowers.turbo = false;
+			turboActiveTimer = 0;
 			updatePowerClasses();
 			updatePowerPills();
+		}
+
+		function activateTurboNow() {
+			if (!savedPowers.turbo) {
+				return;
+			}
+			savedPowers.turbo = false;
+			turboActiveTimer = 5;
+			updatePowerClasses();
+			updatePowerPills();
+			setStatus(t().statusTurboUsed, false);
+			playTone('turbo');
 		}
 
 		function getOpenLanes() {
@@ -1588,13 +1616,13 @@ document.addEventListener('DOMContentLoaded', function () {
 				}
 			});
 			const lanes = [];
-			for (let i = 0; i < 3; i += 1) {
+			for (let i = 0; i < lanePercents.length; i += 1) {
 				if (!blocked[i]) {
 					lanes.push(i);
 				}
 			}
 			if (!lanes.length) {
-				lanes.push(Math.floor(Math.random() * 3));
+				lanes.push(Math.floor(Math.random() * lanePercents.length));
 			}
 			return lanes;
 		}
@@ -1640,7 +1668,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				el: coin,
 				lane: lane,
 				y: -40,
-				height: 42
+				height: 36
 			});
 		}
 
@@ -1668,7 +1696,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				el: powerup,
 				lane: lane,
 				y: -48,
-				height: 48,
+				height: 44,
 				type: type
 			});
 		}
@@ -1754,7 +1782,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 				bestRun = {
 					score: score,
-					path: currentRunPath.slice(0, 600)
+					path: currentRunPath.slice(0, 800)
 				};
 
 				try {
@@ -1813,13 +1841,14 @@ document.addEventListener('DOMContentLoaded', function () {
 			distanceKm = 0;
 			nearMissCount = 0;
 			lives = 10;
-			laneIndex = 1;
+			laneIndex = 2;
 			runTime = 0;
 			currentRunPath = [{ time: 0, lane: laneIndex }];
 			eventState.type = '';
 			eventState.timer = 0;
 			eventState.cooldown = 10;
 			driftTimer = 0;
+			turboActiveTimer = 0;
 
 			speed = getSettings().baseSpeed;
 
@@ -1857,7 +1886,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			eventState.timer = 0;
 			eventState.cooldown = 8 + Math.random() * 5;
 			driftTimer = 0;
-			laneIndex = 1;
+			laneIndex = 2;
+			turboActiveTimer = 0;
 			speed = getSettings().baseSpeed;
 
 			setPlayerLane();
@@ -1953,7 +1983,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				time: runTime,
 				lane: laneIndex
 			});
-			if (currentRunPath.length > 600) {
+			if (currentRunPath.length > 800) {
 				currentRunPath.shift();
 			}
 		}
@@ -1975,7 +2005,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				return;
 			}
 			const oldLane = laneIndex;
-			laneIndex = Math.min(2, laneIndex + 1);
+			laneIndex = Math.min(lanePercents.length - 1, laneIndex + 1);
 			if (laneIndex !== oldLane) {
 				setPlayerLane();
 				markLaneChange('right');
@@ -1983,7 +2013,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function intersectsLane(yTop, yBottom, lane) {
-			const playerTop = road.clientHeight - player.offsetHeight - 22;
+			const playerTop = road.clientHeight - player.offsetHeight - 28;
 			const playerBottom = playerTop + player.offsetHeight - 10;
 			return lane === laneIndex && yBottom >= playerTop && yTop <= playerBottom;
 		}
@@ -2077,10 +2107,10 @@ document.addEventListener('DOMContentLoaded', function () {
 			});
 
 			const palmData = [
-				{ left: '11%', bottom: '51%', scale: 0.95, rotate: -1 },
-				{ left: '23%', bottom: '67%', scale: 0.45, rotate: 2 },
-				{ left: '78%', bottom: '67%', scale: 0.45, rotate: -2 },
-				{ left: '88%', bottom: '52%', scale: 1.08, rotate: 2 }
+				{ left: '8%', bottom: '57%', scale: 0.95, rotate: -1 },
+				{ left: '22%', bottom: '70%', scale: 0.45, rotate: 2 },
+				{ left: '77%', bottom: '70%', scale: 0.45, rotate: -2 },
+				{ left: '90%', bottom: '58%', scale: 1.08, rotate: 2 }
 			];
 
 			palmData.forEach(function (item) {
@@ -2132,6 +2162,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			updateHud();
 			updatePowerPills();
 			updateParentStats();
+			updateTurboButton();
 
 			if (!running && !paused && !ended) {
 				setStatus(dict.statusReady, false);
@@ -2155,6 +2186,13 @@ document.addEventListener('DOMContentLoaded', function () {
 			updateGhost(runTime);
 			updateDrift(delta);
 			updateEvent(delta);
+
+			if (turboActiveTimer > 0) {
+				turboActiveTimer = Math.max(0, turboActiveTimer - delta);
+				if (turboActiveTimer === 0) {
+					updatePowerClasses();
+				}
+			}
 
 			const settings = getSettings();
 			const slowFactor = savedPowers.slow ? 0.72 : 1;
@@ -2197,7 +2235,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			const roadHeight = road.clientHeight;
-			const playerTop = roadHeight - player.offsetHeight - 22;
+			const playerTop = roadHeight - player.offsetHeight - 28;
 			const playerBottom = playerTop + player.offsetHeight - 10;
 			const playerCenterLaneX = lanePercents[laneIndex];
 
@@ -2386,9 +2424,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 
 		turboBtn.addEventListener('click', function () {
-			if (savedPowers.turbo) {
-				moveRight();
-			}
+			activateTurboNow();
 		});
 
 		skinSelect.addEventListener('change', function () {
@@ -2428,6 +2464,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			} else if (event.key === 'ArrowRight') {
 				event.preventDefault();
 				moveRight();
+			} else if (event.key === 'ArrowUp') {
+				event.preventDefault();
+				activateTurboNow();
 			} else if (event.key === ' ' || event.key === 'Enter') {
 				event.preventDefault();
 				if (running || paused) {
@@ -2485,6 +2524,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		updateMoveDuration();
 		updateHud();
 		updatePowerPills();
+		updateTurboButton();
 		applyTranslations();
 		resetGame();
 	});
@@ -2516,6 +2556,8 @@ if (!function_exists('zo_game_car_lane_switch_render')) {
 							<div class="zo-car-road-lanes">
 								<div class="zo-car-lane-line zo-car-lane-line--1"></div>
 								<div class="zo-car-lane-line zo-car-lane-line--2"></div>
+								<div class="zo-car-lane-line zo-car-lane-line--3"></div>
+								<div class="zo-car-lane-line zo-car-lane-line--4"></div>
 							</div>
 						</div>
 
@@ -2579,7 +2621,7 @@ if (!function_exists('zo_game_car_lane_switch_render')) {
 						</div>
 
 						<div class="zo-car-controls-group-right">
-							<button type="button" class="zo-car-circle-btn zo-car-circle-btn--ability zo-car-turbo" aria-label="Turbo move">⚡</button>
+							<button type="button" class="zo-car-circle-btn zo-car-circle-btn--ability zo-car-turbo" aria-label="Use turbo" disabled>⚡</button>
 							<button type="button" class="zo-car-circle-btn zo-car-circle-btn--small zo-car-pause-bottom" aria-label="Pause game">❚❚</button>
 						</div>
 					</div>
@@ -2587,7 +2629,7 @@ if (!function_exists('zo_game_car_lane_switch_render')) {
 					<div class="zo-car-overlay">
 						<div class="zo-car-panel">
 							<h3 class="zo-car-panel-title">Car Lane Switch</h3>
-							<p class="zo-car-panel-text">Use a slower style like the preview image. Turbo only makes side movement faster.</p>
+							<p class="zo-car-panel-text">Higher camera view. Five lanes. Turbo is now a real use button.</p>
 							<div class="zo-car-panel-countdown"></div>
 							<div class="zo-car-buttons">
 								<button type="button" class="zo-car-btn zo-car-btn--accent zo-car-start">Start</button>
@@ -2657,7 +2699,7 @@ return array(
 	'slug'            => 'car-lane-switch',
 	'name'            => 'Car Lane Switch',
 	'author'          => 'Asker',
-	'description'     => 'A slower lane-switching driving game with 10 lives, arrow keys, pause controls, side-move turbo, and a UI inspired by a highway racing game.',
+	'description'     => 'A slower lane-switching driving game with 5 lanes, a higher camera view, arrow keys, pause controls, and a real turbo-use button.',
 	'render_callback' => 'zo_game_car_lane_switch_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,
