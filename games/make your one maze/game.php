@@ -256,8 +256,8 @@ if (!function_exists('zo_game_puzzle_creator_admin_render')) {
 }
 
 return array(
-	'slug'            => 'puzzle-creator-admin',
-	'name'            => 'Puzzle Creator Admin',
+	'slug'            => 'puzzle-creator-pro',
+	'name'            => 'Puzzle Creator Pro',
 	'author'          => 'Asker',
 	'description'     => 'Create, send, approve, and manage puzzles with admin password.',
 	'render_callback' => 'zo_game_puzzle_creator_admin_render',
