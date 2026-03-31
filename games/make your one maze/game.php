@@ -6,23 +6,29 @@ if (!defined('ABSPATH')) {
 
 /*
 |--------------------------------------------------------------------------
-| AJAX HANDLERS (Shared System Storage)
+| AJAX HANDLERS
 |--------------------------------------------------------------------------
 */
 
 add_action('wp_ajax_zo_pca_save_shared', 'zo_pca_save_shared');
+add_action('wp_ajax_nopriv_zo_pca_save_shared', 'zo_pca_save_shared');
+
 add_action('wp_ajax_zo_pca_get_shared', 'zo_pca_get_shared');
+add_action('wp_ajax_nopriv_zo_pca_get_shared', 'zo_pca_get_shared');
+
 add_action('wp_ajax_zo_pca_delete_shared', 'zo_pca_delete_shared');
+add_action('wp_ajax_nopriv_zo_pca_delete_shared', 'zo_pca_delete_shared');
 
 function zo_pca_save_shared() {
 	check_ajax_referer('zo_pca_nonce', 'nonce');
 
-	if (!current_user_can('manage_options')) {
-		wp_send_json_error('Permission denied');
-	}
-
 	$name = sanitize_text_field($_POST['name'] ?? '');
 	$code = sanitize_text_field($_POST['code'] ?? '');
+	$password = sanitize_text_field($_POST['password'] ?? '');
+
+	if ($password !== 'asker1905123') {
+		wp_send_json_error('Wrong admin password');
+	}
 
 	if (!$name || !$code) {
 		wp_send_json_error('Missing data');
@@ -46,11 +52,13 @@ function zo_pca_get_shared() {
 function zo_pca_delete_shared() {
 	check_ajax_referer('zo_pca_nonce', 'nonce');
 
-	if (!current_user_can('manage_options')) {
-		wp_send_json_error('Permission denied');
+	$password = sanitize_text_field($_POST['password'] ?? '');
+	$index = intval($_POST['index'] ?? -1);
+
+	if ($password !== 'asker1905123') {
+		wp_send_json_error('Wrong admin password');
 	}
 
-	$index = intval($_POST['index'] ?? -1);
 	$list = get_option('zo_pca_shared_puzzles', array());
 
 	if (isset($list[$index])) {
@@ -75,7 +83,6 @@ $css = <<<'CSS'
 	background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
 	border-radius: 18px;
 	color: #ffffff;
-	box-sizing: border-box;
 	font-family: inherit;
 }
 
@@ -115,6 +122,10 @@ $css = <<<'CSS'
 	margin-bottom: 10px;
 	font-weight: 600;
 	color: #facc15;
+}
+
+.zo-pca-shared button {
+	margin: 4px;
 }
 CSS;
 
@@ -232,6 +243,8 @@ document.addEventListener('DOMContentLoaded', function () {
 		game.querySelector('.zo-pca-save').onclick = function () {
 			const name = prompt('Puzzle name:');
 			if (!name) return;
+			const password = prompt('Enter admin password:');
+			if (!password) return;
 
 			fetch(ajaxUrl, {
 				method: 'POST',
@@ -240,6 +253,7 @@ document.addEventListener('DOMContentLoaded', function () {
 					action: 'zo_pca_save_shared',
 					name: name,
 					code: encodePuzzle(),
+					password: password,
 					nonce: nonce
 				})
 			})
@@ -248,6 +262,8 @@ document.addEventListener('DOMContentLoaded', function () {
 				if (data.success) {
 					statusEl.textContent = 'Saved to system.';
 					renderShared(data.data);
+				} else {
+					statusEl.textContent = data.data;
 				}
 			});
 		};
@@ -255,13 +271,43 @@ document.addEventListener('DOMContentLoaded', function () {
 		function renderShared(list) {
 			sharedBox.innerHTML = '';
 			list.forEach(function (item, index) {
-				const btn = document.createElement('button');
-				btn.className = 'zo-pca-btn';
-				btn.textContent = item.name;
-				btn.onclick = function () {
+				const wrapper = document.createElement('div');
+
+				const playBtn = document.createElement('button');
+				playBtn.className = 'zo-pca-btn';
+				playBtn.textContent = item.name;
+				playBtn.onclick = function () {
 					loadPuzzle(item.code);
 				};
-				sharedBox.appendChild(btn);
+
+				const deleteBtn = document.createElement('button');
+				deleteBtn.className = 'zo-pca-btn';
+				deleteBtn.textContent = 'Delete';
+				deleteBtn.onclick = function () {
+					const password = prompt('Enter admin password:');
+					if (!password) return;
+
+					fetch(ajaxUrl, {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+						body: new URLSearchParams({
+							action: 'zo_pca_delete_shared',
+							index: index,
+							password: password,
+							nonce: nonce
+						})
+					})
+					.then(res => res.json())
+					.then(data => {
+						if (data.success) {
+							renderShared(data.data);
+						}
+					});
+				};
+
+				wrapper.appendChild(playBtn);
+				wrapper.appendChild(deleteBtn);
+				sharedBox.appendChild(wrapper);
 			});
 		}
 
@@ -324,7 +370,7 @@ return array(
 	'slug'            => 'puzzle-creator-pro',
 	'name'            => 'Puzzle Creator Pro',
 	'author'          => 'Asker',
-	'description'     => 'Create puzzles and save them system-wide for everyone.',
+	'description'     => 'Create puzzles and share them system-wide with admin password.',
 	'render_callback' => 'zo_game_puzzle_creator_pro_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,
