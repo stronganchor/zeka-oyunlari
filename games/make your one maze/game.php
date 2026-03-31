@@ -5,8 +5,8 @@ if (!defined('ABSPATH')) {
 }
 
 $css = <<<'CSS'
-.zo-game-root--puzzle-creator-mode {
-	max-width: 720px;
+.zo-game-root--puzzle-creator-pro {
+	max-width: 760px;
 	margin: 0 auto;
 	padding: 20px;
 	background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
@@ -16,195 +16,145 @@ $css = <<<'CSS'
 	font-family: inherit;
 }
 
-.zo-game-root--puzzle-creator-mode * {
+.zo-game-root--puzzle-creator-pro * {
 	box-sizing: border-box;
 }
 
-.zo-game-root--puzzle-creator-mode h2 {
+.zo-game-root--puzzle-creator-pro h2 {
 	margin: 0 0 8px;
 	font-size: 26px;
 }
 
-.zo-game-root--puzzle-creator-mode p {
+.zo-game-root--puzzle-creator-pro p {
 	margin: 0 0 12px;
 	color: #cbd5e1;
 	font-size: 14px;
 }
 
-.zo-game-root--puzzle-creator-mode .zo-pcm-panel {
+.zo-game-root--puzzle-creator-pro .zo-pcp-panel {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 10px;
-	margin-bottom: 14px;
+	gap: 8px;
+	margin-bottom: 12px;
 }
 
-.zo-game-root--puzzle-creator-mode .zo-pcm-btn {
+.zo-game-root--puzzle-creator-pro .zo-pcp-btn {
 	border: none;
 	border-radius: 999px;
-	padding: 10px 16px;
+	padding: 8px 14px;
 	font-weight: 700;
 	cursor: pointer;
 	background: #38bdf8;
 	color: #0f172a;
-	font-size: 14px;
+	font-size: 13px;
 }
 
-.zo-game-root--puzzle-creator-mode .zo-pcm-btn-secondary {
+.zo-game-root--puzzle-creator-pro .zo-pcp-btn-secondary {
 	background: #e5e7eb;
 	color: #111827;
 }
 
-.zo-game-root--puzzle-creator-mode .zo-pcm-status {
+.zo-game-root--puzzle-creator-pro .zo-pcp-status {
 	min-height: 24px;
 	margin-bottom: 10px;
 	font-weight: 600;
 	color: #facc15;
 }
 
-.zo-game-root--puzzle-creator-mode .zo-pcm-grid {
+.zo-game-root--puzzle-creator-pro .zo-pcp-grid {
 	display: grid;
 	grid-template-columns: repeat(8, 1fr);
 	gap: 4px;
-	margin-bottom: 14px;
+	margin-bottom: 12px;
 }
 
-.zo-game-root--puzzle-creator-mode .zo-pcm-cell {
+.zo-game-root--puzzle-creator-pro .zo-pcp-cell {
 	width: 100%;
 	aspect-ratio: 1 / 1;
 	border-radius: 8px;
 	background: #334155;
 	cursor: pointer;
-	border: 2px solid transparent;
 }
 
-.zo-game-root--puzzle-creator-mode .zo-pcm-cell.active {
-	background: #22c55e;
-}
+.zo-game-root--puzzle-creator-pro .zo-pcp-cell.wall { background: #22c55e; }
+.zo-game-root--puzzle-creator-pro .zo-pcp-cell.start { background: #3b82f6; }
+.zo-game-root--puzzle-creator-pro .zo-pcp-cell.goal { background: #ef4444; }
 
-.zo-game-root--puzzle-creator-mode .zo-pcm-cell.start {
-	background: #3b82f6;
-}
-
-.zo-game-root--puzzle-creator-mode .zo-pcm-cell.goal {
-	background: #ef4444;
-}
-
-.zo-game-root--puzzle-creator-mode .zo-pcm-legend {
+.zo-game-root--puzzle-creator-pro .zo-pcp-share {
 	display: flex;
+	gap: 6px;
 	flex-wrap: wrap;
-	gap: 12px;
-	font-size: 13px;
-	color: #e2e8f0;
+	margin-top: 10px;
+}
+
+.zo-game-root--puzzle-creator-pro input {
+	padding: 6px;
+	border-radius: 6px;
+	border: none;
+	font-size: 12px;
 }
 CSS;
 
 $js = <<<'JS'
 document.addEventListener('DOMContentLoaded', function () {
-	const games = document.querySelectorAll('.zo-game-root--puzzle-creator-mode');
+	const games = document.querySelectorAll('.zo-game-root--puzzle-creator-pro');
 
 	games.forEach(function (game) {
 
-		const grid = game.querySelector('.zo-pcm-grid');
-		const modeWallBtn = game.querySelector('.zo-pcm-mode-wall');
-		const modeStartBtn = game.querySelector('.zo-pcm-mode-start');
-		const modeGoalBtn = game.querySelector('.zo-pcm-mode-goal');
-		const testBtn = game.querySelector('.zo-pcm-test');
-		const clearBtn = game.querySelector('.zo-pcm-clear');
-		const statusEl = game.querySelector('.zo-pcm-status');
-
-		if (!grid) return;
+		const grid = game.querySelector('.zo-pcp-grid');
+		const statusEl = game.querySelector('.zo-pcp-status');
+		const saveBtn = game.querySelector('.zo-pcp-save');
+		const codeInput = game.querySelector('.zo-pcp-code');
 
 		const size = 8;
 		let mode = 'wall';
 		let start = null;
 		let goal = null;
-
 		const cells = [];
 
-		function setMode(newMode) {
-			mode = newMode;
-			statusEl.textContent = 'Mode: ' + newMode.toUpperCase();
-		}
-
-		function clearGrid() {
-			cells.forEach(function (cell) {
-				cell.className = 'zo-pcm-cell';
+		function encodePuzzle() {
+			let data = '';
+			cells.forEach(function (cell, i) {
+				if (cell.classList.contains('start')) data += 'S';
+				else if (cell.classList.contains('goal')) data += 'G';
+				else if (cell.classList.contains('wall')) data += '1';
+				else data += '0';
 			});
-			start = null;
-			goal = null;
-			statusEl.textContent = 'Grid cleared.';
+			return btoa(data);
 		}
 
-		function getIndex(row, col) {
-			return row * size + col;
-		}
-
-		function getNeighbors(index) {
-			const row = Math.floor(index / size);
-			const col = index % size;
-			const neighbors = [];
-
-			if (row > 0) neighbors.push(getIndex(row - 1, col));
-			if (row < size - 1) neighbors.push(getIndex(row + 1, col));
-			if (col > 0) neighbors.push(getIndex(row, col - 1));
-			if (col < size - 1) neighbors.push(getIndex(row, col + 1));
-
-			return neighbors;
-		}
-
-		function testPath() {
-			if (start === null || goal === null) {
-				statusEl.textContent = 'You must set a start and a goal.';
-				return;
-			}
-
-			const visited = new Set();
-			const queue = [start];
-
-			while (queue.length > 0) {
-				const current = queue.shift();
-				if (current === goal) {
-					statusEl.textContent = 'Path exists. Puzzle is solvable.';
-					return;
-				}
-
-				visited.add(current);
-
-				getNeighbors(current).forEach(function (n) {
-					if (!visited.has(n) && !cells[n].classList.contains('active')) {
-						queue.push(n);
-						visited.add(n);
-					}
+		function decodePuzzle(code) {
+			try {
+				const data = atob(code);
+				if (data.length !== size * size) return;
+				data.split('').forEach(function (ch, i) {
+					const cell = cells[i];
+					cell.className = 'zo-pcp-cell';
+					if (ch === '1') cell.classList.add('wall');
+					if (ch === 'S') { cell.classList.add('start'); start = i; }
+					if (ch === 'G') { cell.classList.add('goal'); goal = i; }
 				});
+				statusEl.textContent = 'Puzzle loaded.';
+			} catch (e) {
+				statusEl.textContent = 'Invalid code.';
 			}
-
-			statusEl.textContent = 'No path found. Puzzle is blocked.';
 		}
 
 		for (let i = 0; i < size * size; i++) {
 			const cell = document.createElement('div');
-			cell.className = 'zo-pcm-cell';
+			cell.className = 'zo-pcp-cell';
 
 			cell.addEventListener('click', function () {
-
-				if (mode === 'wall') {
-					if (cell.classList.contains('start') || cell.classList.contains('goal')) return;
-					cell.classList.toggle('active');
-				}
-
-				if (mode === 'start') {
+				cell.classList.remove('wall','start','goal');
+				if (mode === 'wall') cell.classList.add('wall');
+				if (mode === 'start') { 
 					if (start !== null) cells[start].classList.remove('start');
 					start = i;
-					cell.classList.remove('active');
-					cell.classList.remove('goal');
 					cell.classList.add('start');
 				}
-
-				if (mode === 'goal') {
+				if (mode === 'goal') { 
 					if (goal !== null) cells[goal].classList.remove('goal');
 					goal = i;
-					cell.classList.remove('active');
-					cell.classList.remove('start');
 					cell.classList.add('goal');
 				}
 			});
@@ -213,43 +163,46 @@ document.addEventListener('DOMContentLoaded', function () {
 			cells.push(cell);
 		}
 
-		modeWallBtn.addEventListener('click', function () { setMode('wall'); });
-		modeStartBtn.addEventListener('click', function () { setMode('start'); });
-		modeGoalBtn.addEventListener('click', function () { setMode('goal'); });
-		testBtn.addEventListener('click', function () { testPath(); });
-		clearBtn.addEventListener('click', function () { clearGrid(); });
+		game.querySelector('.zo-pcp-mode-wall').onclick = () => { mode='wall'; };
+		game.querySelector('.zo-pcp-mode-start').onclick = () => { mode='start'; };
+		game.querySelector('.zo-pcp-mode-goal').onclick = () => { mode='goal'; };
 
-		setMode('wall');
+		saveBtn.onclick = function () {
+			const code = encodePuzzle();
+			codeInput.value = code;
+			statusEl.textContent = 'Puzzle code generated. Send this to admin.';
+		};
+
+		game.querySelector('.zo-pcp-load').onclick = function () {
+			decodePuzzle(codeInput.value.trim());
+		};
 	});
 });
 JS;
 
-if (!function_exists('zo_game_puzzle_creator_mode_render')) {
-	function zo_game_puzzle_creator_mode_render($post_id = 0, $module = array()) {
-		$instance_id = 'zo-puzzle-creator-mode-' . ($post_id ? absint($post_id) : wp_rand(1000, 999999));
-
+if (!function_exists('zo_game_puzzle_creator_pro_render')) {
+	function zo_game_puzzle_creator_pro_render($post_id = 0, $module = array()) {
+		$instance_id = 'zo-puzzle-creator-pro-' . ($post_id ? absint($post_id) : wp_rand(1000, 999999));
 		ob_start();
 		?>
-		<div class="zo-game-root zo-game-root--puzzle-creator-mode" id="<?php echo esc_attr($instance_id); ?>">
-			<h2>Puzzle Creator Mode</h2>
-			<p>Design your own maze. Add walls, choose a start and goal, then test if it can be solved.</p>
+		<div class="zo-game-root zo-game-root--puzzle-creator-pro" id="<?php echo esc_attr($instance_id); ?>">
+			<h2>Puzzle Creator Pro</h2>
+			<p>Create a maze. Save it as a code. Send the code to admin for approval.</p>
 
-			<div class="zo-pcm-panel">
-				<button type="button" class="zo-pcm-btn zo-pcm-mode-wall">Wall Mode</button>
-				<button type="button" class="zo-pcm-btn zo-pcm-mode-start">Start Mode</button>
-				<button type="button" class="zo-pcm-btn zo-pcm-mode-goal">Goal Mode</button>
-				<button type="button" class="zo-pcm-btn zo-pcm-test">Test Path</button>
-				<button type="button" class="zo-pcm-btn zo-pcm-btn-secondary zo-pcm-clear">Clear</button>
+			<div class="zo-pcp-panel">
+				<button type="button" class="zo-pcp-btn zo-pcp-mode-wall">Wall</button>
+				<button type="button" class="zo-pcp-btn zo-pcp-mode-start">Start</button>
+				<button type="button" class="zo-pcp-btn zo-pcp-mode-goal">Goal</button>
 			</div>
 
-			<div class="zo-pcm-status"></div>
+			<div class="zo-pcp-status"></div>
 
-			<div class="zo-pcm-grid"></div>
+			<div class="zo-pcp-grid"></div>
 
-			<div class="zo-pcm-legend">
-				<div>Green = Wall</div>
-				<div>Blue = Start</div>
-				<div>Red = Goal</div>
+			<div class="zo-pcp-share">
+				<button type="button" class="zo-pcp-btn zo-pcp-save">Generate Code</button>
+				<input type="text" class="zo-pcp-code" placeholder="Puzzle code">
+				<button type="button" class="zo-pcp-btn zo-pcp-btn-secondary zo-pcp-load">Load Code</button>
 			</div>
 		</div>
 		<?php
@@ -258,11 +211,11 @@ if (!function_exists('zo_game_puzzle_creator_mode_render')) {
 }
 
 return array(
-	'slug'            => 'puzzle-creator-mode',
-	'name'            => 'Puzzle Creator Mode',
+	'slug'            => 'puzzle-creator-pro',
+	'name'            => 'Puzzle Creator Pro',
 	'author'          => 'Asker',
-	'description'     => 'Create and test your own maze puzzles.',
-	'render_callback' => 'zo_game_puzzle_creator_mode_render',
+	'description'     => 'Create, encode, and share puzzles for admin approval.',
+	'render_callback' => 'zo_game_puzzle_creator_pro_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,
 );
