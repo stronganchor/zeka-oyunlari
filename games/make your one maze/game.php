@@ -16,10 +16,6 @@ $css = <<<'CSS'
 	font-family: inherit;
 }
 
-.zo-game-root--puzzle-creator-admin * {
-	box-sizing: border-box;
-}
-
 .zo-pca-grid {
 	display: grid;
 	grid-template-columns: repeat(8, 1fr);
@@ -37,6 +33,7 @@ $css = <<<'CSS'
 .zo-pca-cell.wall { background: #22c55e; }
 .zo-pca-cell.start { background: #3b82f6; }
 .zo-pca-cell.goal { background: #ef4444; }
+.zo-pca-cell.player { outline: 3px solid #facc15; }
 
 .zo-pca-panel,
 .zo-pca-admin,
@@ -97,6 +94,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		let mode = 'wall';
 		let start = null;
 		let goal = null;
+		let player = null;
 		let isAdmin = false;
 		const cells = [];
 
@@ -128,6 +126,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			try {
 				const data = atob(code);
 				if (data.length !== size * size) return;
+				start = null;
+				goal = null;
 				data.split('').forEach(function (ch, i) {
 					const cell = cells[i];
 					cell.className = 'zo-pca-cell';
@@ -135,16 +135,50 @@ document.addEventListener('DOMContentLoaded', function () {
 					if (ch === 'S') { cell.classList.add('start'); start = i; }
 					if (ch === 'G') { cell.classList.add('goal'); goal = i; }
 				});
-				statusEl.textContent = 'Puzzle loaded.';
+				player = start;
+				updatePlayer();
+				statusEl.textContent = 'Puzzle loaded. Use arrow keys to solve.';
 			} catch {
 				statusEl.textContent = 'Invalid code.';
 			}
 		}
 
+		function updatePlayer() {
+			cells.forEach(c => c.classList.remove('player'));
+			if (player !== null) {
+				cells[player].classList.add('player');
+			}
+		}
+
+		function movePlayer(dx, dy) {
+			if (player === null) return;
+			const row = Math.floor(player / size);
+			const col = player % size;
+			const newRow = row + dy;
+			const newCol = col + dx;
+			if (newRow < 0 || newRow >= size || newCol < 0 || newCol >= size) return;
+			const newIndex = newRow * size + newCol;
+			if (cells[newIndex].classList.contains('wall')) return;
+			player = newIndex;
+			updatePlayer();
+			if (player === goal) {
+				statusEl.textContent = 'Puzzle solved.';
+			}
+		}
+
+		document.addEventListener('keydown', function (e) {
+			if (!game.contains(document.activeElement)) return;
+			if (e.key === 'ArrowUp') movePlayer(0,-1);
+			if (e.key === 'ArrowDown') movePlayer(0,1);
+			if (e.key === 'ArrowLeft') movePlayer(-1,0);
+			if (e.key === 'ArrowRight') movePlayer(1,0);
+		});
+
 		for (let i = 0; i < size * size; i++) {
 			const cell = document.createElement('div');
 			cell.className = 'zo-pca-cell';
 			cell.addEventListener('click', function () {
+				if (mode === 'play') return;
 				cell.classList.remove('wall','start','goal');
 				if (mode === 'wall') cell.classList.add('wall');
 				if (mode === 'start') {
@@ -165,10 +199,11 @@ document.addEventListener('DOMContentLoaded', function () {
 		game.querySelector('.zo-pca-mode-wall').onclick = () => mode='wall';
 		game.querySelector('.zo-pca-mode-start').onclick = () => mode='start';
 		game.querySelector('.zo-pca-mode-goal').onclick = () => mode='goal';
+		game.querySelector('.zo-pca-mode-play').onclick = () => { mode='play'; player=start; updatePlayer(); statusEl.textContent='Play mode.'; };
 
 		game.querySelector('.zo-pca-generate').onclick = function () {
 			codeInput.value = encodePuzzle();
-			statusEl.textContent = 'Code generated. Send to admin.';
+			statusEl.textContent = 'Code generated.';
 		};
 
 		game.querySelector('.zo-pca-load').onclick = function () {
@@ -176,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		};
 
 		game.querySelector('.zo-pca-send').onclick = function () {
-			statusEl.textContent = 'Puzzle sent. Waiting for admin approval.';
+			statusEl.textContent = 'Puzzle sent.';
 		};
 
 		game.querySelector('.zo-pca-admin-login').onclick = function () {
@@ -190,25 +225,19 @@ document.addEventListener('DOMContentLoaded', function () {
 		};
 
 		game.querySelector('.zo-pca-approve').onclick = function () {
-			if (!isAdmin) {
-				statusEl.textContent = 'Admin login required.';
-				return;
-			}
+			if (!isAdmin) return;
 			const code = codeInput.value.trim();
 			if (!code) return;
 			const list = getApprovedList();
 			list.push(code);
 			saveApprovedList(list);
 			renderApproved();
-			statusEl.textContent = 'Puzzle approved and saved.';
+			statusEl.textContent = 'Approved.';
 		};
 
 		game.querySelector('.zo-pca-trash').onclick = function () {
-			if (!isAdmin) {
-				statusEl.textContent = 'Admin login required.';
-				return;
-			}
-			statusEl.textContent = 'Puzzle rejected.';
+			if (!isAdmin) return;
+			statusEl.textContent = 'Rejected.';
 		};
 
 		renderApproved();
@@ -216,21 +245,22 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 JS;
 
-if (!function_exists('zo_game_puzzle_creator_admin_render')) {
-	function zo_game_puzzle_creator_admin_render($post_id = 0, $module = array()) {
-		$instance_id = 'zo-puzzle-creator-admin-' . ($post_id ? absint($post_id) : wp_rand(1000, 999999));
+if (!function_exists('zo_game_puzzle_creator_pro_render')) {
+	function zo_game_puzzle_creator_pro_render($post_id = 0, $module = array()) {
+		$instance_id = 'zo-puzzle-creator-pro-' . ($post_id ? absint($post_id) : wp_rand(1000, 999999));
 		ob_start();
 		?>
-		<div class="zo-game-root zo-game-root--puzzle-creator-admin" id="<?php echo esc_attr($instance_id); ?>">
-			<h2>Puzzle Creator Admin</h2>
+		<div class="zo-game-root zo-game-root--puzzle-creator-admin" id="<?php echo esc_attr($instance_id); ?>" tabindex="0">
+			<h2>Puzzle Creator Pro</h2>
+
 			<div class="zo-pca-panel">
 				<button class="zo-pca-btn zo-pca-mode-wall">Wall</button>
 				<button class="zo-pca-btn zo-pca-mode-start">Start</button>
 				<button class="zo-pca-btn zo-pca-mode-goal">Goal</button>
+				<button class="zo-pca-btn zo-pca-mode-play">Play</button>
 			</div>
 
 			<div class="zo-pca-status"></div>
-
 			<div class="zo-pca-grid"></div>
 
 			<div class="zo-pca-panel">
@@ -259,8 +289,8 @@ return array(
 	'slug'            => 'puzzle-creator-pro',
 	'name'            => 'Puzzle Creator Pro',
 	'author'          => 'Asker',
-	'description'     => 'Create, send, approve, and manage puzzles with admin password.',
-	'render_callback' => 'zo_game_puzzle_creator_admin_render',
+	'description'     => 'Create, send, approve, and solve puzzles.',
+	'render_callback' => 'zo_game_puzzle_creator_pro_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,
 );
