@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 
 $css = <<<'CSS'
 .zo-game-root--puzzle-creator-admin {
-	max-width: 760px;
+	max-width: 780px;
 	margin: 0 auto;
 	padding: 20px;
 	background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
@@ -33,11 +33,9 @@ $css = <<<'CSS'
 .zo-pca-cell.wall { background: #22c55e; }
 .zo-pca-cell.start { background: #3b82f6; }
 .zo-pca-cell.goal { background: #ef4444; }
-.zo-pca-cell.player { outline: 3px solid #facc15; }
 
 .zo-pca-panel,
-.zo-pca-admin,
-.zo-pca-approved {
+.zo-pca-admin {
 	margin-bottom: 12px;
 	display: flex;
 	flex-wrap: wrap;
@@ -70,10 +68,28 @@ $css = <<<'CSS'
 .zo-pca-approved-list {
 	width: 100%;
 	background: rgba(255,255,255,0.06);
-	padding: 8px;
+	padding: 10px;
 	border-radius: 10px;
-	font-size: 12px;
-	word-break: break-all;
+	font-size: 13px;
+	line-height: 1.6;
+}
+
+.zo-pca-approved-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 10px;
+	padding: 6px 0;
+	border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.zo-pca-approved-item:last-child {
+	border-bottom: none;
+}
+
+.zo-pca-approved-controls {
+	display: flex;
+	gap: 6px;
 }
 CSS;
 
@@ -94,21 +110,71 @@ document.addEventListener('DOMContentLoaded', function () {
 		let mode = 'wall';
 		let start = null;
 		let goal = null;
-		let player = null;
 		let isAdmin = false;
 		const cells = [];
 
-		function saveApprovedList(list) {
-			localStorage.setItem('zo_pca_approved', JSON.stringify(list));
+		function getList() {
+			return JSON.parse(localStorage.getItem('zo_pca_saved_list') || '[]');
 		}
 
-		function getApprovedList() {
-			return JSON.parse(localStorage.getItem('zo_pca_approved') || '[]');
+		function saveList(list) {
+			localStorage.setItem('zo_pca_saved_list', JSON.stringify(list));
 		}
 
-		function renderApproved() {
-			const list = getApprovedList();
-			approvedBox.textContent = list.length ? list.join('\n') : 'No approved puzzles yet.';
+		function renderList() {
+			const list = getList();
+			approvedBox.innerHTML = '';
+			if (!list.length) {
+				approvedBox.textContent = 'No saved puzzles.';
+				return;
+			}
+			list.forEach(function (item, index) {
+				const row = document.createElement('div');
+				row.className = 'zo-pca-approved-item';
+
+				const label = document.createElement('div');
+				label.textContent = (index + 1) + ' = ' + item.name;
+
+				const controls = document.createElement('div');
+				controls.className = 'zo-pca-approved-controls';
+
+				const loadBtn = document.createElement('button');
+				loadBtn.className = 'zo-pca-btn zo-pca-btn-secondary';
+				loadBtn.textContent = 'Load';
+				loadBtn.onclick = function () {
+					decodePuzzle(item.code);
+				};
+
+				const renameBtn = document.createElement('button');
+				renameBtn.className = 'zo-pca-btn';
+				renameBtn.textContent = 'Rename';
+				renameBtn.onclick = function () {
+					if (!isAdmin) return;
+					const newName = prompt('New name:', item.name);
+					if (!newName) return;
+					item.name = newName;
+					saveList(list);
+					renderList();
+				};
+
+				const deleteBtn = document.createElement('button');
+				deleteBtn.className = 'zo-pca-btn zo-pca-btn-secondary';
+				deleteBtn.textContent = 'Delete';
+				deleteBtn.onclick = function () {
+					if (!isAdmin) return;
+					list.splice(index, 1);
+					saveList(list);
+					renderList();
+				};
+
+				controls.appendChild(loadBtn);
+				controls.appendChild(renameBtn);
+				controls.appendChild(deleteBtn);
+
+				row.appendChild(label);
+				row.appendChild(controls);
+				approvedBox.appendChild(row);
+			});
 		}
 
 		function encodePuzzle() {
@@ -135,50 +201,16 @@ document.addEventListener('DOMContentLoaded', function () {
 					if (ch === 'S') { cell.classList.add('start'); start = i; }
 					if (ch === 'G') { cell.classList.add('goal'); goal = i; }
 				});
-				player = start;
-				updatePlayer();
-				statusEl.textContent = 'Puzzle loaded. Use arrow keys to solve.';
+				statusEl.textContent = 'Puzzle loaded.';
 			} catch {
 				statusEl.textContent = 'Invalid code.';
 			}
 		}
 
-		function updatePlayer() {
-			cells.forEach(c => c.classList.remove('player'));
-			if (player !== null) {
-				cells[player].classList.add('player');
-			}
-		}
-
-		function movePlayer(dx, dy) {
-			if (player === null) return;
-			const row = Math.floor(player / size);
-			const col = player % size;
-			const newRow = row + dy;
-			const newCol = col + dx;
-			if (newRow < 0 || newRow >= size || newCol < 0 || newCol >= size) return;
-			const newIndex = newRow * size + newCol;
-			if (cells[newIndex].classList.contains('wall')) return;
-			player = newIndex;
-			updatePlayer();
-			if (player === goal) {
-				statusEl.textContent = 'Puzzle solved.';
-			}
-		}
-
-		document.addEventListener('keydown', function (e) {
-			if (!game.contains(document.activeElement)) return;
-			if (e.key === 'ArrowUp') movePlayer(0,-1);
-			if (e.key === 'ArrowDown') movePlayer(0,1);
-			if (e.key === 'ArrowLeft') movePlayer(-1,0);
-			if (e.key === 'ArrowRight') movePlayer(1,0);
-		});
-
 		for (let i = 0; i < size * size; i++) {
 			const cell = document.createElement('div');
 			cell.className = 'zo-pca-cell';
 			cell.addEventListener('click', function () {
-				if (mode === 'play') return;
 				cell.classList.remove('wall','start','goal');
 				if (mode === 'wall') cell.classList.add('wall');
 				if (mode === 'start') {
@@ -199,19 +231,19 @@ document.addEventListener('DOMContentLoaded', function () {
 		game.querySelector('.zo-pca-mode-wall').onclick = () => mode='wall';
 		game.querySelector('.zo-pca-mode-start').onclick = () => mode='start';
 		game.querySelector('.zo-pca-mode-goal').onclick = () => mode='goal';
-		game.querySelector('.zo-pca-mode-play').onclick = () => { mode='play'; player=start; updatePlayer(); statusEl.textContent='Play mode.'; };
 
-		game.querySelector('.zo-pca-generate').onclick = function () {
-			codeInput.value = encodePuzzle();
-			statusEl.textContent = 'Code generated.';
-		};
-
-		game.querySelector('.zo-pca-load').onclick = function () {
-			decodePuzzle(codeInput.value.trim());
-		};
-
-		game.querySelector('.zo-pca-send').onclick = function () {
-			statusEl.textContent = 'Puzzle sent.';
+		game.querySelector('.zo-pca-save').onclick = function () {
+			if (!isAdmin) {
+				statusEl.textContent = 'Admin login required.';
+				return;
+			}
+			const name = prompt('Puzzle name:');
+			if (!name) return;
+			const list = getList();
+			list.push({ name: name, code: encodePuzzle() });
+			saveList(list);
+			renderList();
+			statusEl.textContent = 'Puzzle saved.';
 		};
 
 		game.querySelector('.zo-pca-admin-login').onclick = function () {
@@ -224,23 +256,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		};
 
-		game.querySelector('.zo-pca-approve').onclick = function () {
-			if (!isAdmin) return;
-			const code = codeInput.value.trim();
-			if (!code) return;
-			const list = getApprovedList();
-			list.push(code);
-			saveApprovedList(list);
-			renderApproved();
-			statusEl.textContent = 'Approved.';
-		};
-
-		game.querySelector('.zo-pca-trash').onclick = function () {
-			if (!isAdmin) return;
-			statusEl.textContent = 'Rejected.';
-		};
-
-		renderApproved();
+		renderList();
 	});
 });
 JS;
@@ -250,35 +266,24 @@ if (!function_exists('zo_game_puzzle_creator_pro_render')) {
 		$instance_id = 'zo-puzzle-creator-pro-' . ($post_id ? absint($post_id) : wp_rand(1000, 999999));
 		ob_start();
 		?>
-		<div class="zo-game-root zo-game-root--puzzle-creator-admin" id="<?php echo esc_attr($instance_id); ?>" tabindex="0">
+		<div class="zo-game-root zo-game-root--puzzle-creator-admin" id="<?php echo esc_attr($instance_id); ?>">
 			<h2>Puzzle Creator Pro</h2>
 
 			<div class="zo-pca-panel">
 				<button class="zo-pca-btn zo-pca-mode-wall">Wall</button>
 				<button class="zo-pca-btn zo-pca-mode-start">Start</button>
 				<button class="zo-pca-btn zo-pca-mode-goal">Goal</button>
-				<button class="zo-pca-btn zo-pca-mode-play">Play</button>
+				<button class="zo-pca-btn zo-pca-save">Save Puzzle</button>
 			</div>
 
 			<div class="zo-pca-status"></div>
 			<div class="zo-pca-grid"></div>
 
-			<div class="zo-pca-panel">
-				<button class="zo-pca-btn zo-pca-generate">Generate Code</button>
-				<button class="zo-pca-btn zo-pca-send">Send to Admin</button>
-				<input type="text" class="zo-pca-code" placeholder="Puzzle code">
-				<button class="zo-pca-btn zo-pca-btn-secondary zo-pca-load">Load Code</button>
-			</div>
-
 			<div class="zo-pca-admin">
 				<button class="zo-pca-btn zo-pca-admin-login">Put in Admin Sifresi</button>
-				<button class="zo-pca-btn zo-pca-approve">Save to System</button>
-				<button class="zo-pca-btn zo-pca-btn-secondary zo-pca-trash">Trash</button>
 			</div>
 
-			<div class="zo-pca-approved">
-				<div class="zo-pca-approved-list"></div>
-			</div>
+			<div class="zo-pca-approved-list"></div>
 		</div>
 		<?php
 		return ob_get_clean();
@@ -289,7 +294,7 @@ return array(
 	'slug'            => 'puzzle-creator-pro',
 	'name'            => 'Puzzle Creator Pro',
 	'author'          => 'Asker',
-	'description'     => 'Create, send, approve, and solve puzzles.',
+	'description'     => 'Create, save, rename, and delete multiple puzzles with admin control.',
 	'render_callback' => 'zo_game_puzzle_creator_pro_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,
