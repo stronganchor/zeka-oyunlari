@@ -6,355 +6,314 @@ if (!defined('ABSPATH')) {
 
 $css = <<<'CSS'
 .zo-game-root {
-	max-width: 700px;
+	max-width: 980px;
 	margin: 0 auto;
 	font-family: inherit;
 }
 
 .zo-game-root--car-lane-switch .zo-car-game {
-	background: linear-gradient(180deg, #bfe7ff 0%, #eaf7ff 42%, #74c365 42%, #5daa4f 100%);
-	border-radius: 22px;
-	padding: 16px;
-	box-sizing: border-box;
-	box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
 	position: relative;
+	border-radius: 24px;
 	overflow: hidden;
+	background: linear-gradient(180deg, #f4b37d 0%, #f7d3b0 18%, #5b5f66 18%, #45484e 100%);
+	box-shadow: 0 18px 38px rgba(0, 0, 0, 0.22);
+	padding: 0;
 }
 
-.zo-game-root--car-lane-switch .zo-car-game[data-theme="desert"] {
-	background: linear-gradient(180deg, #ffd79f 0%, #fff0cf 42%, #d7a867 42%, #c58d49 100%);
-}
-
-.zo-game-root--car-lane-switch .zo-car-game[data-theme="snow"] {
-	background: linear-gradient(180deg, #dff1ff 0%, #f6fbff 42%, #e9f4fb 42%, #cfe4ef 100%);
-}
-
-.zo-game-root--car-lane-switch .zo-car-game[data-theme="night"] {
-	background: linear-gradient(180deg, #13213b 0%, #1b3358 42%, #203d2d 42%, #16291f 100%);
-}
-
-.zo-game-root--car-lane-switch .zo-car-game[data-theme="mountain"] {
-	background: linear-gradient(180deg, #cce7ff 0%, #eef7ff 38%, #7eb06f 38%, #5d8750 100%);
-}
-
-.zo-game-root--car-lane-switch .zo-car-title {
-	margin: 0 0 8px;
-	font-size: 28px;
-	line-height: 1.2;
-	text-align: center;
-	color: #17324d;
-}
-
-.zo-game-root--car-lane-switch .zo-car-game[data-theme="night"] .zo-car-title,
-.zo-game-root--car-lane-switch .zo-car-game[data-theme="night"] .zo-car-status,
-.zo-game-root--car-lane-switch .zo-car-game[data-theme="night"] .zo-car-instructions {
-	color: #e7f0ff;
-}
-
-.zo-game-root--car-lane-switch .zo-car-instructions {
-	margin: 0 0 14px;
-	font-size: 14px;
-	line-height: 1.5;
-	text-align: center;
-	color: #21415d;
-	background: rgba(255, 255, 255, 0.74);
-	padding: 10px 12px;
-	border-radius: 12px;
-}
-
-.zo-game-root--car-lane-switch .zo-car-topbar {
-	display: grid;
-	grid-template-columns: repeat(5, minmax(0, 1fr));
-	gap: 8px;
-	margin-bottom: 10px;
-}
-
-.zo-game-root--car-lane-switch .zo-car-select {
-	width: 100%;
-	box-sizing: border-box;
-	border: 0;
-	border-radius: 12px;
-	padding: 10px 12px;
-	font-size: 14px;
-	font-weight: 700;
-	background: rgba(255, 255, 255, 0.92);
-	color: #17324d;
-	box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
-}
-
-.zo-game-root--car-lane-switch .zo-car-hud {
-	display: grid;
-	grid-template-columns: repeat(6, minmax(0, 1fr));
-	gap: 10px;
-	margin-bottom: 12px;
-}
-
-.zo-game-root--car-lane-switch .zo-car-chip {
-	background: rgba(255, 255, 255, 0.9);
-	border-radius: 12px;
-	padding: 10px 8px;
-	text-align: center;
-	box-sizing: border-box;
-	min-width: 0;
-}
-
-.zo-game-root--car-lane-switch .zo-car-chip-label {
-	display: block;
-	font-size: 12px;
-	color: #4b6072;
-	margin-bottom: 4px;
-}
-
-.zo-game-root--car-lane-switch .zo-car-chip-value {
-	display: block;
-	font-size: 20px;
-	font-weight: 700;
-	color: #17324d;
-}
-
-.zo-game-root--car-lane-switch .zo-car-hearts {
-	letter-spacing: 2px;
-}
-
-.zo-game-root--car-lane-switch .zo-car-track-wrap {
+.zo-game-root--car-lane-switch .zo-car-screen {
 	position: relative;
-}
-
-.zo-game-root--car-lane-switch .zo-car-track {
-	position: relative;
-	width: 100%;
-	height: 500px;
-	border-radius: 18px;
+	height: 680px;
 	overflow: hidden;
-	background: linear-gradient(90deg, #4f4f4f 0%, #585858 8%, #4b4b4b 50%, #585858 92%, #4f4f4f 100%);
-	box-shadow: inset 0 0 0 4px rgba(255, 255, 255, 0.08);
-	touch-action: manipulation;
-	user-select: none;
+	background:
+		radial-gradient(circle at 50% 18%, rgba(255, 230, 165, 0.95) 0%, rgba(255, 206, 120, 0.65) 10%, rgba(255, 186, 120, 0.08) 24%, transparent 30%),
+		linear-gradient(180deg, #8ea1c2 0%, #f3c3a0 17%, #f4bf8f 26%, #7f7c85 27%, #494d54 100%);
 }
 
-.zo-game-root--car-lane-switch .zo-car-game[data-theme="city"] .zo-car-track {
-	background: linear-gradient(90deg, #4f4f4f 0%, #5a5a5a 8%, #4a4a4a 50%, #5a5a5a 92%, #4f4f4f 100%);
+.zo-game-root--car-lane-switch .zo-car-game[data-theme="night"] .zo-car-screen {
+	background:
+		radial-gradient(circle at 50% 20%, rgba(255, 238, 170, 0.75) 0%, rgba(255, 216, 122, 0.25) 12%, rgba(255, 216, 122, 0.06) 22%, transparent 28%),
+		linear-gradient(180deg, #111b33 0%, #2b3554 18%, #3d3f48 18%, #30333a 100%);
 }
 
-.zo-game-root--car-lane-switch .zo-car-game[data-theme="desert"] .zo-car-track {
-	background: linear-gradient(90deg, #6f645b 0%, #786d64 8%, #675d55 50%, #786d64 92%, #6f645b 100%);
+.zo-game-root--car-lane-switch .zo-car-game[data-theme="snow"] .zo-car-screen {
+	background:
+		radial-gradient(circle at 50% 18%, rgba(255, 244, 199, 0.85) 0%, rgba(255, 220, 165, 0.35) 12%, transparent 24%),
+		linear-gradient(180deg, #b5d2e6 0%, #f5dcc6 18%, #7f8c98 18%, #59616c 100%);
 }
 
-.zo-game-root--car-lane-switch .zo-car-game[data-theme="snow"] .zo-car-track {
-	background: linear-gradient(90deg, #737b86 0%, #818a96 8%, #6d7580 50%, #818a96 92%, #737b86 100%);
+.zo-game-root--car-lane-switch .zo-car-game[data-theme="desert"] .zo-car-screen {
+	background:
+		radial-gradient(circle at 50% 18%, rgba(255, 236, 160, 0.9) 0%, rgba(255, 208, 109, 0.45) 12%, transparent 24%),
+		linear-gradient(180deg, #b6a5a1 0%, #f0c38e 18%, #76645b 18%, #5b4c45 100%);
 }
 
-.zo-game-root--car-lane-switch .zo-car-game[data-theme="night"] .zo-car-track {
-	background: linear-gradient(90deg, #21252c 0%, #2b3039 8%, #1a1e25 50%, #2b3039 92%, #21252c 100%);
+.zo-game-root--car-lane-switch .zo-car-game[data-theme="mountain"] .zo-car-screen {
+	background:
+		radial-gradient(circle at 50% 18%, rgba(255, 235, 175, 0.9) 0%, rgba(255, 207, 125, 0.42) 12%, transparent 24%),
+		linear-gradient(180deg, #92a7c6 0%, #f0c39f 18%, #6d7178 18%, #4c5158 100%);
 }
 
-.zo-game-root--car-lane-switch .zo-car-game[data-theme="mountain"] .zo-car-track {
-	background: linear-gradient(90deg, #585858 0%, #636363 8%, #515151 50%, #636363 92%, #585858 100%);
-}
-
-.zo-game-root--car-lane-switch .zo-car-bg {
+.zo-game-root--car-lane-switch .zo-car-scene {
 	position: absolute;
 	inset: 0;
-	z-index: 1;
+}
+
+.zo-game-root--car-lane-switch .zo-car-skyline {
+	position: absolute;
+	left: 50%;
+	bottom: 50%;
+	transform: translateX(-50%);
+	width: 44%;
+	height: 14%;
+	display: flex;
+	align-items: flex-end;
+	gap: 4px;
+	opacity: 0.55;
+}
+
+.zo-game-root--car-lane-switch .zo-car-skyline-bar {
+	flex: 1 1 auto;
+	background: rgba(95, 83, 99, 0.55);
+	border-radius: 4px 4px 0 0;
+}
+
+.zo-game-root--car-lane-switch .zo-car-horizon-hills {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 50%;
+	height: 16%;
 	pointer-events: none;
-	overflow: hidden;
 }
 
-.zo-game-root--car-lane-switch .zo-car-sky-detail {
+.zo-game-root--car-lane-switch .zo-car-hill {
 	position: absolute;
-	top: 16px;
+	bottom: 0;
+	border-radius: 50% 50% 0 0;
+	background: rgba(89, 74, 90, 0.38);
+	filter: blur(1px);
+}
+
+.zo-game-root--car-lane-switch .zo-car-water {
+	position: absolute;
 	left: 0;
 	right: 0;
-	height: 110px;
+	bottom: 47%;
+	height: 5%;
+	background: linear-gradient(180deg, rgba(114, 130, 167, 0.5) 0%, rgba(90, 98, 123, 0.18) 100%);
 }
 
-.zo-game-root--car-lane-switch .zo-car-cloud,
-.zo-game-root--car-lane-switch .zo-car-light,
-.zo-game-root--car-lane-switch .zo-car-tree,
-.zo-game-root--car-lane-switch .zo-car-house,
-.zo-game-root--car-lane-switch .zo-car-mountain {
+.zo-game-root--car-lane-switch .zo-car-palm {
 	position: absolute;
-}
-
-.zo-game-root--car-lane-switch .zo-car-cloud {
-	width: 80px;
-	height: 28px;
-	border-radius: 999px;
-	background: rgba(255, 255, 255, 0.75);
-	animation: zoCarCloudDrift 20s linear infinite;
-}
-
-.zo-game-root--car-lane-switch .zo-car-cloud::before,
-.zo-game-root--car-lane-switch .zo-car-cloud::after {
-	content: '';
-	position: absolute;
-	background: rgba(255, 255, 255, 0.75);
-	border-radius: 999px;
-}
-
-.zo-game-root--car-lane-switch .zo-car-cloud::before {
-	width: 28px;
-	height: 28px;
-	left: 10px;
-	top: -10px;
-}
-
-.zo-game-root--car-lane-switch .zo-car-cloud::after {
-	width: 34px;
-	height: 34px;
-	right: 12px;
-	top: -13px;
-}
-
-.zo-game-root--car-lane-switch .zo-car-mountain {
-	bottom: 0;
-	width: 0;
-	height: 0;
-	border-left: 60px solid transparent;
-	border-right: 60px solid transparent;
-	border-bottom: 70px solid rgba(90, 120, 120, 0.42);
-}
-
-.zo-game-root--car-lane-switch .zo-car-house {
-	bottom: 0;
-	width: 34px;
-	height: 26px;
-	background: rgba(255, 255, 255, 0.7);
-}
-
-.zo-game-root--car-lane-switch .zo-car-house::before {
-	content: '';
-	position: absolute;
-	left: -4px;
-	right: -4px;
-	top: -13px;
-	border-left: 21px solid transparent;
-	border-right: 21px solid transparent;
-	border-bottom: 13px solid rgba(215, 97, 97, 0.88);
-}
-
-.zo-game-root--car-lane-switch .zo-car-tree {
-	bottom: 0;
-	width: 18px;
-	height: 34px;
-}
-
-.zo-game-root--car-lane-switch .zo-car-tree::before {
-	content: '';
-	position: absolute;
-	left: -10px;
-	top: 0;
-	width: 38px;
-	height: 26px;
-	background: rgba(56, 140, 64, 0.9);
-	border-radius: 50%;
-}
-
-.zo-game-root--car-lane-switch .zo-car-tree::after {
-	content: '';
-	position: absolute;
-	left: 7px;
-	top: 18px;
-	width: 4px;
-	height: 16px;
-	background: rgba(116, 78, 44, 0.9);
-}
-
-.zo-game-root--car-lane-switch .zo-car-light {
-	bottom: 0;
-	width: 4px;
-	height: 34px;
-	background: rgba(210, 210, 210, 0.9);
-}
-
-.zo-game-root--car-lane-switch .zo-car-light::before {
-	content: '';
-	position: absolute;
-	top: -8px;
-	left: -5px;
-	width: 14px;
-	height: 14px;
-	border-radius: 50%;
-	background: rgba(255, 237, 160, 0.95);
-	box-shadow: 0 0 14px rgba(255, 237, 160, 0.9);
-}
-
-.zo-game-root--car-lane-switch .zo-car-side {
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	width: 16%;
 	z-index: 2;
-	overflow: hidden;
+	width: 16px;
+	height: 170px;
+	transform-origin: bottom center;
+	opacity: 0.9;
 }
 
-.zo-game-root--car-lane-switch .zo-car-side--left {
+.zo-game-root--car-lane-switch .zo-car-palm::before {
+	content: '';
+	position: absolute;
+	left: 6px;
+	bottom: 0;
+	width: 4px;
+	height: 100%;
+	background: linear-gradient(180deg, #4a372e 0%, #2f241f 100%);
+	border-radius: 999px;
+}
+
+.zo-game-root--car-lane-switch .zo-car-palm::after {
+	content: '';
+	position: absolute;
+	left: -36px;
+	top: -6px;
+	width: 88px;
+	height: 88px;
+	border-radius: 50%;
+	background:
+		conic-gradient(
+			from 0deg,
+			rgba(0, 0, 0, 0) 0deg,
+			rgba(0, 0, 0, 0) 18deg,
+			#263d2a 18deg,
+			#263d2a 32deg,
+			rgba(0, 0, 0, 0) 32deg,
+			rgba(0, 0, 0, 0) 50deg,
+			#2f4d36 50deg,
+			#2f4d36 64deg,
+			rgba(0, 0, 0, 0) 64deg,
+			rgba(0, 0, 0, 0) 82deg,
+			#29452f 82deg,
+			#29452f 96deg,
+			rgba(0, 0, 0, 0) 96deg,
+			rgba(0, 0, 0, 0) 114deg,
+			#35593d 114deg,
+			#35593d 128deg,
+			rgba(0, 0, 0, 0) 128deg,
+			rgba(0, 0, 0, 0) 146deg,
+			#2d4a33 146deg,
+			#2d4a33 160deg,
+			rgba(0, 0, 0, 0) 160deg,
+			rgba(0, 0, 0, 0) 360deg
+		);
+	transform: rotate(12deg);
+}
+
+.zo-game-root--car-lane-switch .zo-car-road-perspective {
+	position: absolute;
+	left: 50%;
+	bottom: 0;
+	transform: translateX(-50%);
+	width: 78%;
+	height: 73%;
+	clip-path: polygon(30% 0, 70% 0, 100% 100%, 0 100%);
+	background: linear-gradient(180deg, #5a5d65 0%, #43464d 18%, #3f4248 100%);
+	box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.04);
+}
+
+.zo-game-root--car-lane-switch .zo-car-road-edge-left,
+.zo-game-root--car-lane-switch .zo-car-road-edge-right {
+	position: absolute;
+	bottom: 0;
+	height: 72%;
+	width: 26%;
+	background: linear-gradient(180deg, #867264 0%, #575e66 22%, #40454d 100%);
+	z-index: 1;
+}
+
+.zo-game-root--car-lane-switch .zo-car-road-edge-left {
+	left: 0;
+	clip-path: polygon(100% 0, 100% 100%, 0 100%, 0 82%);
+}
+
+.zo-game-root--car-lane-switch .zo-car-road-edge-right {
+	right: 0;
+	clip-path: polygon(0 0, 100% 82%, 100% 100%, 0 100%);
+}
+
+.zo-game-root--car-lane-switch .zo-car-guard {
+	position: absolute;
+	height: 6px;
+	background: linear-gradient(180deg, #b9b9bb 0%, #666 100%);
+	border-radius: 999px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.18);
+	z-index: 2;
+}
+
+.zo-game-root--car-lane-switch .zo-car-guard--left {
+	left: 9%;
+	bottom: 34%;
+	width: 32%;
+	transform: rotate(-14deg);
+}
+
+.zo-game-root--car-lane-switch .zo-car-guard--right {
+	right: 9%;
+	bottom: 34%;
+	width: 32%;
+	transform: rotate(14deg);
+}
+
+.zo-game-root--car-lane-switch .zo-car-road-lanes {
+	position: absolute;
+	inset: 0;
+	z-index: 3;
+}
+
+.zo-game-root--car-lane-switch .zo-car-lane-line {
+	position: absolute;
+	top: 17%;
+	bottom: 0;
+	width: 2%;
+	transform: translateX(-50%);
+	background:
+		repeating-linear-gradient(
+			180deg,
+			rgba(255, 255, 255, 0.96) 0 58px,
+			transparent 58px 118px
+		);
+	filter: blur(0.2px);
+	opacity: 0.95;
+}
+
+.zo-game-root--car-lane-switch .zo-car-lane-line--1 {
+	left: 33.33%;
+}
+
+.zo-game-root--car-lane-switch .zo-car-lane-line--2 {
+	left: 66.66%;
+}
+
+.zo-game-root--car-lane-switch .zo-car-sign-bridge {
+	position: absolute;
+	left: 50%;
+	top: 20%;
+	transform: translateX(-50%);
+	width: 54%;
+	height: 10px;
+	background: #535252;
+	border-radius: 999px;
+	z-index: 4;
+}
+
+.zo-game-root--car-lane-switch .zo-car-sign-bridge::before,
+.zo-game-root--car-lane-switch .zo-car-sign-bridge::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	width: 8px;
+	height: 120px;
+	background: linear-gradient(180deg, #666 0%, #444 100%);
+}
+
+.zo-game-root--car-lane-switch .zo-car-sign-bridge::before {
 	left: 0;
 }
 
-.zo-game-root--car-lane-switch .zo-car-side--right {
+.zo-game-root--car-lane-switch .zo-car-sign-bridge::after {
 	right: 0;
 }
 
-.zo-game-root--car-lane-switch .zo-car-side-surface {
+.zo-game-root--car-lane-switch .zo-car-sign {
 	position: absolute;
-	inset: 0;
-	background: repeating-linear-gradient(180deg, #68b74d 0px, #68b74d 24px, #5ca844 24px, #5ca844 48px);
+	top: -16px;
+	width: 24%;
+	min-width: 110px;
+	background: linear-gradient(180deg, #30694a 0%, #1d4d35 100%);
+	color: #dbe9d7;
+	border-radius: 10px;
+	padding: 12px 10px;
+	text-align: center;
+	font-weight: 800;
+	font-size: 14px;
+	letter-spacing: 0.5px;
+	box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.12);
 }
 
-.zo-game-root--car-lane-switch .zo-car-game[data-theme="city"] .zo-car-side-surface {
-	background: repeating-linear-gradient(180deg, #89939f 0px, #89939f 24px, #7a858f 24px, #7a858f 48px);
+.zo-game-root--car-lane-switch .zo-car-sign--left {
+	left: 17%;
 }
 
-.zo-game-root--car-lane-switch .zo-car-game[data-theme="desert"] .zo-car-side-surface {
-	background: repeating-linear-gradient(180deg, #d7a867 0px, #d7a867 24px, #ca9755 24px, #ca9755 48px);
+.zo-game-root--car-lane-switch .zo-car-sign--right {
+	right: 17%;
 }
 
-.zo-game-root--car-lane-switch .zo-car-game[data-theme="snow"] .zo-car-side-surface {
-	background: repeating-linear-gradient(180deg, #f3f8fc 0px, #f3f8fc 24px, #e4edf4 24px, #e4edf4 48px);
-}
-
-.zo-game-root--car-lane-switch .zo-car-game[data-theme="night"] .zo-car-side-surface {
-	background: repeating-linear-gradient(180deg, #1e3c2b 0px, #1e3c2b 24px, #173121 24px, #173121 48px);
-}
-
-.zo-game-root--car-lane-switch .zo-car-game[data-theme="mountain"] .zo-car-side-surface {
-	background: repeating-linear-gradient(180deg, #6e975f 0px, #6e975f 24px, #618251 24px, #618251 48px);
-}
-
-.zo-game-root--car-lane-switch .zo-car-side-items {
-	position: absolute;
-	inset: 0;
+.zo-game-root--car-lane-switch .zo-car-sign-arrow {
+	display: block;
+	font-size: 18px;
+	line-height: 1;
+	margin-top: 6px;
 }
 
 .zo-game-root--car-lane-switch .zo-car-road {
 	position: absolute;
-	top: 0;
+	left: 50%;
 	bottom: 0;
-	left: 16%;
-	right: 16%;
-	z-index: 3;
-}
-
-.zo-game-root--car-lane-switch .zo-car-road::before,
-.zo-game-root--car-lane-switch .zo-car-road::after {
-	content: '';
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	width: 6px;
-	background: repeating-linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0px, rgba(255, 255, 255, 0.85) 26px, transparent 26px, transparent 52px);
-	opacity: 0.9;
-}
-
-.zo-game-root--car-lane-switch .zo-car-road::before {
-	left: 33.333%;
 	transform: translateX(-50%);
-}
-
-.zo-game-root--car-lane-switch .zo-car-road::after {
-	left: 66.666%;
-	transform: translateX(-50%);
+	width: 62%;
+	height: 74%;
+	z-index: 8;
 }
 
 .zo-game-root--car-lane-switch .zo-car-player,
@@ -370,148 +329,362 @@ $css = <<<'CSS'
 .zo-game-root--car-lane-switch .zo-car-player,
 .zo-game-root--car-lane-switch .zo-car-obstacle,
 .zo-game-root--car-lane-switch .zo-car-ghost {
-	width: 20%;
-	max-width: 72px;
-	min-width: 54px;
-	aspect-ratio: 0.78 / 1;
-	border-radius: 16px 16px 10px 10px;
+	width: 19%;
+	max-width: 120px;
+	min-width: 72px;
+	aspect-ratio: 0.94 / 1.3;
+	border-radius: 22px 22px 18px 18px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	font-size: 34px;
+	font-size: 0;
+}
+
+.zo-game-root--car-lane-switch .zo-car-shell {
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.14), 0 12px 22px rgba(0, 0, 0, 0.22);
+}
+
+.zo-game-root--car-lane-switch .zo-car-player .zo-car-shell {
+	background: linear-gradient(180deg, #ff5b57 0%, #c41414 100%);
+}
+
+.zo-game-root--car-lane-switch .zo-car-obstacle .zo-car-shell {
+	background: linear-gradient(180deg, #4c81ff 0%, #2049bd 100%);
+}
+
+.zo-game-root--car-lane-switch .zo-car-obstacle--truck .zo-car-shell {
+	background: linear-gradient(180deg, #f8a442 0%, #cf6500 100%);
+}
+
+.zo-game-root--car-lane-switch .zo-car-ghost .zo-car-shell {
+	background: linear-gradient(180deg, #d8d8d8 0%, #7f7f7f 100%);
+	box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.12);
+}
+
+.zo-game-root--car-lane-switch .zo-car-window {
+	position: absolute;
+	left: 18%;
+	right: 18%;
+	top: 12%;
+	height: 28%;
+	border-radius: 16px 16px 14px 14px;
+	background: linear-gradient(180deg, rgba(196, 232, 255, 0.95) 0%, rgba(82, 102, 128, 0.92) 100%);
+}
+
+.zo-game-root--car-lane-switch .zo-car-lightbar {
+	position: absolute;
+	left: 14%;
+	right: 14%;
+	bottom: 12%;
+	height: 11%;
+	border-radius: 999px;
+	background: linear-gradient(180deg, rgba(255, 79, 68, 0.98) 0%, rgba(186, 18, 18, 1) 100%);
+	box-shadow: 0 0 14px rgba(255, 65, 65, 0.8);
 }
 
 .zo-game-root--car-lane-switch .zo-car-player {
-	bottom: 18px;
-	z-index: 9;
-	background: linear-gradient(180deg, #ff5757 0%, #d71f1f 100%);
-	box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.26), 0 8px 16px rgba(0, 0, 0, 0.22);
-	transition: left 0.18s ease, transform 0.18s ease, filter 0.14s ease;
+	bottom: 22px;
+	z-index: 12;
+	transition: left 0.18s ease, transform 0.18s ease, filter 0.18s ease;
 }
 
 .zo-game-root--car-lane-switch .zo-car-player.is-drifting {
-	transition: left 0.14s ease, transform 0.14s ease, filter 0.14s ease;
+	transition: left 0.1s ease, transform 0.1s ease, filter 0.18s ease;
 }
 
 .zo-game-root--car-lane-switch .zo-car-player.is-drift-left {
-	transform: translateX(-50%) rotate(-8deg);
+	transform: translateX(-50%) rotate(-9deg);
 }
 
 .zo-game-root--car-lane-switch .zo-car-player.is-drift-right {
-	transform: translateX(-50%) rotate(8deg);
+	transform: translateX(-50%) rotate(9deg);
 }
 
-.zo-game-root--car-lane-switch .zo-car-player.is-powerup {
-	box-shadow: 0 0 0 8px rgba(255, 219, 77, 0.25), inset 0 0 0 3px rgba(255, 255, 255, 0.26), 0 8px 16px rgba(0, 0, 0, 0.22);
-}
-
-.zo-game-root--car-lane-switch .zo-car-player::before,
-.zo-game-root--car-lane-switch .zo-car-obstacle::before,
-.zo-game-root--car-lane-switch .zo-car-ghost::before {
-	content: '';
-	position: absolute;
-	top: 12%;
-	left: 18%;
-	right: 18%;
-	height: 22%;
-	border-radius: 10px;
-	background: rgba(180, 235, 255, 0.9);
-}
-
-.zo-game-root--car-lane-switch .zo-car-player::after,
-.zo-game-root--car-lane-switch .zo-car-obstacle::after,
-.zo-game-root--car-lane-switch .zo-car-ghost::after {
-	content: '';
-	position: absolute;
-	bottom: 10%;
-	left: 16%;
-	right: 16%;
-	height: 12%;
-	border-radius: 10px;
-	background: rgba(255, 225, 120, 0.92);
+.zo-game-root--car-lane-switch .zo-car-player.is-powerup .zo-car-shell {
+	box-shadow: 0 0 0 10px rgba(255, 214, 98, 0.18), inset 0 0 0 3px rgba(255, 255, 255, 0.14), 0 12px 22px rgba(0, 0, 0, 0.22);
 }
 
 .zo-game-root--car-lane-switch .zo-car-ghost {
-	bottom: 18px;
-	z-index: 4;
-	opacity: 0.25;
-	pointer-events: none;
+	bottom: 22px;
+	z-index: 7;
+	opacity: 0.22;
 	filter: grayscale(1);
-	background: linear-gradient(180deg, #d9d9d9 0%, #8b8b8b 100%);
-	box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.18);
+	pointer-events: none;
 }
 
 .zo-game-root--car-lane-switch .zo-car-obstacle {
-	top: -120px;
-	z-index: 6;
-	background: linear-gradient(180deg, #4b7dff 0%, #2248b5 100%);
-	box-shadow: inset 0 0 0 3px rgba(255, 255, 255, 0.22), 0 8px 16px rgba(0, 0, 0, 0.2);
-}
-
-.zo-game-root--car-lane-switch .zo-car-obstacle--truck {
-	background: linear-gradient(180deg, #ffa643 0%, #d76c00 100%);
+	top: -130px;
+	z-index: 10;
 }
 
 .zo-game-root--car-lane-switch .zo-car-coin,
 .zo-game-root--car-lane-switch .zo-car-powerup {
-	z-index: 7;
+	z-index: 11;
 	display: flex;
 	align-items: center;
 	justify-content: center;
 }
 
 .zo-game-root--car-lane-switch .zo-car-coin {
-	width: 34px;
-	height: 34px;
+	width: 42px;
+	height: 42px;
 	border-radius: 50%;
-	font-size: 22px;
+	font-size: 28px;
 	background: radial-gradient(circle at 35% 35%, #fff9c5 0%, #ffd95d 45%, #e0a700 100%);
 	box-shadow: 0 6px 12px rgba(0, 0, 0, 0.18);
 }
 
 .zo-game-root--car-lane-switch .zo-car-powerup {
-	width: 42px;
-	height: 42px;
+	width: 48px;
+	height: 48px;
 	border-radius: 50%;
-	font-size: 22px;
-	background: linear-gradient(180deg, #ffffff 0%, #ddf3ff 100%);
+	font-size: 25px;
+	background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(221, 243, 255, 0.96) 100%);
 	box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
-	border: 3px solid rgba(255, 255, 255, 0.9);
+	border: 3px solid rgba(255, 255, 255, 0.92);
 }
 
 .zo-game-root--car-lane-switch .zo-car-powerup--shield {
-	box-shadow: 0 0 0 4px rgba(72, 178, 255, 0.2), 0 6px 14px rgba(0, 0, 0, 0.18);
+	box-shadow: 0 0 0 4px rgba(72, 178, 255, 0.18), 0 6px 14px rgba(0, 0, 0, 0.18);
 }
 
 .zo-game-root--car-lane-switch .zo-car-powerup--slow {
-	box-shadow: 0 0 0 4px rgba(126, 222, 161, 0.22), 0 6px 14px rgba(0, 0, 0, 0.18);
+	box-shadow: 0 0 0 4px rgba(126, 222, 161, 0.18), 0 6px 14px rgba(0, 0, 0, 0.18);
 }
 
 .zo-game-root--car-lane-switch .zo-car-powerup--magnet {
-	box-shadow: 0 0 0 4px rgba(255, 219, 77, 0.24), 0 6px 14px rgba(0, 0, 0, 0.18);
+	box-shadow: 0 0 0 4px rgba(255, 219, 77, 0.18), 0 6px 14px rgba(0, 0, 0, 0.18);
 }
 
 .zo-game-root--car-lane-switch .zo-car-powerup--turbo {
-	box-shadow: 0 0 0 4px rgba(255, 140, 107, 0.22), 0 6px 14px rgba(0, 0, 0, 0.18);
+	box-shadow: 0 0 0 4px rgba(255, 140, 107, 0.18), 0 6px 14px rgba(0, 0, 0, 0.18);
 }
 
+.zo-game-root--car-lane-switch .zo-car-panel-stack {
+	position: absolute;
+	z-index: 20;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	top: 34px;
+}
+
+.zo-game-root--car-lane-switch .zo-car-panel-stack--left {
+	left: 28px;
+}
+
+.zo-game-root--car-lane-switch .zo-car-panel-stack--right {
+	right: 28px;
+	align-items: flex-end;
+}
+
+.zo-game-root--car-lane-switch .zo-car-hud-panel {
+	position: relative;
+	background: linear-gradient(180deg, rgba(19, 20, 24, 0.72) 0%, rgba(35, 36, 41, 0.62) 100%);
+	backdrop-filter: blur(2px);
+	color: #fff;
+	padding: 14px 20px 14px 18px;
+	min-width: 150px;
+	box-shadow: 0 12px 22px rgba(0, 0, 0, 0.18);
+	clip-path: polygon(0 0, 100% 0, 92% 100%, 0 100%);
+}
+
+.zo-game-root--car-lane-switch .zo-car-hud-panel--right {
+	clip-path: polygon(8% 0, 100% 0, 100% 100%, 0 100%);
+	padding: 14px 18px 14px 20px;
+	text-align: right;
+}
+
+.zo-game-root--car-lane-switch .zo-car-hud-label {
+	display: block;
+	font-size: 14px;
+	font-weight: 800;
+	letter-spacing: 0.7px;
+	text-transform: uppercase;
+	opacity: 0.92;
+}
+
+.zo-game-root--car-lane-switch .zo-car-hud-value {
+	display: block;
+	margin-top: 3px;
+	font-size: 36px;
+	font-weight: 800;
+	line-height: 1;
+	letter-spacing: -0.5px;
+}
+
+.zo-game-root--car-lane-switch .zo-car-hud-sub {
+	font-size: 14px;
+	font-weight: 700;
+	margin-left: 5px;
+	opacity: 0.9;
+}
+
+.zo-game-root--car-lane-switch .zo-car-pause-top {
+	position: absolute;
+	right: 18px;
+	top: 18px;
+	z-index: 24;
+	width: 58px;
+	height: 58px;
+	border: 0;
+	border-radius: 14px;
+	background: rgba(14, 16, 22, 0.6);
+	backdrop-filter: blur(2px);
+	color: #fff;
+	font-size: 28px;
+	font-weight: 900;
+	line-height: 1;
+	cursor: pointer;
+	box-shadow: 0 10px 18px rgba(0, 0, 0, 0.2);
+}
+
+.zo-game-root--car-lane-switch .zo-car-bottom-controls {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 18px;
+	z-index: 21;
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-end;
+	padding: 0 22px;
+	pointer-events: none;
+}
+
+.zo-game-root--car-lane-switch .zo-car-controls-group,
+.zo-game-root--car-lane-switch .zo-car-controls-group-right {
+	display: flex;
+	gap: 18px;
+	pointer-events: auto;
+}
+
+.zo-game-root--car-lane-switch .zo-car-circle-btn {
+	width: 120px;
+	height: 120px;
+	border-radius: 50%;
+	border: 3px solid rgba(112, 210, 255, 0.65);
+	background: radial-gradient(circle at 50% 35%, rgba(24, 50, 73, 0.48) 0%, rgba(16, 20, 30, 0.66) 68%, rgba(12, 18, 28, 0.78) 100%);
+	color: #fff;
+	font-size: 58px;
+	font-weight: 800;
+	cursor: pointer;
+	box-shadow: 0 0 0 3px rgba(107, 211, 255, 0.08), 0 0 22px rgba(86, 200, 255, 0.34), inset 0 0 20px rgba(30, 111, 160, 0.16);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	line-height: 1;
+}
+
+.zo-game-root--car-lane-switch .zo-car-circle-btn:active {
+	transform: scale(0.98);
+}
+
+.zo-game-root--car-lane-switch .zo-car-circle-btn--ability {
+	font-size: 54px;
+	color: #74d3ff;
+}
+
+.zo-game-root--car-lane-switch .zo-car-circle-btn--small {
+	width: 106px;
+	height: 106px;
+	border-color: rgba(255, 255, 255, 0.24);
+	box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.04), inset 0 0 20px rgba(255, 255, 255, 0.05);
+	font-size: 46px;
+	color: rgba(255, 255, 255, 0.88);
+}
+
+.zo-game-root--car-lane-switch .zo-car-middle-toolbar {
+	position: relative;
+	z-index: 23;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	padding: 14px 16px 16px;
+	background: linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(244, 246, 248, 0.96) 100%);
+	border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.zo-game-root--car-lane-switch .zo-car-select,
+.zo-game-root--car-lane-switch .zo-car-toolbar-btn {
+	height: 42px;
+	border: 0;
+	border-radius: 12px;
+	padding: 0 14px;
+	font-size: 14px;
+	font-weight: 700;
+	background: #fff;
+	color: #17324d;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+	box-sizing: border-box;
+}
+
+.zo-game-root--car-lane-switch .zo-car-select {
+	min-width: 135px;
+}
+
+.zo-game-root--car-lane-switch .zo-car-toolbar-btn {
+	cursor: pointer;
+}
+
+.zo-game-root--car-lane-switch .zo-car-toolbar-btn[aria-pressed="true"] {
+	background: #17324d;
+	color: #fff;
+}
+
+.zo-game-root--car-lane-switch .zo-car-status-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	padding: 0 16px 16px;
+	background: linear-gradient(180deg, rgba(244, 246, 248, 0.96) 0%, rgba(239, 242, 245, 0.96) 100%);
+}
+
+.zo-game-root--car-lane-switch .zo-car-status,
+.zo-game-root--car-lane-switch .zo-car-active-powers,
 .zo-game-root--car-lane-switch .zo-car-event-banner {
-	margin: 10px 0 0;
-	min-height: 26px;
-	text-align: center;
+	flex: 1 1 100%;
+	min-height: 22px;
 	font-size: 14px;
 	font-weight: 700;
 	color: #17324d;
 }
 
+.zo-game-root--car-lane-switch .zo-car-status.is-danger {
+	color: #b21f1f;
+}
+
+.zo-game-root--car-lane-switch .zo-car-active-powers {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+
+.zo-game-root--car-lane-switch .zo-car-power-pill {
+	background: #fff;
+	color: #17324d;
+	border-radius: 999px;
+	padding: 7px 12px;
+	font-size: 13px;
+	font-weight: 700;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.zo-game-root--car-lane-switch .zo-car-power-pill.is-empty {
+	opacity: 0.8;
+}
+
 .zo-game-root--car-lane-switch .zo-car-overlay {
 	position: absolute;
 	inset: 0;
-	z-index: 14;
+	z-index: 30;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	background: rgba(10, 24, 39, 0.58);
+	background: rgba(10, 18, 28, 0.56);
 	padding: 18px;
 	box-sizing: border-box;
 }
@@ -522,17 +695,17 @@ $css = <<<'CSS'
 
 .zo-game-root--car-lane-switch .zo-car-panel {
 	width: 100%;
-	max-width: 420px;
-	background: #ffffff;
-	border-radius: 18px;
-	padding: 18px 16px;
+	max-width: 450px;
+	background: #fff;
+	border-radius: 22px;
+	padding: 22px 18px;
 	text-align: center;
-	box-shadow: 0 12px 28px rgba(0, 0, 0, 0.22);
+	box-shadow: 0 18px 38px rgba(0, 0, 0, 0.26);
 }
 
 .zo-game-root--car-lane-switch .zo-car-panel-title {
 	margin: 0 0 8px;
-	font-size: 24px;
+	font-size: 28px;
 	color: #16304a;
 }
 
@@ -544,17 +717,17 @@ $css = <<<'CSS'
 }
 
 .zo-game-root--car-lane-switch .zo-car-panel-countdown {
-	font-size: 52px;
+	font-size: 58px;
 	font-weight: 800;
 	line-height: 1;
 	color: #e44949;
 	margin: 8px 0 14px;
-	min-height: 52px;
+	min-height: 58px;
 }
 
 .zo-game-root--car-lane-switch .zo-car-parent-box {
 	margin-top: 14px;
-	padding-top: 12px;
+	padding-top: 14px;
 	border-top: 1px solid rgba(0, 0, 0, 0.08);
 }
 
@@ -580,17 +753,7 @@ $css = <<<'CSS'
 	cursor: pointer;
 	background: #17324d;
 	color: #fff;
-	box-shadow: 0 6px 14px rgba(23, 50, 77, 0.2);
-	transition: transform 0.15s ease, opacity 0.15s ease;
-}
-
-.zo-game-root--car-lane-switch .zo-car-btn:hover,
-.zo-game-root--car-lane-switch .zo-car-btn:focus {
-	transform: translateY(-1px);
-}
-
-.zo-game-root--car-lane-switch .zo-car-btn:active {
-	transform: translateY(1px);
+	box-shadow: 0 8px 16px rgba(23, 50, 77, 0.18);
 }
 
 .zo-game-root--car-lane-switch .zo-car-btn--accent {
@@ -601,101 +764,106 @@ $css = <<<'CSS'
 	background: #b98700;
 }
 
-.zo-game-root--car-lane-switch .zo-car-btn[aria-pressed="true"] {
-	background: #2f7d32;
-}
-
-.zo-game-root--car-lane-switch .zo-car-controls {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: 10px;
-	margin-top: 14px;
-}
-
-.zo-game-root--car-lane-switch .zo-car-control {
-	appearance: none;
-	border: 0;
-	border-radius: 16px;
-	padding: 14px 10px;
-	font-size: 16px;
-	font-weight: 700;
-	cursor: pointer;
-	background: rgba(255, 255, 255, 0.88);
-	color: #17324d;
-	box-shadow: 0 8px 18px rgba(0, 0, 0, 0.12);
-}
-
-.zo-game-root--car-lane-switch .zo-car-status {
-	margin-top: 12px;
-	min-height: 24px;
-	text-align: center;
-	font-size: 15px;
-	font-weight: 700;
-	color: #17324d;
-}
-
-.zo-game-root--car-lane-switch .zo-car-status.is-danger {
-	color: #b21f1f;
-}
-
-.zo-game-root--car-lane-switch .zo-car-active-powers {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 8px;
-	justify-content: center;
-	margin-top: 10px;
-	min-height: 34px;
-}
-
-.zo-game-root--car-lane-switch .zo-car-power-pill {
-	background: rgba(255, 255, 255, 0.92);
-	color: #17324d;
-	border-radius: 999px;
-	padding: 7px 12px;
-	font-size: 13px;
-	font-weight: 700;
-	box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
-}
-
-.zo-game-root--car-lane-switch .zo-car-power-pill.is-empty {
-	opacity: 0.7;
-}
-
-.zo-game-root--car-lane-switch .zo-car-medal {
-	font-size: 18px;
-}
-
-@keyframes zoCarCloudDrift {
-	0% {
-		transform: translateX(-120px);
+@media (max-width: 900px) {
+	.zo-game-root--car-lane-switch .zo-car-screen {
+		height: 600px;
 	}
-	100% {
-		transform: translateX(820px);
+
+	.zo-game-root--car-lane-switch .zo-car-circle-btn {
+		width: 102px;
+		height: 102px;
+		font-size: 50px;
+	}
+
+	.zo-game-root--car-lane-switch .zo-car-circle-btn--small {
+		width: 92px;
+		height: 92px;
+		font-size: 40px;
+	}
+
+	.zo-game-root--car-lane-switch .zo-car-hud-value {
+		font-size: 30px;
 	}
 }
 
-@media (max-width: 720px) {
-	.zo-game-root--car-lane-switch .zo-car-topbar {
-		grid-template-columns: repeat(2, minmax(0, 1fr));
+@media (max-width: 700px) {
+	.zo-game-root--car-lane-switch .zo-car-screen {
+		height: 520px;
 	}
 
-	.zo-game-root--car-lane-switch .zo-car-hud {
-		grid-template-columns: repeat(3, minmax(0, 1fr));
+	.zo-game-root--car-lane-switch .zo-car-panel-stack {
+		top: 16px;
+		gap: 8px;
 	}
 
-	.zo-game-root--car-lane-switch .zo-car-track {
-		height: 430px;
+	.zo-game-root--car-lane-switch .zo-car-panel-stack--left {
+		left: 12px;
 	}
 
-	.zo-game-root--car-lane-switch .zo-car-title {
-		font-size: 24px;
+	.zo-game-root--car-lane-switch .zo-car-panel-stack--right {
+		right: 12px;
 	}
 
-	.zo-game-root--car-lane-switch .zo-car-player,
-	.zo-game-root--car-lane-switch .zo-car-obstacle,
-	.zo-game-root--car-lane-switch .zo-car-ghost {
-		font-size: 28px;
-		min-width: 48px;
+	.zo-game-root--car-lane-switch .zo-car-hud-panel {
+		min-width: 118px;
+		padding: 10px 14px;
+	}
+
+	.zo-game-root--car-lane-switch .zo-car-hud-label {
+		font-size: 11px;
+	}
+
+	.zo-game-root--car-lane-switch .zo-car-hud-value {
+		font-size: 22px;
+	}
+
+	.zo-game-root--car-lane-switch .zo-car-hud-sub {
+		font-size: 11px;
+	}
+
+	.zo-game-root--car-lane-switch .zo-car-pause-top {
+		width: 48px;
+		height: 48px;
+		font-size: 22px;
+		right: 10px;
+		top: 10px;
+	}
+
+	.zo-game-root--car-lane-switch .zo-car-bottom-controls {
+		padding: 0 10px;
+		bottom: 10px;
+	}
+
+	.zo-game-root--car-lane-switch .zo-car-controls-group,
+	.zo-game-root--car-lane-switch .zo-car-controls-group-right {
+		gap: 10px;
+	}
+
+	.zo-game-root--car-lane-switch .zo-car-circle-btn {
+		width: 78px;
+		height: 78px;
+		font-size: 38px;
+		border-width: 2px;
+	}
+
+	.zo-game-root--car-lane-switch .zo-car-circle-btn--ability {
+		font-size: 34px;
+	}
+
+	.zo-game-root--car-lane-switch .zo-car-circle-btn--small {
+		width: 72px;
+		height: 72px;
+		font-size: 30px;
+	}
+
+	.zo-game-root--car-lane-switch .zo-car-middle-toolbar {
+		padding: 12px;
+	}
+
+	.zo-game-root--car-lane-switch .zo-car-select,
+	.zo-game-root--car-lane-switch .zo-car-toolbar-btn {
+		min-width: 0;
+		flex: 1 1 45%;
 	}
 }
 CSS;
@@ -711,20 +879,16 @@ document.addEventListener('DOMContentLoaded', function () {
 		game.dataset.zoCarReady = '1';
 
 		const gameWrap = game.querySelector('.zo-car-game');
-		const track = game.querySelector('.zo-car-track');
+		const screen = game.querySelector('.zo-car-screen');
 		const road = game.querySelector('.zo-car-road');
 		const player = game.querySelector('.zo-car-player');
 		const ghost = game.querySelector('.zo-car-ghost');
-		const sideLeft = game.querySelector('.zo-car-side--left .zo-car-side-items');
-		const sideRight = game.querySelector('.zo-car-side--right .zo-car-side-items');
-		const skyDetail = game.querySelector('.zo-car-sky-detail');
 		const scoreValue = game.querySelector('.zo-car-score');
-		const bestValue = game.querySelector('.zo-car-best');
+		const distanceValue = game.querySelector('.zo-car-distance');
+		const streakValue = game.querySelector('.zo-car-streak');
 		const speedValue = game.querySelector('.zo-car-speed');
 		const coinValue = game.querySelector('.zo-car-coins');
 		const heartValue = game.querySelector('.zo-car-hearts');
-		const medalValue = game.querySelector('.zo-car-medal');
-		const mapValue = game.querySelector('.zo-car-map-name');
 		const status = game.querySelector('.zo-car-status');
 		const eventBanner = game.querySelector('.zo-car-event-banner');
 		const overlay = game.querySelector('.zo-car-overlay');
@@ -735,34 +899,39 @@ document.addEventListener('DOMContentLoaded', function () {
 		const parentStats = game.querySelector('.zo-car-parent-stats');
 		const startBtn = game.querySelector('.zo-car-start');
 		const restartBtn = game.querySelector('.zo-car-restart');
-		const pauseBtn = game.querySelector('.zo-car-pause');
+		const pauseBtn = game.querySelector('.zo-car-pause-top');
 		const parentBtn = game.querySelector('.zo-car-parent');
 		const resetScoresBtn = game.querySelector('.zo-car-reset-scores');
 		const resetUnlocksBtn = game.querySelector('.zo-car-reset-unlocks');
 		const closeParentBtn = game.querySelector('.zo-car-close-parent');
 		const leftBtn = game.querySelector('.zo-car-left');
 		const rightBtn = game.querySelector('.zo-car-right');
+		const turboBtn = game.querySelector('.zo-car-turbo');
+		const pauseBottomBtn = game.querySelector('.zo-car-pause-bottom');
 		const skinSelect = game.querySelector('.zo-car-skin');
 		const difficultySelect = game.querySelector('.zo-car-difficulty');
 		const themeSelect = game.querySelector('.zo-car-theme');
 		const languageSelect = game.querySelector('.zo-car-language');
 		const soundToggle = game.querySelector('.zo-car-sound');
 		const activePowers = game.querySelector('.zo-car-active-powers');
+		const skyline = game.querySelector('.zo-car-skyline');
+		const hills = game.querySelector('.zo-car-horizon-hills');
+		const palms = game.querySelector('.zo-car-palms');
 
 		const lanePercents = [16.66, 50, 83.33];
 		const obstacleTypes = ['car', 'truck'];
 		const powerTypes = ['shield', 'slow', 'magnet', 'turbo'];
 		const storageKeys = {
-			best: 'zo_car_lane_switch_best_v4',
-			unlocks: 'zo_car_lane_switch_unlocks_v4',
-			bestRun: 'zo_car_lane_switch_best_run_v4',
-			totalCoins: 'zo_car_lane_switch_total_coins_v4'
+			best: 'zo_car_lane_switch_best_v5',
+			unlocks: 'zo_car_lane_switch_unlocks_v5',
+			bestRun: 'zo_car_lane_switch_best_run_v5',
+			totalCoins: 'zo_car_lane_switch_total_coins_v5'
 		};
 
 		const translations = {
 			en: {
 				title: 'Car Lane Switch',
-				instructions: 'Switch lanes to dodge traffic, collect coins, and grab power-ups. Use buttons, arrow keys, tap left or right, or swipe on mobile.',
+				instructions: 'Switch lanes with arrow keys or buttons. Dodge traffic, collect coins, and save power-ups.',
 				skin: { red: 'Red Car', blue: 'Blue Car', green: 'Green Car', purple: 'Purple Car' },
 				difficulty: { easy: 'Easy', medium: 'Medium', hard: 'Hard' },
 				theme: { city: 'City', desert: 'Desert', snow: 'Snow', night: 'Night', mountain: 'Mountain' },
@@ -770,20 +939,19 @@ document.addEventListener('DOMContentLoaded', function () {
 				soundOn: 'Sound On',
 				soundOff: 'Sound Off',
 				score: 'Score',
-				coins: 'Coins',
-				hearts: 'Lives',
-				best: 'Best',
+				distance: 'Distance',
+				streak: 'Near Miss',
 				speed: 'Speed',
-				medal: 'Medal',
-				map: 'Map',
-				left: '⬅ Left',
-				right: 'Right ➡',
-				pause: 'Pause',
-				resume: 'Resume',
-				restart: 'Restart',
-				parent: 'Parent Menu',
+				coins: 'Coins',
+				lives: 'Lives',
+				left: '◀',
+				right: '▶',
 				start: 'Start',
 				playAgain: 'Play Again',
+				restart: 'Restart',
+				pause: 'Pause',
+				resume: 'Resume',
+				parent: 'Parent Menu',
 				noPowerups: 'No saved power-ups',
 				statusReady: 'Choose your setup, then press Start.',
 				statusGo: 'Go. Dodge traffic and collect bonuses.',
@@ -792,35 +960,35 @@ document.addEventListener('DOMContentLoaded', function () {
 				statusCrash: 'Crash. You lost a life.',
 				statusGameOver: 'Game over. Try again.',
 				statusNearMiss: 'Near miss bonus.',
-				statusPowerSaved: 'Power-up saved until your lives run out.',
+				statusPowerSaved: 'Power-up saved until all lives are gone.',
 				statusResetScores: 'Scores reset.',
 				statusResetUnlocks: 'Unlocks reset.',
-				eventNone: '',
 				eventCoinRain: 'Event: Coin Rain',
 				eventRoadwork: 'Event: Roadwork',
 				getReady: 'Get Ready',
-				countdownText: 'Lane switching starts after the countdown.',
-				overlaySetup: 'Pick your car, difficulty, road theme, and language. Collect coins to unlock new maps.',
+				countdownText: 'The race starts after the countdown.',
+				overlaySetup: 'Use a slower style like the preview image. Turbo only makes side movement faster.',
 				pausedTitle: 'Paused',
-				pausedText: 'Tap Resume or press Pause again to continue.',
+				pausedText: 'Press Resume or pause again to continue.',
 				parentTitle: 'Parent Menu',
 				parentStats: 'Best score: {best} | Unlocked maps: {maps} | Total coins: {coins}',
 				resetScores: 'Reset Scores',
 				resetUnlocks: 'Reset Unlocks',
 				close: 'Close',
 				gameOverTitle: 'Game Over',
-				gameOverText: 'Score: {score} | Coins: {coins} | Best: {best} | Medal: {medal}',
-				medals: { none: 'None', bronze: 'Bronze', silver: 'Silver', gold: 'Gold' },
+				gameOverText: 'Score: {score} | Coins: {coins} | Best: {best}',
 				pills: {
 					shield: '🛡 Shield',
 					slow: '🐢 Slow',
 					magnet: '🧲 Magnet',
-					turbo: '⚡ Turbo'
-				}
+					turbo: '⚡ Side Turbo'
+				},
+				signLeft: 'DOWNTOWN',
+				signRight: 'BEACH ROAD'
 			},
 			tr: {
 				title: 'Araba Şerit Değiştir',
-				instructions: 'Trafikten kaçmak için şerit değiştir, para topla ve güçlendirmeleri al. Düğmeleri, ok tuşlarını, sola sağa dokunmayı ya da mobilde kaydırmayı kullan.',
+				instructions: 'Ok tuşları veya düğmelerle şerit değiştir. Trafikten kaç, para topla ve güçleri sakla.',
 				skin: { red: 'Kırmızı Araba', blue: 'Mavi Araba', green: 'Yeşil Araba', purple: 'Mor Araba' },
 				difficulty: { easy: 'Kolay', medium: 'Orta', hard: 'Zor' },
 				theme: { city: 'Şehir', desert: 'Çöl', snow: 'Kar', night: 'Gece', mountain: 'Dağ' },
@@ -828,20 +996,19 @@ document.addEventListener('DOMContentLoaded', function () {
 				soundOn: 'Ses Açık',
 				soundOff: 'Ses Kapalı',
 				score: 'Skor',
-				coins: 'Para',
-				hearts: 'Can',
-				best: 'En İyi',
+				distance: 'Mesafe',
+				streak: 'Kıl Payı',
 				speed: 'Hız',
-				medal: 'Madalya',
-				map: 'Harita',
-				left: '⬅ Sol',
-				right: 'Sağ ➡',
-				pause: 'Duraklat',
-				resume: 'Devam Et',
-				restart: 'Yeniden Başlat',
-				parent: 'Ebeveyn Menüsü',
+				coins: 'Para',
+				lives: 'Can',
+				left: '◀',
+				right: '▶',
 				start: 'Başlat',
 				playAgain: 'Tekrar Oyna',
+				restart: 'Yeniden Başlat',
+				pause: 'Duraklat',
+				resume: 'Devam Et',
+				parent: 'Ebeveyn Menüsü',
 				noPowerups: 'Kayıtlı güç yok',
 				statusReady: 'Ayarlarını seç, sonra Başlat’a bas.',
 				statusGo: 'Başla. Trafikten kaç ve bonusları topla.',
@@ -850,35 +1017,35 @@ document.addEventListener('DOMContentLoaded', function () {
 				statusCrash: 'Çarpıştın. Bir can gitti.',
 				statusGameOver: 'Oyun bitti. Tekrar dene.',
 				statusNearMiss: 'Kıl payı bonusu.',
-				statusPowerSaved: 'Güçlendirme canların bitene kadar saklanır.',
+				statusPowerSaved: 'Güç canlar bitene kadar saklanır.',
 				statusResetScores: 'Skorlar sıfırlandı.',
 				statusResetUnlocks: 'Kilitler sıfırlandı.',
-				eventNone: '',
 				eventCoinRain: 'Etkinlik: Para Yağmuru',
 				eventRoadwork: 'Etkinlik: Yol Çalışması',
 				getReady: 'Hazır Ol',
-				countdownText: 'Şerit değiştirme geri sayımdan sonra başlar.',
-				overlaySetup: 'Arabayı, zorluğu, haritayı ve dili seç. Yeni haritaları açmak için para topla.',
+				countdownText: 'Yarış geri sayımdan sonra başlar.',
+				overlaySetup: 'Önizleme resmine benzer daha yavaş bir stil kullanır. Turbo sadece sağa sola daha hızlı götürür.',
 				pausedTitle: 'Duraklatıldı',
-				pausedText: 'Devam Et’e dokun ya da yeniden Duraklat düğmesine bas.',
+				pausedText: 'Devam Et’e bas ya da tekrar duraklat.',
 				parentTitle: 'Ebeveyn Menüsü',
 				parentStats: 'En iyi skor: {best} | Açık harita: {maps} | Toplam para: {coins}',
 				resetScores: 'Skorları Sıfırla',
 				resetUnlocks: 'Kilitleri Sıfırla',
 				close: 'Kapat',
 				gameOverTitle: 'Oyun Bitti',
-				gameOverText: 'Skor: {score} | Para: {coins} | En iyi: {best} | Madalya: {medal}',
-				medals: { none: 'Yok', bronze: 'Bronz', silver: 'Gümüş', gold: 'Altın' },
+				gameOverText: 'Skor: {score} | Para: {coins} | En iyi: {best}',
 				pills: {
 					shield: '🛡 Kalkan',
 					slow: '🐢 Yavaş',
 					magnet: '🧲 Mıknatıs',
-					turbo: '⚡ Turbo'
-				}
+					turbo: '⚡ Yan Turbo'
+				},
+				signLeft: 'MERKEZ',
+				signRight: 'SAHİL YOLU'
 			},
 			de: {
 				title: 'Auto Spurwechsel',
-				instructions: 'Wechsle die Spur, weiche dem Verkehr aus, sammle Münzen und hole Power-ups. Nutze Tasten, Pfeile, Tippen oder Wischen auf Mobilgeräten.',
+				instructions: 'Wechsle mit Pfeiltasten oder Knöpfen die Spur. Weiche aus, sammle Münzen und speichere Power-ups.',
 				skin: { red: 'Rotes Auto', blue: 'Blaues Auto', green: 'Grünes Auto', purple: 'Lila Auto' },
 				difficulty: { easy: 'Leicht', medium: 'Mittel', hard: 'Schwer' },
 				theme: { city: 'Stadt', desert: 'Wüste', snow: 'Schnee', night: 'Nacht', mountain: 'Berg' },
@@ -886,20 +1053,19 @@ document.addEventListener('DOMContentLoaded', function () {
 				soundOn: 'Ton An',
 				soundOff: 'Ton Aus',
 				score: 'Punkte',
-				coins: 'Münzen',
-				hearts: 'Leben',
-				best: 'Bestwert',
+				distance: 'Distanz',
+				streak: 'Beinahe',
 				speed: 'Tempo',
-				medal: 'Medaille',
-				map: 'Karte',
-				left: '⬅ Links',
-				right: 'Rechts ➡',
-				pause: 'Pause',
-				resume: 'Weiter',
-				restart: 'Neu Start',
-				parent: 'Elternmenü',
+				coins: 'Münzen',
+				lives: 'Leben',
+				left: '◀',
+				right: '▶',
 				start: 'Start',
 				playAgain: 'Nochmal',
+				restart: 'Neu Start',
+				pause: 'Pause',
+				resume: 'Weiter',
+				parent: 'Elternmenü',
 				noPowerups: 'Keine gespeicherten Power-ups',
 				statusReady: 'Wähle deine Einstellungen und drücke Start.',
 				statusGo: 'Los. Weiche aus und sammle Boni.',
@@ -911,32 +1077,32 @@ document.addEventListener('DOMContentLoaded', function () {
 				statusPowerSaved: 'Power-up bleibt bis alle Leben weg sind.',
 				statusResetScores: 'Punkte zurückgesetzt.',
 				statusResetUnlocks: 'Freischaltungen zurückgesetzt.',
-				eventNone: '',
 				eventCoinRain: 'Event: Münzregen',
 				eventRoadwork: 'Event: Baustelle',
 				getReady: 'Bereit',
-				countdownText: 'Der Spurwechsel startet nach dem Countdown.',
-				overlaySetup: 'Wähle Auto, Schwierigkeit, Karte und Sprache. Sammle Münzen, um neue Karten freizuschalten.',
+				countdownText: 'Das Rennen startet nach dem Countdown.',
+				overlaySetup: 'Langsamer Stil wie im Vorschaubild. Turbo macht nur Spurwechsel schneller.',
 				pausedTitle: 'Pausiert',
-				pausedText: 'Tippe auf Weiter oder drücke Pause erneut.',
+				pausedText: 'Drücke Weiter oder Pause erneut.',
 				parentTitle: 'Elternmenü',
 				parentStats: 'Bestwert: {best} | Freigeschaltete Karten: {maps} | Gesamtmünzen: {coins}',
 				resetScores: 'Punkte Löschen',
 				resetUnlocks: 'Freischaltungen Löschen',
 				close: 'Schließen',
 				gameOverTitle: 'Spiel Vorbei',
-				gameOverText: 'Punkte: {score} | Münzen: {coins} | Bestwert: {best} | Medaille: {medal}',
-				medals: { none: 'Keine', bronze: 'Bronze', silver: 'Silber', gold: 'Gold' },
+				gameOverText: 'Punkte: {score} | Münzen: {coins} | Bestwert: {best}',
 				pills: {
 					shield: '🛡 Schild',
 					slow: '🐢 Langsam',
 					magnet: '🧲 Magnet',
-					turbo: '⚡ Turbo'
-				}
+					turbo: '⚡ Seiten-Turbo'
+				},
+				signLeft: 'INNENSTADT',
+				signRight: 'STRANDSTRASSE'
 			},
 			es: {
 				title: 'Cambio de Carril',
-				instructions: 'Cambia de carril para esquivar el tráfico, recoge monedas y consigue poderes. Usa botones, flechas, tocar o deslizar en móvil.',
+				instructions: 'Cambia de carril con flechas o botones. Esquiva coches, recoge monedas y guarda poderes.',
 				skin: { red: 'Coche Rojo', blue: 'Coche Azul', green: 'Coche Verde', purple: 'Coche Morado' },
 				difficulty: { easy: 'Fácil', medium: 'Medio', hard: 'Difícil' },
 				theme: { city: 'Ciudad', desert: 'Desierto', snow: 'Nieve', night: 'Noche', mountain: 'Montaña' },
@@ -944,20 +1110,19 @@ document.addEventListener('DOMContentLoaded', function () {
 				soundOn: 'Sonido Sí',
 				soundOff: 'Sonido No',
 				score: 'Puntos',
-				coins: 'Monedas',
-				hearts: 'Vidas',
-				best: 'Mejor',
+				distance: 'Distancia',
+				streak: 'Casi',
 				speed: 'Velocidad',
-				medal: 'Medalla',
-				map: 'Mapa',
-				left: '⬅ Izq',
-				right: 'Der ➡',
-				pause: 'Pausa',
-				resume: 'Seguir',
-				restart: 'Reiniciar',
-				parent: 'Menú Padres',
+				coins: 'Monedas',
+				lives: 'Vidas',
+				left: '◀',
+				right: '▶',
 				start: 'Empezar',
 				playAgain: 'Otra Vez',
+				restart: 'Reiniciar',
+				pause: 'Pausa',
+				resume: 'Seguir',
+				parent: 'Menú Padres',
 				noPowerups: 'Sin poderes guardados',
 				statusReady: 'Elige tu configuración y pulsa Empezar.',
 				statusGo: 'Vamos. Esquiva y recoge bonos.',
@@ -966,75 +1131,66 @@ document.addEventListener('DOMContentLoaded', function () {
 				statusCrash: 'Choque. Perdiste una vida.',
 				statusGameOver: 'Fin del juego. Inténtalo otra vez.',
 				statusNearMiss: 'Bono por casi chocar.',
-				statusPowerSaved: 'El poder se guarda hasta que se acaben tus vidas.',
+				statusPowerSaved: 'El poder queda guardado hasta perder todas las vidas.',
 				statusResetScores: 'Puntuaciones borradas.',
 				statusResetUnlocks: 'Desbloqueos borrados.',
-				eventNone: '',
 				eventCoinRain: 'Evento: Lluvia de Monedas',
 				eventRoadwork: 'Evento: Obras',
 				getReady: 'Prepárate',
-				countdownText: 'El cambio de carril empieza después de la cuenta atrás.',
-				overlaySetup: 'Elige coche, dificultad, mapa e idioma. Recoge monedas para desbloquear nuevos mapas.',
+				countdownText: 'La carrera empieza después de la cuenta atrás.',
+				overlaySetup: 'Estilo más lento como en la imagen. Turbo solo acelera el movimiento lateral.',
 				pausedTitle: 'En Pausa',
-				pausedText: 'Pulsa Seguir o vuelve a pulsar Pausa.',
+				pausedText: 'Pulsa Seguir o Pausa otra vez.',
 				parentTitle: 'Menú Padres',
 				parentStats: 'Mejor puntuación: {best} | Mapas desbloqueados: {maps} | Monedas totales: {coins}',
 				resetScores: 'Borrar Puntos',
 				resetUnlocks: 'Borrar Desbloqueos',
 				close: 'Cerrar',
 				gameOverTitle: 'Fin del Juego',
-				gameOverText: 'Puntos: {score} | Monedas: {coins} | Mejor: {best} | Medalla: {medal}',
-				medals: { none: 'Ninguna', bronze: 'Bronce', silver: 'Plata', gold: 'Oro' },
+				gameOverText: 'Puntos: {score} | Monedas: {coins} | Mejor: {best}',
 				pills: {
 					shield: '🛡 Escudo',
 					slow: '🐢 Lento',
 					magnet: '🧲 Imán',
-					turbo: '⚡ Turbo'
-				}
+					turbo: '⚡ Turbo Lateral'
+				},
+				signLeft: 'CENTRO',
+				signRight: 'CAMINO PLAYA'
 			}
 		};
 
 		const difficultySettings = {
 			easy: {
-				baseSpeed: 120,
-				spawnGap: 1.9,
-				speedGain: 1.8,
-				coinGap: 1.05,
-				powerGap: 6.2
+				baseSpeed: 118,
+				spawnGap: 1.95,
+				speedGain: 1.2,
+				coinGap: 1.0,
+				powerGap: 6.6,
+				sideMoveDuration: 0.22
 			},
 			medium: {
-				baseSpeed: 150,
-				spawnGap: 1.6,
-				speedGain: 2.2,
-				coinGap: 1.0,
-				powerGap: 5.7
+				baseSpeed: 138,
+				spawnGap: 1.65,
+				speedGain: 1.55,
+				coinGap: 0.95,
+				powerGap: 6.0,
+				sideMoveDuration: 0.18
 			},
 			hard: {
-				baseSpeed: 185,
-				spawnGap: 1.3,
-				speedGain: 2.8,
-				coinGap: 0.95,
-				powerGap: 5.2
+				baseSpeed: 160,
+				spawnGap: 1.38,
+				speedGain: 1.9,
+				coinGap: 0.9,
+				powerGap: 5.5,
+				sideMoveDuration: 0.16
 			}
 		};
 
 		const skins = {
-			red: {
-				emoji: '🚗',
-				background: 'linear-gradient(180deg, #ff5757 0%, #d71f1f 100%)'
-			},
-			blue: {
-				emoji: '🚙',
-				background: 'linear-gradient(180deg, #59a7ff 0%, #205fd0 100%)'
-			},
-			green: {
-				emoji: '🚕',
-				background: 'linear-gradient(180deg, #59d96b 0%, #198f34 100%)'
-			},
-			purple: {
-				emoji: '🚘',
-				background: 'linear-gradient(180deg, #b07bff 0%, #6f38d0 100%)'
-			}
+			red: { background: 'linear-gradient(180deg, #ff5b57 0%, #c41414 100%)' },
+			blue: { background: 'linear-gradient(180deg, #4c81ff 0%, #2049bd 100%)' },
+			green: { background: 'linear-gradient(180deg, #57d26a 0%, #138c2b 100%)' },
+			purple: { background: 'linear-gradient(180deg, #b27bff 0%, #6630c8 100%)' }
 		};
 
 		const mapUnlockCosts = {
@@ -1071,8 +1227,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		try {
 			const unlockRaw = window.localStorage.getItem(storageKeys.unlocks);
 			if (unlockRaw) {
-				const parsedUnlocks = JSON.parse(unlockRaw);
-				unlocks = Object.assign(unlocks, parsedUnlocks || {});
+				unlocks = Object.assign(unlocks, JSON.parse(unlockRaw) || {});
 			}
 		} catch (err) {}
 
@@ -1098,11 +1253,13 @@ document.addEventListener('DOMContentLoaded', function () {
 		let ended = false;
 		let paused = false;
 		let score = 0;
+		let distanceKm = 0;
+		let nearMissCount = 0;
 		let speed = difficultySettings.medium.baseSpeed;
 		let countdownTimer = null;
 		let soundEnabled = false;
 		let audioContext = null;
-		let lives = 3;
+		let lives = 10;
 		let savedPowers = {
 			shield: false,
 			slow: false,
@@ -1117,6 +1274,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		let driftTimer = 0;
 		let currentRunPath = [];
 		let runTime = 0;
+		let currentSideMoveDuration = difficultySettings.medium.sideMoveDuration;
 
 		function t() {
 			return translations[languageSelect.value] || translations.en;
@@ -1132,6 +1290,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function getSettings() {
 			return difficultySettings[difficultySelect.value] || difficultySettings.medium;
+		}
+
+		function updateMoveDuration() {
+			const base = getSettings().sideMoveDuration;
+			currentSideMoveDuration = savedPowers.turbo ? Math.max(0.08, base * 0.5) : base;
+			player.style.transitionDuration = currentSideMoveDuration + 's, ' + currentSideMoveDuration + 's, 0.18s';
 		}
 
 		function ensureAudio() {
@@ -1266,35 +1430,25 @@ document.addEventListener('DOMContentLoaded', function () {
 			status.classList.toggle('is-danger', !!danger);
 		}
 
-		function getMedal(scoreValueNumber) {
-			if (scoreValueNumber >= 80) {
-				return 'gold';
-			}
-			if (scoreValueNumber >= 45) {
-				return 'silver';
-			}
-			if (scoreValueNumber >= 20) {
-				return 'bronze';
-			}
-			return 'none';
-		}
-
 		function updateHud() {
-			scoreValue.textContent = String(score);
-			coinValue.textContent = String(totalCoins);
-			speedValue.textContent = String(Math.round(speed / 20));
-			bestValue.textContent = String(bestScore);
-			heartValue.textContent = '❤'.repeat(Math.max(0, lives));
-			const medalKey = getMedal(score);
-			medalValue.textContent = t().medals[medalKey];
-			mapValue.textContent = t().theme[themeSelect.value] || themeSelect.value;
+			scoreValue.textContent = score.toLocaleString();
+			distanceValue.textContent = distanceKm.toFixed(2) + ' km';
+			streakValue.textContent = nearMissCount + ' s';
+			speedValue.textContent = Math.round(speed).toLocaleString();
+			coinValue.textContent = totalCoins.toLocaleString();
+			heartValue.textContent = String(lives);
 		}
 
-		function updateSkin() {
+		function updateCarShellColors() {
 			const skin = skins[skinSelect.value] || skins.red;
-			player.textContent = skin.emoji;
-			player.style.background = skin.background;
-			ghost.textContent = skin.emoji;
+			const playerShell = player.querySelector('.zo-car-shell');
+			const ghostShell = ghost.querySelector('.zo-car-shell');
+			if (playerShell) {
+				playerShell.style.background = skin.background;
+			}
+			if (ghostShell) {
+				ghostShell.style.background = 'linear-gradient(180deg, #d8d8d8 0%, #7f7f7f 100%)';
+			}
 		}
 
 		function saveUnlocks() {
@@ -1342,8 +1496,6 @@ document.addEventListener('DOMContentLoaded', function () {
 				themeSelect.value = 'city';
 			}
 			gameWrap.setAttribute('data-theme', themeSelect.value);
-			buildBackground();
-			updateHud();
 		}
 
 		function clearList(list) {
@@ -1377,6 +1529,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		function updatePowerClasses() {
 			const hasSavedPower = savedPowers.shield || savedPowers.slow || savedPowers.magnet || savedPowers.turbo;
 			player.classList.toggle('is-powerup', hasSavedPower);
+			updateMoveDuration();
 		}
 
 		function updatePowerPills() {
@@ -1430,7 +1583,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		function getOpenLanes() {
 			const blocked = {};
 			obstacles.forEach(function (item) {
-				if (item.y < 140) {
+				if (item.y < 160) {
 					blocked[item.lane] = true;
 				}
 			});
@@ -1446,31 +1599,29 @@ document.addEventListener('DOMContentLoaded', function () {
 			return lanes;
 		}
 
+		function createCarElement(extraClass) {
+			const el = document.createElement('div');
+			el.className = extraClass;
+			el.innerHTML = '<span class="zo-car-shell"></span><span class="zo-car-window"></span><span class="zo-car-lightbar"></span>';
+			return el;
+		}
+
 		function spawnObstacle() {
 			const type = obstacleTypes[Math.floor(Math.random() * obstacleTypes.length)];
-			const obstacle = document.createElement('div');
-			obstacle.className = 'zo-car-obstacle';
-
-			if (type === 'truck') {
-				obstacle.classList.add('zo-car-obstacle--truck');
-				obstacle.textContent = '🚚';
-			} else {
-				obstacle.textContent = '🚙';
-			}
-
+			const obstacle = createCarElement('zo-car-obstacle' + (type === 'truck' ? ' zo-car-obstacle--truck' : ''));
 			const laneChoices = getOpenLanes();
 			const lane = laneChoices[Math.floor(Math.random() * laneChoices.length)];
 			obstacle.style.left = lanePercents[lane] + '%';
-			obstacle.style.top = '-90px';
+			obstacle.style.top = '-130px';
 			road.appendChild(obstacle);
 
 			obstacles.push({
 				el: obstacle,
 				lane: lane,
-				y: -90,
+				y: -130,
 				passed: false,
 				nearBonusGiven: false,
-				height: 86,
+				height: type === 'truck' ? 118 : 108,
 				type: type
 			});
 		}
@@ -1489,7 +1640,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				el: coin,
 				lane: lane,
 				y: -40,
-				height: 34
+				height: 42
 			});
 		}
 
@@ -1497,7 +1648,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			const type = powerTypes[Math.floor(Math.random() * powerTypes.length)];
 			const powerup = document.createElement('div');
 			powerup.className = 'zo-car-powerup zo-car-powerup--' + type;
-
 			if (type === 'shield') {
 				powerup.textContent = '🛡';
 			} else if (type === 'slow') {
@@ -1518,7 +1668,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				el: powerup,
 				lane: lane,
 				y: -48,
-				height: 42,
+				height: 48,
 				type: type
 			});
 		}
@@ -1574,7 +1724,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			setStatus(t().statusCrash, true);
-			player.classList.add('is-powerup');
 			window.setTimeout(function () {
 				updatePowerClasses();
 			}, 180);
@@ -1584,8 +1733,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			running = false;
 			ended = true;
 			paused = false;
-			pauseBtn.textContent = t().pause;
-			pauseBtn.setAttribute('aria-pressed', 'false');
+			pauseBtn.textContent = '❚❚';
+			pauseBottomBtn.textContent = t().pause;
 
 			if (countdownTimer) {
 				window.clearTimeout(countdownTimer);
@@ -1596,8 +1745,6 @@ document.addEventListener('DOMContentLoaded', function () {
 				cancelAnimationFrame(animationFrame);
 				animationFrame = null;
 			}
-
-			const medalKey = getMedal(score);
 
 			if (score > bestScore) {
 				bestScore = score;
@@ -1623,10 +1770,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			showOverlay(
 				t().gameOverTitle,
 				replaceTokens(t().gameOverText, {
-					score: score,
-					coins: totalCoins,
-					best: bestScore,
-					medal: t().medals[medalKey]
+					score: score.toLocaleString(),
+					coins: totalCoins.toLocaleString(),
+					best: bestScore.toLocaleString()
 				}),
 				t().playAgain,
 				''
@@ -1640,9 +1786,9 @@ document.addEventListener('DOMContentLoaded', function () {
 				return unlocks[key];
 			}).length;
 			parentStats.textContent = replaceTokens(t().parentStats, {
-				best: bestScore,
+				best: bestScore.toLocaleString(),
 				maps: count,
-				coins: totalCoins
+				coins: totalCoins.toLocaleString()
 			});
 		}
 
@@ -1664,7 +1810,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			coinTimer = 0;
 			powerTimer = 0;
 			score = 0;
-			lives = 3;
+			distanceKm = 0;
+			nearMissCount = 0;
+			lives = 10;
 			laneIndex = 1;
 			runTime = 0;
 			currentRunPath = [{ time: 0, lane: laneIndex }];
@@ -1673,17 +1821,16 @@ document.addEventListener('DOMContentLoaded', function () {
 			eventState.cooldown = 10;
 			driftTimer = 0;
 
-			const settings = getSettings();
-			speed = settings.baseSpeed;
+			speed = getSettings().baseSpeed;
 
 			clearAllFalling();
 			setPlayerLane();
-			updateSkin();
+			updateCarShellColors();
 			applyTheme();
 			updateHud();
 			clearSavedPowers();
-			pauseBtn.textContent = t().pause;
-			pauseBtn.setAttribute('aria-pressed', 'false');
+			pauseBtn.textContent = '❚❚';
+			pauseBottomBtn.textContent = t().pause;
 			setStatus(t().statusReady, false);
 			setEventBanner('');
 			showOverlay(t().title, t().overlaySetup, t().start, '');
@@ -1694,7 +1841,9 @@ document.addEventListener('DOMContentLoaded', function () {
 		function reallyStartGame() {
 			clearAllFalling();
 			score = 0;
-			lives = 3;
+			distanceKm = 0;
+			nearMissCount = 0;
+			lives = 10;
 			spawnTimer = 0;
 			coinTimer = 0;
 			powerTimer = 0;
@@ -1712,14 +1861,14 @@ document.addEventListener('DOMContentLoaded', function () {
 			speed = getSettings().baseSpeed;
 
 			setPlayerLane();
-			updateSkin();
+			updateCarShellColors();
 			applyTheme();
 			updateHud();
 			updatePowerClasses();
 			updatePowerPills();
 			hideOverlay();
-			pauseBtn.textContent = t().pause;
-			pauseBtn.setAttribute('aria-pressed', 'false');
+			pauseBtn.textContent = '❚❚';
+			pauseBottomBtn.textContent = t().pause;
 			setStatus(t().statusGo, false);
 			setEventBanner('');
 			playTone('go');
@@ -1735,7 +1884,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				countdownTimer = null;
 			}
 
-			updateSkin();
+			updateCarShellColors();
 			applyTheme();
 			showOverlay(t().getReady, t().countdownText, t().start, '3');
 
@@ -1744,13 +1893,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			function nextStep() {
 				countdownEl.textContent = values[index];
-
 				if (values[index] === 'GO') {
 					playTone('go');
 				} else {
 					playTone('beep');
 				}
-
 				index += 1;
 
 				if (index < values.length) {
@@ -1767,8 +1914,13 @@ document.addEventListener('DOMContentLoaded', function () {
 			nextStep();
 		}
 
+		function setPauseButtonsPausedState() {
+			pauseBtn.textContent = paused ? '▶' : '❚❚';
+			pauseBottomBtn.textContent = paused ? t().resume : t().pause;
+		}
+
 		function pauseGame() {
-			if (!running) {
+			if (!running && !paused) {
 				return;
 			}
 			paused = !paused;
@@ -1778,16 +1930,14 @@ document.addEventListener('DOMContentLoaded', function () {
 					cancelAnimationFrame(animationFrame);
 					animationFrame = null;
 				}
-				pauseBtn.textContent = t().resume;
-				pauseBtn.setAttribute('aria-pressed', 'true');
+				setPauseButtonsPausedState();
 				setStatus(t().statusPaused, false);
 				showOverlay(t().pausedTitle, t().pausedText, t().resume, '');
 				playTone('pause');
 			} else {
 				hideOverlay();
 				lastTime = 0;
-				pauseBtn.textContent = t().pause;
-				pauseBtn.setAttribute('aria-pressed', 'false');
+				setPauseButtonsPausedState();
 				setStatus(t().statusResume, false);
 				playTone('go');
 				animationFrame = requestAnimationFrame(loop);
@@ -1833,14 +1983,14 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function intersectsLane(yTop, yBottom, lane) {
-			const playerTop = track.clientHeight - player.offsetHeight - 18;
+			const playerTop = road.clientHeight - player.offsetHeight - 22;
 			const playerBottom = playerTop + player.offsetHeight - 10;
 			return lane === laneIndex && yBottom >= playerTop && yTop <= playerBottom;
 		}
 
 		function collectCoin(item, index) {
 			totalCoins += 1;
-			score += savedPowers.turbo ? 2 : 1;
+			score += 1;
 			saveTotalCoins();
 			unlockMapsByCoins();
 			updateHud();
@@ -1888,6 +2038,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (distance < 18 && itemBottom >= playerTop - 20 && itemTop <= playerBottom + 20) {
 				item.nearBonusGiven = true;
 				score += 2;
+				nearMissCount += 1;
 				if (score > bestScore) {
 					bestScore = score;
 				}
@@ -1897,69 +2048,56 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		}
 
-		function buildBackground() {
-			skyDetail.innerHTML = '';
-			sideLeft.innerHTML = '';
-			sideRight.innerHTML = '';
+		function buildScenery() {
+			skyline.innerHTML = '';
+			hills.innerHTML = '';
+			palms.innerHTML = '';
 
-			for (let i = 0; i < 3; i += 1) {
-				const cloud = document.createElement('div');
-				cloud.className = 'zo-car-cloud';
-				cloud.style.top = (10 + i * 18) + 'px';
-				cloud.style.left = (i * 140) + 'px';
-				cloud.style.animationDelay = (i * -5) + 's';
-				skyDetail.appendChild(cloud);
+			for (let i = 0; i < 12; i += 1) {
+				const bar = document.createElement('span');
+				bar.className = 'zo-car-skyline-bar';
+				bar.style.height = (18 + Math.random() * 70) + '%';
+				skyline.appendChild(bar);
 			}
 
-			if (themeSelect.value === 'mountain') {
-				for (let i = 0; i < 4; i += 1) {
-					const mountain = document.createElement('div');
-					mountain.className = 'zo-car-mountain';
-					mountain.style.left = (i * 80 + 10) + 'px';
-					mountain.style.borderLeftWidth = (50 + (i % 2) * 18) + 'px';
-					mountain.style.borderRightWidth = (50 + (i % 2) * 18) + 'px';
-					mountain.style.borderBottomWidth = (55 + i * 8) + 'px';
-					skyDetail.appendChild(mountain);
-				}
-			}
+			const hillData = [
+				{ left: '-4%', width: '33%', height: '54%' },
+				{ left: '20%', width: '38%', height: '65%' },
+				{ left: '56%', width: '30%', height: '52%' },
+				{ left: '74%', width: '28%', height: '45%' }
+			];
 
-			for (let i = 0; i < 7; i += 1) {
-				const itemLeft = document.createElement('div');
-				const itemRight = document.createElement('div');
-				const mod = i % 3;
+			hillData.forEach(function (item) {
+				const hill = document.createElement('span');
+				hill.className = 'zo-car-hill';
+				hill.style.left = item.left;
+				hill.style.width = item.width;
+				hill.style.height = item.height;
+				hills.appendChild(hill);
+			});
 
-				if (themeSelect.value === 'city') {
-					itemLeft.className = mod === 0 ? 'zo-car-house' : 'zo-car-light';
-					itemRight.className = mod === 1 ? 'zo-car-house' : 'zo-car-light';
-				} else if (themeSelect.value === 'desert') {
-					itemLeft.className = mod === 0 ? 'zo-car-tree' : 'zo-car-light';
-					itemRight.className = mod === 2 ? 'zo-car-tree' : 'zo-car-light';
-				} else if (themeSelect.value === 'snow') {
-					itemLeft.className = mod === 0 ? 'zo-car-tree' : 'zo-car-house';
-					itemRight.className = mod === 1 ? 'zo-car-tree' : 'zo-car-house';
-				} else if (themeSelect.value === 'night') {
-					itemLeft.className = mod === 0 ? 'zo-car-light' : 'zo-car-house';
-					itemRight.className = mod === 1 ? 'zo-car-light' : 'zo-car-house';
-				} else {
-					itemLeft.className = mod === 0 ? 'zo-car-tree' : 'zo-car-light';
-					itemRight.className = mod === 1 ? 'zo-car-tree' : 'zo-car-light';
-				}
+			const palmData = [
+				{ left: '11%', bottom: '51%', scale: 0.95, rotate: -1 },
+				{ left: '23%', bottom: '67%', scale: 0.45, rotate: 2 },
+				{ left: '78%', bottom: '67%', scale: 0.45, rotate: -2 },
+				{ left: '88%', bottom: '52%', scale: 1.08, rotate: 2 }
+			];
 
-				itemLeft.style.top = (i * 80 + 24) + 'px';
-				itemRight.style.top = (i * 80 + 50) + 'px';
-				itemLeft.style.left = (i % 2 === 0 ? 18 : 52) + 'px';
-				itemRight.style.left = (i % 2 === 0 ? 40 : 14) + 'px';
-
-				sideLeft.appendChild(itemLeft);
-				sideRight.appendChild(itemRight);
-			}
+			palmData.forEach(function (item) {
+				const palm = document.createElement('span');
+				palm.className = 'zo-car-palm';
+				palm.style.left = item.left;
+				palm.style.bottom = item.bottom;
+				palm.style.transform = 'scale(' + item.scale + ') rotate(' + item.rotate + 'deg)';
+				palms.appendChild(palm);
+			});
 		}
 
 		function applyTranslations() {
 			const dict = t();
 
-			game.querySelector('.zo-car-title').textContent = dict.title;
-			game.querySelector('.zo-car-instructions').textContent = dict.instructions;
+			game.querySelector('.zo-car-sign-text--left').textContent = dict.signLeft;
+			game.querySelector('.zo-car-sign-text--right').textContent = dict.signRight;
 
 			Array.prototype.forEach.call(skinSelect.options, function (option) {
 				option.textContent = dict.skin[option.value];
@@ -1973,17 +2111,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			refreshThemeOptions();
 
-			game.querySelector('.zo-car-chip-label--score').textContent = dict.score;
-			game.querySelector('.zo-car-chip-label--coins').textContent = dict.coins;
-			game.querySelector('.zo-car-chip-label--hearts').textContent = dict.hearts;
-			game.querySelector('.zo-car-chip-label--best').textContent = dict.best;
-			game.querySelector('.zo-car-chip-label--speed').textContent = dict.speed;
-			game.querySelector('.zo-car-chip-label--medal').textContent = dict.medal;
-			game.querySelector('.zo-car-chip-label--map').textContent = dict.map;
+			game.querySelector('.zo-car-hud-label--score').textContent = dict.score;
+			game.querySelector('.zo-car-hud-label--distance').textContent = dict.distance;
+			game.querySelector('.zo-car-hud-label--streak').textContent = dict.streak;
+			game.querySelector('.zo-car-hud-label--speed').textContent = dict.speed;
+			game.querySelector('.zo-car-hud-label--coins').textContent = dict.coins;
+			game.querySelector('.zo-car-hud-label--lives').textContent = dict.lives;
 
 			leftBtn.textContent = dict.left;
 			rightBtn.textContent = dict.right;
-			pauseBtn.textContent = paused ? dict.resume : dict.pause;
+			pauseBottomBtn.textContent = paused ? dict.resume : dict.pause;
 			restartBtn.textContent = dict.restart;
 			parentBtn.textContent = dict.parent;
 			startBtn.textContent = running ? dict.resume : dict.start;
@@ -2021,30 +2158,30 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			const settings = getSettings();
 			const slowFactor = savedPowers.slow ? 0.72 : 1;
-			const turboBonus = savedPowers.turbo ? 28 : 0;
 
-			speed += delta * settings.speedGain * (savedPowers.turbo ? 1.08 : 1);
-			const moveSpeed = (speed + turboBonus) * slowFactor;
+			speed += delta * settings.speedGain;
+			const moveSpeed = speed * slowFactor;
 
 			spawnTimer += delta;
 			coinTimer += delta;
 			powerTimer += delta;
+			distanceKm += (moveSpeed * delta) / 1000;
 
-			let obstacleGap = Math.max(1.05, settings.spawnGap - score * 0.002);
+			let obstacleGap = Math.max(1.08, settings.spawnGap - score * 0.002);
 			let coinGap = settings.coinGap;
 			let powerGap = settings.powerGap;
 
 			if (eventState.type === 'coin-rain') {
-				coinGap = 0.35;
+				coinGap = 0.34;
 			}
 			if (eventState.type === 'roadwork') {
-				obstacleGap *= 0.88;
+				obstacleGap *= 0.86;
 			}
 
 			if (spawnTimer >= obstacleGap) {
 				spawnTimer = 0;
 				spawnObstacle();
-				if (eventState.type === 'roadwork' && Math.random() < 0.25) {
+				if (eventState.type === 'roadwork' && Math.random() < 0.22) {
 					spawnObstacle();
 				}
 			}
@@ -2059,8 +2196,8 @@ document.addEventListener('DOMContentLoaded', function () {
 				spawnPowerup();
 			}
 
-			const trackHeight = track.clientHeight;
-			const playerTop = trackHeight - player.offsetHeight - 18;
+			const roadHeight = road.clientHeight;
+			const playerTop = roadHeight - player.offsetHeight - 22;
 			const playerBottom = playerTop + player.offsetHeight - 10;
 			const playerCenterLaneX = lanePercents[laneIndex];
 
@@ -2079,7 +2216,7 @@ document.addEventListener('DOMContentLoaded', function () {
 						savedPowers.shield = false;
 						updatePowerClasses();
 						updatePowerPills();
-						if (item.el && item.el.parentNode) {
+						if (item.el.parentNode) {
 							item.el.parentNode.removeChild(item.el);
 						}
 						obstacles.splice(i, 1);
@@ -2088,7 +2225,7 @@ document.addEventListener('DOMContentLoaded', function () {
 						continue;
 					}
 
-					if (item.el && item.el.parentNode) {
+					if (item.el.parentNode) {
 						item.el.parentNode.removeChild(item.el);
 					}
 					obstacles.splice(i, 1);
@@ -2102,15 +2239,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
 				if (!item.passed && itemTop > playerBottom) {
 					item.passed = true;
-					score += savedPowers.turbo ? 2 : 1;
+					score += 1;
 					if (score > bestScore) {
 						bestScore = score;
 					}
 					updateHud();
 				}
 
-				if (itemTop > trackHeight + 120) {
-					if (item.el && item.el.parentNode) {
+				if (itemTop > roadHeight + 140) {
+					if (item.el.parentNode) {
 						item.el.parentNode.removeChild(item.el);
 					}
 					obstacles.splice(i, 1);
@@ -2124,7 +2261,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				if (savedPowers.magnet) {
 					const targetLeft = playerCenterLaneX;
 					const currentLeft = parseFloat(item.el.style.left);
-					const nextLeft = currentLeft + (targetLeft - currentLeft) * Math.min(1, delta * 4.2);
+					const nextLeft = currentLeft + (targetLeft - currentLeft) * Math.min(1, delta * 4.0);
 					item.el.style.left = nextLeft + '%';
 					item.lane = Math.abs(nextLeft - playerCenterLaneX) < 8 ? laneIndex : item.lane;
 				}
@@ -2138,8 +2275,8 @@ document.addEventListener('DOMContentLoaded', function () {
 					continue;
 				}
 
-				if (itemTop > trackHeight + 80) {
-					if (item.el && item.el.parentNode) {
+				if (itemTop > roadHeight + 90) {
+					if (item.el.parentNode) {
 						item.el.parentNode.removeChild(item.el);
 					}
 					coins.splice(i, 1);
@@ -2153,23 +2290,25 @@ document.addEventListener('DOMContentLoaded', function () {
 
 				const itemTop = item.y;
 				const itemBottom = item.y + item.height;
+
 				if (intersectsLane(itemTop, itemBottom, item.lane)) {
 					collectPowerup(item, i);
 					continue;
 				}
 
-				if (itemTop > trackHeight + 80) {
-					if (item.el && item.el.parentNode) {
+				if (itemTop > roadHeight + 90) {
+					if (item.el.parentNode) {
 						item.el.parentNode.removeChild(item.el);
 					}
 					powerups.splice(i, 1);
 				}
 			}
 
-			if (Math.random() < 0.015) {
+			if (Math.random() < 0.012) {
 				playMusicStep();
 			}
 
+			updateHud();
 			animationFrame = requestAnimationFrame(loop);
 		}
 
@@ -2186,9 +2325,10 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 
 		pauseBtn.addEventListener('click', function () {
-			if (!running && !paused) {
-				return;
-			}
+			pauseGame();
+		});
+
+		pauseBottomBtn.addEventListener('click', function () {
 			pauseGame();
 		});
 
@@ -2245,8 +2385,14 @@ document.addEventListener('DOMContentLoaded', function () {
 			moveRight();
 		});
 
+		turboBtn.addEventListener('click', function () {
+			if (savedPowers.turbo) {
+				moveRight();
+			}
+		});
+
 		skinSelect.addEventListener('change', function () {
-			updateSkin();
+			updateCarShellColors();
 		});
 
 		themeSelect.addEventListener('change', function () {
@@ -2256,6 +2402,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		difficultySelect.addEventListener('change', function () {
 			if (!running) {
 				speed = getSettings().baseSpeed;
+				updateMoveDuration();
 				updateHud();
 			}
 		});
@@ -2288,18 +2435,21 @@ document.addEventListener('DOMContentLoaded', function () {
 				} else {
 					startCountdown();
 				}
+			} else if (event.key === 'p' || event.key === 'P') {
+				event.preventDefault();
+				pauseGame();
 			}
 		});
 
 		let touchStartX = 0;
-		track.addEventListener('touchstart', function (event) {
+		screen.addEventListener('touchstart', function (event) {
 			if (!event.changedTouches || !event.changedTouches.length) {
 				return;
 			}
 			touchStartX = event.changedTouches[0].clientX;
 		}, { passive: true });
 
-		track.addEventListener('touchend', function (event) {
+		screen.addEventListener('touchend', function (event) {
 			if (!event.changedTouches || !event.changedTouches.length) {
 				return;
 			}
@@ -2309,7 +2459,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (Math.abs(diff) < 20) {
 				return;
 			}
-
 			if (diff < 0) {
 				moveLeft();
 			} else {
@@ -2317,24 +2466,23 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		}, { passive: true });
 
-		track.addEventListener('click', function (event) {
-			if (event.target.closest('.zo-car-overlay')) {
-				return;
-			}
-			const rect = track.getBoundingClientRect();
-			const x = event.clientX - rect.left;
-			if (x < rect.width / 2) {
-				moveLeft();
-			} else {
-				moveRight();
-			}
-		});
+		function initDecor() {
+			buildScenery();
+		}
+
+		function initStaticCars() {
+			player.innerHTML = '<span class="zo-car-shell"></span><span class="zo-car-window"></span><span class="zo-car-lightbar"></span>';
+			ghost.innerHTML = '<span class="zo-car-shell"></span><span class="zo-car-window"></span><span class="zo-car-lightbar"></span>';
+		}
 
 		game.setAttribute('tabindex', '0');
-		updateSkin();
+		initStaticCars();
+		initDecor();
 		refreshThemeOptions();
 		applyTheme();
+		updateCarShellColors();
 		setPlayerLane();
+		updateMoveDuration();
 		updateHud();
 		updatePowerPills();
 		applyTranslations();
@@ -2351,10 +2499,113 @@ if (!function_exists('zo_game_car_lane_switch_render')) {
 		?>
 		<div class="zo-game-root zo-game-root--car-lane-switch" id="<?php echo esc_attr($instance_id); ?>">
 			<div class="zo-car-game" data-theme="city">
-				<h2 class="zo-car-title">Car Lane Switch</h2>
-				<p class="zo-car-instructions">Switch lanes to dodge traffic, collect coins, and grab power-ups. Use buttons, arrow keys, tap left or right, or swipe on mobile.</p>
+				<div class="zo-car-screen">
+					<div class="zo-car-scene">
+						<div class="zo-car-water" aria-hidden="true"></div>
 
-				<div class="zo-car-topbar">
+						<div class="zo-car-horizon-hills" aria-hidden="true"></div>
+						<div class="zo-car-skyline" aria-hidden="true"></div>
+						<div class="zo-car-palms" aria-hidden="true"></div>
+
+						<div class="zo-car-road-edge-left" aria-hidden="true"></div>
+						<div class="zo-car-road-edge-right" aria-hidden="true"></div>
+						<div class="zo-car-guard zo-car-guard--left" aria-hidden="true"></div>
+						<div class="zo-car-guard zo-car-guard--right" aria-hidden="true"></div>
+
+						<div class="zo-car-road-perspective" aria-hidden="true">
+							<div class="zo-car-road-lanes">
+								<div class="zo-car-lane-line zo-car-lane-line--1"></div>
+								<div class="zo-car-lane-line zo-car-lane-line--2"></div>
+							</div>
+						</div>
+
+						<div class="zo-car-sign-bridge" aria-hidden="true">
+							<div class="zo-car-sign zo-car-sign--left">
+								<span class="zo-car-sign-text zo-car-sign-text--left">DOWNTOWN</span>
+								<span class="zo-car-sign-arrow">↓</span>
+							</div>
+							<div class="zo-car-sign zo-car-sign--right">
+								<span class="zo-car-sign-text zo-car-sign-text--right">BEACH ROAD</span>
+								<span class="zo-car-sign-arrow">↓</span>
+							</div>
+						</div>
+
+						<div class="zo-car-road">
+							<div class="zo-car-ghost" aria-hidden="true"></div>
+							<div class="zo-car-player" aria-hidden="true"></div>
+						</div>
+					</div>
+
+					<div class="zo-car-panel-stack zo-car-panel-stack--left">
+						<div class="zo-car-hud-panel">
+							<span class="zo-car-hud-label zo-car-hud-label--score">Score</span>
+							<span class="zo-car-hud-value zo-car-score">0</span>
+						</div>
+
+						<div class="zo-car-hud-panel">
+							<span class="zo-car-hud-label zo-car-hud-label--distance">Distance</span>
+							<span class="zo-car-hud-value zo-car-distance">0.00 km</span>
+						</div>
+
+						<div class="zo-car-hud-panel">
+							<span class="zo-car-hud-label zo-car-hud-label--streak">Near Miss</span>
+							<span class="zo-car-hud-value zo-car-streak">0 s</span>
+						</div>
+					</div>
+
+					<div class="zo-car-panel-stack zo-car-panel-stack--right">
+						<div class="zo-car-hud-panel zo-car-hud-panel--right">
+							<span class="zo-car-hud-label zo-car-hud-label--speed">Speed</span>
+							<span class="zo-car-hud-value"><span class="zo-car-speed">0</span><span class="zo-car-hud-sub">KM/H</span></span>
+						</div>
+
+						<div class="zo-car-hud-panel zo-car-hud-panel--right">
+							<span class="zo-car-hud-label zo-car-hud-label--coins">Coins</span>
+							<span class="zo-car-hud-value zo-car-coins">0</span>
+						</div>
+
+						<div class="zo-car-hud-panel zo-car-hud-panel--right">
+							<span class="zo-car-hud-label zo-car-hud-label--lives">Lives</span>
+							<span class="zo-car-hud-value zo-car-hearts">10</span>
+						</div>
+					</div>
+
+					<button type="button" class="zo-car-pause-top" aria-label="Pause game">❚❚</button>
+
+					<div class="zo-car-bottom-controls">
+						<div class="zo-car-controls-group">
+							<button type="button" class="zo-car-circle-btn zo-car-left" aria-label="Move left">◀</button>
+							<button type="button" class="zo-car-circle-btn zo-car-right" aria-label="Move right">▶</button>
+						</div>
+
+						<div class="zo-car-controls-group-right">
+							<button type="button" class="zo-car-circle-btn zo-car-circle-btn--ability zo-car-turbo" aria-label="Turbo move">⚡</button>
+							<button type="button" class="zo-car-circle-btn zo-car-circle-btn--small zo-car-pause-bottom" aria-label="Pause game">❚❚</button>
+						</div>
+					</div>
+
+					<div class="zo-car-overlay">
+						<div class="zo-car-panel">
+							<h3 class="zo-car-panel-title">Car Lane Switch</h3>
+							<p class="zo-car-panel-text">Use a slower style like the preview image. Turbo only makes side movement faster.</p>
+							<div class="zo-car-panel-countdown"></div>
+							<div class="zo-car-buttons">
+								<button type="button" class="zo-car-btn zo-car-btn--accent zo-car-start">Start</button>
+							</div>
+
+							<div class="zo-car-parent-box" hidden>
+								<div class="zo-car-parent-stats">Best score: 0 | Unlocked maps: 2 | Total coins: 0</div>
+								<div class="zo-car-buttons">
+									<button type="button" class="zo-car-btn zo-car-reset-scores">Reset Scores</button>
+									<button type="button" class="zo-car-btn zo-car-btn--gold zo-car-reset-unlocks">Reset Unlocks</button>
+									<button type="button" class="zo-car-btn zo-car-close-parent">Close</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="zo-car-middle-toolbar">
 					<select class="zo-car-select zo-car-skin" aria-label="Choose car skin">
 						<option value="red">Red Car</option>
 						<option value="blue">Blue Car</option>
@@ -2383,104 +2634,18 @@ if (!function_exists('zo_game_car_lane_switch_render')) {
 						<option value="es">Español</option>
 					</select>
 
-					<button type="button" class="zo-car-btn zo-car-sound" aria-pressed="false">Sound Off</button>
+					<button type="button" class="zo-car-toolbar-btn zo-car-sound" aria-pressed="false">Sound Off</button>
+					<button type="button" class="zo-car-toolbar-btn zo-car-restart">Restart</button>
+					<button type="button" class="zo-car-toolbar-btn zo-car-parent">Parent Menu</button>
 				</div>
 
-				<div class="zo-car-hud">
-					<div class="zo-car-chip">
-						<span class="zo-car-chip-label zo-car-chip-label--score">Score</span>
-						<span class="zo-car-chip-value zo-car-score">0</span>
+				<div class="zo-car-status-row">
+					<div class="zo-car-status" aria-live="polite">Choose your setup, then press Start.</div>
+					<div class="zo-car-active-powers" aria-live="polite">
+						<span class="zo-car-power-pill is-empty">No saved power-ups</span>
 					</div>
-					<div class="zo-car-chip">
-						<span class="zo-car-chip-label zo-car-chip-label--coins">Coins</span>
-						<span class="zo-car-chip-value zo-car-coins">0</span>
-					</div>
-					<div class="zo-car-chip">
-						<span class="zo-car-chip-label zo-car-chip-label--hearts">Lives</span>
-						<span class="zo-car-chip-value zo-car-hearts">❤❤❤</span>
-					</div>
-					<div class="zo-car-chip">
-						<span class="zo-car-chip-label zo-car-chip-label--best">Best</span>
-						<span class="zo-car-chip-value zo-car-best">0</span>
-					</div>
-					<div class="zo-car-chip">
-						<span class="zo-car-chip-label zo-car-chip-label--speed">Speed</span>
-						<span class="zo-car-chip-value zo-car-speed">10</span>
-					</div>
-					<div class="zo-car-chip">
-						<span class="zo-car-chip-label zo-car-chip-label--medal">Medal</span>
-						<span class="zo-car-chip-value zo-car-medal">None</span>
-					</div>
-				</div>
-
-				<div class="zo-car-hud">
-					<div class="zo-car-chip">
-						<span class="zo-car-chip-label zo-car-chip-label--map">Map</span>
-						<span class="zo-car-chip-value zo-car-map-name">City</span>
-					</div>
-				</div>
-
-				<div class="zo-car-track-wrap">
-					<div class="zo-car-track">
-						<div class="zo-car-bg">
-							<div class="zo-car-sky-detail"></div>
-						</div>
-
-						<div class="zo-car-side zo-car-side--left">
-							<div class="zo-car-side-surface"></div>
-							<div class="zo-car-side-items"></div>
-						</div>
-
-						<div class="zo-car-road">
-							<div class="zo-car-ghost" aria-hidden="true">🚗</div>
-							<div class="zo-car-player" aria-hidden="true">🚗</div>
-						</div>
-
-						<div class="zo-car-side zo-car-side--right">
-							<div class="zo-car-side-surface"></div>
-							<div class="zo-car-side-items"></div>
-						</div>
-
-						<div class="zo-car-overlay">
-							<div class="zo-car-panel">
-								<h3 class="zo-car-panel-title">Car Lane Switch</h3>
-								<p class="zo-car-panel-text">Pick your car, difficulty, road theme, and language. Collect coins to unlock new maps.</p>
-								<div class="zo-car-panel-countdown"></div>
-								<div class="zo-car-buttons">
-									<button type="button" class="zo-car-btn zo-car-btn--accent zo-car-start">Start</button>
-								</div>
-
-								<div class="zo-car-parent-box" hidden>
-									<div class="zo-car-parent-stats">Best score: 0 | Unlocked maps: 2 | Total coins: 0</div>
-									<div class="zo-car-buttons">
-										<button type="button" class="zo-car-btn zo-car-reset-scores">Reset Scores</button>
-										<button type="button" class="zo-car-btn zo-car-btn--gold zo-car-reset-unlocks">Reset Unlocks</button>
-										<button type="button" class="zo-car-btn zo-car-close-parent">Close</button>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-
 					<div class="zo-car-event-banner" aria-live="polite"></div>
 				</div>
-
-				<div class="zo-car-controls">
-					<button type="button" class="zo-car-control zo-car-left">⬅ Left</button>
-					<button type="button" class="zo-car-control zo-car-right">Right ➡</button>
-				</div>
-
-				<div class="zo-car-buttons">
-					<button type="button" class="zo-car-btn zo-car-pause" aria-pressed="false">Pause</button>
-					<button type="button" class="zo-car-btn zo-car-restart">Restart</button>
-					<button type="button" class="zo-car-btn zo-car-parent">Parent Menu</button>
-				</div>
-
-				<div class="zo-car-active-powers" aria-live="polite">
-					<span class="zo-car-power-pill is-empty">No saved power-ups</span>
-				</div>
-
-				<div class="zo-car-status" aria-live="polite">Choose your setup, then press Start.</div>
 			</div>
 		</div>
 		<?php
@@ -2492,7 +2657,7 @@ return array(
 	'slug'            => 'car-lane-switch',
 	'name'            => 'Car Lane Switch',
 	'author'          => 'Asker',
-	'description'     => 'A slower lane-switching driving game with persistent coins, unlockable maps, ghost replay, medals, events, and saved power-ups.',
+	'description'     => 'A slower lane-switching driving game with 10 lives, arrow keys, pause controls, side-move turbo, and a UI inspired by a highway racing game.',
 	'render_callback' => 'zo_game_car_lane_switch_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,
