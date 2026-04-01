@@ -25,6 +25,7 @@ function zo_ll_save_sets(){
 	}
 
 	$sets=json_decode(stripslashes($_POST['sets']),true);
+
 	update_option('zo_ll_sets',$sets);
 
 	wp_send_json_success($sets);
@@ -59,10 +60,28 @@ $css = '
 .zo-ll-root{max-width:900px;margin:0 auto;padding:20px;background:#0f172a;color:#fff;border-radius:18px;font-family:inherit}
 .zo-ll-input{width:100%;padding:6px;margin-bottom:6px;border-radius:8px;border:none}
 .zo-ll-btn{padding:6px 12px;border-radius:999px;border:none;background:#38bdf8;color:#000;font-weight:bold;margin:4px 4px 4px 0;cursor:pointer}
-.zo-ll-card{height:220px;background:#1e293b;border-radius:14px;display:flex;flex-direction:column;justify-content:center;align-items:center;margin-bottom:10px;cursor:pointer}
-.zo-ll-img{max-height:100px;margin-bottom:8px;border-radius:8px}
-.zo-ll-set-select{width:100%;padding:6px;border-radius:8px;margin-bottom:10px}
-.zo-ll-edit-box{background:#1e293b;padding:10px;border-radius:10px;margin-top:20px}
+.zo-ll-select{width:100%;padding:6px;margin-bottom:10px;border-radius:8px}
+
+.zo-ll-card-wrap{perspective:1000px;margin:20px 0}
+.zo-ll-card{width:100%;height:260px;position:relative;transform-style:preserve-3d;transition:transform .6s}
+.zo-ll-card.flipped{transform:rotateY(180deg)}
+
+.zo-ll-face{
+position:absolute;
+width:100%;
+height:100%;
+backface-visibility:hidden;
+border-radius:16px;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+background:#1e293b;
+padding:10px;
+}
+
+.zo-ll-back{transform:rotateY(180deg);background:#334155}
+.zo-ll-img{max-height:120px;margin-bottom:10px;border-radius:10px}
 ';
 
 /* ================= JS ================= */
@@ -78,28 +97,32 @@ let sets=[];
 let currentSetIndex=null;
 let currentIndex=0;
 let newItems=[];
+let imageURL="";
+let audioURL="";
 
-/* LOAD SETS */
+/* ================= LOAD SETS ================= */
+
 function fetchSets(){
 fetch(ajaxUrl+"?action=zo_ll_get_sets")
 .then(r=>r.json())
 .then(d=>{
 if(d.success){
 sets=d.data||[];
-renderSetSelect();
+renderSelect();
 }
 });
 }
 
-function renderSetSelect(){
+function renderSelect(){
 const select=document.querySelector(".zo-ll-set-select");
 select.innerHTML='<option value="">Select Set</option>';
 sets.forEach((s,i)=>{
-select.innerHTML+=`<option value="\${i}">\${s.language} - \${s.category} - \${s.title}</option>`;
+select.innerHTML+=`<option value="\${i}">\${s.language} - \${s.category}</option>`;
 });
 }
 
-/* SELECT SET */
+/* ================= SELECT SET ================= */
+
 document.querySelector(".zo-ll-set-select").onchange=function(){
 if(this.value==="") return;
 currentSetIndex=parseInt(this.value);
@@ -107,16 +130,18 @@ currentIndex=0;
 showCard();
 };
 
-/* SHOW CARD */
+/* ================= SHOW CARD ================= */
+
 function showCard(){
+
 if(currentSetIndex===null) return;
 const items=sets[currentSetIndex].items;
 if(!items || !items.length) return;
 
 const item=items[currentIndex];
 
-document.querySelector(".zo-ll-word-show").textContent=item.word;
-document.querySelector(".zo-ll-translation-show").textContent=item.translation;
+document.querySelector(".zo-ll-front-word").textContent=item.word;
+document.querySelector(".zo-ll-back-translation").textContent=item.translation;
 
 const img=document.querySelector(".zo-ll-img");
 if(item.image){
@@ -133,9 +158,12 @@ audioBtn.onclick=function(){ new Audio(item.audio).play(); };
 }else{
 audioBtn.style.display="none";
 }
+
+document.querySelector(".zo-ll-card").classList.remove("flipped");
 }
 
-/* NAVIGATION */
+/* ================= NAVIGATION ================= */
+
 document.querySelector(".zo-ll-prev").onclick=function(){
 if(currentSetIndex===null) return;
 if(currentIndex>0){currentIndex--;showCard();}
@@ -147,7 +175,14 @@ const items=sets[currentSetIndex].items;
 if(currentIndex < items.length-1){currentIndex++;showCard();}
 };
 
-/* UPLOAD FILE */
+/* ================= FLIP ================= */
+
+document.querySelector(".zo-ll-card").onclick=function(){
+this.classList.toggle("flipped");
+};
+
+/* ================= UPLOAD ================= */
+
 function uploadFile(inputField,callback){
 
 const file=inputField.files[0];
@@ -171,9 +206,6 @@ callback(d.data);
 });
 }
 
-let imageURL="";
-let audioURL="";
-
 document.querySelector(".zo-ll-upload-image").onclick=function(){
 uploadFile(document.querySelector(".zo-ll-image-file"),function(url){
 imageURL=url;
@@ -188,7 +220,8 @@ alert("Audio uploaded");
 });
 };
 
-/* ADD WORD */
+/* ================= ADD WORD ================= */
+
 document.querySelector(".zo-ll-add-word").onclick=function(){
 
 const word=document.querySelector(".zo-ll-word").value.trim();
@@ -210,7 +243,8 @@ audioURL="";
 alert("Word added");
 };
 
-/* SAVE SET */
+/* ================= SAVE SET ================= */
+
 document.querySelector(".zo-ll-save-set").onclick=function(){
 
 const title=document.querySelector(".zo-ll-title").value.trim();
@@ -218,6 +252,14 @@ const language=document.querySelector(".zo-ll-language").value.trim();
 const category=document.querySelector(".zo-ll-category").value.trim();
 
 if(!title||!language||!category||!newItems.length) return;
+
+/* Prevent duplicate category in same language */
+for(let s of sets){
+if(s.language===language && s.category===category){
+alert("Category already exists for this language.");
+return;
+}
+}
 
 const pass=prompt("Admin password:");
 if(!pass) return;
@@ -262,21 +304,30 @@ ob_start(); ?>
 
 <div class="zo-game-root zo-ll-root" data-nonce="<?php echo esc_attr($nonce); ?>">
 
-<h2>Language Learning Platform</h2>
+<h2>Language Flashcards</h2>
 
-<select class="zo-ll-set-select"></select>
+<select class="zo-ll-select zo-ll-set-select"></select>
 
+<div class="zo-ll-card-wrap">
 <div class="zo-ll-card">
-<img class="zo-ll-img" style="display:none">
-<h3 class="zo-ll-word-show"></h3>
-<p class="zo-ll-translation-show"></p>
+
+<div class="zo-ll-face">
+<h2 class="zo-ll-front-word"></h2>
 <button class="zo-ll-btn zo-ll-audio-btn" style="display:none;">Play Audio</button>
+</div>
+
+<div class="zo-ll-face zo-ll-back">
+<img class="zo-ll-img" style="display:none">
+<h3 class="zo-ll-back-translation"></h3>
+</div>
+
+</div>
 </div>
 
 <button class="zo-ll-btn zo-ll-prev">Prev</button>
 <button class="zo-ll-btn zo-ll-next">Next</button>
 
-<div class="zo-ll-edit-box">
+<hr>
 
 <h3>Create New Set</h3>
 
@@ -298,15 +349,13 @@ ob_start(); ?>
 
 </div>
 
-</div>
-
 <?php return ob_get_clean(); }
 
 return [
 'slug'=>'language-learning-platform',
 'name'=>'Language Learning Platform',
 'author'=>'Asker',
-'description'=>'Working language flashcard system.',
+'description'=>'Stable flashcard system with duplicate protection.',
 'render_callback'=>'zo_game_language_learner_render',
 'inline_style'=>$css,
 'inline_script'=>$js
