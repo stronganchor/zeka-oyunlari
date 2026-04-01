@@ -471,9 +471,9 @@ document.addEventListener('DOMContentLoaded', function () {
 		};
 
 		const difficultySettings = {
-			kolay: { enemySpeed: 90, enemyDamage: 8, enemyFireDelay: 1.55, enemyAimRange: 240, levelScale: 0.09, label: 'Kolay', loseMoneyRate: 0.08 },
-			orta:  { enemySpeed: 120, enemyDamage: 11, enemyFireDelay: 1.10, enemyAimRange: 300, levelScale: 0.13, label: 'Orta', loseMoneyRate: 0.12 },
-			zor:   { enemySpeed: 150, enemyDamage: 15, enemyFireDelay: 0.80, enemyAimRange: 380, levelScale: 0.17, label: 'Zor', loseMoneyRate: 0.16 }
+			kolay: { enemySpeed: 90, enemyDamage: 8, enemyFireDelay: 1.55, enemyAimRange: 240, levelScale: 0.16, label: 'Kolay', loseMoneyRate: 0.08 },
+			orta:  { enemySpeed: 120, enemyDamage: 11, enemyFireDelay: 1.10, enemyAimRange: 300, levelScale: 0.22, label: 'Orta', loseMoneyRate: 0.12 },
+			zor:   { enemySpeed: 150, enemyDamage: 15, enemyFireDelay: 0.80, enemyAimRange: 380, levelScale: 0.28, label: 'Zor', loseMoneyRate: 0.16 }
 		};
 
 		const bushes = [
@@ -572,7 +572,11 @@ document.addEventListener('DOMContentLoaded', function () {
 				{ x: 460, y: 500 },
 				{ x: 460, y: 80 },
 				{ x: 120, y: 260 },
-				{ x: 800, y: 260 }
+				{ x: 800, y: 260 },
+				{ x: 250, y: 100 },
+				{ x: 670, y: 450 },
+				{ x: 250, y: 450 },
+				{ x: 670, y: 100 }
 			];
 			return points[index % points.length];
 		}
@@ -851,7 +855,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			const diff = difficultySettings[state.difficulty];
 			const current = selectedBrawler();
 			const enemyLevelMul = 1 + ((state.level - 1) * diff.levelScale);
-			const enemyCount = CONFIG.baseEnemyCount + Math.floor((state.level - 1) / 4);
+			const enemyCount = CONFIG.baseEnemyCount + Math.floor((state.level - 1) / 2);
 
 			state.player = makeFighter('player', current.name, 'player', spawnPoint(0).x, spawnPoint(0).y, current.hp, current.damage, current.speed);
 			state.enemies = [];
@@ -864,10 +868,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			for (let i = 0; i < enemyCount; i++) {
 				const p = spawnPoint(i + 1);
-				const baseCost = 10 + Math.floor((state.level * 3) + (i * 4));
-				const enemyHp = Math.round(85 + (baseCost * 1.4) * enemyLevelMul);
-				const enemyDamage = Math.round(8 + (baseCost * 0.22) * enemyLevelMul);
-				const enemySpeed = Math.round((110 + Math.min(160, baseCost * 0.14)) * enemyLevelMul);
+				const baseCost = 10 + Math.floor((state.level * 4) + (i * 6));
+				const enemyHp = Math.round((85 + (baseCost * 1.4)) * enemyLevelMul);
+				const enemyDamage = Math.round((8 + (baseCost * 0.22)) * enemyLevelMul);
+				const enemySpeed = Math.round((110 + Math.min(190, baseCost * 0.16)) * enemyLevelMul);
 				const enemyName = 'AI ' + (i + 1);
 				state.enemies.push(makeFighter('enemy-' + i, enemyName, 'enemy', p.x, p.y, enemyHp, enemyDamage, enemySpeed));
 			}
@@ -880,7 +884,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				});
 			}
 
-			state.log = 'Level ' + state.level + ' başladı. AI rakipler gücüne göre saldırır.';
+			state.log = 'Level ' + state.level + ' başladı. Bu levelde ' + enemyCount + ' AI var.';
 			hideOverlay();
 			renderAll();
 			state.rafId = window.requestAnimationFrame(loop);
@@ -898,11 +902,11 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.enemies = [];
 			state.shots = [];
 			state.packs = [];
-			state.log = 'Karakter seç ve oyunu başlat.';
+			state.log = 'Karakter seç ve başla.';
 			updateDifficultyButtons();
 			renderBushes();
 			renderAll();
-			showOverlay('Sonsuz Roster Brawl', '1000 kişi var. Parayla daha iyi kişi alabilirsin. Kazanırsan az para gelir. Kaybedersen para gider.', 'start');
+			showOverlay('Roster Brawl 1000', 'AI her level daha iyi olur. Daha çok AI gelir. Her kazanç sadece 5 para verir.', 'start');
 		}
 
 		function movePlayer(dt) {
@@ -977,7 +981,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				enemy.x = clamp(enemy.x, enemy.size / 2, CONFIG.width - enemy.size / 2);
 				enemy.y = clamp(enemy.y, enemy.size / 2, CONFIG.height - enemy.size / 2);
 
-				const enemyDelay = Math.max(0.22, diff.enemyFireDelay - (enemy.damage * 0.006));
+				const enemyDelay = Math.max(0.18, diff.enemyFireDelay - (enemy.damage * 0.006));
 
 				if (targetDistance <= diff.enemyAimRange && enemy.fireCooldown <= 0) {
 					fireShot(enemy, target.x, target.y, enemy.damage);
@@ -1012,8 +1016,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 							if (shot.ownerType === 'player' && fighter.type === 'enemy') {
 								state.elims += 1;
-								state.money += 2;
-								state.log = fighter.name + ' düştü. +2 para.';
+								state.log = fighter.name + ' düştü.';
 							} else if (fighter.type === 'player') {
 								state.log = 'Sen düştün.';
 							}
@@ -1067,7 +1070,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		function endRunWin() {
 			state.running = false;
 			state.levelCleared = true;
-			const reward = 6 + Math.floor(state.level * 2);
+			const reward = 5;
 			state.money += reward;
 			renderAll();
 			showOverlay('Level ' + state.level + ' Bitti', 'Kazandın. +' + reward + ' para aldın. İstersen sonraki leveli sen başlat.', 'next');
@@ -1217,7 +1220,7 @@ if (!function_exists('zo_game_mini_brawl_roster_render')) {
 		?>
 		<div class="zo-game-root zo-game-root--mini-brawl-roster" id="<?php echo esc_attr($instance_id); ?>" tabindex="0">
 			<div class="mbr-title">Roster Brawl 1000</div>
-			<div class="mbr-instructions">1000 kişi var. Parayla daha iyi kişi al. Fiyat yükseldikçe saldırı, can ve hız da yükselir. Kazanırsan daha az para gelir. Kaybedersen para kaybedersin.</div>
+			<div class="mbr-instructions">1000 kişi var. Parayla daha iyi kişi al. AI her level daha iyi olur ve daha çok gelir. Her level kazanınca sadece 5 para gelir.</div>
 
 			<div class="mbr-topbar">
 				<div class="mbr-stat">Hayatta: <span data-role="alive">5</span></div>
@@ -1284,7 +1287,7 @@ if (!function_exists('zo_game_mini_brawl_roster_render')) {
 				<button type="button" class="mbr-move mbr-move--right" data-move="right" aria-label="Sağ">→</button>
 			</div>
 
-			<div class="mbr-controls">Hareket: ok tuşları veya WASD. Başlat: Space veya Enter. Daha pahalı kişi daha güçlü vurur. Kaybedersen para düşer.</div>
+			<div class="mbr-controls">Hareket: ok tuşları veya WASD. Başlat: Space veya Enter. Her yeni levelde AI hem güçlenir hem sayısı artar. Kazanırsan 5 para gelir.</div>
 		</div>
 		<?php
 		return ob_get_clean();
@@ -1295,7 +1298,7 @@ return array(
 	'slug'            => 'mini-brawl-roster',
 	'name'            => 'Roster Brawl 1000',
 	'author'          => 'Arslan',
-	'description'     => 'An endless arena game with 1000 buyable characters whose attack scales with cost, lower win rewards, and money loss on defeat.',
+	'description'     => 'An endless arena game with 1000 buyable characters, stronger AI each level, more enemies per level, and 5 coins per win.',
 	'render_callback' => 'zo_game_mini_brawl_roster_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,
