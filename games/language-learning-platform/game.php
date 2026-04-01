@@ -75,9 +75,10 @@ const ajaxUrl=window.location.origin+"/wp-admin/admin-ajax.php";
 const nonce=game.dataset.nonce;
 
 let sets=[];
-let currentSet=0;
+let currentSetIndex=null;
 let currentIndex=0;
-let editingItems=[];
+
+/* ================= LOAD SETS ================= */
 
 function fetchSets(){
 fetch(ajaxUrl+"?action=zo_ll_get_sets")
@@ -92,21 +93,33 @@ renderSetSelect();
 
 function renderSetSelect(){
 const select=document.querySelector(".zo-ll-set-select");
-select.innerHTML="";
+select.innerHTML='<option value="">Select Set</option>';
 sets.forEach((s,i)=>{
 select.innerHTML+=`<option value="\${i}">\${s.language} - \${s.category} - \${s.title}</option>`;
 });
 }
 
+/* ================= SELECT SET ================= */
+
 document.querySelector(".zo-ll-set-select").onchange=function(){
-currentSet=this.value;
+if(this.value==="") return;
+currentSetIndex=parseInt(this.value);
 currentIndex=0;
 showCard();
 };
 
+/* ================= SHOW CARD ================= */
+
 function showCard(){
-if(!sets[currentSet])return;
-const item=sets[currentSet].items[currentIndex];
+
+if(currentSetIndex===null) return;
+if(!sets[currentSetIndex]) return;
+
+const items=sets[currentSetIndex].items;
+if(!items || !items.length) return;
+
+const item=items[currentIndex];
+
 document.querySelector(".zo-ll-word-show").textContent=item.word;
 document.querySelector(".zo-ll-translation-show").textContent=item.translation;
 
@@ -114,104 +127,52 @@ const img=document.querySelector(".zo-ll-img");
 if(item.image){
 img.src=item.image;
 img.style.display="block";
-}else img.style.display="none";
+}else{
+img.style.display="none";
 }
 
+/* AUDIO */
+const audioBtn=document.querySelector(".zo-ll-audio-btn");
+if(item.audio){
+audioBtn.style.display="inline-block";
+audioBtn.onclick=function(){ new Audio(item.audio).play(); };
+}else{
+audioBtn.style.display="none";
+}
+
+/* RESET FLIP */
+document.querySelector(".zo-ll-card").classList.remove("flipped");
+}
+
+/* ================= NAVIGATION ================= */
+
 document.querySelector(".zo-ll-prev").onclick=function(){
-if(currentIndex>0){currentIndex--;showCard();}
+if(currentSetIndex===null) return;
+if(currentIndex>0){
+currentIndex--;
+showCard();
+}
 };
 
 document.querySelector(".zo-ll-next").onclick=function(){
-if(currentIndex<sets[currentSet].items.length-1){currentIndex++;showCard();}
-};
-
-/* ===== Upload Logic ===== */
-
-function uploadFile(inputField, type){
-
-const file=inputField.files[0];
-if(!file)return;
-
-const pass=prompt("Admin password:");
-if(!pass)return;
-
-const formData=new FormData();
-formData.append("action","zo_ll_upload");
-formData.append("file",file);
-formData.append("password",pass);
-formData.append("nonce",nonce);
-
-fetch(ajaxUrl,{method:"POST",body:formData})
-.then(r=>r.json())
-.then(d=>{
-if(d.success){
-alert(type+" uploaded");
-inputField.dataset.url=d.data;
-}else{
-alert(d.data);
+if(currentSetIndex===null) return;
+const items=sets[currentSetIndex].items;
+if(currentIndex < items.length-1){
+currentIndex++;
+showCard();
 }
-});
-}
-
-document.querySelector(".zo-ll-upload-image").onclick=function(){
-uploadFile(document.querySelector(".zo-ll-image-file"),"Image");
 };
 
-document.querySelector(".zo-ll-upload-audio").onclick=function(){
-uploadFile(document.querySelector(".zo-ll-audio-file"),"Audio");
+/* ================= FLIP ================= */
+
+document.querySelector(".zo-ll-card").onclick=function(){
+this.classList.toggle("flipped");
 };
 
-/* ===== Add Word ===== */
-
-document.querySelector(".zo-ll-add-word").onclick=function(){
-
-const word=document.querySelector(".zo-ll-word").value.trim();
-const trans=document.querySelector(".zo-ll-translation").value.trim();
-const image=document.querySelector(".zo-ll-image-file").dataset.url||"";
-const audio=document.querySelector(".zo-ll-audio-file").dataset.url||"";
-
-if(!word||!trans)return;
-
-editingItems.push({word:word,translation:trans,image:image,audio:audio});
-
-document.querySelector(".zo-ll-word").value="";
-document.querySelector(".zo-ll-translation").value="";
-};
-
-/* ===== Save All Sets ===== */
-
-document.querySelector(".zo-ll-save-all").onclick=function(){
-
-const pass=prompt("Admin password:");
-if(!pass)return;
-
-sets.push({
-title:document.querySelector(".zo-ll-title").value,
-language:document.querySelector(".zo-ll-language").value,
-category:document.querySelector(".zo-ll-category").value,
-items:editingItems
-});
-
-fetch(ajaxUrl,{
-method:"POST",
-body:new URLSearchParams({
-action:"zo_ll_save_sets",
-password:pass,
-sets:JSON.stringify(sets),
-nonce:nonce
-})
-})
-.then(r=>r.json())
-.then(d=>{
-if(d.success){
-alert("Saved");
-editingItems=[];
-fetchSets();
-}else alert(d.data);
-});
-};
+/* ================= INIT ================= */
 
 fetchSets();
+
 });
 JS;
 
