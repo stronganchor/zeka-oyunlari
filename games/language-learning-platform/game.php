@@ -5,7 +5,7 @@ if (!defined('ABSPATH')) {
 }
 
 /* =========================
-   AJAX
+   AJAX HANDLERS
 ========================= */
 
 add_action('wp_ajax_zo_ll_save_set', 'zo_ll_save_set');
@@ -58,7 +58,7 @@ function zo_ll_get_sets() {
 ========================= */
 
 $css = '
-.zo-ll-root{max-width:900px;margin:0 auto;padding:20px;background:linear-gradient(180deg,#0f172a,#1e293b);border-radius:20px;color:#fff;}
+.zo-ll-root{max-width:900px;margin:0 auto;padding:20px;background:linear-gradient(180deg,#0f172a,#1e293b);border-radius:20px;color:#fff;font-family:inherit;}
 .zo-ll-input{width:100%;padding:8px;margin-bottom:6px;border:none;border-radius:8px;}
 .zo-ll-btn{background:#38bdf8;color:#0f172a;border:none;border-radius:999px;padding:8px 14px;font-weight:700;cursor:pointer;margin:4px 4px 6px 0;}
 .zo-ll-card-wrap{perspective:1000px;max-width:400px;margin:20px auto;}
@@ -67,6 +67,8 @@ $css = '
 .zo-ll-face{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:16px;background:#1e293b;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:10px;}
 .zo-ll-back{transform:rotateY(180deg);background:#334155;}
 .zo-ll-img{max-width:100%;max-height:120px;margin-bottom:10px;border-radius:10px;}
+.zo-ll-select{width:100%;padding:8px;margin-bottom:6px;border-radius:8px;border:none;}
+.zo-ll-status{min-height:24px;color:#facc15;font-weight:600;}
 ';
 
 /* =========================
@@ -76,19 +78,17 @@ $css = '
 $js = <<<JS
 document.addEventListener("DOMContentLoaded",function(){
 
-if(typeof wp !== "undefined" && wp.media){
-	wp.media;
-}
-
 const games=document.querySelectorAll(".zo-ll-root");
 
 games.forEach(function(game){
 
 const ajaxUrl=window.location.origin+"/wp-admin/admin-ajax.php";
 const nonce=game.dataset.nonce;
+const loggedIn=game.dataset.loggedin==="1";
 
-let items=[];
+let tempItems=[];
 let allSets=[];
+let currentItems=[];
 let currentIndex=0;
 
 const card=game.querySelector(".zo-ll-card");
@@ -96,10 +96,12 @@ const frontWord=game.querySelector(".zo-ll-front-word");
 const backWord=game.querySelector(".zo-ll-back-word");
 const imgEl=game.querySelector(".zo-ll-img");
 const audioBtn=game.querySelector(".zo-ll-audio");
+const statusEl=game.querySelector(".zo-ll-status");
+const setFilter=game.querySelector(".zo-ll-filter-set");
 
 function showCard(){
-if(!items.length)return;
-const item=items[currentIndex];
+if(!currentItems.length)return;
+const item=currentItems[currentIndex];
 frontWord.textContent=item.word;
 backWord.textContent=item.translation;
 
@@ -120,17 +122,43 @@ audioBtn.style.display="none";
 card.classList.remove("flipped");
 }
 
+card.onclick=function(){card.classList.toggle("flipped");};
+
 game.querySelector(".zo-ll-next").onclick=function(){
-if(currentIndex<items.length-1){currentIndex++;showCard();}
+if(currentIndex<currentItems.length-1){currentIndex++;showCard();}
 };
 
 game.querySelector(".zo-ll-prev").onclick=function(){
 if(currentIndex>0){currentIndex--;showCard();}
 };
 
-card.onclick=function(){card.classList.toggle("flipped");};
+function loadSets(){
+fetch(ajaxUrl+"?action=zo_ll_get_sets")
+.then(r=>r.json())
+.then(d=>{
+if(d.success){
+allSets=d.data||[];
+renderSetFilter();
+}
+});
+}
 
-/* MEDIA UPLOAD */
+function renderSetFilter(){
+setFilter.innerHTML='<option value="">Select Set</option>';
+allSets.forEach((s,i)=>{
+setFilter.innerHTML+=`<option value="\${i}">\${s.language} - \${s.category} - \${s.title}</option>`;
+});
+}
+
+setFilter.onchange=function(){
+if(this.value!==""){
+currentItems=allSets[this.value].items;
+currentIndex=0;
+showCard();
+}
+};
+
+/* ===== MEDIA UPLOAD ===== */
 
 function openMedia(field){
 
@@ -148,6 +176,8 @@ field.value=attachment.url;
 frame.open();
 }
 
+if(loggedIn && typeof wp!=="undefined" && wp.media){
+
 game.querySelector(".zo-ll-upload-audio").onclick=function(){
 openMedia(game.querySelector(".zo-ll-audio-url"));
 };
@@ -155,6 +185,16 @@ openMedia(game.querySelector(".zo-ll-audio-url"));
 game.querySelector(".zo-ll-upload-image").onclick=function(){
 openMedia(game.querySelector(".zo-ll-image-url"));
 };
+
+}else{
+
+game.querySelectorAll(".zo-ll-upload-audio,.zo-ll-upload-image").forEach(btn=>{
+btn.onclick=function(){alert("Login required for upload.");};
+});
+
+}
+
+/* ===== ADD ITEM ===== */
 
 game.querySelector(".zo-ll-add-item").onclick=function(){
 
@@ -165,7 +205,7 @@ const image=game.querySelector(".zo-ll-image-url").value.trim();
 
 if(!word||!trans)return;
 
-items.push({word:word,translation:trans,audio:audio,image:image});
+tempItems.push({word:word,translation:trans,audio:audio,image:image});
 
 game.querySelector(".zo-ll-word").value="";
 game.querySelector(".zo-ll-translation").value="";
@@ -173,13 +213,15 @@ game.querySelector(".zo-ll-audio-url").value="";
 game.querySelector(".zo-ll-image-url").value="";
 };
 
+/* ===== SAVE SET ===== */
+
 game.querySelector(".zo-ll-save").onclick=function(){
 
 const title=game.querySelector(".zo-ll-title").value.trim();
 const language=game.querySelector(".zo-ll-language").value.trim();
 const category=game.querySelector(".zo-ll-category").value.trim();
 
-if(!title||!language||!category||!items.length)return;
+if(!title||!language||!category||!tempItems.length)return;
 
 const pass=prompt("Admin password:");
 if(!pass)return;
@@ -192,16 +234,24 @@ action:"zo_ll_save_set",
 title:title,
 language:language,
 category:category,
-items:JSON.stringify(items),
+items:JSON.stringify(tempItems),
 password:pass,
 nonce:nonce
 })
 })
 .then(r=>r.json())
 .then(d=>{
-if(d.success){alert("Saved");}
+if(d.success){
+statusEl.textContent="Saved.";
+tempItems=[];
+loadSets();
+}else{
+statusEl.textContent=d.data;
+}
 });
 };
+
+loadSets();
 
 });
 });
@@ -213,16 +263,23 @@ JS;
 
 function zo_game_language_learner_render($post_id=0,$module=array()){
 
-wp_enqueue_media();
+if(is_user_logged_in()){
+	wp_enqueue_media();
+}
 
 $instance='zo-ll-'.wp_rand(1000,999999);
 $nonce=wp_create_nonce('zo_ll_nonce');
 
 ob_start();
 ?>
-<div class="zo-game-root zo-ll-root" id="<?php echo esc_attr($instance); ?>" data-nonce="<?php echo esc_attr($nonce); ?>">
+<div class="zo-game-root zo-ll-root"
+     id="<?php echo esc_attr($instance); ?>"
+     data-nonce="<?php echo esc_attr($nonce); ?>"
+     data-loggedin="<?php echo is_user_logged_in()?'1':'0'; ?>">
 
 <h2>Language Learning Platform</h2>
+
+<select class="zo-ll-select zo-ll-filter-set"></select>
 
 <div class="zo-ll-card-wrap">
 <div class="zo-ll-card">
@@ -260,6 +317,8 @@ ob_start();
 <button class="zo-ll-btn zo-ll-add-item">Add Item</button>
 <button class="zo-ll-btn zo-ll-save">Save Set</button>
 
+<div class="zo-ll-status"></div>
+
 </div>
 <?php
 return ob_get_clean();
@@ -269,7 +328,7 @@ return array(
 'slug'=>'language-learning-platform',
 'name'=>'Language Learning Platform',
 'author'=>'Asker',
-'description'=>'Flashcards with media upload.',
+'description'=>'Flashcards with upload support.',
 'render_callback'=>'zo_game_language_learner_render',
 'inline_style'=>$css,
 'inline_script'=>$js,
