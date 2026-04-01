@@ -61,8 +61,8 @@ $css = '
 .zo-ll-btn{padding:6px 12px;border-radius:999px;border:none;background:#38bdf8;color:#000;font-weight:bold;margin:4px 4px 4px 0;cursor:pointer}
 .zo-ll-card{height:220px;background:#1e293b;border-radius:14px;display:flex;flex-direction:column;justify-content:center;align-items:center;margin-bottom:10px;cursor:pointer}
 .zo-ll-img{max-height:100px;margin-bottom:8px;border-radius:8px}
-.zo-ll-edit-box{background:#1e293b;padding:10px;border-radius:10px;margin-bottom:12px}
 .zo-ll-set-select{width:100%;padding:6px;border-radius:8px;margin-bottom:10px}
+.zo-ll-edit-box{background:#1e293b;padding:10px;border-radius:10px;margin-top:20px}
 ';
 
 /* ================= JS ================= */
@@ -77,9 +77,9 @@ const nonce=game.dataset.nonce;
 let sets=[];
 let currentSetIndex=null;
 let currentIndex=0;
+let newItems=[];
 
-/* ================= LOAD SETS ================= */
-
+/* LOAD SETS */
 function fetchSets(){
 fetch(ajaxUrl+"?action=zo_ll_get_sets")
 .then(r=>r.json())
@@ -99,8 +99,7 @@ select.innerHTML+=`<option value="\${i}">\${s.language} - \${s.category} - \${s.
 });
 }
 
-/* ================= SELECT SET ================= */
-
+/* SELECT SET */
 document.querySelector(".zo-ll-set-select").onchange=function(){
 if(this.value==="") return;
 currentSetIndex=parseInt(this.value);
@@ -108,13 +107,9 @@ currentIndex=0;
 showCard();
 };
 
-/* ================= SHOW CARD ================= */
-
+/* SHOW CARD */
 function showCard(){
-
 if(currentSetIndex===null) return;
-if(!sets[currentSetIndex]) return;
-
 const items=sets[currentSetIndex].items;
 if(!items || !items.length) return;
 
@@ -131,7 +126,6 @@ img.style.display="block";
 img.style.display="none";
 }
 
-/* AUDIO */
 const audioBtn=document.querySelector(".zo-ll-audio-btn");
 if(item.audio){
 audioBtn.style.display="inline-block";
@@ -139,40 +133,122 @@ audioBtn.onclick=function(){ new Audio(item.audio).play(); };
 }else{
 audioBtn.style.display="none";
 }
-
-/* RESET FLIP */
-document.querySelector(".zo-ll-card").classList.remove("flipped");
 }
 
-/* ================= NAVIGATION ================= */
-
+/* NAVIGATION */
 document.querySelector(".zo-ll-prev").onclick=function(){
 if(currentSetIndex===null) return;
-if(currentIndex>0){
-currentIndex--;
-showCard();
-}
+if(currentIndex>0){currentIndex--;showCard();}
 };
 
 document.querySelector(".zo-ll-next").onclick=function(){
 if(currentSetIndex===null) return;
 const items=sets[currentSetIndex].items;
-if(currentIndex < items.length-1){
-currentIndex++;
-showCard();
+if(currentIndex < items.length-1){currentIndex++;showCard();}
+};
+
+/* UPLOAD FILE */
+function uploadFile(inputField,callback){
+
+const file=inputField.files[0];
+if(!file) return;
+
+const pass=prompt("Admin password:");
+if(!pass) return;
+
+const formData=new FormData();
+formData.append("action","zo_ll_upload");
+formData.append("file",file);
+formData.append("password",pass);
+formData.append("nonce",nonce);
+
+fetch(ajaxUrl,{method:"POST",body:formData})
+.then(r=>r.json())
+.then(d=>{
+if(d.success){
+callback(d.data);
+}else alert(d.data);
+});
 }
+
+let imageURL="";
+let audioURL="";
+
+document.querySelector(".zo-ll-upload-image").onclick=function(){
+uploadFile(document.querySelector(".zo-ll-image-file"),function(url){
+imageURL=url;
+alert("Image uploaded");
+});
 };
 
-/* ================= FLIP ================= */
-
-document.querySelector(".zo-ll-card").onclick=function(){
-this.classList.toggle("flipped");
+document.querySelector(".zo-ll-upload-audio").onclick=function(){
+uploadFile(document.querySelector(".zo-ll-audio-file"),function(url){
+audioURL=url;
+alert("Audio uploaded");
+});
 };
 
-/* ================= INIT ================= */
+/* ADD WORD */
+document.querySelector(".zo-ll-add-word").onclick=function(){
+
+const word=document.querySelector(".zo-ll-word").value.trim();
+const trans=document.querySelector(".zo-ll-translation").value.trim();
+
+if(!word||!trans) return;
+
+newItems.push({
+word:word,
+translation:trans,
+image:imageURL,
+audio:audioURL
+});
+
+document.querySelector(".zo-ll-word").value="";
+document.querySelector(".zo-ll-translation").value="";
+imageURL="";
+audioURL="";
+alert("Word added");
+};
+
+/* SAVE SET */
+document.querySelector(".zo-ll-save-set").onclick=function(){
+
+const title=document.querySelector(".zo-ll-title").value.trim();
+const language=document.querySelector(".zo-ll-language").value.trim();
+const category=document.querySelector(".zo-ll-category").value.trim();
+
+if(!title||!language||!category||!newItems.length) return;
+
+const pass=prompt("Admin password:");
+if(!pass) return;
+
+sets.push({
+title:title,
+language:language,
+category:category,
+items:newItems
+});
+
+fetch(ajaxUrl,{
+method:"POST",
+body:new URLSearchParams({
+action:"zo_ll_save_sets",
+password:pass,
+sets:JSON.stringify(sets),
+nonce:nonce
+})
+})
+.then(r=>r.json())
+.then(d=>{
+if(d.success){
+alert("Saved");
+newItems=[];
+fetchSets();
+}else alert(d.data);
+});
+};
 
 fetchSets();
-
 });
 JS;
 
@@ -194,15 +270,15 @@ ob_start(); ?>
 <img class="zo-ll-img" style="display:none">
 <h3 class="zo-ll-word-show"></h3>
 <p class="zo-ll-translation-show"></p>
+<button class="zo-ll-btn zo-ll-audio-btn" style="display:none;">Play Audio</button>
 </div>
 
 <button class="zo-ll-btn zo-ll-prev">Prev</button>
 <button class="zo-ll-btn zo-ll-next">Next</button>
 
-<hr>
-
 <div class="zo-ll-edit-box">
-<h3>Add / Edit Set</h3>
+
+<h3>Create New Set</h3>
 
 <input class="zo-ll-input zo-ll-title" placeholder="Set Title">
 <input class="zo-ll-input zo-ll-language" placeholder="Language">
@@ -218,7 +294,7 @@ ob_start(); ?>
 <button class="zo-ll-btn zo-ll-upload-audio">Upload Audio</button>
 
 <button class="zo-ll-btn zo-ll-add-word">Add Word</button>
-<button class="zo-ll-btn zo-ll-save-all">Save Set</button>
+<button class="zo-ll-btn zo-ll-save-set">Save Set</button>
 
 </div>
 
@@ -230,7 +306,7 @@ return [
 'slug'=>'language-learning-platform',
 'name'=>'Language Learning Platform',
 'author'=>'Asker',
-'description'=>'Editable language platform with custom audio/image upload.',
+'description'=>'Working language flashcard system.',
 'render_callback'=>'zo_game_language_learner_render',
 'inline_style'=>$css,
 'inline_script'=>$js
