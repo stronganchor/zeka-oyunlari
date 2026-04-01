@@ -1,335 +1,219 @@
 <?php
+if (!defined('ABSPATH')) exit;
 
-if (!defined('ABSPATH')) {
-	exit;
+/* ================= AJAX ================= */
+
+add_action('wp_ajax_zo_ll_get_sets','zo_ll_get_sets');
+add_action('wp_ajax_nopriv_zo_ll_get_sets','zo_ll_get_sets');
+
+add_action('wp_ajax_zo_ll_save_set','zo_ll_save_set');
+add_action('wp_ajax_nopriv_zo_ll_save_set','zo_ll_save_set');
+
+add_action('wp_ajax_zo_ll_upload_file','zo_ll_upload_file');
+add_action('wp_ajax_nopriv_zo_ll_upload_file','zo_ll_upload_file');
+
+function zo_ll_get_sets(){
+	wp_send_json_success(get_option('zo_ll_sets',[]));
 }
 
-/* =========================
-   AJAX HANDLERS
-========================= */
+function zo_ll_save_set(){
 
-add_action('wp_ajax_zo_ll_save_set', 'zo_ll_save_set');
-add_action('wp_ajax_nopriv_zo_ll_save_set', 'zo_ll_save_set');
+	check_ajax_referer('zo_ll_nonce','nonce');
 
-add_action('wp_ajax_zo_ll_get_sets', 'zo_ll_get_sets');
-add_action('wp_ajax_nopriv_zo_ll_get_sets', 'zo_ll_get_sets');
-
-function zo_ll_save_set() {
-
-	check_ajax_referer('zo_ll_nonce', 'nonce');
-
-	$password = sanitize_text_field($_POST['password'] ?? '');
-
-	if ($password !== 'asker1905123') {
-		wp_send_json_error('Wrong admin password');
+	if($_POST['password']!=='asker1905123'){
+		wp_send_json_error('Wrong password');
 	}
 
-	$title     = sanitize_text_field($_POST['title'] ?? '');
-	$language  = sanitize_text_field($_POST['language'] ?? '');
-	$category  = sanitize_text_field($_POST['category'] ?? '');
-	$items_raw = wp_unslash($_POST['items'] ?? '');
+	$sets=json_decode(stripslashes($_POST['sets']),true);
+	update_option('zo_ll_sets',$sets);
 
-	if (!$title || !$language || !$category || !$items_raw) {
-		wp_send_json_error('Missing data');
+	wp_send_json_success($sets);
+}
+
+function zo_ll_upload_file(){
+
+	check_ajax_referer('zo_ll_nonce','nonce');
+
+	if($_POST['password']!=='asker1905123'){
+		wp_send_json_error('Wrong password');
 	}
 
-	$items = json_decode($items_raw, true);
+	if(empty($_FILES['file'])){
+		wp_send_json_error('No file');
+	}
 
-	$list = get_option('zo_ll_shared_sets', array());
+	require_once ABSPATH.'wp-admin/includes/file.php';
 
-	$list[] = array(
-		'title'    => $title,
-		'language' => $language,
-		'category' => $category,
-		'items'    => $items,
-	);
+	$uploaded=wp_handle_upload($_FILES['file'],['test_form'=>false]);
 
-	update_option('zo_ll_shared_sets', $list);
+	if(isset($uploaded['error'])){
+		wp_send_json_error($uploaded['error']);
+	}
 
-	wp_send_json_success($list);
+	wp_send_json_success($uploaded['url']);
 }
 
-function zo_ll_get_sets() {
-	wp_send_json_success(get_option('zo_ll_shared_sets', array()));
-}
+/* ================= CSS ================= */
 
-/* =========================
-   STYLES
-========================= */
-
-$css = '
-.zo-ll-root{max-width:900px;margin:0 auto;padding:20px;background:linear-gradient(180deg,#0f172a,#1e293b);border-radius:20px;color:#fff;font-family:inherit;}
-.zo-ll-input{width:100%;padding:8px;margin-bottom:6px;border:none;border-radius:8px;}
-.zo-ll-btn{background:#38bdf8;color:#0f172a;border:none;border-radius:999px;padding:8px 14px;font-weight:700;cursor:pointer;margin:4px 4px 6px 0;}
-.zo-ll-card-wrap{perspective:1000px;max-width:400px;margin:20px auto;}
-.zo-ll-card{height:250px;position:relative;transform-style:preserve-3d;transition:transform .6s;cursor:pointer;}
-.zo-ll-card.flipped{transform:rotateY(180deg);}
-.zo-ll-face{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:16px;background:#1e293b;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:10px;}
-.zo-ll-back{transform:rotateY(180deg);background:#334155;}
-.zo-ll-img{max-width:100%;max-height:120px;margin-bottom:10px;border-radius:10px;}
-.zo-ll-select{width:100%;padding:8px;margin-bottom:6px;border-radius:8px;border:none;}
-.zo-ll-status{min-height:24px;color:#facc15;font-weight:600;}
+$css='
+.zo-ll-root{max-width:900px;margin:0 auto;padding:20px;background:#0f172a;color:#fff;border-radius:18px}
+.zo-ll-input{width:100%;padding:6px;margin-bottom:6px;border-radius:8px;border:none}
+.zo-ll-btn{padding:6px 12px;border-radius:999px;border:none;background:#38bdf8;color:#000;font-weight:bold;margin:4px 4px 4px 0;cursor:pointer}
+.zo-ll-card{height:220px;background:#1e293b;border-radius:14px;display:flex;flex-direction:column;justify-content:center;align-items:center;cursor:pointer}
+.zo-ll-img{max-height:100px;margin-bottom:8px;border-radius:8px}
+.zo-ll-edit{background:#334155;padding:8px;border-radius:8px;margin-bottom:8px}
 ';
 
-/* =========================
-   SCRIPT
-========================= */
+/* ================= JS ================= */
 
-$js = <<<JS
+$js=<<<JS
 document.addEventListener("DOMContentLoaded",function(){
 
-const games=document.querySelectorAll(".zo-ll-root");
-
-games.forEach(function(game){
-
+const game=document.querySelector(".zo-ll-root");
 const ajaxUrl=window.location.origin+"/wp-admin/admin-ajax.php";
 const nonce=game.dataset.nonce;
-const loggedIn=game.dataset.loggedin==="1";
 
-let tempItems=[];
-let allSets=[];
-let currentItems=[];
+let sets=[];
+let currentSet=0;
 let currentIndex=0;
 
-const card=game.querySelector(".zo-ll-card");
-const frontWord=game.querySelector(".zo-ll-front-word");
-const backWord=game.querySelector(".zo-ll-back-word");
-const imgEl=game.querySelector(".zo-ll-img");
-const audioBtn=game.querySelector(".zo-ll-audio");
-const statusEl=game.querySelector(".zo-ll-status");
-const setFilter=game.querySelector(".zo-ll-filter-set");
-
-function showCard(){
-if(!currentItems.length)return;
-const item=currentItems[currentIndex];
-frontWord.textContent=item.word;
-backWord.textContent=item.translation;
-
-if(item.image){
-imgEl.src=item.image;
-imgEl.style.display="block";
-}else{
-imgEl.style.display="none";
-}
-
-if(item.audio){
-audioBtn.style.display="inline-block";
-audioBtn.onclick=function(){new Audio(item.audio).play();};
-}else{
-audioBtn.style.display="none";
-}
-
-card.classList.remove("flipped");
-}
-
-card.onclick=function(){card.classList.toggle("flipped");};
-
-game.querySelector(".zo-ll-next").onclick=function(){
-if(currentIndex<currentItems.length-1){currentIndex++;showCard();}
-};
-
-game.querySelector(".zo-ll-prev").onclick=function(){
-if(currentIndex>0){currentIndex--;showCard();}
-};
-
-function loadSets(){
+function fetchSets(){
 fetch(ajaxUrl+"?action=zo_ll_get_sets")
 .then(r=>r.json())
 .then(d=>{
 if(d.success){
-allSets=d.data||[];
-renderSetFilter();
+sets=d.data||[];
+renderSetList();
 }
 });
 }
 
-function renderSetFilter(){
-setFilter.innerHTML='<option value="">Select Set</option>';
-allSets.forEach((s,i)=>{
-setFilter.innerHTML+=`<option value="\${i}">\${s.language} - \${s.category} - \${s.title}</option>`;
+function renderSetList(){
+const select=document.querySelector(".zo-ll-set-select");
+select.innerHTML="";
+sets.forEach((s,i)=>{
+select.innerHTML+=`<option value="\${i}">\${s.title}</option>`;
 });
 }
 
-setFilter.onchange=function(){
-if(this.value!==""){
-currentItems=allSets[this.value].items;
+document.querySelector(".zo-ll-set-select").onchange=function(){
+currentSet=this.value;
 currentIndex=0;
 showCard();
-}
 };
 
-/* ===== MEDIA UPLOAD ===== */
+function showCard(){
+if(!sets[currentSet])return;
+const item=sets[currentSet].items[currentIndex];
+document.querySelector(".zo-ll-word-show").textContent=item.word;
+document.querySelector(".zo-ll-translation-show").textContent=item.translation;
 
-function openMedia(field){
-
-const frame=wp.media({
-title:"Select File",
-button:{text:"Use this file"},
-multiple:false
-});
-
-frame.on("select",function(){
-const attachment=frame.state().get("selection").first().toJSON();
-field.value=attachment.url;
-});
-
-frame.open();
+const img=document.querySelector(".zo-ll-img");
+if(item.image){
+img.src=item.image;
+img.style.display="block";
+}else img.style.display="none";
 }
 
-if(loggedIn && typeof wp!=="undefined" && wp.media){
-
-game.querySelector(".zo-ll-upload-audio").onclick=function(){
-openMedia(game.querySelector(".zo-ll-audio-url"));
+document.querySelector(".zo-ll-next").onclick=function(){
+if(currentIndex<sets[currentSet].items.length-1){currentIndex++;showCard();}
 };
 
-game.querySelector(".zo-ll-upload-image").onclick=function(){
-openMedia(game.querySelector(".zo-ll-image-url"));
+document.querySelector(".zo-ll-prev").onclick=function(){
+if(currentIndex>0){currentIndex--;showCard();}
 };
 
-}else{
-
-game.querySelectorAll(".zo-ll-upload-audio,.zo-ll-upload-image").forEach(btn=>{
-btn.onclick=function(){alert("Login required for upload.");};
-});
-
-}
-
-/* ===== ADD ITEM ===== */
-
-game.querySelector(".zo-ll-add-item").onclick=function(){
-
-const word=game.querySelector(".zo-ll-word").value.trim();
-const trans=game.querySelector(".zo-ll-translation").value.trim();
-const audio=game.querySelector(".zo-ll-audio-url").value.trim();
-const image=game.querySelector(".zo-ll-image-url").value.trim();
-
-if(!word||!trans)return;
-
-tempItems.push({word:word,translation:trans,audio:audio,image:image});
-
-game.querySelector(".zo-ll-word").value="";
-game.querySelector(".zo-ll-translation").value="";
-game.querySelector(".zo-ll-audio-url").value="";
-game.querySelector(".zo-ll-image-url").value="";
-};
-
-/* ===== SAVE SET ===== */
-
-game.querySelector(".zo-ll-save").onclick=function(){
-
-const title=game.querySelector(".zo-ll-title").value.trim();
-const language=game.querySelector(".zo-ll-language").value.trim();
-const category=game.querySelector(".zo-ll-category").value.trim();
-
-if(!title||!language||!category||!tempItems.length)return;
+document.querySelector(".zo-ll-save-all").onclick=function(){
 
 const pass=prompt("Admin password:");
 if(!pass)return;
 
 fetch(ajaxUrl,{
 method:"POST",
-headers:{"Content-Type":"application/x-www-form-urlencoded"},
 body:new URLSearchParams({
 action:"zo_ll_save_set",
-title:title,
-language:language,
-category:category,
-items:JSON.stringify(tempItems),
 password:pass,
+sets:JSON.stringify(sets),
 nonce:nonce
 })
 })
 .then(r=>r.json())
 .then(d=>{
-if(d.success){
-statusEl.textContent="Saved.";
-tempItems=[];
-loadSets();
-}else{
-statusEl.textContent=d.data;
-}
+alert(d.success?"Saved":"Error");
 });
 };
 
-loadSets();
+document.querySelectorAll(".zo-ll-upload").forEach(btn=>{
+btn.onclick=function(){
+const pass=prompt("Admin password:");
+if(!pass)return;
 
+const input=this.previousElementSibling;
+const file=input.files[0];
+if(!file)return;
+
+const formData=new FormData();
+formData.append("action","zo_ll_upload_file");
+formData.append("file",file);
+formData.append("password",pass);
+formData.append("nonce",nonce);
+
+fetch(ajaxUrl,{method:"POST",body:formData})
+.then(r=>r.json())
+.then(d=>{
+if(d.success){
+alert("Uploaded");
+}else alert(d.data);
 });
+};
+});
+
+fetchSets();
 });
 JS;
 
-/* =========================
-   RENDER
-========================= */
+/* ================= RENDER ================= */
 
-function zo_game_language_learner_render($post_id=0,$module=array()){
+function zo_game_language_learner_render($post_id=0,$module=[]){
 
-if(is_user_logged_in()){
-	wp_enqueue_media();
-}
-
-$instance='zo-ll-'.wp_rand(1000,999999);
 $nonce=wp_create_nonce('zo_ll_nonce');
 
-ob_start();
-?>
-<div class="zo-game-root zo-ll-root"
-     id="<?php echo esc_attr($instance); ?>"
-     data-nonce="<?php echo esc_attr($nonce); ?>"
-     data-loggedin="<?php echo is_user_logged_in()?'1':'0'; ?>">
+ob_start(); ?>
 
-<h2>Language Learning Platform</h2>
+<div class="zo-game-root zo-ll-root" data-nonce="<?php echo esc_attr($nonce); ?>">
 
-<select class="zo-ll-select zo-ll-filter-set"></select>
+<h2>Language Platform</h2>
 
-<div class="zo-ll-card-wrap">
+<select class="zo-ll-set-select"></select>
+
 <div class="zo-ll-card">
-<div class="zo-ll-face">
-<img class="zo-ll-img" style="display:none;">
-<h3 class="zo-ll-front-word"></h3>
-</div>
-<div class="zo-ll-face zo-ll-back">
-<h3 class="zo-ll-back-word"></h3>
-<button class="zo-ll-btn zo-ll-audio" style="display:none;">Play Audio</button>
-</div>
-</div>
+<img class="zo-ll-img" style="display:none">
+<h3 class="zo-ll-word-show"></h3>
+<p class="zo-ll-translation-show"></p>
 </div>
 
-<button class="zo-ll-btn zo-ll-prev">Previous</button>
+<button class="zo-ll-btn zo-ll-prev">Prev</button>
 <button class="zo-ll-btn zo-ll-next">Next</button>
 
 <hr>
 
-<h3>Admin Add Set</h3>
+<h3>Edit / Add Words</h3>
 
-<input class="zo-ll-input zo-ll-title" placeholder="Set Title">
-<input class="zo-ll-input zo-ll-language" placeholder="Language">
-<input class="zo-ll-input zo-ll-category" placeholder="Category">
+<input type="file" class="zo-ll-input">
+<button class="zo-ll-btn zo-ll-upload">Upload File</button>
 
-<input class="zo-ll-input zo-ll-word" placeholder="Word">
-<input class="zo-ll-input zo-ll-translation" placeholder="Translation">
-
-<input class="zo-ll-input zo-ll-audio-url" placeholder="Audio URL">
-<button class="zo-ll-btn zo-ll-upload-audio">Upload Audio</button>
-
-<input class="zo-ll-input zo-ll-image-url" placeholder="Image URL">
-<button class="zo-ll-btn zo-ll-upload-image">Upload Image</button>
-
-<button class="zo-ll-btn zo-ll-add-item">Add Item</button>
-<button class="zo-ll-btn zo-ll-save">Save Set</button>
-
-<div class="zo-ll-status"></div>
+<button class="zo-ll-btn zo-ll-save-all">Save All</button>
 
 </div>
-<?php
-return ob_get_clean();
-}
 
-return array(
+<?php return ob_get_clean(); }
+
+return [
 'slug'=>'language-learning-platform',
 'name'=>'Language Learning Platform',
 'author'=>'Asker',
-'description'=>'Flashcards with upload support.',
+'description'=>'Editable language platform with custom uploads.',
 'render_callback'=>'zo_game_language_learner_render',
 'inline_style'=>$css,
-'inline_script'=>$js,
-);
+'inline_script'=>$js
+];
