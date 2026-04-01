@@ -6,17 +6,17 @@ if (!defined('ABSPATH')) exit;
 add_action('wp_ajax_zo_ll_get_sets','zo_ll_get_sets');
 add_action('wp_ajax_nopriv_zo_ll_get_sets','zo_ll_get_sets');
 
-add_action('wp_ajax_zo_ll_save_set','zo_ll_save_set');
-add_action('wp_ajax_nopriv_zo_ll_save_set','zo_ll_save_set');
+add_action('wp_ajax_zo_ll_save_sets','zo_ll_save_sets');
+add_action('wp_ajax_nopriv_zo_ll_save_sets','zo_ll_save_sets');
 
-add_action('wp_ajax_zo_ll_upload_file','zo_ll_upload_file');
-add_action('wp_ajax_nopriv_zo_ll_upload_file','zo_ll_upload_file');
+add_action('wp_ajax_zo_ll_upload','zo_ll_upload');
+add_action('wp_ajax_nopriv_zo_ll_upload','zo_ll_upload');
 
 function zo_ll_get_sets(){
 	wp_send_json_success(get_option('zo_ll_sets',[]));
 }
 
-function zo_ll_save_set(){
+function zo_ll_save_sets(){
 
 	check_ajax_referer('zo_ll_nonce','nonce');
 
@@ -30,7 +30,7 @@ function zo_ll_save_set(){
 	wp_send_json_success($sets);
 }
 
-function zo_ll_upload_file(){
+function zo_ll_upload(){
 
 	check_ajax_referer('zo_ll_nonce','nonce');
 
@@ -55,18 +55,19 @@ function zo_ll_upload_file(){
 
 /* ================= CSS ================= */
 
-$css='
-.zo-ll-root{max-width:900px;margin:0 auto;padding:20px;background:#0f172a;color:#fff;border-radius:18px}
+$css = '
+.zo-ll-root{max-width:900px;margin:0 auto;padding:20px;background:#0f172a;color:#fff;border-radius:18px;font-family:inherit}
 .zo-ll-input{width:100%;padding:6px;margin-bottom:6px;border-radius:8px;border:none}
 .zo-ll-btn{padding:6px 12px;border-radius:999px;border:none;background:#38bdf8;color:#000;font-weight:bold;margin:4px 4px 4px 0;cursor:pointer}
-.zo-ll-card{height:220px;background:#1e293b;border-radius:14px;display:flex;flex-direction:column;justify-content:center;align-items:center;cursor:pointer}
+.zo-ll-card{height:220px;background:#1e293b;border-radius:14px;display:flex;flex-direction:column;justify-content:center;align-items:center;margin-bottom:10px;cursor:pointer}
 .zo-ll-img{max-height:100px;margin-bottom:8px;border-radius:8px}
-.zo-ll-edit{background:#334155;padding:8px;border-radius:8px;margin-bottom:8px}
+.zo-ll-edit-box{background:#1e293b;padding:10px;border-radius:10px;margin-bottom:12px}
+.zo-ll-set-select{width:100%;padding:6px;border-radius:8px;margin-bottom:10px}
 ';
 
 /* ================= JS ================= */
 
-$js=<<<JS
+$js = <<<JS
 document.addEventListener("DOMContentLoaded",function(){
 
 const game=document.querySelector(".zo-ll-root");
@@ -76,6 +77,7 @@ const nonce=game.dataset.nonce;
 let sets=[];
 let currentSet=0;
 let currentIndex=0;
+let editingItems=[];
 
 function fetchSets(){
 fetch(ajaxUrl+"?action=zo_ll_get_sets")
@@ -83,16 +85,16 @@ fetch(ajaxUrl+"?action=zo_ll_get_sets")
 .then(d=>{
 if(d.success){
 sets=d.data||[];
-renderSetList();
+renderSetSelect();
 }
 });
 }
 
-function renderSetList(){
+function renderSetSelect(){
 const select=document.querySelector(".zo-ll-set-select");
 select.innerHTML="";
 sets.forEach((s,i)=>{
-select.innerHTML+=`<option value="\${i}">\${s.title}</option>`;
+select.innerHTML+=`<option value="\${i}">\${s.language} - \${s.category} - \${s.title}</option>`;
 });
 }
 
@@ -115,45 +117,26 @@ img.style.display="block";
 }else img.style.display="none";
 }
 
-document.querySelector(".zo-ll-next").onclick=function(){
-if(currentIndex<sets[currentSet].items.length-1){currentIndex++;showCard();}
-};
-
 document.querySelector(".zo-ll-prev").onclick=function(){
 if(currentIndex>0){currentIndex--;showCard();}
 };
 
-document.querySelector(".zo-ll-save-all").onclick=function(){
-
-const pass=prompt("Admin password:");
-if(!pass)return;
-
-fetch(ajaxUrl,{
-method:"POST",
-body:new URLSearchParams({
-action:"zo_ll_save_set",
-password:pass,
-sets:JSON.stringify(sets),
-nonce:nonce
-})
-})
-.then(r=>r.json())
-.then(d=>{
-alert(d.success?"Saved":"Error");
-});
+document.querySelector(".zo-ll-next").onclick=function(){
+if(currentIndex<sets[currentSet].items.length-1){currentIndex++;showCard();}
 };
 
-document.querySelectorAll(".zo-ll-upload").forEach(btn=>{
-btn.onclick=function(){
+/* ===== Upload Logic ===== */
+
+function uploadFile(inputField, type){
+
+const file=inputField.files[0];
+if(!file)return;
+
 const pass=prompt("Admin password:");
 if(!pass)return;
 
-const input=this.previousElementSibling;
-const file=input.files[0];
-if(!file)return;
-
 const formData=new FormData();
-formData.append("action","zo_ll_upload_file");
+formData.append("action","zo_ll_upload");
 formData.append("file",file);
 formData.append("password",pass);
 formData.append("nonce",nonce);
@@ -162,11 +145,71 @@ fetch(ajaxUrl,{method:"POST",body:formData})
 .then(r=>r.json())
 .then(d=>{
 if(d.success){
-alert("Uploaded");
+alert(type+" uploaded");
+inputField.dataset.url=d.data;
+}else{
+alert(d.data);
+}
+});
+}
+
+document.querySelector(".zo-ll-upload-image").onclick=function(){
+uploadFile(document.querySelector(".zo-ll-image-file"),"Image");
+};
+
+document.querySelector(".zo-ll-upload-audio").onclick=function(){
+uploadFile(document.querySelector(".zo-ll-audio-file"),"Audio");
+};
+
+/* ===== Add Word ===== */
+
+document.querySelector(".zo-ll-add-word").onclick=function(){
+
+const word=document.querySelector(".zo-ll-word").value.trim();
+const trans=document.querySelector(".zo-ll-translation").value.trim();
+const image=document.querySelector(".zo-ll-image-file").dataset.url||"";
+const audio=document.querySelector(".zo-ll-audio-file").dataset.url||"";
+
+if(!word||!trans)return;
+
+editingItems.push({word:word,translation:trans,image:image,audio:audio});
+
+document.querySelector(".zo-ll-word").value="";
+document.querySelector(".zo-ll-translation").value="";
+};
+
+/* ===== Save All Sets ===== */
+
+document.querySelector(".zo-ll-save-all").onclick=function(){
+
+const pass=prompt("Admin password:");
+if(!pass)return;
+
+sets.push({
+title:document.querySelector(".zo-ll-title").value,
+language:document.querySelector(".zo-ll-language").value,
+category:document.querySelector(".zo-ll-category").value,
+items:editingItems
+});
+
+fetch(ajaxUrl,{
+method:"POST",
+body:new URLSearchParams({
+action:"zo_ll_save_sets",
+password:pass,
+sets:JSON.stringify(sets),
+nonce:nonce
+})
+})
+.then(r=>r.json())
+.then(d=>{
+if(d.success){
+alert("Saved");
+editingItems=[];
+fetchSets();
 }else alert(d.data);
 });
 };
-});
 
 fetchSets();
 });
@@ -174,7 +217,7 @@ JS;
 
 /* ================= RENDER ================= */
 
-function zo_game_language_learner_render($post_id=0,$module=[]){
+function zo_game_language_learner_render(){
 
 $nonce=wp_create_nonce('zo_ll_nonce');
 
@@ -182,7 +225,7 @@ ob_start(); ?>
 
 <div class="zo-game-root zo-ll-root" data-nonce="<?php echo esc_attr($nonce); ?>">
 
-<h2>Language Platform</h2>
+<h2>Language Learning Platform</h2>
 
 <select class="zo-ll-set-select"></select>
 
@@ -197,12 +240,26 @@ ob_start(); ?>
 
 <hr>
 
-<h3>Edit / Add Words</h3>
+<div class="zo-ll-edit-box">
+<h3>Add / Edit Set</h3>
 
-<input type="file" class="zo-ll-input">
-<button class="zo-ll-btn zo-ll-upload">Upload File</button>
+<input class="zo-ll-input zo-ll-title" placeholder="Set Title">
+<input class="zo-ll-input zo-ll-language" placeholder="Language">
+<input class="zo-ll-input zo-ll-category" placeholder="Category">
 
-<button class="zo-ll-btn zo-ll-save-all">Save All</button>
+<input class="zo-ll-input zo-ll-word" placeholder="Word">
+<input class="zo-ll-input zo-ll-translation" placeholder="Translation">
+
+<input type="file" class="zo-ll-input zo-ll-image-file">
+<button class="zo-ll-btn zo-ll-upload-image">Upload Image</button>
+
+<input type="file" class="zo-ll-input zo-ll-audio-file">
+<button class="zo-ll-btn zo-ll-upload-audio">Upload Audio</button>
+
+<button class="zo-ll-btn zo-ll-add-word">Add Word</button>
+<button class="zo-ll-btn zo-ll-save-all">Save Set</button>
+
+</div>
 
 </div>
 
@@ -212,7 +269,7 @@ return [
 'slug'=>'language-learning-platform',
 'name'=>'Language Learning Platform',
 'author'=>'Asker',
-'description'=>'Editable language platform with custom uploads.',
+'description'=>'Editable language platform with custom audio/image upload.',
 'render_callback'=>'zo_game_language_learner_render',
 'inline_style'=>$css,
 'inline_script'=>$js
