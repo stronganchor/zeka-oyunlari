@@ -25,7 +25,6 @@ function zo_ll_save_sets(){
 	}
 
 	$sets=json_decode(stripslashes($_POST['sets']),true);
-
 	update_option('zo_ll_sets',$sets);
 
 	wp_send_json_success($sets);
@@ -56,37 +55,24 @@ function zo_ll_upload(){
 
 /* ================= CSS ================= */
 
-$css = '
-.zo-ll-root{max-width:900px;margin:0 auto;padding:20px;background:#0f172a;color:#fff;border-radius:18px;font-family:inherit}
+$css='
+.zo-ll-root{max-width:900px;margin:0 auto;padding:20px;background:#0f172a;color:#fff;border-radius:18px}
 .zo-ll-input{width:100%;padding:6px;margin-bottom:6px;border-radius:8px;border:none}
 .zo-ll-btn{padding:6px 12px;border-radius:999px;border:none;background:#38bdf8;color:#000;font-weight:bold;margin:4px 4px 4px 0;cursor:pointer}
 .zo-ll-select{width:100%;padding:6px;margin-bottom:10px;border-radius:8px}
-
+.zo-ll-edit-item{background:#1e293b;padding:8px;border-radius:10px;margin-bottom:8px}
 .zo-ll-card-wrap{perspective:1000px;margin:20px 0}
 .zo-ll-card{width:100%;height:260px;position:relative;transform-style:preserve-3d;transition:transform .6s}
 .zo-ll-card.flipped{transform:rotateY(180deg)}
-
-.zo-ll-face{
-position:absolute;
-width:100%;
-height:100%;
-backface-visibility:hidden;
-border-radius:16px;
-display:flex;
-flex-direction:column;
-justify-content:center;
-align-items:center;
-background:#1e293b;
-padding:10px;
-}
-
+.zo-ll-face{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:16px;display:flex;flex-direction:column;justify-content:center;align-items:center;background:#1e293b;padding:10px}
 .zo-ll-back{transform:rotateY(180deg);background:#334155}
 .zo-ll-img{max-height:120px;margin-bottom:10px;border-radius:10px}
+.small-preview{max-height:60px;margin-top:4px;border-radius:6px}
 ';
 
 /* ================= JS ================= */
 
-$js = <<<JS
+$js=<<<JS
 document.addEventListener("DOMContentLoaded",function(){
 
 const game=document.querySelector(".zo-ll-root");
@@ -96,11 +82,8 @@ const nonce=game.dataset.nonce;
 let sets=[];
 let currentSetIndex=null;
 let currentIndex=0;
-let newItems=[];
-let imageURL="";
-let audioURL="";
 
-/* ================= LOAD SETS ================= */
+/* ================= LOAD ================= */
 
 function fetchSets(){
 fetch(ajaxUrl+"?action=zo_ll_get_sets")
@@ -121,22 +104,22 @@ select.innerHTML+=`<option value="\${i}">\${s.language} - \${s.category}</option
 });
 }
 
-/* ================= SELECT SET ================= */
+/* ================= SELECT ================= */
 
 document.querySelector(".zo-ll-set-select").onchange=function(){
 if(this.value==="") return;
 currentSetIndex=parseInt(this.value);
 currentIndex=0;
+renderEditList();
 showCard();
 };
 
 /* ================= SHOW CARD ================= */
 
 function showCard(){
-
 if(currentSetIndex===null) return;
 const items=sets[currentSetIndex].items;
-if(!items || !items.length) return;
+if(!items.length) return;
 
 const item=items[currentIndex];
 
@@ -144,20 +127,14 @@ document.querySelector(".zo-ll-front-word").textContent=item.word;
 document.querySelector(".zo-ll-back-translation").textContent=item.translation;
 
 const img=document.querySelector(".zo-ll-img");
-if(item.image){
-img.src=item.image;
-img.style.display="block";
-}else{
-img.style.display="none";
-}
+if(item.image){ img.src=item.image; img.style.display="block"; }
+else img.style.display="none";
 
 const audioBtn=document.querySelector(".zo-ll-audio-btn");
 if(item.audio){
 audioBtn.style.display="inline-block";
 audioBtn.onclick=function(){ new Audio(item.audio).play(); };
-}else{
-audioBtn.style.display="none";
-}
+}else audioBtn.style.display="none";
 
 document.querySelector(".zo-ll-card").classList.remove("flipped");
 }
@@ -165,27 +142,115 @@ document.querySelector(".zo-ll-card").classList.remove("flipped");
 /* ================= NAVIGATION ================= */
 
 document.querySelector(".zo-ll-prev").onclick=function(){
-if(currentSetIndex===null) return;
 if(currentIndex>0){currentIndex--;showCard();}
 };
 
 document.querySelector(".zo-ll-next").onclick=function(){
-if(currentSetIndex===null) return;
-const items=sets[currentSetIndex].items;
-if(currentIndex < items.length-1){currentIndex++;showCard();}
+if(currentSetIndex===null)return;
+if(currentIndex < sets[currentSetIndex].items.length-1){
+currentIndex++;
+showCard();
+}
 };
-
-/* ================= FLIP ================= */
 
 document.querySelector(".zo-ll-card").onclick=function(){
 this.classList.toggle("flipped");
 };
 
+/* ================= EDIT LIST ================= */
+
+function renderEditList(){
+
+const container=document.querySelector(".zo-ll-edit-list");
+container.innerHTML="";
+if(currentSetIndex===null) return;
+
+sets[currentSetIndex].items.forEach((item,i)=>{
+
+container.innerHTML+=`
+<div class="zo-ll-edit-item">
+<input class="zo-ll-input edit-word" data-i="\${i}" value="\${item.word}">
+<input class="zo-ll-input edit-translation" data-i="\${i}" value="\${item.translation}">
+
+<label>Image:</label>
+<input type="file" class="edit-image-file" data-i="\${i}">
+<img src="\${item.image||''}" class="small-preview">
+
+<label>Audio:</label>
+<input type="file" class="edit-audio-file" data-i="\${i}">
+
+<button class="zo-ll-btn edit-delete" data-i="\${i}">Delete</button>
+</div>`;
+});
+
+attachEditHandlers();
+}
+
+function attachEditHandlers(){
+
+document.querySelectorAll(".edit-word").forEach(inp=>{
+inp.oninput=function(){
+sets[currentSetIndex].items[this.dataset.i].word=this.value;
+};
+});
+
+document.querySelectorAll(".edit-translation").forEach(inp=>{
+inp.oninput=function(){
+sets[currentSetIndex].items[this.dataset.i].translation=this.value;
+};
+});
+
+document.querySelectorAll(".edit-delete").forEach(btn=>{
+btn.onclick=function(){
+sets[currentSetIndex].items.splice(this.dataset.i,1);
+renderEditList();
+showCard();
+};
+});
+
+document.querySelectorAll(".edit-image-file").forEach(inp=>{
+inp.onchange=function(){
+uploadFile(this.files[0],url=>{
+sets[currentSetIndex].items[this.dataset.i].image=url;
+renderEditList();
+});
+};
+});
+
+document.querySelectorAll(".edit-audio-file").forEach(inp=>{
+inp.onchange=function(){
+uploadFile(this.files[0],url=>{
+sets[currentSetIndex].items[this.dataset.i].audio=url;
+});
+};
+});
+}
+
+/* ================= ADD NEW WORD TO EXISTING ================= */
+
+document.querySelector(".zo-ll-add-new-word").onclick=function(){
+
+if(currentSetIndex===null) return;
+
+const word=prompt("Word:");
+const trans=prompt("Translation:");
+
+if(!word||!trans) return;
+
+sets[currentSetIndex].items.push({
+word:word,
+translation:trans,
+image:"",
+audio:""
+});
+
+renderEditList();
+};
+
 /* ================= UPLOAD ================= */
 
-function uploadFile(inputField,callback){
+function uploadFile(file,callback){
 
-const file=inputField.files[0];
 if(!file) return;
 
 const pass=prompt("Admin password:");
@@ -200,76 +265,17 @@ formData.append("nonce",nonce);
 fetch(ajaxUrl,{method:"POST",body:formData})
 .then(r=>r.json())
 .then(d=>{
-if(d.success){
-callback(d.data);
-}else alert(d.data);
+if(d.success) callback(d.data);
+else alert(d.data);
 });
 }
 
-document.querySelector(".zo-ll-upload-image").onclick=function(){
-uploadFile(document.querySelector(".zo-ll-image-file"),function(url){
-imageURL=url;
-alert("Image uploaded");
-});
-};
+/* ================= SAVE ================= */
 
-document.querySelector(".zo-ll-upload-audio").onclick=function(){
-uploadFile(document.querySelector(".zo-ll-audio-file"),function(url){
-audioURL=url;
-alert("Audio uploaded");
-});
-};
-
-/* ================= ADD WORD ================= */
-
-document.querySelector(".zo-ll-add-word").onclick=function(){
-
-const word=document.querySelector(".zo-ll-word").value.trim();
-const trans=document.querySelector(".zo-ll-translation").value.trim();
-
-if(!word||!trans) return;
-
-newItems.push({
-word:word,
-translation:trans,
-image:imageURL,
-audio:audioURL
-});
-
-document.querySelector(".zo-ll-word").value="";
-document.querySelector(".zo-ll-translation").value="";
-imageURL="";
-audioURL="";
-alert("Word added");
-};
-
-/* ================= SAVE SET ================= */
-
-document.querySelector(".zo-ll-save-set").onclick=function(){
-
-const title=document.querySelector(".zo-ll-title").value.trim();
-const language=document.querySelector(".zo-ll-language").value.trim();
-const category=document.querySelector(".zo-ll-category").value.trim();
-
-if(!title||!language||!category||!newItems.length) return;
-
-/* Prevent duplicate category in same language */
-for(let s of sets){
-if(s.language===language && s.category===category){
-alert("Category already exists for this language.");
-return;
-}
-}
+document.querySelector(".zo-ll-save-all").onclick=function(){
 
 const pass=prompt("Admin password:");
 if(!pass) return;
-
-sets.push({
-title:title,
-language:language,
-category:category,
-items:newItems
-});
 
 fetch(ajaxUrl,{
 method:"POST",
@@ -282,11 +288,8 @@ nonce:nonce
 })
 .then(r=>r.json())
 .then(d=>{
-if(d.success){
-alert("Saved");
-newItems=[];
-fetchSets();
-}else alert(d.data);
+if(d.success) alert("Saved");
+else alert(d.data);
 });
 };
 
@@ -329,23 +332,11 @@ ob_start(); ?>
 
 <hr>
 
-<h3>Create New Set</h3>
+<h3>Edit Words</h3>
+<div class="zo-ll-edit-list"></div>
 
-<input class="zo-ll-input zo-ll-title" placeholder="Set Title">
-<input class="zo-ll-input zo-ll-language" placeholder="Language">
-<input class="zo-ll-input zo-ll-category" placeholder="Category">
-
-<input class="zo-ll-input zo-ll-word" placeholder="Word">
-<input class="zo-ll-input zo-ll-translation" placeholder="Translation">
-
-<input type="file" class="zo-ll-input zo-ll-image-file">
-<button class="zo-ll-btn zo-ll-upload-image">Upload Image</button>
-
-<input type="file" class="zo-ll-input zo-ll-audio-file">
-<button class="zo-ll-btn zo-ll-upload-audio">Upload Audio</button>
-
-<button class="zo-ll-btn zo-ll-add-word">Add Word</button>
-<button class="zo-ll-btn zo-ll-save-set">Save Set</button>
+<button class="zo-ll-btn zo-ll-add-new-word">Add New Word</button>
+<button class="zo-ll-btn zo-ll-save-all">Save Changes</button>
 
 </div>
 
@@ -355,7 +346,7 @@ return [
 'slug'=>'language-learning-platform',
 'name'=>'Language Learning Platform',
 'author'=>'Asker',
-'description'=>'Stable flashcard system with duplicate protection.',
+'description'=>'Advanced editable flashcard system.',
 'render_callback'=>'zo_game_language_learner_render',
 'inline_style'=>$css,
 'inline_script'=>$js
