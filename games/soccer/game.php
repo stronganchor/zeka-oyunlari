@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 
 $css = <<<'CSS'
 .zo-game-root--soccer-match-ai {
-	max-width: 1100px;
+	max-width: 1200px;
 	margin: 0 auto;
 	text-align: center;
 	font-family: Arial, sans-serif;
@@ -36,7 +36,7 @@ $css = <<<'CSS'
 	border: 2px solid #dfe7d8;
 	border-radius: 12px;
 	padding: 10px 14px;
-	min-width: 120px;
+	min-width: 130px;
 }
 
 .zo-soccer-panel strong {
@@ -52,15 +52,6 @@ $css = <<<'CSS'
 	margin-top: 4px;
 }
 
-.zo-soccer-rolebar {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 8px;
-	justify-content: center;
-	margin-bottom: 12px;
-}
-
-.zo-soccer-rolebtn,
 .zo-soccer-btn {
 	border: none;
 	border-radius: 10px;
@@ -72,25 +63,15 @@ $css = <<<'CSS'
 	color: #fff;
 }
 
-.zo-soccer-rolebtn.is-active {
-	background: #1565c0;
-}
-
-.zo-soccer-btn:hover,
-.zo-soccer-rolebtn:hover {
+.zo-soccer-btn:hover {
 	opacity: 0.92;
-}
-
-.zo-soccer-btn[disabled] {
-	opacity: 0.45;
-	cursor: default;
 }
 
 .zo-soccer-field {
 	position: relative;
 	width: 100%;
-	max-width: 1040px;
-	height: 620px;
+	max-width: 1120px;
+	height: 630px;
 	margin: 0 auto;
 	background:
 		linear-gradient(
@@ -119,9 +100,9 @@ $css = <<<'CSS'
 	border: 4px solid #fff;
 	border-radius: 18px;
 	overflow: hidden;
-	touch-action: none;
 	outline: none;
 	user-select: none;
+	touch-action: none;
 }
 
 .zo-soccer-line-mid,
@@ -150,10 +131,10 @@ $css = <<<'CSS'
 .zo-soccer-circle {
 	left: 50%;
 	top: 50%;
-	width: 140px;
-	height: 140px;
-	margin-left: -70px;
-	margin-top: -70px;
+	width: 150px;
+	height: 150px;
+	margin-left: -75px;
+	margin-top: -75px;
 	border: 4px solid rgba(255,255,255,0.95);
 	border-radius: 50%;
 }
@@ -172,15 +153,15 @@ $css = <<<'CSS'
 .zo-soccer-box-left,
 .zo-soccer-box-right {
 	top: 190px;
-	width: 130px;
-	height: 240px;
+	width: 145px;
+	height: 250px;
 	border: 4px solid rgba(255,255,255,0.95);
 }
 
 .zo-soccer-smallbox-left,
 .zo-soccer-smallbox-right {
-	top: 245px;
-	width: 60px;
+	top: 250px;
+	width: 65px;
 	height: 130px;
 	border: 4px solid rgba(255,255,255,0.95);
 }
@@ -201,7 +182,7 @@ $css = <<<'CSS'
 
 .zo-soccer-goal-left,
 .zo-soccer-goal-right {
-	top: 245px;
+	top: 250px;
 	width: 18px;
 	height: 130px;
 	background: rgba(255,255,255,0.95);
@@ -224,54 +205,23 @@ $css = <<<'CSS'
 	border-radius: 50%;
 }
 
-.zo-soccer-corner-arc--tl {
-	left: -17px;
-	top: -17px;
-}
-
-.zo-soccer-corner-arc--tr {
-	right: -17px;
-	top: -17px;
-}
-
-.zo-soccer-corner-arc--bl {
-	left: -17px;
-	bottom: -17px;
-}
-
-.zo-soccer-corner-arc--br {
-	right: -17px;
-	bottom: -17px;
-}
+.zo-soccer-corner-arc--tl { left: -17px; top: -17px; }
+.zo-soccer-corner-arc--tr { right: -17px; top: -17px; }
+.zo-soccer-corner-arc--bl { left: -17px; bottom: -17px; }
+.zo-soccer-corner-arc--br { right: -17px; bottom: -17px; }
 
 .zo-soccer-player,
 .zo-soccer-ball,
-.zo-soccer-target {
+.zo-soccer-target,
+.zo-soccer-pass-line {
 	position: absolute;
 	transform: translate(-50%, -50%);
 	pointer-events: none;
 }
 
 .zo-soccer-player {
-	width: 26px;
-	height: 40px;
-}
-
-.zo-soccer-player__arrow {
-	position: absolute;
-	left: 50%;
-	top: -18px;
-	transform: translateX(-50%);
-	width: 0;
-	height: 0;
-	border-left: 8px solid transparent;
-	border-right: 8px solid transparent;
-	border-bottom: 12px solid #ffd54f;
-	display: none;
-}
-
-.zo-soccer-player--user .zo-soccer-player__arrow {
-	display: block;
+	width: 24px;
+	height: 38px;
 }
 
 .zo-soccer-player__head {
@@ -291,7 +241,7 @@ $css = <<<'CSS'
 	left: 50%;
 	top: 12px;
 	width: 18px;
-	height: 15px;
+	height: 14px;
 	margin-left: -9px;
 	border-radius: 7px 7px 6px 6px;
 	border: 1px solid rgba(0,0,0,0.16);
@@ -300,9 +250,9 @@ $css = <<<'CSS'
 .zo-soccer-player__legs {
 	position: absolute;
 	left: 50%;
-	top: 27px;
+	top: 26px;
 	width: 18px;
-	height: 11px;
+	height: 10px;
 	margin-left: -9px;
 }
 
@@ -312,37 +262,43 @@ $css = <<<'CSS'
 	position: absolute;
 	top: 0;
 	width: 4px;
-	height: 11px;
+	height: 10px;
 	background: #202020;
 	border-radius: 3px;
 }
 
-.zo-soccer-player__legs::before {
-	left: 3px;
-}
+.zo-soccer-player__legs::before { left: 3px; }
+.zo-soccer-player__legs::after { right: 3px; }
 
-.zo-soccer-player__legs::after {
-	right: 3px;
-}
-
-.zo-soccer-player__name {
+.zo-soccer-player__label {
 	position: absolute;
 	left: 50%;
-	top: 40px;
+	top: 38px;
 	transform: translateX(-50%);
-	font-size: 10px;
+	font-size: 9px;
 	font-weight: 700;
 	line-height: 1;
 	padding: 2px 5px;
 	border-radius: 8px;
 	white-space: nowrap;
-	background: rgba(255,255,255,0.85);
+	background: rgba(255,255,255,0.88);
 	color: #1d2a1d;
-	display: none;
 }
 
-.zo-soccer-player--user .zo-soccer-player__name {
-	display: block;
+.zo-soccer-player__marker {
+	position: absolute;
+	left: 50%;
+	top: -12px;
+	transform: translateX(-50%);
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: transparent;
+}
+
+.zo-soccer-player--decision .zo-soccer-player__marker {
+	background: #ffd54f;
+	box-shadow: 0 0 0 3px rgba(255, 213, 79, 0.28);
 }
 
 .zo-soccer-player--blue .zo-soccer-player__body {
@@ -371,14 +327,26 @@ $css = <<<'CSS'
 }
 
 .zo-soccer-target {
-	width: 26px;
-	height: 26px;
+	width: 24px;
+	height: 24px;
 	border-radius: 50%;
-	border: 3px dashed rgba(255,255,255,0.9);
+	border: 3px dashed rgba(255,255,255,0.92);
 	display: none;
 }
 
 .zo-soccer-target.is-active {
+	display: block;
+}
+
+.zo-soccer-pass-line {
+	height: 4px;
+	background: rgba(255,255,255,0.92);
+	transform-origin: left center;
+	display: none;
+	border-radius: 4px;
+}
+
+.zo-soccer-pass-line.is-active {
 	display: block;
 }
 
@@ -398,7 +366,7 @@ $css = <<<'CSS'
 }
 
 .zo-soccer-help,
-.zo-soccer-shop {
+.zo-soccer-decision {
 	background: #fff;
 	border: 2px solid #dfe7d8;
 	border-radius: 12px;
@@ -406,73 +374,51 @@ $css = <<<'CSS'
 	font-size: 14px;
 	line-height: 1.45;
 	color: #334233;
-	max-width: 980px;
+	max-width: 1120px;
 	width: 100%;
 }
 
-.zo-soccer-shop-title {
-	font-weight: 700;
-	font-size: 16px;
-	margin-bottom: 8px;
-	color: #1d2a1d;
+.zo-soccer-decision {
+	display: none;
+}
+
+.zo-soccer-decision.is-active {
+	display: block;
 }
 
 .zo-soccer-mobilepad {
 	display: none;
-	grid-template-columns: repeat(3, 60px);
-	grid-template-rows: repeat(3, 60px);
-	gap: 8px;
-	justify-content: center;
-	margin-top: 4px;
 }
 
-.zo-soccer-padbtn {
-	border: none;
-	border-radius: 12px;
-	background: #fff;
-	border: 2px solid #dfe7d8;
-	font-size: 24px;
-	font-weight: 700;
-	color: #1d2a1d;
-}
-
-.zo-soccer-padbtn:active {
-	transform: scale(0.97);
-}
-
-@media (max-width: 820px) {
+@media (max-width: 900px) {
 	.zo-soccer-field {
-		height: 540px;
+		height: 560px;
 	}
 }
 
 @media (max-width: 700px) {
 	.zo-soccer-field {
-		height: 460px;
+		height: 450px;
 	}
 
-	.zo-soccer-mobilepad {
-		display: grid;
+	.zo-soccer-player__label {
+		font-size: 8px;
 	}
 }
 
 @media (max-width: 520px) {
 	.zo-soccer-field {
-		height: 380px;
+		height: 360px;
 	}
 
 	.zo-soccer-panel {
-		min-width: 100px;
+		min-width: 104px;
 		padding: 8px 10px;
 	}
 
 	.zo-soccer-help,
-	.zo-soccer-shop {
+	.zo-soccer-decision {
 		font-size: 13px;
-	}
-
-	.zo-soccer-player__name {
-		font-size: 9px;
 	}
 }
 CSS;
@@ -487,25 +433,21 @@ document.addEventListener('DOMContentLoaded', function () {
 		const scoreAiEl = game.querySelector('.zo-score-ai');
 		const timerEl = game.querySelector('.zo-status-timer');
 		const messageEl = game.querySelector('.zo-status-message');
-		const coinsEl = game.querySelector('.zo-status-coins');
-		const speedEl = game.querySelector('.zo-status-speed');
-		const roleEl = game.querySelector('.zo-status-role');
+		const modeEl = game.querySelector('.zo-status-mode');
 		const restartBtn = game.querySelector('.zo-soccer-restart');
 		const startBtn = game.querySelector('.zo-soccer-start');
-		const buy1Btn = game.querySelector('.zo-buy-speed-1');
-		const buy2Btn = game.querySelector('.zo-buy-speed-2');
 		const targetEl = game.querySelector('.zo-soccer-target');
-		const padButtons = game.querySelectorAll('.zo-soccer-padbtn');
-		const roleButtons = game.querySelectorAll('.zo-soccer-rolebtn');
+		const passLineEl = game.querySelector('.zo-soccer-pass-line');
+		const decisionBox = game.querySelector('.zo-soccer-decision');
+		const decisionText = game.querySelector('.zo-soccer-decision-text');
 
-		const FIELD_W = 1040;
-		const FIELD_H = 620;
+		const FIELD_W = 1120;
+		const FIELD_H = 630;
 		const PLAYER_RADIUS = 14;
-		const USER_RADIUS = 16;
 		const BALL_R = 8;
-		const GOAL_TOP = 245;
-		const GOAL_BOTTOM = 375;
-		const MATCH_TIME = 90;
+		const GOAL_TOP = 250;
+		const GOAL_BOTTOM = 380;
+		const MATCH_TIME = 300;
 
 		let animationId = null;
 		let lastTime = 0;
@@ -514,14 +456,12 @@ document.addEventListener('DOMContentLoaded', function () {
 		let userScore = 0;
 		let aiScore = 0;
 		let remaining = MATCH_TIME;
-		let coins = 0;
-		let userBaseSpeed = 190;
-		let dragTarget = null;
 		let restartType = null;
 		let restartTeam = null;
 		let restartSpot = null;
-		let roleMode = 'forward';
-		let userInput = { up: false, down: false, left: false, right: false };
+		let decisionMode = false;
+		let decisionPlayer = null;
+		let decisionTarget = null;
 
 		function clamp(value, min, max) {
 			return Math.max(min, Math.min(max, value));
@@ -533,9 +473,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			return Math.sqrt(dx * dx + dy * dy);
 		}
 
-		function createPlayer(role, team, position, label, homeX, homeY, options) {
+		function createPlayer(team, position, label, homeX, homeY, options) {
 			return {
-				role: role,
 				team: team,
 				position: position,
 				label: label,
@@ -549,37 +488,36 @@ document.addEventListener('DOMContentLoaded', function () {
 				vy: 0,
 				speed: options.speed,
 				isGoalie: !!options.isGoalie,
-				el: null,
-				nameEl: null
+				el: null
 			};
 		}
 
 		const bluePlayers = [
-			createPlayer('user', 'blue', 'forward', 'YOU', 560, 310, { speed: userBaseSpeed }),
-			createPlayer('ally', 'blue', 'goalie', 'GK', 86, 310, { speed: 142, isGoalie: true }),
-			createPlayer('ally', 'blue', 'defender', 'CB', 190, 220, { speed: 145 }),
-			createPlayer('ally', 'blue', 'defender', 'CB', 190, 400, { speed: 145 }),
-			createPlayer('ally', 'blue', 'wing', 'LW', 330, 105, { speed: 150 }),
-			createPlayer('ally', 'blue', 'wing', 'RW', 330, 515, { speed: 150 }),
-			createPlayer('ally', 'blue', 'midfielder', 'CM', 390, 235, { speed: 150 }),
-			createPlayer('ally', 'blue', 'midfielder', 'CM', 390, 385, { speed: 150 }),
-			createPlayer('ally', 'blue', 'forward', 'LF', 530, 165, { speed: 154 }),
-			createPlayer('ally', 'blue', 'forward', 'RF', 530, 455, { speed: 154 }),
-			createPlayer('ally', 'blue', 'forward', 'ST', 620, 310, { speed: 156 })
+			createPlayer('blue', 'goalie', 'GK', 86, 315, { speed: 82, isGoalie: true }),
+			createPlayer('blue', 'defender', 'CB', 195, 225, { speed: 84 }),
+			createPlayer('blue', 'defender', 'CB', 195, 405, { speed: 84 }),
+			createPlayer('blue', 'wing', 'LW', 340, 110, { speed: 88 }),
+			createPlayer('blue', 'wing', 'RW', 340, 520, { speed: 88 }),
+			createPlayer('blue', 'midfielder', 'CM', 420, 245, { speed: 88 }),
+			createPlayer('blue', 'midfielder', 'CM', 420, 385, { speed: 88 }),
+			createPlayer('blue', 'forward', 'LF', 565, 175, { speed: 90 }),
+			createPlayer('blue', 'forward', 'RF', 565, 455, { speed: 90 }),
+			createPlayer('blue', 'forward', 'ST', 650, 315, { speed: 92 }),
+			createPlayer('blue', 'defender', 'SW', 120, 315, { speed: 82 })
 		];
 
 		const redPlayers = [
-			createPlayer('enemy', 'red', 'goalie', 'GK', 954, 310, { speed: 142, isGoalie: true }),
-			createPlayer('enemy', 'red', 'defender', 'CB', 850, 220, { speed: 145 }),
-			createPlayer('enemy', 'red', 'defender', 'CB', 850, 400, { speed: 145 }),
-			createPlayer('enemy', 'red', 'wing', 'LW', 710, 105, { speed: 150 }),
-			createPlayer('enemy', 'red', 'wing', 'RW', 710, 515, { speed: 150 }),
-			createPlayer('enemy', 'red', 'midfielder', 'CM', 650, 235, { speed: 150 }),
-			createPlayer('enemy', 'red', 'midfielder', 'CM', 650, 385, { speed: 150 }),
-			createPlayer('enemy', 'red', 'forward', 'LF', 510, 165, { speed: 154 }),
-			createPlayer('enemy', 'red', 'forward', 'RF', 510, 455, { speed: 154 }),
-			createPlayer('enemy', 'red', 'forward', 'ST', 420, 310, { speed: 156 }),
-			createPlayer('enemy', 'red', 'defender', 'SW', 910, 310, { speed: 146 })
+			createPlayer('red', 'goalie', 'GK', 1034, 315, { speed: 82, isGoalie: true }),
+			createPlayer('red', 'defender', 'CB', 925, 225, { speed: 84 }),
+			createPlayer('red', 'defender', 'CB', 925, 405, { speed: 84 }),
+			createPlayer('red', 'wing', 'LW', 780, 110, { speed: 88 }),
+			createPlayer('red', 'wing', 'RW', 780, 520, { speed: 88 }),
+			createPlayer('red', 'midfielder', 'CM', 700, 245, { speed: 88 }),
+			createPlayer('red', 'midfielder', 'CM', 700, 385, { speed: 88 }),
+			createPlayer('red', 'forward', 'LF', 555, 175, { speed: 90 }),
+			createPlayer('red', 'forward', 'RF', 555, 455, { speed: 90 }),
+			createPlayer('red', 'forward', 'ST', 470, 315, { speed: 92 }),
+			createPlayer('red', 'defender', 'SW', 1000, 315, { speed: 82 })
 		];
 
 		const state = {
@@ -593,32 +531,27 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		};
 
-		const user = bluePlayers[0];
-
-		const roleHomes = {
-			defender: { x: 230, y: 310, label: 'YOU' },
-			wing: { x: 330, y: 105, label: 'YOU' },
-			midfielder: { x: 410, y: 310, label: 'YOU' },
-			forward: { x: 560, y: 310, label: 'YOU' }
-		};
-
-		function setUserRole(role) {
-			roleMode = role;
-			user.position = role;
-			user.baseHomeX = roleHomes[role].x;
-			user.baseHomeY = roleHomes[role].y;
-			user.homeX = user.baseHomeX;
-			user.homeY = user.baseHomeY;
-			roleButtons.forEach(function (btn) {
-				btn.classList.toggle('is-active', btn.getAttribute('data-role') === role);
-			});
-			roleEl.textContent = role.charAt(0).toUpperCase() + role.slice(1);
-			if (!started) {
-				user.x = user.homeX;
-				user.y = user.homeY;
-				render();
+		function updateModeLabel() {
+			if (decisionMode) {
+				modeEl.textContent = 'Decision';
+			} else if (running) {
+				modeEl.textContent = 'Live';
+			} else {
+				modeEl.textContent = 'Stopped';
 			}
-			setMessage('Role: ' + role.charAt(0).toUpperCase() + role.slice(1));
+		}
+
+		function setMessage(text) {
+			messageEl.textContent = text;
+		}
+
+		function updateHud() {
+			scoreUserEl.textContent = String(userScore);
+			scoreAiEl.textContent = String(aiScore);
+			const mins = Math.floor(remaining / 60);
+			const secs = Math.max(0, Math.ceil(remaining % 60));
+			timerEl.textContent = mins + ':' + String(secs).padStart(2, '0');
+			updateModeLabel();
 		}
 
 		function buildEntities() {
@@ -626,26 +559,21 @@ document.addEventListener('DOMContentLoaded', function () {
 				node.remove();
 			});
 
-			state.players.forEach(function (player, index) {
+			state.players.forEach(function (player) {
 				const el = document.createElement('div');
 				el.className = 'zo-soccer-player ' +
-					(index === 0 ? 'zo-soccer-player--user ' : '') +
 					(player.team === 'blue' ? 'zo-soccer-player--blue ' : 'zo-soccer-player--red ') +
 					(player.isGoalie ? 'zo-soccer-player--goalie' : '');
 
-				el.innerHTML = '' +
-					'<div class="zo-soccer-player__arrow"></div>' +
+				el.innerHTML =
+					'<div class="zo-soccer-player__marker"></div>' +
 					'<div class="zo-soccer-player__head"></div>' +
 					'<div class="zo-soccer-player__body"></div>' +
 					'<div class="zo-soccer-player__legs"></div>' +
-					'<div class="zo-soccer-player__name"></div>';
+					'<div class="zo-soccer-player__label">' + player.label + '</div>';
 
 				field.appendChild(el);
 				player.el = el;
-				player.nameEl = el.querySelector('.zo-soccer-player__name');
-				if (player.nameEl) {
-					player.nameEl.textContent = player.label;
-				}
 			});
 
 			const ballEl = document.createElement('div');
@@ -662,31 +590,21 @@ document.addEventListener('DOMContentLoaded', function () {
 				player.y = player.homeY;
 				player.vx = 0;
 				player.vy = 0;
+				player.el.classList.remove('zo-soccer-player--decision');
 			});
 			state.ball.x = FIELD_W / 2;
 			state.ball.y = FIELD_H / 2;
 			state.ball.vx = 0;
 			state.ball.vy = 0;
-			dragTarget = null;
 			restartType = null;
 			restartTeam = null;
 			restartSpot = null;
+			decisionMode = false;
+			decisionPlayer = null;
+			decisionTarget = null;
 			targetEl.classList.remove('is-active');
-		}
-
-		function updateHud() {
-			scoreUserEl.textContent = String(userScore);
-			scoreAiEl.textContent = String(aiScore);
-			timerEl.textContent = String(Math.max(0, Math.ceil(remaining)));
-			coinsEl.textContent = String(coins);
-			speedEl.textContent = String(userBaseSpeed);
-			roleEl.textContent = roleMode.charAt(0).toUpperCase() + roleMode.slice(1);
-			buy1Btn.disabled = coins < 5 || userBaseSpeed >= 210;
-			buy2Btn.disabled = coins < 10 || userBaseSpeed >= 230;
-		}
-
-		function setMessage(text) {
-			messageEl.textContent = text;
+			passLineEl.classList.remove('is-active');
+			decisionBox.classList.remove('is-active');
 		}
 
 		function render() {
@@ -702,12 +620,28 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.ball.el.style.left = (state.ball.x * scaleX) + 'px';
 			state.ball.el.style.top = (state.ball.y * scaleY) + 'px';
 
-			if (dragTarget) {
+			if (decisionMode && decisionTarget && decisionPlayer) {
+				const startX = decisionPlayer.x * scaleX;
+				const startY = decisionPlayer.y * scaleY;
+				const endX = decisionTarget.x * scaleX;
+				const endY = decisionTarget.y * scaleY;
+				const dx = endX - startX;
+				const dy = endY - startY;
+				const len = Math.sqrt(dx * dx + dy * dy);
+				const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+
 				targetEl.classList.add('is-active');
-				targetEl.style.left = (dragTarget.x * scaleX) + 'px';
-				targetEl.style.top = (dragTarget.y * scaleY) + 'px';
+				targetEl.style.left = endX + 'px';
+				targetEl.style.top = endY + 'px';
+
+				passLineEl.classList.add('is-active');
+				passLineEl.style.left = startX + 'px';
+				passLineEl.style.top = startY + 'px';
+				passLineEl.style.width = len + 'px';
+				passLineEl.style.transform = 'translate(0, -50%) rotate(' + angle + 'deg)';
 			} else {
 				targetEl.classList.remove('is-active');
+				passLineEl.classList.remove('is-active');
 			}
 		}
 
@@ -718,10 +652,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			started = false;
 			running = false;
 			lastTime = 0;
-			userInput.up = false;
-			userInput.down = false;
-			userInput.left = false;
-			userInput.right = false;
 			resetPositions();
 			updateHud();
 			setMessage('Press Start Match');
@@ -732,23 +662,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			render();
 		}
 
-		function getNearestTeammate(passer) {
-			let best = null;
-			let bestDist = Infinity;
-
-			state.players.forEach(function (player) {
-				if (player !== passer && player.team === passer.team) {
-					const d = distance(passer, player);
-					if (d < bestDist) {
-						bestDist = d;
-						best = player;
-					}
-				}
-			});
-
-			return best;
-		}
-
 		function kickBallToward(targetX, targetY, power) {
 			const dx = targetX - state.ball.x;
 			const dy = targetY - state.ball.y;
@@ -757,110 +670,109 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.ball.vy = (dy / dist) * power;
 		}
 
-		function userPass() {
-			if (restartType) {
-				handleRestartKick(user.team);
-				return;
-			}
-			const d = distance(user, state.ball);
-			if (d > 38) {
-				return;
-			}
-			const teammate = getNearestTeammate(user);
-			if (!teammate) {
-				return;
-			}
-			kickBallToward(teammate.x, teammate.y, 250);
-			setMessage('Pass');
+		function findBestPassTarget(player) {
+			const teammates = state.players.filter(function (other) {
+				return other.team === player.team && other !== player;
+			});
+
+			let best = null;
+			let bestScore = -999999;
+
+			teammates.forEach(function (mate) {
+				const forwardScore = player.team === 'blue' ? (mate.x - player.x) : (player.x - mate.x);
+				const spacingScore = 160 - Math.abs(mate.y - player.y);
+				const roleBonus =
+					(mate.position === 'forward' ? 38 : 0) +
+					(mate.position === 'wing' ? 20 : 0) +
+					(mate.position === 'midfielder' ? 12 : 0);
+
+				const total = forwardScore + spacingScore + roleBonus;
+
+				if (total > bestScore) {
+					bestScore = total;
+					best = mate;
+				}
+			});
+
+			return best;
 		}
 
-		function userShoot() {
-			if (restartType) {
-				handleRestartKick(user.team);
-				return;
+		function startDecisionMode(player) {
+			decisionMode = true;
+			running = false;
+			decisionPlayer = player;
+			decisionTarget = findBestPassTarget(player);
+
+			state.players.forEach(function (p) {
+				p.el.classList.toggle('zo-soccer-player--decision', p === player);
+			});
+
+			if (!decisionTarget) {
+				decisionTarget = {
+					x: player.team === 'blue' ? FIELD_W - 120 : 120,
+					y: FIELD_H / 2
+				};
 			}
-			const d = distance(user, state.ball);
-			if (d > 38) {
-				return;
-			}
-			kickBallToward(FIELD_W + 24, FIELD_H / 2, 350);
-			setMessage('Shot');
+
+			decisionBox.classList.add('is-active');
+			decisionText.textContent = 'Your teammate has the ball. Click or tap where to kick.';
+			setMessage('Choose where to kick');
+			updateHud();
+			render();
 		}
 
-		function applyUserMovement(dt) {
-			let targetX = null;
-			let targetY = null;
-
-			if (dragTarget) {
-				targetX = dragTarget.x;
-				targetY = dragTarget.y;
-			} else {
-				let mx = 0;
-				let my = 0;
-
-				if (userInput.up) my -= 1;
-				if (userInput.down) my += 1;
-				if (userInput.left) mx -= 1;
-				if (userInput.right) mx += 1;
-
-				if (mx !== 0 || my !== 0) {
-					const len = Math.sqrt(mx * mx + my * my);
-					targetX = user.x + (mx / len) * 60;
-					targetY = user.y + (my / len) * 60;
-				}
+		function endDecisionModeAndKick(targetX, targetY) {
+			if (!decisionMode || !decisionPlayer) {
+				return;
 			}
 
-			if (targetX !== null && targetY !== null) {
-				const dx = targetX - user.x;
-				const dy = targetY - user.y;
-				const dist = Math.sqrt(dx * dx + dy * dy);
+			state.ball.x = decisionPlayer.x + (decisionPlayer.team === 'blue' ? 12 : -12);
+			state.ball.y = decisionPlayer.y;
+			kickBallToward(targetX, targetY, 175);
 
-				if (dist > 3) {
-					user.vx = (dx / dist) * userBaseSpeed;
-					user.vy = (dy / dist) * userBaseSpeed;
-				} else {
-					user.vx *= 0.7;
-					user.vy *= 0.7;
-				}
-			} else {
-				user.vx *= 0.78;
-				user.vy *= 0.78;
-			}
-
-			user.x += user.vx * dt;
-			user.y += user.vy * dt;
+			decisionMode = false;
+			running = true;
+			decisionPlayer = null;
+			decisionTarget = null;
+			state.players.forEach(function (p) {
+				p.el.classList.remove('zo-soccer-player--decision');
+			});
+			decisionBox.classList.remove('is-active');
+			setMessage('Ball played');
+			updateHud();
+			animationId = requestAnimationFrame(loop);
 		}
 
 		function getRoleHomeShift(player, ball) {
 			const sideFactor = player.team === 'blue'
-				? clamp((ball.x - FIELD_W / 2) / 2.1, -120, 180)
-				: clamp((FIELD_W / 2 - ball.x) / 2.1, -120, 180);
+				? clamp((ball.x - FIELD_W / 2) / 2.8, -90, 140)
+				: clamp((FIELD_W / 2 - ball.x) / 2.8, -90, 140);
 
 			if (player.position === 'defender') {
 				return {
-					x: player.baseHomeX + (player.team === 'blue' ? sideFactor * 0.22 : -sideFactor * 0.22),
-					y: player.baseHomeY + (ball.y - player.baseHomeY) * 0.10
+					x: player.baseHomeX + (player.team === 'blue' ? sideFactor * 0.18 : -sideFactor * 0.18),
+					y: player.baseHomeY + (ball.y - player.baseHomeY) * 0.08
 				};
 			}
 
 			if (player.position === 'wing') {
 				const topWing = player.baseHomeY < FIELD_H / 2;
 				return {
-					x: player.baseHomeX + (player.team === 'blue' ? sideFactor * 0.40 : -sideFactor * 0.40),
-					y: topWing ? clamp(ball.y - 95, 70, 220) : clamp(ball.y + 95, FIELD_H - 220, FIELD_H - 70)
+					x: player.baseHomeX + (player.team === 'blue' ? sideFactor * 0.34 : -sideFactor * 0.34),
+					y: topWing ? clamp(ball.y - 90, 70, 230) : clamp(ball.y + 90, FIELD_H - 230, FIELD_H - 70)
 				};
 			}
 
 			if (player.position === 'midfielder') {
 				return {
-					x: player.baseHomeX + (player.team === 'blue' ? sideFactor * 0.50 : -sideFactor * 0.50),
-					y: player.baseHomeY + (ball.y - player.baseHomeY) * 0.28
+					x: player.baseHomeX + (player.team === 'blue' ? sideFactor * 0.42 : -sideFactor * 0.42),
+					y: player.baseHomeY + (ball.y - player.baseHomeY) * 0.22
 				};
 			}
 
 			return {
-				x: player.baseHomeX + (player.team === 'blue' ? sideFactor * 0.68 : -sideFactor * 0.68),
-				y: player.baseHomeY + (ball.y - player.baseHomeY) * 0.22
+				x: player.baseHomeX + (player.team === 'blue' ? sideFactor * 0.58 : -sideFactor * 0.58),
+				y: player.baseHomeY + (ball.y - player.baseHomeY) * 0.18
 			};
 		}
 
@@ -873,39 +785,36 @@ document.addEventListener('DOMContentLoaded', function () {
 				if (restartTeam === player.team) {
 					if (restartType === 'corner') {
 						if (player.isGoalie) {
-							targetX = player.team === 'blue' ? 86 : 954;
-							targetY = 310;
+							targetX = player.team === 'blue' ? 86 : 1034;
+							targetY = 315;
 						} else if (player.position === 'wing') {
 							targetX = restartSpot.x + (player.team === 'blue' ? 70 : -70);
-							targetY = clamp(restartSpot.y + (player.baseHomeY < FIELD_H / 2 ? 65 : -65), 80, FIELD_H - 80);
+							targetY = clamp(restartSpot.y + (player.baseHomeY < FIELD_H / 2 ? 70 : -70), 85, FIELD_H - 85);
 						} else if (player.position === 'forward') {
-							targetX = player.team === 'blue' ? FIELD_W - 180 : 180;
+							targetX = player.team === 'blue' ? FIELD_W - 190 : 190;
 							targetY = clamp(player.baseHomeY, 150, FIELD_H - 150);
 						} else {
-							targetX = player.baseHomeX + (player.team === 'blue' ? 50 : -50);
+							targetX = player.baseHomeX + (player.team === 'blue' ? 45 : -45);
 							targetY = player.baseHomeY;
 						}
 					}
 				} else {
 					if (player.isGoalie) {
-						targetX = player.team === 'blue' ? 86 : 954;
-						targetY = 310;
-					} else if (player.position === 'defender') {
-						targetX = player.baseHomeX;
-						targetY = player.baseHomeY;
+						targetX = player.team === 'blue' ? 86 : 1034;
+						targetY = 315;
 					} else {
-						targetX = player.baseHomeX + (player.team === 'blue' ? -25 : 25);
+						targetX = player.baseHomeX;
 						targetY = player.baseHomeY;
 					}
 				}
 			} else if (player.isGoalie) {
-				targetX = player.team === 'blue' ? 86 : 954;
-				targetY = clamp(ball.y, 235, 385);
+				targetX = player.team === 'blue' ? 86 : 1034;
+				targetY = clamp(ball.y, 240, 390);
 
-				const goalieThreat = player.team === 'blue' ? ball.x < 170 : ball.x > 870;
+				const goalieThreat = player.team === 'blue' ? ball.x < 180 : ball.x > 940;
 				if (goalieThreat) {
-					targetX = player.team === 'blue' ? 54 : 986;
-					targetY = clamp(ball.y, 220, 400);
+					targetX = player.team === 'blue' ? 58 : 1062;
+					targetY = clamp(ball.y, 220, 410);
 				}
 			} else {
 				const roleHome = getRoleHomeShift(player, ball);
@@ -913,28 +822,28 @@ document.addEventListener('DOMContentLoaded', function () {
 				targetY = roleHome.y;
 
 				const ballDist = distance(player, ball);
-				const attackSide = player.team === 'blue' ? ball.x > FIELD_W * 0.42 : ball.x < FIELD_W * 0.58;
+				const attackSide = player.team === 'blue' ? ball.x > FIELD_W * 0.45 : ball.x < FIELD_W * 0.55;
 
 				if (player.position === 'defender') {
-					if ((player.team === 'blue' && ball.x < FIELD_W * 0.46) || (player.team === 'red' && ball.x > FIELD_W * 0.54)) {
-						if (ballDist < 175) {
-							targetX = ball.x + (player.team === 'blue' ? -14 : 14);
+					if ((player.team === 'blue' && ball.x < FIELD_W * 0.48) || (player.team === 'red' && ball.x > FIELD_W * 0.52)) {
+						if (ballDist < 135) {
+							targetX = ball.x + (player.team === 'blue' ? -12 : 12);
 							targetY = ball.y;
 						}
 					}
 				} else if (player.position === 'wing') {
-					if (ballDist < 130 || attackSide) {
+					if (ballDist < 115 || attackSide) {
 						targetX = ball.x + (player.team === 'blue' ? -10 : 10);
-						targetY = ball.y + (player.baseHomeY < FIELD_H / 2 ? -45 : 45);
+						targetY = ball.y + (player.baseHomeY < FIELD_H / 2 ? -35 : 35);
 					}
 				} else if (player.position === 'midfielder') {
-					if (ballDist < 145 || attackSide) {
-						targetX = ball.x + (player.team === 'blue' ? -8 : 8);
+					if (ballDist < 120 || attackSide) {
+						targetX = ball.x + (player.team === 'blue' ? -7 : 7);
 						targetY = ball.y;
 					}
 				} else if (player.position === 'forward') {
-					if (ballDist < 160 || attackSide) {
-						targetX = ball.x + (player.team === 'blue' ? -6 : 6);
+					if (ballDist < 130 || attackSide) {
+						targetX = ball.x + (player.team === 'blue' ? -5 : 5);
 						targetY = ball.y;
 					}
 				}
@@ -948,8 +857,8 @@ document.addEventListener('DOMContentLoaded', function () {
 				player.vx = (dx / dist) * player.speed;
 				player.vy = (dy / dist) * player.speed;
 			} else {
-				player.vx *= 0.75;
-				player.vy *= 0.75;
+				player.vx *= 0.7;
+				player.vy *= 0.7;
 			}
 
 			player.x += player.vx * dt;
@@ -957,10 +866,9 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function keepPlayersInBounds() {
-			state.players.forEach(function (player, index) {
-				const radius = index === 0 ? USER_RADIUS : PLAYER_RADIUS;
-				player.x = clamp(player.x, radius, FIELD_W - radius);
-				player.y = clamp(player.y, radius, FIELD_H - radius);
+			state.players.forEach(function (player) {
+				player.x = clamp(player.x, PLAYER_RADIUS, FIELD_W - PLAYER_RADIUS);
+				player.y = clamp(player.y, PLAYER_RADIUS, FIELD_H - PLAYER_RADIUS);
 			});
 		}
 
@@ -972,7 +880,7 @@ document.addEventListener('DOMContentLoaded', function () {
 					const dx = b.x - a.x;
 					const dy = b.y - a.y;
 					const dist = Math.sqrt(dx * dx + dy * dy) || 0.01;
-					const minDist = (i === 0 || j === 0) ? 28 : 24;
+					const minDist = 24;
 
 					if (dist < minDist) {
 						const overlap = (minDist - dist) / 2;
@@ -987,71 +895,59 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		}
 
+		function getBallOwner() {
+			let owner = null;
+			let bestDist = Infinity;
+
+			state.players.forEach(function (player) {
+				const d = distance(player, state.ball);
+				if (d < bestDist) {
+					bestDist = d;
+					owner = player;
+				}
+			});
+
+			if (bestDist <= 24) {
+				return owner;
+			}
+
+			return null;
+		}
+
 		function maybeAiPassOrShoot(player) {
 			if (restartType) {
-				if (player.team === restartTeam && distance(player, state.ball) < 30) {
+				if (player.team === restartTeam && distance(player, state.ball) < 28) {
 					handleRestartKick(player.team);
 				}
 				return;
 			}
 
-			const d = distance(player, state.ball);
-			if (d > 28) {
+			if (player.team === 'blue') {
+				startDecisionMode(player);
 				return;
 			}
 
 			const towardLeft = player.team === 'red';
-
-			if (player.isGoalie) {
-				const teammate = getNearestTeammate(player);
-				if (teammate) {
-					kickBallToward(teammate.x, teammate.y, 220);
-				}
-				return;
-			}
-
 			const closeToGoal = towardLeft ? state.ball.x < 190 : state.ball.x > FIELD_W - 190;
 
 			if (closeToGoal || (player.position === 'forward' && Math.random() > 0.45)) {
-				kickBallToward(towardLeft ? -24 : FIELD_W + 24, FIELD_H / 2 + (Math.random() * 130 - 65), 300);
+				kickBallToward(towardLeft ? -24 : FIELD_W + 24, FIELD_H / 2 + (Math.random() * 130 - 65), 170);
 				return;
 			}
 
-			const teammates = state.players.filter(function (other) {
-				return other.team === player.team && other !== player;
-			});
-
-			let best = null;
-			let bestScore = -99999;
-
-			teammates.forEach(function (mate) {
-				let forwardScore = towardLeft ? (player.x - mate.x) : (mate.x - player.x);
-				let spacingScore = 140 - Math.abs(player.y - mate.y);
-				let roleBonus = 0;
-
-				if (mate.position === 'forward') roleBonus += 40;
-				if (mate.position === 'wing') roleBonus += 20;
-				if (mate.position === 'midfielder') roleBonus += 10;
-
-				const total = forwardScore + spacingScore + roleBonus;
-				if (total > bestScore) {
-					bestScore = total;
-					best = mate;
-				}
-			});
+			const best = findBestPassTarget(player);
 
 			if (best) {
-				kickBallToward(best.x, best.y, 220);
+				kickBallToward(best.x, best.y, 145);
 			}
 		}
 
 		function pushBallFromPlayers() {
-			state.players.forEach(function (player, index) {
+			state.players.forEach(function (player) {
 				const dx = state.ball.x - player.x;
 				const dy = state.ball.y - player.y;
 				const dist = Math.sqrt(dx * dx + dy * dy);
-				const radius = index === 0 ? USER_RADIUS : PLAYER_RADIUS;
-				const minDist = radius + BALL_R;
+				const minDist = PLAYER_RADIUS + BALL_R;
 
 				if (dist > 0 && dist < minDist) {
 					const nx = dx / dist;
@@ -1061,18 +957,14 @@ document.addEventListener('DOMContentLoaded', function () {
 					state.ball.x += nx * overlap;
 					state.ball.y += ny * overlap;
 
-					const kickPower = index === 0 ? 170 : 150;
-					state.ball.vx += nx * kickPower;
-					state.ball.vy += ny * kickPower;
+					const touchPower = 78;
+					state.ball.vx += nx * touchPower;
+					state.ball.vy += ny * touchPower;
 
 					if (player.team === 'blue') {
-						state.ball.vx += 18;
+						state.ball.vx += 8;
 					} else {
-						state.ball.vx -= 18;
-					}
-
-					if (index !== 0) {
-						maybeAiPassOrShoot(player);
+						state.ball.vx -= 8;
 					}
 				}
 			});
@@ -1097,9 +989,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			if (restartType === 'corner') {
-				const targetX = team === 'blue' ? FIELD_W - 170 : 170;
-				const targetY = FIELD_H / 2 + (Math.random() * 180 - 90);
-				kickBallToward(targetX, targetY, 290);
+				const targetX = team === 'blue' ? FIELD_W - 200 : 200;
+				const targetY = FIELD_H / 2 + (Math.random() * 160 - 80);
+				kickBallToward(targetX, targetY, 160);
 				setMessage((team === 'blue' ? 'Blue' : 'Red') + ' corner kick');
 			}
 
@@ -1112,16 +1004,16 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.ball.x += state.ball.vx * dt;
 			state.ball.y += state.ball.vy * dt;
 
-			state.ball.vx *= 0.989;
-			state.ball.vy *= 0.989;
+			state.ball.vx *= 0.992;
+			state.ball.vy *= 0.992;
 
 			if (state.ball.y <= BALL_R && state.ball.x > 0 && state.ball.x < FIELD_W) {
 				state.ball.y = BALL_R;
-				state.ball.vy *= -0.88;
+				state.ball.vy *= -0.84;
 			}
 			if (state.ball.y >= FIELD_H - BALL_R && state.ball.x > 0 && state.ball.x < FIELD_W) {
 				state.ball.y = FIELD_H - BALL_R;
-				state.ball.vy *= -0.88;
+				state.ball.vy *= -0.84;
 			}
 
 			const inGoalOpening = state.ball.y >= GOAL_TOP && state.ball.y <= GOAL_BOTTOM;
@@ -1129,28 +1021,26 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (!inGoalOpening) {
 				if (state.ball.x <= BALL_R && state.ball.y > 28 && state.ball.y < FIELD_H - 28) {
 					state.ball.x = BALL_R;
-					state.ball.vx *= -0.88;
+					state.ball.vx *= -0.84;
 				}
 				if (state.ball.x >= FIELD_W - BALL_R && state.ball.y > 28 && state.ball.y < FIELD_H - 28) {
 					state.ball.x = FIELD_W - BALL_R;
-					state.ball.vx *= -0.88;
+					state.ball.vx *= -0.84;
 				}
 			}
 
 			if (state.ball.x < -16 && inGoalOpening) {
 				aiScore += 1;
-				coins += 1;
 				updateHud();
-				setMessage('AI scored');
+				setMessage('Red scored');
 				resetPositions();
 				return;
 			}
 
 			if (state.ball.x > FIELD_W + 16 && inGoalOpening) {
 				userScore += 1;
-				coins += 3;
 				updateHud();
-				setMessage('You scored');
+				setMessage('Blue scored');
 				resetPositions();
 				return;
 			}
@@ -1176,12 +1066,8 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function updatePlayers(dt) {
-			applyUserMovement(dt);
-
-			state.players.forEach(function (player, index) {
-				if (index !== 0) {
-					aiMovePlayer(player, dt);
-				}
+			state.players.forEach(function (player) {
+				aiMovePlayer(player, dt);
 			});
 
 			separatePlayers();
@@ -1189,7 +1075,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function loop(ts) {
-			if (!running) {
+			if (!running || decisionMode) {
 				return;
 			}
 
@@ -1212,15 +1098,11 @@ document.addEventListener('DOMContentLoaded', function () {
 				render();
 
 				if (userScore > aiScore) {
-					coins += 5;
-					updateHud();
-					setMessage('You win. +5 coins');
+					setMessage('Blue wins');
 				} else if (userScore < aiScore) {
-					setMessage('AI wins');
+					setMessage('Red wins');
 				} else {
-					coins += 2;
-					updateHud();
-					setMessage('Draw. +2 coins');
+					setMessage('Draw match');
 				}
 				return;
 			}
@@ -1228,14 +1110,22 @@ document.addEventListener('DOMContentLoaded', function () {
 			updatePlayers(dt);
 			pushBallFromPlayers();
 			updateBall(dt);
+
+			const owner = getBallOwner();
+			if (owner && !decisionMode) {
+				maybeAiPassOrShoot(owner);
+			}
+
 			updateHud();
 			render();
 
-			animationId = requestAnimationFrame(loop);
+			if (running && !decisionMode) {
+				animationId = requestAnimationFrame(loop);
+			}
 		}
 
 		function startMatch() {
-			if (running) {
+			if (running || decisionMode) {
 				return;
 			}
 			if (!started) {
@@ -1248,15 +1138,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			running = true;
 			lastTime = 0;
 			setMessage('Match in progress');
+			updateHud();
 			field.focus();
 			animationId = requestAnimationFrame(loop);
-		}
-
-		function setInputFromKey(key, isDown) {
-			if (key === 'ArrowUp' || key === 'w' || key === 'W') userInput.up = isDown;
-			if (key === 'ArrowDown' || key === 's' || key === 'S') userInput.down = isDown;
-			if (key === 'ArrowLeft' || key === 'a' || key === 'A') userInput.left = isDown;
-			if (key === 'ArrowRight' || key === 'd' || key === 'D') userInput.right = isDown;
 		}
 
 		function fieldPointFromEvent(event) {
@@ -1269,116 +1153,40 @@ document.addEventListener('DOMContentLoaded', function () {
 			};
 		}
 
-		function beginDrag(event) {
-			event.preventDefault();
-			dragTarget = fieldPointFromEvent(event);
-			field.focus();
-		}
-
-		function moveDrag(event) {
-			if (!dragTarget) {
+		field.addEventListener('mousemove', function (e) {
+			if (!decisionMode) {
 				return;
 			}
-			event.preventDefault();
-			dragTarget = fieldPointFromEvent(event);
-		}
-
-		function endDrag(event) {
-			if (event) {
-				event.preventDefault();
-			}
-			dragTarget = null;
-		}
-
-		game.addEventListener('keydown', function (e) {
-			if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'W', 'a', 'A', 's', 'S', 'd', 'D'].indexOf(e.key) !== -1) {
-				e.preventDefault();
-				setInputFromKey(e.key, true);
-			}
-			if (e.code === 'Space') {
-				e.preventDefault();
-				userPass();
-			}
-			if (e.key === 'Enter') {
-				e.preventDefault();
-				userShoot();
-			}
+			decisionTarget = fieldPointFromEvent(e);
+			render();
 		});
 
-		game.addEventListener('keyup', function (e) {
-			setInputFromKey(e.key, false);
-		});
-
-		field.addEventListener('keydown', function (e) {
-			if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'W', 'a', 'A', 's', 'S', 'd', 'D'].indexOf(e.key) !== -1) {
-				e.preventDefault();
-				setInputFromKey(e.key, true);
+		field.addEventListener('touchmove', function (e) {
+			if (!decisionMode) {
+				return;
 			}
-			if (e.code === 'Space') {
-				e.preventDefault();
-				userPass();
+			e.preventDefault();
+			decisionTarget = fieldPointFromEvent(e);
+			render();
+		}, { passive: false });
+
+		field.addEventListener('mousedown', function (e) {
+			if (!decisionMode) {
+				return;
 			}
-			if (e.key === 'Enter') {
-				e.preventDefault();
-				userShoot();
+			e.preventDefault();
+			const point = fieldPointFromEvent(e);
+			endDecisionModeAndKick(point.x, point.y);
+		});
+
+		field.addEventListener('touchstart', function (e) {
+			if (!decisionMode) {
+				return;
 			}
-		});
-
-		field.addEventListener('keyup', function (e) {
-			setInputFromKey(e.key, false);
-		});
-
-		field.addEventListener('mousedown', beginDrag);
-		field.addEventListener('mousemove', moveDrag);
-		field.addEventListener('mouseup', endDrag);
-		field.addEventListener('mouseleave', endDrag);
-
-		field.addEventListener('touchstart', beginDrag, { passive: false });
-		field.addEventListener('touchmove', moveDrag, { passive: false });
-		field.addEventListener('touchend', endDrag, { passive: false });
-		field.addEventListener('touchcancel', endDrag, { passive: false });
-
-		padButtons.forEach(function (btn) {
-			const dir = btn.getAttribute('data-dir');
-
-			function press(stateValue) {
-				if (dir === 'up') userInput.up = stateValue;
-				if (dir === 'down') userInput.down = stateValue;
-				if (dir === 'left') userInput.left = stateValue;
-				if (dir === 'right') userInput.right = stateValue;
-				field.focus();
-			}
-
-			btn.addEventListener('touchstart', function (e) {
-				e.preventDefault();
-				press(true);
-			}, { passive: false });
-
-			btn.addEventListener('touchend', function (e) {
-				e.preventDefault();
-				press(false);
-			}, { passive: false });
-
-			btn.addEventListener('mousedown', function (e) {
-				e.preventDefault();
-				press(true);
-			});
-
-			btn.addEventListener('mouseup', function () {
-				press(false);
-			});
-
-			btn.addEventListener('mouseleave', function () {
-				press(false);
-			});
-		});
-
-		roleButtons.forEach(function (btn) {
-			btn.addEventListener('click', function () {
-				setUserRole(btn.getAttribute('data-role'));
-				field.focus();
-			});
-		});
+			e.preventDefault();
+			const point = fieldPointFromEvent(e);
+			endDecisionModeAndKick(point.x, point.y);
+		}, { passive: false });
 
 		startBtn.addEventListener('click', function () {
 			startMatch();
@@ -1389,26 +1197,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			field.focus();
 		});
 
-		buy1Btn.addEventListener('click', function () {
-			if (coins >= 5 && userBaseSpeed < 210) {
-				coins -= 5;
-				userBaseSpeed += 10;
-				updateHud();
-				setMessage('Speed upgraded');
-			}
-		});
-
-		buy2Btn.addEventListener('click', function () {
-			if (coins >= 10 && userBaseSpeed < 230) {
-				coins -= 10;
-				userBaseSpeed += 20;
-				updateHud();
-				setMessage('Big speed upgrade');
-			}
-		});
-
 		buildEntities();
-		setUserRole('forward');
 		resetMatch();
 	});
 });
@@ -1420,44 +1209,29 @@ if (!function_exists('zo_game_soccer_match_ai_render')) {
 
 		ob_start();
 		?>
-		<div class="zo-game-root zo-game-root--soccer-match-ai" id="<?php echo esc_attr($instance_id); ?>" tabindex="0">
+		<div class="zo-game-root zo-game-root--soccer-match-ai" id="<?php echo esc_attr($instance_id); ?>">
 			<div class="zo-soccer-wrap">
 				<div class="zo-soccer-topbar">
 					<div class="zo-soccer-panel">
 						<strong class="zo-score-user">0</strong>
-						<span>Your Team</span>
+						<span>Blue Team</span>
 					</div>
 					<div class="zo-soccer-panel">
 						<strong class="zo-score-ai">0</strong>
-						<span>AI Team</span>
+						<span>Red Team</span>
 					</div>
 					<div class="zo-soccer-panel">
-						<strong class="zo-status-timer">90</strong>
-						<span>Seconds Left</span>
+						<strong class="zo-status-timer">5:00</strong>
+						<span>Match Time</span>
 					</div>
 					<div class="zo-soccer-panel">
-						<strong class="zo-status-coins">0</strong>
-						<span>Coins</span>
-					</div>
-					<div class="zo-soccer-panel">
-						<strong class="zo-status-speed">190</strong>
-						<span>Your Speed</span>
-					</div>
-					<div class="zo-soccer-panel">
-						<strong class="zo-status-role">Forward</strong>
-						<span>Your Role</span>
+						<strong class="zo-status-mode">Stopped</strong>
+						<span>Game Mode</span>
 					</div>
 					<div class="zo-soccer-panel">
 						<strong class="zo-status-message">Press Start Match</strong>
 						<span>Status</span>
 					</div>
-				</div>
-
-				<div class="zo-soccer-rolebar">
-					<button type="button" class="zo-soccer-rolebtn" data-role="defender">Defence</button>
-					<button type="button" class="zo-soccer-rolebtn" data-role="wing">Wing</button>
-					<button type="button" class="zo-soccer-rolebtn" data-role="midfielder">Midfield</button>
-					<button type="button" class="zo-soccer-rolebtn is-active" data-role="forward">Forward</button>
 				</div>
 
 				<div class="zo-soccer-field" tabindex="0" aria-label="Soccer field game area">
@@ -1475,35 +1249,21 @@ if (!function_exists('zo_game_soccer_match_ai_render')) {
 					<div class="zo-soccer-corner-arc zo-soccer-corner-arc--bl"></div>
 					<div class="zo-soccer-corner-arc zo-soccer-corner-arc--br"></div>
 					<div class="zo-soccer-target"></div>
+					<div class="zo-soccer-pass-line"></div>
 				</div>
 
 				<div class="zo-soccer-controls">
 					<div class="zo-soccer-buttons">
 						<button type="button" class="zo-soccer-btn zo-soccer-start">Start Match</button>
 						<button type="button" class="zo-soccer-btn zo-soccer-restart">Restart</button>
-						<button type="button" class="zo-soccer-btn zo-buy-speed-1">Buy +10 Speed (5 coins)</button>
-						<button type="button" class="zo-soccer-btn zo-buy-speed-2">Buy +20 Speed (10 coins)</button>
 					</div>
 
 					<div class="zo-soccer-help">
-						Choose your role: Defence, Wing, Midfield, or Forward. Use arrow keys or WASD to move. Press Space to pass. Press Enter to shoot. You can also drag on the field with mouse or touch. Players stay spread out in real positions, and corner kicks happen from the corner.
+						All players move by AI. The match is slow and lasts 5 minutes. When a blue teammate gets the ball, the game pauses and you choose where the ball should be kicked by clicking or tapping on the field. The field is shown in a wide real match view.
 					</div>
 
-					<div class="zo-soccer-shop">
-						<div class="zo-soccer-shop-title">Upgrades</div>
-						<div>Score goals and win matches to earn coins. Use coins to make your player faster.</div>
-					</div>
-
-					<div class="zo-soccer-mobilepad">
-						<div></div>
-						<button type="button" class="zo-soccer-padbtn" data-dir="up">↑</button>
-						<div></div>
-						<button type="button" class="zo-soccer-padbtn" data-dir="left">←</button>
-						<div></div>
-						<button type="button" class="zo-soccer-padbtn" data-dir="right">→</button>
-						<div></div>
-						<button type="button" class="zo-soccer-padbtn" data-dir="down">↓</button>
-						<div></div>
+					<div class="zo-soccer-decision">
+						<div class="zo-soccer-decision-text">Your teammate has the ball. Click or tap where to kick.</div>
 					</div>
 				</div>
 			</div>
@@ -1517,7 +1277,7 @@ return array(
 	'slug'            => 'soccer-match-ai',
 	'name'            => 'Soccer Match AI',
 	'author'          => 'Asker',
-	'description'     => 'A soccer match game with proper player spacing, role selection, and corner kicks.',
+	'description'     => 'A slow 5 minute soccer match where all players are AI and you decide where blue team passes or kicks.',
 	'render_callback' => 'zo_game_soccer_match_ai_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,
