@@ -1,40 +1,40 @@
 <?php
 if (!defined('ABSPATH')) exit;
 
-/* ================= AJAX ================= */
+/* ===== AJAX ===== */
 
-add_action('wp_ajax_zo_ll_get_sets','zo_ll_get_sets');
-add_action('wp_ajax_nopriv_zo_ll_get_sets','zo_ll_get_sets');
+add_action('wp_ajax_zo_ll_get','zo_ll_get');
+add_action('wp_ajax_nopriv_zo_ll_get','zo_ll_get');
 
-add_action('wp_ajax_zo_ll_save_sets','zo_ll_save_sets');
-add_action('wp_ajax_nopriv_zo_ll_save_sets','zo_ll_save_sets');
+add_action('wp_ajax_zo_ll_save','zo_ll_save');
+add_action('wp_ajax_nopriv_zo_ll_save','zo_ll_save');
 
 add_action('wp_ajax_zo_ll_upload','zo_ll_upload');
 add_action('wp_ajax_nopriv_zo_ll_upload','zo_ll_upload');
 
-function zo_ll_get_sets(){
+function zo_ll_get(){
 	wp_send_json_success(get_option('zo_ll_sets',[]));
 }
 
-function zo_ll_save_sets(){
+function zo_ll_save(){
 
 	check_ajax_referer('zo_ll_nonce','nonce');
 
-	if($_POST['password']!=='asker1905123'){
+	if($_POST['password'] !== 'asker1905123'){
 		wp_send_json_error('Wrong password');
 	}
 
-	$sets=json_decode(stripslashes($_POST['sets']),true);
-	update_option('zo_ll_sets',$sets);
+	$data = json_decode(stripslashes($_POST['sets']), true);
+	update_option('zo_ll_sets',$data);
 
-	wp_send_json_success($sets);
+	wp_send_json_success();
 }
 
 function zo_ll_upload(){
 
 	check_ajax_referer('zo_ll_nonce','nonce');
 
-	if($_POST['password']!=='asker1905123'){
+	if($_POST['password'] !== 'asker1905123'){
 		wp_send_json_error('Wrong password');
 	}
 
@@ -43,50 +43,46 @@ function zo_ll_upload(){
 	}
 
 	require_once ABSPATH.'wp-admin/includes/file.php';
+	$upload = wp_handle_upload($_FILES['file'],['test_form'=>false]);
 
-	$uploaded=wp_handle_upload($_FILES['file'],['test_form'=>false]);
-
-	if(isset($uploaded['error'])){
-		wp_send_json_error($uploaded['error']);
+	if(isset($upload['error'])){
+		wp_send_json_error($upload['error']);
 	}
 
-	wp_send_json_success($uploaded['url']);
+	wp_send_json_success($upload['url']);
 }
 
-/* ================= CSS ================= */
+/* ===== CSS ===== */
 
 $css='
-.zo-ll-root{max-width:900px;margin:0 auto;padding:20px;background:#0f172a;color:#fff;border-radius:18px}
-.zo-ll-input{width:100%;padding:6px;margin-bottom:6px;border-radius:8px;border:none}
-.zo-ll-btn{padding:6px 12px;border-radius:999px;border:none;background:#38bdf8;color:#000;font-weight:bold;margin:4px 4px 4px 0;cursor:pointer}
-.zo-ll-select{width:100%;padding:6px;margin-bottom:10px;border-radius:8px}
-.zo-ll-edit-item{background:#1e293b;padding:8px;border-radius:10px;margin-bottom:8px}
-.zo-ll-card-wrap{perspective:1000px;margin:20px 0}
-.zo-ll-card{width:100%;height:260px;position:relative;transform-style:preserve-3d;transition:transform .6s}
-.zo-ll-card.flipped{transform:rotateY(180deg)}
-.zo-ll-face{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:16px;display:flex;flex-direction:column;justify-content:center;align-items:center;background:#1e293b;padding:10px}
-.zo-ll-back{transform:rotateY(180deg);background:#334155}
-.zo-ll-img{max-height:120px;margin-bottom:10px;border-radius:10px}
-.small-preview{max-height:60px;margin-top:4px;border-radius:6px}
+.ll{background:#0f172a;color:#fff;padding:20px;border-radius:16px;max-width:900px;margin:auto}
+.ll input{width:100%;margin:4px 0;padding:6px;border-radius:6px;border:none}
+.ll button{margin:4px 4px 4px 0;padding:6px 10px;border:none;border-radius:20px;background:#38bdf8;color:#000;font-weight:bold;cursor:pointer}
+.card-wrap{perspective:1000px;margin:20px 0}
+.card{height:240px;position:relative;transform-style:preserve-3d;transition:.6s}
+.card.flip{transform:rotateY(180deg)}
+.face{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:14px;background:#1e293b;display:flex;flex-direction:column;justify-content:center;align-items:center}
+.back{transform:rotateY(180deg);background:#334155}
+img{max-height:120px;margin-bottom:10px}
+.edit{background:#1e293b;padding:8px;border-radius:8px;margin:6px 0}
 ';
 
-/* ================= JS ================= */
+/* ===== JS ===== */
 
 $js=<<<JS
 document.addEventListener("DOMContentLoaded",function(){
 
-const game=document.querySelector(".zo-ll-root");
-const ajaxUrl=window.location.origin+"/wp-admin/admin-ajax.php";
-const nonce=game.dataset.nonce;
+const root=document.querySelector(".ll");
+const ajax=window.location.origin+"/wp-admin/admin-ajax.php";
+const nonce=root.dataset.nonce;
 
 let sets=[];
-let currentSetIndex=null;
+let currentSet=null;
 let currentIndex=0;
 
-/* ================= LOAD ================= */
-
-function fetchSets(){
-fetch(ajaxUrl+"?action=zo_ll_get_sets")
+/* LOAD */
+function load(){
+fetch(ajax+"?action=zo_ll_get")
 .then(r=>r.json())
 .then(d=>{
 if(d.success){
@@ -97,190 +93,140 @@ renderSelect();
 }
 
 function renderSelect(){
-const select=document.querySelector(".zo-ll-set-select");
-select.innerHTML='<option value="">Select Set</option>';
+const sel=root.querySelector(".set");
+sel.innerHTML='<option value="">Select</option>';
 sets.forEach((s,i)=>{
-select.innerHTML+=`<option value="\${i}">\${s.language} - \${s.category}</option>`;
+sel.innerHTML+=`<option value="\${i}">\${s.name}</option>`;
 });
 }
 
-/* ================= SELECT ================= */
-
-document.querySelector(".zo-ll-set-select").onchange=function(){
-if(this.value==="") return;
-currentSetIndex=parseInt(this.value);
+root.querySelector(".set").onchange=function(){
+if(this.value==="")return;
+currentSet=parseInt(this.value);
 currentIndex=0;
-renderEditList();
-showCard();
+renderEdit();
+show();
 };
 
-/* ================= SHOW CARD ================= */
+/* SHOW CARD */
+function show(){
+if(currentSet===null)return;
+const item=sets[currentSet].items[currentIndex];
+root.querySelector(".front-word").textContent=item.word;
+root.querySelector(".back-trans").textContent=item.translation;
 
-function showCard(){
-if(currentSetIndex===null) return;
-const items=sets[currentSetIndex].items;
-if(!items.length) return;
-
-const item=items[currentIndex];
-
-document.querySelector(".zo-ll-front-word").textContent=item.word;
-document.querySelector(".zo-ll-back-translation").textContent=item.translation;
-
-const img=document.querySelector(".zo-ll-img");
+const img=root.querySelector(".img");
 if(item.image){ img.src=item.image; img.style.display="block"; }
 else img.style.display="none";
 
-const audioBtn=document.querySelector(".zo-ll-audio-btn");
+const btn=root.querySelector(".audio");
 if(item.audio){
-audioBtn.style.display="inline-block";
-audioBtn.onclick=function(){ new Audio(item.audio).play(); };
-}else audioBtn.style.display="none";
+btn.style.display="inline-block";
+btn.onclick=()=>new Audio(item.audio).play();
+}else btn.style.display="none";
 
-document.querySelector(".zo-ll-card").classList.remove("flipped");
+root.querySelector(".card").classList.remove("flip");
 }
 
-/* ================= NAVIGATION ================= */
+root.querySelector(".prev").onclick=()=>{ if(currentIndex>0){currentIndex--;show();} };
+root.querySelector(".next").onclick=()=>{ if(currentSet!==null && currentIndex<sets[currentSet].items.length-1){currentIndex++;show();} };
+root.querySelector(".card").onclick=()=>root.querySelector(".card").classList.toggle("flip");
 
-document.querySelector(".zo-ll-prev").onclick=function(){
-if(currentIndex>0){currentIndex--;showCard();}
-};
+/* EDIT */
+function renderEdit(){
+const box=root.querySelector(".edit-list");
+box.innerHTML="";
+if(currentSet===null)return;
 
-document.querySelector(".zo-ll-next").onclick=function(){
-if(currentSetIndex===null)return;
-if(currentIndex < sets[currentSetIndex].items.length-1){
-currentIndex++;
-showCard();
-}
-};
-
-document.querySelector(".zo-ll-card").onclick=function(){
-this.classList.toggle("flipped");
-};
-
-/* ================= EDIT LIST ================= */
-
-function renderEditList(){
-
-const container=document.querySelector(".zo-ll-edit-list");
-container.innerHTML="";
-if(currentSetIndex===null) return;
-
-sets[currentSetIndex].items.forEach((item,i)=>{
-
-container.innerHTML+=`
-<div class="zo-ll-edit-item">
-<input class="zo-ll-input edit-word" data-i="\${i}" value="\${item.word}">
-<input class="zo-ll-input edit-translation" data-i="\${i}" value="\${item.translation}">
-
-<label>Image:</label>
-<input type="file" class="edit-image-file" data-i="\${i}">
-<img src="\${item.image||''}" class="small-preview">
-
-<label>Audio:</label>
-<input type="file" class="edit-audio-file" data-i="\${i}">
-
-<button class="zo-ll-btn edit-delete" data-i="\${i}">Delete</button>
+sets[currentSet].items.forEach((item,i)=>{
+box.innerHTML+=`
+<div class="edit">
+<input data-i="\${i}" class="w" value="\${item.word}">
+<input data-i="\${i}" class="t" value="\${item.translation}">
+<input type="file" data-i="\${i}" class="imgf">
+<input type="file" data-i="\${i}" class="audf">
+<button data-i="\${i}" class="del">Delete</button>
 </div>`;
 });
 
-attachEditHandlers();
+attachEdit();
 }
 
-function attachEditHandlers(){
+function attachEdit(){
 
-document.querySelectorAll(".edit-word").forEach(inp=>{
+root.querySelectorAll(".w").forEach(inp=>{
 inp.oninput=function(){
-sets[currentSetIndex].items[this.dataset.i].word=this.value;
+sets[currentSet].items[this.dataset.i].word=this.value;
 };
 });
 
-document.querySelectorAll(".edit-translation").forEach(inp=>{
+root.querySelectorAll(".t").forEach(inp=>{
 inp.oninput=function(){
-sets[currentSetIndex].items[this.dataset.i].translation=this.value;
+sets[currentSet].items[this.dataset.i].translation=this.value;
 };
 });
 
-document.querySelectorAll(".edit-delete").forEach(btn=>{
+root.querySelectorAll(".del").forEach(btn=>{
 btn.onclick=function(){
-sets[currentSetIndex].items.splice(this.dataset.i,1);
-renderEditList();
-showCard();
+sets[currentSet].items.splice(this.dataset.i,1);
+renderEdit();
+show();
 };
 });
 
-document.querySelectorAll(".edit-image-file").forEach(inp=>{
+root.querySelectorAll(".imgf").forEach(inp=>{
 inp.onchange=function(){
-uploadFile(this.files[0],url=>{
-sets[currentSetIndex].items[this.dataset.i].image=url;
-renderEditList();
+upload(this.files[0],url=>{
+sets[currentSet].items[this.dataset.i].image=url;
 });
 };
 });
 
-document.querySelectorAll(".edit-audio-file").forEach(inp=>{
+root.querySelectorAll(".audf").forEach(inp=>{
 inp.onchange=function(){
-uploadFile(this.files[0],url=>{
-sets[currentSetIndex].items[this.dataset.i].audio=url;
+upload(this.files[0],url=>{
+sets[currentSet].items[this.dataset.i].audio=url;
 });
 };
 });
 }
 
-/* ================= ADD NEW WORD TO EXISTING ================= */
-
-document.querySelector(".zo-ll-add-new-word").onclick=function(){
-
-if(currentSetIndex===null) return;
-
-const word=prompt("Word:");
-const trans=prompt("Translation:");
-
-if(!word||!trans) return;
-
-sets[currentSetIndex].items.push({
-word:word,
-translation:trans,
-image:"",
-audio:""
-});
-
-renderEditList();
+/* ADD WORD */
+root.querySelector(".add").onclick=function(){
+if(currentSet===null)return;
+sets[currentSet].items.push({word:"New",translation:"",image:"",audio:""});
+renderEdit();
 };
 
-/* ================= UPLOAD ================= */
-
-function uploadFile(file,callback){
-
-if(!file) return;
-
+/* UPLOAD */
+function upload(file,cb){
+if(!file)return;
 const pass=prompt("Admin password:");
-if(!pass) return;
+if(!pass)return;
 
-const formData=new FormData();
-formData.append("action","zo_ll_upload");
-formData.append("file",file);
-formData.append("password",pass);
-formData.append("nonce",nonce);
+const fd=new FormData();
+fd.append("action","zo_ll_upload");
+fd.append("file",file);
+fd.append("password",pass);
+fd.append("nonce",nonce);
 
-fetch(ajaxUrl,{method:"POST",body:formData})
+fetch(ajax,{method:"POST",body:fd})
 .then(r=>r.json())
 .then(d=>{
-if(d.success) callback(d.data);
+if(d.success)cb(d.data);
 else alert(d.data);
 });
 }
 
-/* ================= SAVE ================= */
-
-document.querySelector(".zo-ll-save-all").onclick=function(){
-
+/* SAVE */
+root.querySelector(".save").onclick=function(){
 const pass=prompt("Admin password:");
-if(!pass) return;
+if(!pass)return;
 
-fetch(ajaxUrl,{
+fetch(ajax,{
 method:"POST",
 body:new URLSearchParams({
-action:"zo_ll_save_sets",
+action:"zo_ll_save",
 password:pass,
 sets:JSON.stringify(sets),
 nonce:nonce
@@ -288,16 +234,16 @@ nonce:nonce
 })
 .then(r=>r.json())
 .then(d=>{
-if(d.success) alert("Saved");
+if(d.success)alert("Saved");
 else alert(d.data);
 });
 };
 
-fetchSets();
+load();
 });
 JS;
 
-/* ================= RENDER ================= */
+/* ===== RENDER ===== */
 
 function zo_game_language_learner_render(){
 
@@ -305,38 +251,33 @@ $nonce=wp_create_nonce('zo_ll_nonce');
 
 ob_start(); ?>
 
-<div class="zo-game-root zo-ll-root" data-nonce="<?php echo esc_attr($nonce); ?>">
+<div class="ll" data-nonce="<?php echo esc_attr($nonce); ?>">
 
-<h2>Language Flashcards</h2>
+<select class="set"></select>
 
-<select class="zo-ll-select zo-ll-set-select"></select>
-
-<div class="zo-ll-card-wrap">
-<div class="zo-ll-card">
-
-<div class="zo-ll-face">
-<h2 class="zo-ll-front-word"></h2>
-<button class="zo-ll-btn zo-ll-audio-btn" style="display:none;">Play Audio</button>
+<div class="card-wrap">
+<div class="card">
+<div class="face">
+<h2 class="front-word"></h2>
+<button class="audio" style="display:none">Play Audio</button>
 </div>
-
-<div class="zo-ll-face zo-ll-back">
-<img class="zo-ll-img" style="display:none">
-<h3 class="zo-ll-back-translation"></h3>
+<div class="face back">
+<img class="img" style="display:none">
+<h3 class="back-trans"></h3>
 </div>
-
 </div>
 </div>
 
-<button class="zo-ll-btn zo-ll-prev">Prev</button>
-<button class="zo-ll-btn zo-ll-next">Next</button>
+<button class="prev">Prev</button>
+<button class="next">Next</button>
 
 <hr>
 
 <h3>Edit Words</h3>
-<div class="zo-ll-edit-list"></div>
+<div class="edit-list"></div>
 
-<button class="zo-ll-btn zo-ll-add-new-word">Add New Word</button>
-<button class="zo-ll-btn zo-ll-save-all">Save Changes</button>
+<button class="add">Add Word</button>
+<button class="save">Save</button>
 
 </div>
 
@@ -346,7 +287,7 @@ return [
 'slug'=>'language-learning-platform',
 'name'=>'Language Learning Platform',
 'author'=>'Asker',
-'description'=>'Advanced editable flashcard system.',
+'description'=>'Stable flashcard system.',
 'render_callback'=>'zo_game_language_learner_render',
 'inline_style'=>$css,
 'inline_script'=>$js
