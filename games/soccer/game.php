@@ -386,10 +386,6 @@ $css = <<<'CSS'
 	display: block;
 }
 
-.zo-soccer-mobilepad {
-	display: none;
-}
-
 @media (max-width: 900px) {
 	.zo-soccer-field {
 		height: 560px;
@@ -728,7 +724,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			state.ball.x = decisionPlayer.x + (decisionPlayer.team === 'blue' ? 12 : -12);
 			state.ball.y = decisionPlayer.y;
-			kickBallToward(targetX, targetY, 175);
+			kickBallToward(targetX, targetY, 260);
 
 			decisionMode = false;
 			running = true;
@@ -791,7 +787,7 @@ document.addEventListener('DOMContentLoaded', function () {
 							targetX = restartSpot.x + (player.team === 'blue' ? 70 : -70);
 							targetY = clamp(restartSpot.y + (player.baseHomeY < FIELD_H / 2 ? 70 : -70), 85, FIELD_H - 85);
 						} else if (player.position === 'forward') {
-							targetX = player.team === 'blue' ? FIELD_W - 190 : 190;
+							targetX = player.team === 'blue' ? FIELD_W - 200 : 200;
 							targetY = clamp(player.baseHomeY, 150, FIELD_H - 150);
 						} else {
 							targetX = player.baseHomeX + (player.team === 'blue' ? 45 : -45);
@@ -799,13 +795,8 @@ document.addEventListener('DOMContentLoaded', function () {
 						}
 					}
 				} else {
-					if (player.isGoalie) {
-						targetX = player.team === 'blue' ? 86 : 1034;
-						targetY = 315;
-					} else {
-						targetX = player.baseHomeX;
-						targetY = player.baseHomeY;
-					}
+					targetX = player.baseHomeX;
+					targetY = player.baseHomeY;
 				}
 			} else if (player.isGoalie) {
 				targetX = player.team === 'blue' ? 86 : 1034;
@@ -825,24 +816,24 @@ document.addEventListener('DOMContentLoaded', function () {
 				const attackSide = player.team === 'blue' ? ball.x > FIELD_W * 0.45 : ball.x < FIELD_W * 0.55;
 
 				if (player.position === 'defender') {
-					if ((player.team === 'blue' && ball.x < FIELD_W * 0.48) || (player.team === 'red' && ball.x > FIELD_W * 0.52)) {
-						if (ballDist < 135) {
+					if ((player.team === 'blue' && ball.x < FIELD_W * 0.44) || (player.team === 'red' && ball.x > FIELD_W * 0.56)) {
+						if (ballDist < 70) {
 							targetX = ball.x + (player.team === 'blue' ? -12 : 12);
 							targetY = ball.y;
 						}
 					}
 				} else if (player.position === 'wing') {
-					if (ballDist < 115 || attackSide) {
+					if (ballDist < 62 || (attackSide && ballDist < 82)) {
 						targetX = ball.x + (player.team === 'blue' ? -10 : 10);
 						targetY = ball.y + (player.baseHomeY < FIELD_H / 2 ? -35 : 35);
 					}
 				} else if (player.position === 'midfielder') {
-					if (ballDist < 120 || attackSide) {
+					if (ballDist < 60 || (attackSide && ballDist < 78)) {
 						targetX = ball.x + (player.team === 'blue' ? -7 : 7);
 						targetY = ball.y;
 					}
 				} else if (player.position === 'forward') {
-					if (ballDist < 130 || attackSide) {
+					if (ballDist < 58 || (attackSide && ballDist < 74)) {
 						targetX = ball.x + (player.team === 'blue' ? -5 : 5);
 						targetY = ball.y;
 					}
@@ -907,7 +898,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				}
 			});
 
-			if (bestDist <= 24) {
+			if (bestDist <= 18) {
 				return owner;
 			}
 
@@ -916,7 +907,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function maybeAiPassOrShoot(player) {
 			if (restartType) {
-				if (player.team === restartTeam && distance(player, state.ball) < 28) {
+				if (player.team === restartTeam && distance(player, state.ball) < 24) {
 					handleRestartKick(player.team);
 				}
 				return;
@@ -928,17 +919,19 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			const towardLeft = player.team === 'red';
-			const closeToGoal = towardLeft ? state.ball.x < 190 : state.ball.x > FIELD_W - 190;
+			const closeToGoal = towardLeft ? state.ball.x < 210 : state.ball.x > FIELD_W - 210;
 
-			if (closeToGoal || (player.position === 'forward' && Math.random() > 0.45)) {
-				kickBallToward(towardLeft ? -24 : FIELD_W + 24, FIELD_H / 2 + (Math.random() * 130 - 65), 170);
+			if (closeToGoal || (player.position === 'forward' && Math.random() > 0.55)) {
+				kickBallToward(towardLeft ? -24 : FIELD_W + 24, FIELD_H / 2 + (Math.random() * 130 - 65), 250);
 				return;
 			}
 
 			const best = findBestPassTarget(player);
 
 			if (best) {
-				kickBallToward(best.x, best.y, 145);
+				kickBallToward(best.x, best.y, 220);
+			} else {
+				kickBallToward(towardLeft ? 120 : FIELD_W - 120, FIELD_H / 2, 230);
 			}
 		}
 
@@ -957,14 +950,14 @@ document.addEventListener('DOMContentLoaded', function () {
 					state.ball.x += nx * overlap;
 					state.ball.y += ny * overlap;
 
-					const touchPower = 78;
+					const touchPower = 40;
 					state.ball.vx += nx * touchPower;
 					state.ball.vy += ny * touchPower;
 
 					if (player.team === 'blue') {
-						state.ball.vx += 8;
+						state.ball.vx += 4;
 					} else {
-						state.ball.vx -= 8;
+						state.ball.vx -= 4;
 					}
 				}
 			});
@@ -989,9 +982,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			if (restartType === 'corner') {
-				const targetX = team === 'blue' ? FIELD_W - 200 : 200;
-				const targetY = FIELD_H / 2 + (Math.random() * 160 - 80);
-				kickBallToward(targetX, targetY, 160);
+				const targetX = team === 'blue' ? FIELD_W - 220 : 220;
+				const targetY = FIELD_H / 2 + (Math.random() * 140 - 70);
+				kickBallToward(targetX, targetY, 230);
 				setMessage((team === 'blue' ? 'Blue' : 'Red') + ' corner kick');
 			}
 
@@ -1004,8 +997,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.ball.x += state.ball.vx * dt;
 			state.ball.y += state.ball.vy * dt;
 
-			state.ball.vx *= 0.992;
-			state.ball.vy *= 0.992;
+			state.ball.vx *= 0.988;
+			state.ball.vy *= 0.988;
 
 			if (state.ball.y <= BALL_R && state.ball.x > 0 && state.ball.x < FIELD_W) {
 				state.ball.y = BALL_R;
@@ -1259,7 +1252,7 @@ if (!function_exists('zo_game_soccer_match_ai_render')) {
 					</div>
 
 					<div class="zo-soccer-help">
-						All players move by AI. The match is slow and lasts 5 minutes. When a blue teammate gets the ball, the game pauses and you choose where the ball should be kicked by clicking or tapping on the field. The field is shown in a wide real match view.
+						All players move by AI. Fewer players chase the ball now, and players kick much faster when they reach it. The match is slow and lasts 5 minutes. When a blue teammate gets the ball, the game pauses and you choose where the ball should be kicked by clicking or tapping on the field.
 					</div>
 
 					<div class="zo-soccer-decision">
