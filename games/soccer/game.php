@@ -444,6 +444,8 @@ document.addEventListener('DOMContentLoaded', function () {
 		const GOAL_TOP = 250;
 		const GOAL_BOTTOM = 380;
 		const MATCH_TIME = 300;
+		const INTERCEPT_RADIUS = 110;
+		const CHASE_RADIUS = 70;
 
 		let animationId = null;
 		let lastTime = 0;
@@ -697,22 +699,23 @@ document.addEventListener('DOMContentLoaded', function () {
 			decisionMode = true;
 			running = false;
 			decisionPlayer = player;
-			decisionTarget = findBestPassTarget(player);
+			decisionTarget = {
+				x: player.team === 'blue' ? player.x + 140 : player.x - 140,
+				y: player.y
+			};
+
+			const best = findBestPassTarget(player);
+			if (best) {
+				decisionTarget = { x: best.x, y: best.y };
+			}
 
 			state.players.forEach(function (p) {
 				p.el.classList.toggle('zo-soccer-player--decision', p === player);
 			});
 
-			if (!decisionTarget) {
-				decisionTarget = {
-					x: player.team === 'blue' ? FIELD_W - 120 : 120,
-					y: FIELD_H / 2
-				};
-			}
-
 			decisionBox.classList.add('is-active');
-			decisionText.textContent = 'Your teammate has the ball. Click or tap where to kick.';
-			setMessage('Choose where to kick');
+			decisionText.textContent = 'Your teammate has the ball. Move the target and click or tap to kick in exactly that direction.';
+			setMessage('Choose ball direction');
 			updateHud();
 			render();
 		}
@@ -724,7 +727,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			state.ball.x = decisionPlayer.x + (decisionPlayer.team === 'blue' ? 12 : -12);
 			state.ball.y = decisionPlayer.y;
-			kickBallToward(targetX, targetY, 260);
+
+			const dx = targetX - decisionPlayer.x;
+			const dy = targetY - decisionPlayer.y;
+			const len = Math.sqrt(dx * dx + dy * dy) || 1;
+			const distancePower = clamp(len * 1.4, 180, 340);
+
+			kickBallToward(decisionPlayer.x + (dx / len) * 300, decisionPlayer.y + (dy / len) * 300, distancePower);
 
 			decisionMode = false;
 			running = true;
@@ -734,7 +743,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				p.el.classList.remove('zo-soccer-player--decision');
 			});
 			decisionBox.classList.remove('is-active');
-			setMessage('Ball played');
+			setMessage('Ball kicked');
 			updateHud();
 			animationId = requestAnimationFrame(loop);
 		}
@@ -772,10 +781,54 @@ document.addEventListener('DOMContentLoaded', function () {
 			};
 		}
 
+		function getNearestChaser(team) {
+			let best = null;
+			let bestDist = Infinity;
+
+			state.players.forEach(function (player) {
+				if (player.team !== team || player.isGoalie) {
+					return;
+				}
+				const d = distance(player, state.ball);
+				if (d < bestDist) {
+					bestDist = d;
+					best = player;
+				}
+			});
+
+			return best;
+		}
+
+		function getSupportChaser(team, primary) {
+			let best = null;
+			let bestDist = Infinity;
+
+			state.players.forEach(function (player) {
+				if (player.team !== team || player.isGoalie || player === primary) {
+					return;
+				}
+				const d = distance(player, state.ball);
+				if (d < bestDist) {
+					bestDist = d;
+					best = player;
+				}
+			});
+
+			if (bestDist <= INTERCEPT_RADIUS) {
+				return best;
+			}
+			return null;
+		}
+
 		function aiMovePlayer(player, dt) {
 			const ball = state.ball;
 			let targetX = player.baseHomeX;
 			let targetY = player.baseHomeY;
+
+			const primaryBlue = getNearestChaser('blue');
+			const primaryRed = getNearestChaser('red');
+			const supportBlue = getSupportChaser('blue', primaryBlue);
+			const supportRed = getSupportChaser('red', primaryRed);
 
 			if (restartType) {
 				if (restartTeam === player.team) {
@@ -812,31 +865,19 @@ document.addEventListener('DOMContentLoaded', function () {
 				targetX = roleHome.x;
 				targetY = roleHome.y;
 
+				const primary = player.team === 'blue' ? primaryBlue : primaryRed;
+				const support = player.team === 'blue' ? supportBlue : supportRed;
 				const ballDist = distance(player, ball);
-				const attackSide = player.team === 'blue' ? ball.x > FIELD_W * 0.45 : ball.x < FIELD_W * 0.55;
 
-				if (player.position === 'defender') {
-					if ((player.team === 'blue' && ball.x < FIELD_W * 0.44) || (player.team === 'red' && ball.x > FIELD_W * 0.56)) {
-						if (ballDist < 70) {
-							targetX = ball.x + (player.team === 'blue' ? -12 : 12);
-							targetY = ball.y;
-						}
-					}
-				} else if (player.position === 'wing') {
-					if (ballDist < 62 || (attackSide && ballDist < 82)) {
-						targetX = ball.x + (player.team === 'blue' ? -10 : 10);
-						targetY = ball.y + (player.baseHomeY < FIELD_H / 2 ? -35 : 35);
-					}
-				} else if (player.position === 'midfielder') {
-					if (ballDist < 60 || (attackSide && ballDist < 78)) {
-						targetX = ball.x + (player.team === 'blue' ? -7 : 7);
-						targetY = ball.y;
-					}
-				} else if (player.position === 'forward') {
-					if (ballDist < 58 || (attackSide && ballDist < 74)) {
-						targetX = ball.x + (player.team === 'blue' ? -5 : 5);
-						targetY = ball.y;
-					}
+				if (player === primary && ballDist <= INTERCEPT_RADIUS) {
+					targetX = ball.x + (player.team === 'blue' ? -4 : 4);
+					targetY = ball.y;
+				} else if (player === support && ballDist <= INTERCEPT_RADIUS) {
+					targetX = ball.x + (player.team === 'blue' ? -28 : 28);
+					targetY = ball.y + (player.baseHomeY < FIELD_H / 2 ? -26 : 26);
+				} else if (ballDist <= CHASE_RADIUS && player.position !== 'defender') {
+					targetX = ball.x + (player.team === 'blue' ? -18 : 18);
+					targetY = ball.y;
 				}
 			}
 
@@ -898,7 +939,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				}
 			});
 
-			if (bestDist <= 18) {
+			if (bestDist <= 22) {
 				return owner;
 			}
 
@@ -950,14 +991,14 @@ document.addEventListener('DOMContentLoaded', function () {
 					state.ball.x += nx * overlap;
 					state.ball.y += ny * overlap;
 
-					const touchPower = 40;
+					const touchPower = 36;
 					state.ball.vx += nx * touchPower;
 					state.ball.vy += ny * touchPower;
 
 					if (player.team === 'blue') {
-						state.ball.vx += 4;
+						state.ball.vx += 3;
 					} else {
-						state.ball.vx -= 4;
+						state.ball.vx -= 3;
 					}
 				}
 			});
@@ -1252,11 +1293,11 @@ if (!function_exists('zo_game_soccer_match_ai_render')) {
 					</div>
 
 					<div class="zo-soccer-help">
-						All players move by AI. Fewer players chase the ball now, and players kick much faster when they reach it. The match is slow and lasts 5 minutes. When a blue teammate gets the ball, the game pauses and you choose where the ball should be kicked by clicking or tapping on the field.
+						All players are AI. Only one or two nearby players go to the ball now, not the whole team. When your blue team gets the ball, the game pauses and you choose the exact direction of the kick by clicking or tapping on the field.
 					</div>
 
 					<div class="zo-soccer-decision">
-						<div class="zo-soccer-decision-text">Your teammate has the ball. Click or tap where to kick.</div>
+						<div class="zo-soccer-decision-text">Your teammate has the ball. Move the target and click or tap to kick in exactly that direction.</div>
 					</div>
 				</div>
 			</div>
@@ -1270,7 +1311,7 @@ return array(
 	'slug'            => 'soccer-match-ai',
 	'name'            => 'Soccer Match AI',
 	'author'          => 'Asker',
-	'description'     => 'A slow 5 minute soccer match where all players are AI and you decide where blue team passes or kicks.',
+	'description'     => 'A slow 5 minute soccer match where all players are AI and you decide the exact direction of blue team kicks.',
 	'render_callback' => 'zo_game_soccer_match_ai_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,
