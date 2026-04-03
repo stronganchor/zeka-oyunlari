@@ -67,6 +67,11 @@ $css = <<<'CSS'
 	opacity: 0.92;
 }
 
+.zo-soccer-btn[disabled] {
+	opacity: 0.45;
+	cursor: default;
+}
+
 .zo-soccer-field {
 	position: relative;
 	width: 100%;
@@ -366,7 +371,8 @@ $css = <<<'CSS'
 }
 
 .zo-soccer-help,
-.zo-soccer-decision {
+.zo-soccer-decision,
+.zo-soccer-upgrades {
 	background: #fff;
 	border: 2px solid #dfe7d8;
 	border-radius: 12px;
@@ -384,6 +390,42 @@ $css = <<<'CSS'
 
 .zo-soccer-decision.is-active {
 	display: block;
+}
+
+.zo-soccer-upgrades-title {
+	font-size: 16px;
+	font-weight: 700;
+	color: #1d2a1d;
+	margin-bottom: 8px;
+}
+
+.zo-soccer-upgrades-grid {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	justify-content: center;
+}
+
+.zo-soccer-upgrade-card {
+	background: #f8faf7;
+	border: 2px solid #dfe7d8;
+	border-radius: 12px;
+	padding: 10px;
+	min-width: 200px;
+	max-width: 240px;
+}
+
+.zo-soccer-upgrade-card strong {
+	display: block;
+	margin-bottom: 4px;
+	color: #1d2a1d;
+	font-size: 15px;
+}
+
+.zo-soccer-upgrade-card span {
+	display: block;
+	font-size: 13px;
+	margin-bottom: 8px;
 }
 
 @media (max-width: 900px) {
@@ -413,7 +455,8 @@ $css = <<<'CSS'
 	}
 
 	.zo-soccer-help,
-	.zo-soccer-decision {
+	.zo-soccer-decision,
+	.zo-soccer-upgrades {
 		font-size: 13px;
 	}
 }
@@ -430,8 +473,13 @@ document.addEventListener('DOMContentLoaded', function () {
 		const timerEl = game.querySelector('.zo-status-timer');
 		const messageEl = game.querySelector('.zo-status-message');
 		const modeEl = game.querySelector('.zo-status-mode');
+		const coinsEl = game.querySelector('.zo-status-coins');
+		const speedLevelEl = game.querySelector('.zo-status-speed-level');
+		const smartLevelEl = game.querySelector('.zo-status-smart-level');
 		const restartBtn = game.querySelector('.zo-soccer-restart');
 		const startBtn = game.querySelector('.zo-soccer-start');
+		const buySpeedBtn = game.querySelector('.zo-buy-speed');
+		const buySmartBtn = game.querySelector('.zo-buy-smart');
 		const targetEl = game.querySelector('.zo-soccer-target');
 		const passLineEl = game.querySelector('.zo-soccer-pass-line');
 		const decisionBox = game.querySelector('.zo-soccer-decision');
@@ -444,8 +492,13 @@ document.addEventListener('DOMContentLoaded', function () {
 		const GOAL_TOP = 250;
 		const GOAL_BOTTOM = 380;
 		const MATCH_TIME = 300;
-		const INTERCEPT_RADIUS = 110;
-		const CHASE_RADIUS = 70;
+		const BASE_INTERCEPT_RADIUS = 110;
+		const BASE_CHASE_RADIUS = 70;
+		const BASE_DECISION_PASS_POWER = 180;
+		const BASE_DECISION_SHOT_POWER = 340;
+		const BASE_RED_PASS_POWER = 220;
+		const BASE_RED_SHOT_POWER = 250;
+		const BASE_KICK_LOCK = 0.35;
 
 		let animationId = null;
 		let lastTime = 0;
@@ -454,12 +507,48 @@ document.addEventListener('DOMContentLoaded', function () {
 		let userScore = 0;
 		let aiScore = 0;
 		let remaining = MATCH_TIME;
+		let coins = 0;
+		let speedLevel = 0;
+		let smartLevel = 0;
 		let restartType = null;
 		let restartTeam = null;
 		let restartSpot = null;
 		let decisionMode = false;
 		let decisionPlayer = null;
 		let decisionTarget = null;
+
+		function getBlueSpeedMultiplier() {
+			return 1 + (speedLevel * 0.12);
+		}
+
+		function getBlueSmartMultiplier() {
+			return 1 + (smartLevel * 0.18);
+		}
+
+		function getBlueInterceptRadius() {
+			return BASE_INTERCEPT_RADIUS * (1 + smartLevel * 0.10);
+		}
+
+		function getBlueChaseRadius() {
+			return BASE_CHASE_RADIUS * (1 + smartLevel * 0.10);
+		}
+
+		function getDecisionPassPower(len) {
+			const raw = clamp(len * 1.4, BASE_DECISION_PASS_POWER, BASE_DECISION_SHOT_POWER);
+			return raw * (1 + speedLevel * 0.08);
+		}
+
+		function getRedPassPower() {
+			return BASE_RED_PASS_POWER;
+		}
+
+		function getRedShotPower() {
+			return BASE_RED_SHOT_POWER;
+		}
+
+		function getKickLockTime() {
+			return Math.max(0.18, BASE_KICK_LOCK - (smartLevel * 0.04));
+		}
 
 		function clamp(value, min, max) {
 			return Math.max(min, Math.min(max, value));
@@ -482,9 +571,10 @@ document.addEventListener('DOMContentLoaded', function () {
 				homeY: homeY,
 				baseHomeX: homeX,
 				baseHomeY: homeY,
+				baseSpeed: options.speed,
+				speed: options.speed,
 				vx: 0,
 				vy: 0,
-				speed: options.speed,
 				isGoalie: !!options.isGoalie,
 				el: null
 			};
@@ -531,6 +621,17 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		};
 
+		function applyBlueUpgrades() {
+			const speedMultiplier = getBlueSpeedMultiplier();
+			state.players.forEach(function (player) {
+				if (player.team === 'blue') {
+					player.speed = player.baseSpeed * speedMultiplier;
+				} else {
+					player.speed = player.baseSpeed;
+				}
+			});
+		}
+
 		function updateModeLabel() {
 			if (decisionMode) {
 				modeEl.textContent = 'Decision';
@@ -545,12 +646,27 @@ document.addEventListener('DOMContentLoaded', function () {
 			messageEl.textContent = text;
 		}
 
+		function getSpeedUpgradeCost() {
+			return 6 + (speedLevel * 6);
+		}
+
+		function getSmartUpgradeCost() {
+			return 8 + (smartLevel * 8);
+		}
+
 		function updateHud() {
 			scoreUserEl.textContent = String(userScore);
 			scoreAiEl.textContent = String(aiScore);
 			const mins = Math.floor(remaining / 60);
 			const secs = Math.max(0, Math.ceil(remaining % 60));
 			timerEl.textContent = mins + ':' + String(secs).padStart(2, '0');
+			coinsEl.textContent = String(coins);
+			speedLevelEl.textContent = String(speedLevel);
+			smartLevelEl.textContent = String(smartLevel);
+			buySpeedBtn.textContent = 'Upgrade Speed (' + getSpeedUpgradeCost() + ' coins)';
+			buySmartBtn.textContent = 'Upgrade Smart (' + getSmartUpgradeCost() + ' coins)';
+			buySpeedBtn.disabled = coins < getSpeedUpgradeCost();
+			buySmartBtn.disabled = coins < getSmartUpgradeCost();
 			updateModeLabel();
 		}
 
@@ -655,6 +771,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			running = false;
 			lastTime = 0;
 			resetPositions();
+			applyBlueUpgrades();
 			updateHud();
 			setMessage('Press Start Match');
 			if (animationId) {
@@ -688,7 +805,8 @@ document.addEventListener('DOMContentLoaded', function () {
 					(mate.position === 'wing' ? 20 : 0) +
 					(mate.position === 'midfielder' ? 12 : 0);
 
-				const total = forwardScore + spacingScore + roleBonus;
+				const smartBonus = player.team === 'blue' ? (smartLevel * 10) : 0;
+				const total = forwardScore + spacingScore + roleBonus + smartBonus;
 
 				if (total > bestScore) {
 					bestScore = total;
@@ -734,13 +852,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			const len = Math.sqrt(dx * dx + dy * dy) || 1;
 			const nx = dx / len;
 			const ny = dy / len;
-			const distancePower = clamp(len * 1.4, 180, 340);
 
 			state.ball.x = decisionPlayer.x + nx * 24;
 			state.ball.y = decisionPlayer.y + ny * 24;
-			state.ball.vx = nx * distancePower;
-			state.ball.vy = ny * distancePower;
-			state.ball.kick_lock_timer = 0.35;
+			state.ball.vx = nx * getDecisionPassPower(len);
+			state.ball.vy = ny * getDecisionPassPower(len);
+			state.ball.kick_lock_timer = getKickLockTime();
 			state.ball.kick_ignore_player = decisionPlayer;
 
 			decisionMode = false;
@@ -810,6 +927,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		function getSupportChaser(team, primary) {
 			let best = null;
 			let bestDist = Infinity;
+			const interceptRadius = team === 'blue' ? getBlueInterceptRadius() : BASE_INTERCEPT_RADIUS;
 
 			state.players.forEach(function (player) {
 				if (player.team !== team || player.isGoalie || player === primary) {
@@ -822,7 +940,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				}
 			});
 
-			if (bestDist <= INTERCEPT_RADIUS) {
+			if (bestDist <= interceptRadius) {
 				return best;
 			}
 			return null;
@@ -837,6 +955,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			const primaryRed = getNearestChaser('red');
 			const supportBlue = getSupportChaser('blue', primaryBlue);
 			const supportRed = getSupportChaser('red', primaryRed);
+			const interceptRadius = player.team === 'blue' ? getBlueInterceptRadius() : BASE_INTERCEPT_RADIUS;
+			const chaseRadius = player.team === 'blue' ? getBlueChaseRadius() : BASE_CHASE_RADIUS;
 
 			if (restartType) {
 				if (restartTeam === player.team) {
@@ -877,13 +997,13 @@ document.addEventListener('DOMContentLoaded', function () {
 				const support = player.team === 'blue' ? supportBlue : supportRed;
 				const ballDist = distance(player, ball);
 
-				if (player === primary && ballDist <= INTERCEPT_RADIUS) {
+				if (player === primary && ballDist <= interceptRadius) {
 					targetX = ball.x + (player.team === 'blue' ? -4 : 4);
 					targetY = ball.y;
-				} else if (player === support && ballDist <= INTERCEPT_RADIUS) {
+				} else if (player === support && ballDist <= interceptRadius) {
 					targetX = ball.x + (player.team === 'blue' ? -28 : 28);
 					targetY = ball.y + (player.baseHomeY < FIELD_H / 2 ? -26 : 26);
-				} else if (ballDist <= CHASE_RADIUS && player.position !== 'defender') {
+				} else if (ballDist <= chaseRadius && player.position !== 'defender') {
 					targetX = ball.x + (player.team === 'blue' ? -18 : 18);
 					targetY = ball.y;
 				}
@@ -951,7 +1071,8 @@ document.addEventListener('DOMContentLoaded', function () {
 				}
 			});
 
-			if (bestDist <= 22) {
+			const controlDistance = 22 - Math.min(4, smartLevel);
+			if (bestDist <= controlDistance) {
 				return owner;
 			}
 
@@ -975,7 +1096,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			const closeToGoal = towardLeft ? state.ball.x < 210 : state.ball.x > FIELD_W - 210;
 
 			if (closeToGoal || (player.position === 'forward' && Math.random() > 0.55)) {
-				kickBallToward(towardLeft ? -24 : FIELD_W + 24, FIELD_H / 2 + (Math.random() * 130 - 65), 250);
+				kickBallToward(towardLeft ? -24 : FIELD_W + 24, FIELD_H / 2 + (Math.random() * 130 - 65), getRedShotPower());
 				state.ball.kick_lock_timer = 0.22;
 				state.ball.kick_ignore_player = player;
 				return;
@@ -984,9 +1105,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			const best = findBestPassTarget(player);
 
 			if (best) {
-				kickBallToward(best.x, best.y, 220);
+				kickBallToward(best.x, best.y, getRedPassPower());
 			} else {
-				kickBallToward(towardLeft ? 120 : FIELD_W - 120, FIELD_H / 2, 230);
+				kickBallToward(towardLeft ? 120 : FIELD_W - 120, FIELD_H / 2, getRedPassPower() + 10);
 			}
 
 			state.ball.kick_lock_timer = 0.22;
@@ -1048,8 +1169,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (restartType === 'corner') {
 				const targetX = team === 'blue' ? FIELD_W - 220 : 220;
 				const targetY = FIELD_H / 2 + (Math.random() * 140 - 70);
-				kickBallToward(targetX, targetY, 230);
-				state.ball.kick_lock_timer = 0.22;
+				const power = team === 'blue' ? getDecisionPassPower(220) : 230;
+				kickBallToward(targetX, targetY, power);
+				state.ball.kick_lock_timer = team === 'blue' ? getKickLockTime() : 0.22;
 				state.ball.kick_ignore_player = null;
 				setMessage((team === 'blue' ? 'Blue' : 'Red') + ' corner kick');
 			}
@@ -1098,16 +1220,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			if (state.ball.x < -16 && inGoalOpening) {
 				aiScore += 1;
+				coins += 2;
 				updateHud();
-				setMessage('Red scored');
+				setMessage('Red scored. +2 coins');
 				resetPositions();
 				return;
 			}
 
 			if (state.ball.x > FIELD_W + 16 && inGoalOpening) {
 				userScore += 1;
+				coins += 5;
 				updateHud();
-				setMessage('Blue scored');
+				setMessage('Blue scored. +5 coins');
 				resetPositions();
 				return;
 			}
@@ -1165,11 +1289,17 @@ document.addEventListener('DOMContentLoaded', function () {
 				render();
 
 				if (userScore > aiScore) {
-					setMessage('Blue wins');
+					coins += 10;
+					updateHud();
+					setMessage('Blue wins. +10 coins');
 				} else if (userScore < aiScore) {
-					setMessage('Red wins');
+					coins += 4;
+					updateHud();
+					setMessage('Red wins. +4 coins');
 				} else {
-					setMessage('Draw match');
+					coins += 6;
+					updateHud();
+					setMessage('Draw match. +6 coins');
 				}
 				return;
 			}
@@ -1202,6 +1332,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				resetPositions();
 				started = true;
 			}
+			applyBlueUpgrades();
 			running = true;
 			lastTime = 0;
 			setMessage('Match in progress');
@@ -1264,7 +1395,31 @@ document.addEventListener('DOMContentLoaded', function () {
 			field.focus();
 		});
 
+		buySpeedBtn.addEventListener('click', function () {
+			const cost = getSpeedUpgradeCost();
+			if (coins < cost) {
+				return;
+			}
+			coins -= cost;
+			speedLevel += 1;
+			applyBlueUpgrades();
+			updateHud();
+			setMessage('Blue team speed upgraded');
+		});
+
+		buySmartBtn.addEventListener('click', function () {
+			const cost = getSmartUpgradeCost();
+			if (coins < cost) {
+				return;
+			}
+			coins -= cost;
+			smartLevel += 1;
+			updateHud();
+			setMessage('Blue team smart upgraded');
+		});
+
 		buildEntities();
+		applyBlueUpgrades();
 		resetMatch();
 	});
 });
@@ -1290,6 +1445,18 @@ if (!function_exists('zo_game_soccer_match_ai_render')) {
 					<div class="zo-soccer-panel">
 						<strong class="zo-status-timer">5:00</strong>
 						<span>Match Time</span>
+					</div>
+					<div class="zo-soccer-panel">
+						<strong class="zo-status-coins">0</strong>
+						<span>Coins</span>
+					</div>
+					<div class="zo-soccer-panel">
+						<strong class="zo-status-speed-level">0</strong>
+						<span>Speed Level</span>
+					</div>
+					<div class="zo-soccer-panel">
+						<strong class="zo-status-smart-level">0</strong>
+						<span>Smart Level</span>
 					</div>
 					<div class="zo-soccer-panel">
 						<strong class="zo-status-mode">Stopped</strong>
@@ -1323,10 +1490,26 @@ if (!function_exists('zo_game_soccer_match_ai_render')) {
 					<div class="zo-soccer-buttons">
 						<button type="button" class="zo-soccer-btn zo-soccer-start">Start Match</button>
 						<button type="button" class="zo-soccer-btn zo-soccer-restart">Restart</button>
+						<button type="button" class="zo-soccer-btn zo-buy-speed">Upgrade Speed (6 coins)</button>
+						<button type="button" class="zo-soccer-btn zo-buy-smart">Upgrade Smart (8 coins)</button>
 					</div>
 
 					<div class="zo-soccer-help">
-						All players are AI. Only one or two nearby players go to the ball. When blue gets the ball, the game pauses and your click decides the exact kick direction. The kicker is temporarily ignored right after the kick so the ball keeps the direction you chose.
+						All players are AI. When blue gets the ball, the game pauses and your click decides the exact kick direction. You now earn coins and can upgrade your blue team so they are faster or smarter.
+					</div>
+
+					<div class="zo-soccer-upgrades">
+						<div class="zo-soccer-upgrades-title">Upgrades</div>
+						<div class="zo-soccer-upgrades-grid">
+							<div class="zo-soccer-upgrade-card">
+								<strong>Speed Upgrade</strong>
+								<span>Makes blue players move faster all over the field and reach passes sooner.</span>
+							</div>
+							<div class="zo-soccer-upgrade-card">
+								<strong>Smart Upgrade</strong>
+								<span>Makes blue players chase and support better, control the ball better, and keep your chosen kick direction more reliably.</span>
+							</div>
+						</div>
 					</div>
 
 					<div class="zo-soccer-decision">
@@ -1344,7 +1527,7 @@ return array(
 	'slug'            => 'soccer-match-ai',
 	'name'            => 'Soccer Match AI',
 	'author'          => 'Asker',
-	'description'     => 'A slow 5 minute soccer match where all players are AI and you decide the exact direction of blue team kicks.',
+	'description'     => 'A slow 5 minute soccer match where all players are AI and you can upgrade your blue team to be faster or smarter.',
 	'render_callback' => 'zo_game_soccer_match_ai_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,
