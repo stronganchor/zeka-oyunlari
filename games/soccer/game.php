@@ -525,7 +525,9 @@ document.addEventListener('DOMContentLoaded', function () {
 				y: FIELD_H / 2,
 				vx: 0,
 				vy: 0,
-				el: null
+				el: null,
+				kick_lock_timer: 0,
+				kick_ignore_player: null
 			}
 		};
 
@@ -594,6 +596,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.ball.y = FIELD_H / 2;
 			state.ball.vx = 0;
 			state.ball.vy = 0;
+			state.ball.kick_lock_timer = 0;
+			state.ball.kick_ignore_player = null;
 			restartType = null;
 			restartTeam = null;
 			restartSpot = null;
@@ -725,15 +729,19 @@ document.addEventListener('DOMContentLoaded', function () {
 				return;
 			}
 
-			state.ball.x = decisionPlayer.x + (decisionPlayer.team === 'blue' ? 12 : -12);
-			state.ball.y = decisionPlayer.y;
-
 			const dx = targetX - decisionPlayer.x;
 			const dy = targetY - decisionPlayer.y;
 			const len = Math.sqrt(dx * dx + dy * dy) || 1;
+			const nx = dx / len;
+			const ny = dy / len;
 			const distancePower = clamp(len * 1.4, 180, 340);
 
-			kickBallToward(decisionPlayer.x + (dx / len) * 300, decisionPlayer.y + (dy / len) * 300, distancePower);
+			state.ball.x = decisionPlayer.x + nx * 24;
+			state.ball.y = decisionPlayer.y + ny * 24;
+			state.ball.vx = nx * distancePower;
+			state.ball.vy = ny * distancePower;
+			state.ball.kick_lock_timer = 0.35;
+			state.ball.kick_ignore_player = decisionPlayer;
 
 			decisionMode = false;
 			running = true;
@@ -928,6 +936,10 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function getBallOwner() {
+			if (state.ball.kick_lock_timer > 0) {
+				return null;
+			}
+
 			let owner = null;
 			let bestDist = Infinity;
 
@@ -964,6 +976,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			if (closeToGoal || (player.position === 'forward' && Math.random() > 0.55)) {
 				kickBallToward(towardLeft ? -24 : FIELD_W + 24, FIELD_H / 2 + (Math.random() * 130 - 65), 250);
+				state.ball.kick_lock_timer = 0.22;
+				state.ball.kick_ignore_player = player;
 				return;
 			}
 
@@ -974,10 +988,17 @@ document.addEventListener('DOMContentLoaded', function () {
 			} else {
 				kickBallToward(towardLeft ? 120 : FIELD_W - 120, FIELD_H / 2, 230);
 			}
+
+			state.ball.kick_lock_timer = 0.22;
+			state.ball.kick_ignore_player = player;
 		}
 
 		function pushBallFromPlayers() {
 			state.players.forEach(function (player) {
+				if (state.ball.kick_lock_timer > 0 && player === state.ball.kick_ignore_player) {
+					return;
+				}
+
 				const dx = state.ball.x - player.x;
 				const dy = state.ball.y - player.y;
 				const dist = Math.sqrt(dx * dx + dy * dy);
@@ -1014,6 +1035,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.ball.y = y;
 			state.ball.vx = 0;
 			state.ball.vy = 0;
+			state.ball.kick_lock_timer = 0;
+			state.ball.kick_ignore_player = null;
 			setMessage((team === 'blue' ? 'Blue' : 'Red') + ' corner');
 		}
 
@@ -1026,6 +1049,8 @@ document.addEventListener('DOMContentLoaded', function () {
 				const targetX = team === 'blue' ? FIELD_W - 220 : 220;
 				const targetY = FIELD_H / 2 + (Math.random() * 140 - 70);
 				kickBallToward(targetX, targetY, 230);
+				state.ball.kick_lock_timer = 0.22;
+				state.ball.kick_ignore_player = null;
 				setMessage((team === 'blue' ? 'Blue' : 'Red') + ' corner kick');
 			}
 
@@ -1035,6 +1060,14 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function updateBall(dt) {
+			if (state.ball.kick_lock_timer > 0) {
+				state.ball.kick_lock_timer -= dt;
+				if (state.ball.kick_lock_timer <= 0) {
+					state.ball.kick_lock_timer = 0;
+					state.ball.kick_ignore_player = null;
+				}
+			}
+
 			state.ball.x += state.ball.vx * dt;
 			state.ball.y += state.ball.vy * dt;
 
@@ -1293,7 +1326,7 @@ if (!function_exists('zo_game_soccer_match_ai_render')) {
 					</div>
 
 					<div class="zo-soccer-help">
-						All players are AI. Only one or two nearby players go to the ball now, not the whole team. When your blue team gets the ball, the game pauses and you choose the exact direction of the kick by clicking or tapping on the field.
+						All players are AI. Only one or two nearby players go to the ball. When blue gets the ball, the game pauses and your click decides the exact kick direction. The kicker is temporarily ignored right after the kick so the ball keeps the direction you chose.
 					</div>
 
 					<div class="zo-soccer-decision">
