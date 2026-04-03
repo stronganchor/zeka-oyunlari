@@ -411,8 +411,8 @@ $css = <<<'CSS'
 	border: 2px solid #dfe7d8;
 	border-radius: 12px;
 	padding: 10px;
-	min-width: 200px;
-	max-width: 240px;
+	min-width: 160px;
+	max-width: 210px;
 }
 
 .zo-soccer-upgrade-card strong {
@@ -476,10 +476,16 @@ document.addEventListener('DOMContentLoaded', function () {
 		const coinsEl = game.querySelector('.zo-status-coins');
 		const speedLevelEl = game.querySelector('.zo-status-speed-level');
 		const smartLevelEl = game.querySelector('.zo-status-smart-level');
+		const shootingLevelEl = game.querySelector('.zo-status-shooting-level');
+		const passingLevelEl = game.querySelector('.zo-status-passing-level');
+		const defenseLevelEl = game.querySelector('.zo-status-defense-level');
 		const restartBtn = game.querySelector('.zo-soccer-restart');
 		const startBtn = game.querySelector('.zo-soccer-start');
 		const buySpeedBtn = game.querySelector('.zo-buy-speed');
 		const buySmartBtn = game.querySelector('.zo-buy-smart');
+		const buyShootingBtn = game.querySelector('.zo-buy-shooting');
+		const buyPassingBtn = game.querySelector('.zo-buy-passing');
+		const buyDefenseBtn = game.querySelector('.zo-buy-defense');
 		const targetEl = game.querySelector('.zo-soccer-target');
 		const passLineEl = game.querySelector('.zo-soccer-pass-line');
 		const decisionBox = game.querySelector('.zo-soccer-decision');
@@ -510,6 +516,9 @@ document.addEventListener('DOMContentLoaded', function () {
 		let coins = 0;
 		let speedLevel = 0;
 		let smartLevel = 0;
+		let shootingLevel = 0;
+		let passingLevel = 0;
+		let defenseLevel = 0;
 		let restartType = null;
 		let restartTeam = null;
 		let restartSpot = null;
@@ -526,16 +535,20 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function getBlueInterceptRadius() {
-			return BASE_INTERCEPT_RADIUS * (1 + smartLevel * 0.10);
+			return BASE_INTERCEPT_RADIUS * (1 + smartLevel * 0.10 + defenseLevel * 0.08);
 		}
 
 		function getBlueChaseRadius() {
-			return BASE_CHASE_RADIUS * (1 + smartLevel * 0.10);
+			return BASE_CHASE_RADIUS * (1 + smartLevel * 0.10 + defenseLevel * 0.06);
 		}
 
 		function getDecisionPassPower(len) {
 			const raw = clamp(len * 1.4, BASE_DECISION_PASS_POWER, BASE_DECISION_SHOT_POWER);
-			return raw * (1 + speedLevel * 0.08);
+			return raw * (1 + passingLevel * 0.10);
+		}
+
+		function getDecisionShotPower() {
+			return BASE_DECISION_SHOT_POWER * (1 + shootingLevel * 0.12);
 		}
 
 		function getRedPassPower() {
@@ -547,7 +560,31 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function getKickLockTime() {
-			return Math.max(0.18, BASE_KICK_LOCK - (smartLevel * 0.04));
+			return Math.max(0.14, BASE_KICK_LOCK - (smartLevel * 0.04) - (passingLevel * 0.03));
+		}
+
+		function getDefenseTouchPower() {
+			return 36 + (defenseLevel * 8);
+		}
+
+		function getSpeedUpgradeCost() {
+			return 6 + (speedLevel * 6);
+		}
+
+		function getSmartUpgradeCost() {
+			return 8 + (smartLevel * 8);
+		}
+
+		function getShootingUpgradeCost() {
+			return 10 + (shootingLevel * 10);
+		}
+
+		function getPassingUpgradeCost() {
+			return 9 + (passingLevel * 9);
+		}
+
+		function getDefenseUpgradeCost() {
+			return 7 + (defenseLevel * 7);
 		}
 
 		function clamp(value, min, max) {
@@ -646,14 +683,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			messageEl.textContent = text;
 		}
 
-		function getSpeedUpgradeCost() {
-			return 6 + (speedLevel * 6);
-		}
-
-		function getSmartUpgradeCost() {
-			return 8 + (smartLevel * 8);
-		}
-
 		function updateHud() {
 			scoreUserEl.textContent = String(userScore);
 			scoreAiEl.textContent = String(aiScore);
@@ -663,10 +692,22 @@ document.addEventListener('DOMContentLoaded', function () {
 			coinsEl.textContent = String(coins);
 			speedLevelEl.textContent = String(speedLevel);
 			smartLevelEl.textContent = String(smartLevel);
-			buySpeedBtn.textContent = 'Upgrade Speed (' + getSpeedUpgradeCost() + ' coins)';
-			buySmartBtn.textContent = 'Upgrade Smart (' + getSmartUpgradeCost() + ' coins)';
+			shootingLevelEl.textContent = String(shootingLevel);
+			passingLevelEl.textContent = String(passingLevel);
+			defenseLevelEl.textContent = String(defenseLevel);
+
+			buySpeedBtn.textContent = 'Speed (' + getSpeedUpgradeCost() + ')';
+			buySmartBtn.textContent = 'Smart (' + getSmartUpgradeCost() + ')';
+			buyShootingBtn.textContent = 'Shooting (' + getShootingUpgradeCost() + ')';
+			buyPassingBtn.textContent = 'Passing (' + getPassingUpgradeCost() + ')';
+			buyDefenseBtn.textContent = 'Defense (' + getDefenseUpgradeCost() + ')';
+
 			buySpeedBtn.disabled = coins < getSpeedUpgradeCost();
 			buySmartBtn.disabled = coins < getSmartUpgradeCost();
+			buyShootingBtn.disabled = coins < getShootingUpgradeCost();
+			buyPassingBtn.disabled = coins < getPassingUpgradeCost();
+			buyDefenseBtn.disabled = coins < getDefenseUpgradeCost();
+
 			updateModeLabel();
 		}
 
@@ -805,7 +846,7 @@ document.addEventListener('DOMContentLoaded', function () {
 					(mate.position === 'wing' ? 20 : 0) +
 					(mate.position === 'midfielder' ? 12 : 0);
 
-				const smartBonus = player.team === 'blue' ? (smartLevel * 10) : 0;
+				const smartBonus = player.team === 'blue' ? (smartLevel * 10 + passingLevel * 8) : 0;
 				const total = forwardScore + spacingScore + roleBonus + smartBonus;
 
 				if (total > bestScore) {
@@ -836,7 +877,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			});
 
 			decisionBox.classList.add('is-active');
-			decisionText.textContent = 'Your teammate has the ball. Move the target and click or tap to kick in exactly that direction.';
+			decisionText.textContent = 'Your teammate has the ball. Click or tap where to kick. Every pass gives 51 coins.';
 			setMessage('Choose ball direction');
 			updateHud();
 			render();
@@ -855,10 +896,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			state.ball.x = decisionPlayer.x + nx * 24;
 			state.ball.y = decisionPlayer.y + ny * 24;
-			state.ball.vx = nx * getDecisionPassPower(len);
-			state.ball.vy = ny * getDecisionPassPower(len);
+
+			const isShot = (
+				(decisionPlayer.team === 'blue' && targetX > FIELD_W - 120 && targetY > GOAL_TOP - 40 && targetY < GOAL_BOTTOM + 40) ||
+				(decisionPlayer.team === 'red' && targetX < 120 && targetY > GOAL_TOP - 40 && targetY < GOAL_BOTTOM + 40)
+			);
+
+			const power = isShot ? getDecisionShotPower() : getDecisionPassPower(len);
+
+			state.ball.vx = nx * power;
+			state.ball.vy = ny * power;
 			state.ball.kick_lock_timer = getKickLockTime();
 			state.ball.kick_ignore_player = decisionPlayer;
+
+			coins += 51;
 
 			decisionMode = false;
 			running = true;
@@ -868,7 +919,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				p.el.classList.remove('zo-soccer-player--decision');
 			});
 			decisionBox.classList.remove('is-active');
-			setMessage('Ball kicked');
+			setMessage(isShot ? 'Shot taken. +51 coins' : 'Pass made. +51 coins');
 			updateHud();
 			animationId = requestAnimationFrame(loop);
 		}
@@ -1133,12 +1184,16 @@ document.addEventListener('DOMContentLoaded', function () {
 					state.ball.x += nx * overlap;
 					state.ball.y += ny * overlap;
 
-					const touchPower = 36;
+					let touchPower = 36;
+					if (player.team === 'blue') {
+						touchPower = getDefenseTouchPower();
+					}
+
 					state.ball.vx += nx * touchPower;
 					state.ball.vy += ny * touchPower;
 
 					if (player.team === 'blue') {
-						state.ball.vx += 3;
+						state.ball.vx += 3 + defenseLevel;
 					} else {
 						state.ball.vx -= 3;
 					}
@@ -1158,7 +1213,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.ball.vy = 0;
 			state.ball.kick_lock_timer = 0;
 			state.ball.kick_ignore_player = null;
-			setMessage((team === 'blue' ? 'Blue' : 'Red') + ' corner');
+			setMessage((team === 'blue' ? 'Blue' : 'Red') + ' korner');
 		}
 
 		function handleRestartKick(team) {
@@ -1173,7 +1228,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				kickBallToward(targetX, targetY, power);
 				state.ball.kick_lock_timer = team === 'blue' ? getKickLockTime() : 0.22;
 				state.ball.kick_ignore_player = null;
-				setMessage((team === 'blue' ? 'Blue' : 'Red') + ' corner kick');
+				setMessage((team === 'blue' ? 'Blue' : 'Red') + ' korner kick');
 			}
 
 			restartType = null;
@@ -1220,18 +1275,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			if (state.ball.x < -16 && inGoalOpening) {
 				aiScore += 1;
-				coins += 2;
 				updateHud();
-				setMessage('Red scored. +2 coins');
+				setMessage('Red scored');
 				resetPositions();
 				return;
 			}
 
 			if (state.ball.x > FIELD_W + 16 && inGoalOpening) {
 				userScore += 1;
-				coins += 5;
 				updateHud();
-				setMessage('Blue scored. +5 coins');
+				setMessage('Blue scored');
 				resetPositions();
 				return;
 			}
@@ -1404,7 +1457,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			speedLevel += 1;
 			applyBlueUpgrades();
 			updateHud();
-			setMessage('Blue team speed upgraded');
+			setMessage('Blue speed upgraded');
 		});
 
 		buySmartBtn.addEventListener('click', function () {
@@ -1415,7 +1468,40 @@ document.addEventListener('DOMContentLoaded', function () {
 			coins -= cost;
 			smartLevel += 1;
 			updateHud();
-			setMessage('Blue team smart upgraded');
+			setMessage('Blue smart upgraded');
+		});
+
+		buyShootingBtn.addEventListener('click', function () {
+			const cost = getShootingUpgradeCost();
+			if (coins < cost) {
+				return;
+			}
+			coins -= cost;
+			shootingLevel += 1;
+			updateHud();
+			setMessage('Blue shooting upgraded');
+		});
+
+		buyPassingBtn.addEventListener('click', function () {
+			const cost = getPassingUpgradeCost();
+			if (coins < cost) {
+				return;
+			}
+			coins -= cost;
+			passingLevel += 1;
+			updateHud();
+			setMessage('Blue passing upgraded');
+		});
+
+		buyDefenseBtn.addEventListener('click', function () {
+			const cost = getDefenseUpgradeCost();
+			if (coins < cost) {
+				return;
+			}
+			coins -= cost;
+			defenseLevel += 1;
+			updateHud();
+			setMessage('Blue defense upgraded');
 		});
 
 		buildEntities();
@@ -1452,11 +1538,23 @@ if (!function_exists('zo_game_soccer_match_ai_render')) {
 					</div>
 					<div class="zo-soccer-panel">
 						<strong class="zo-status-speed-level">0</strong>
-						<span>Speed Level</span>
+						<span>Speed</span>
 					</div>
 					<div class="zo-soccer-panel">
 						<strong class="zo-status-smart-level">0</strong>
-						<span>Smart Level</span>
+						<span>Smartness</span>
+					</div>
+					<div class="zo-soccer-panel">
+						<strong class="zo-status-shooting-level">0</strong>
+						<span>Shooting</span>
+					</div>
+					<div class="zo-soccer-panel">
+						<strong class="zo-status-passing-level">0</strong>
+						<span>Passing</span>
+					</div>
+					<div class="zo-soccer-panel">
+						<strong class="zo-status-defense-level">0</strong>
+						<span>Defense</span>
 					</div>
 					<div class="zo-soccer-panel">
 						<strong class="zo-status-mode">Stopped</strong>
@@ -1490,30 +1588,45 @@ if (!function_exists('zo_game_soccer_match_ai_render')) {
 					<div class="zo-soccer-buttons">
 						<button type="button" class="zo-soccer-btn zo-soccer-start">Start Match</button>
 						<button type="button" class="zo-soccer-btn zo-soccer-restart">Restart</button>
-						<button type="button" class="zo-soccer-btn zo-buy-speed">Upgrade Speed (6 coins)</button>
-						<button type="button" class="zo-soccer-btn zo-buy-smart">Upgrade Smart (8 coins)</button>
+						<button type="button" class="zo-soccer-btn zo-buy-speed">Speed (6)</button>
+						<button type="button" class="zo-soccer-btn zo-buy-smart">Smart (8)</button>
+						<button type="button" class="zo-soccer-btn zo-buy-shooting">Shooting (10)</button>
+						<button type="button" class="zo-soccer-btn zo-buy-passing">Passing (9)</button>
+						<button type="button" class="zo-soccer-btn zo-buy-defense">Defense (7)</button>
 					</div>
 
 					<div class="zo-soccer-help">
-						All players are AI. When blue gets the ball, the game pauses and your click decides the exact kick direction. You now earn coins and can upgrade your blue team so they are faster or smarter.
+						Blue team upgrades now use whole team stats: speed, smartness, shooting, passing, and defense. We always use korner kicks. Every pass you make gives 51 coins.
 					</div>
 
 					<div class="zo-soccer-upgrades">
-						<div class="zo-soccer-upgrades-title">Upgrades</div>
+						<div class="zo-soccer-upgrades-title">Team Upgrades</div>
 						<div class="zo-soccer-upgrades-grid">
 							<div class="zo-soccer-upgrade-card">
-								<strong>Speed Upgrade</strong>
-								<span>Makes blue players move faster all over the field and reach passes sooner.</span>
+								<strong>Speed</strong>
+								<span>Blue players run faster.</span>
 							</div>
 							<div class="zo-soccer-upgrade-card">
-								<strong>Smart Upgrade</strong>
-								<span>Makes blue players chase and support better, control the ball better, and keep your chosen kick direction more reliably.</span>
+								<strong>Smartness</strong>
+								<span>Better spacing and better support.</span>
+							</div>
+							<div class="zo-soccer-upgrade-card">
+								<strong>Shooting</strong>
+								<span>Stronger shots when you aim at goal.</span>
+							</div>
+							<div class="zo-soccer-upgrade-card">
+								<strong>Passing</strong>
+								<span>Stronger and cleaner passes.</span>
+							</div>
+							<div class="zo-soccer-upgrade-card">
+								<strong>Defense</strong>
+								<span>Blue defenders close down and clear better.</span>
 							</div>
 						</div>
 					</div>
 
 					<div class="zo-soccer-decision">
-						<div class="zo-soccer-decision-text">Your teammate has the ball. Move the target and click or tap to kick in exactly that direction.</div>
+						<div class="zo-soccer-decision-text">Your teammate has the ball. Click or tap where to kick. Every pass gives 51 coins.</div>
 					</div>
 				</div>
 			</div>
@@ -1527,7 +1640,7 @@ return array(
 	'slug'            => 'soccer-match-ai',
 	'name'            => 'Soccer Match AI',
 	'author'          => 'Asker',
-	'description'     => 'A slow 5 minute soccer match where all players are AI and you can upgrade your blue team to be faster or smarter.',
+	'description'     => 'A slow 5 minute soccer match where all players are AI and you can upgrade whole blue team stats.',
 	'render_callback' => 'zo_game_soccer_match_ai_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,
