@@ -525,13 +525,10 @@ document.addEventListener('DOMContentLoaded', function () {
 		let decisionMode = false;
 		let decisionPlayer = null;
 		let decisionTarget = null;
+		let decisionContext = 'normal';
 
 		function getBlueSpeedMultiplier() {
 			return 1 + (speedLevel * 0.12);
-		}
-
-		function getBlueSmartMultiplier() {
-			return 1 + (smartLevel * 0.18);
 		}
 
 		function getBlueInterceptRadius() {
@@ -549,6 +546,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function getDecisionShotPower() {
 			return BASE_DECISION_SHOT_POWER * (1 + shootingLevel * 0.12);
+		}
+
+		function getDecisionCornerPower() {
+			return 240 + (passingLevel * 18) + (shootingLevel * 12);
 		}
 
 		function getRedPassPower() {
@@ -671,7 +672,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function updateModeLabel() {
 			if (decisionMode) {
-				modeEl.textContent = 'Decision';
+				modeEl.textContent = decisionContext === 'corner' ? 'Corner' : 'Decision';
 			} else if (running) {
 				modeEl.textContent = 'Live';
 			} else {
@@ -739,6 +740,19 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.ball.el = ballEl;
 		}
 
+		function clearDecisionState() {
+			decisionMode = false;
+			decisionPlayer = null;
+			decisionTarget = null;
+			decisionContext = 'normal';
+			state.players.forEach(function (p) {
+				p.el.classList.remove('zo-soccer-player--decision');
+			});
+			decisionBox.classList.remove('is-active');
+			targetEl.classList.remove('is-active');
+			passLineEl.classList.remove('is-active');
+		}
+
 		function resetPositions() {
 			state.players.forEach(function (player) {
 				player.homeX = player.baseHomeX;
@@ -758,12 +772,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			restartType = null;
 			restartTeam = null;
 			restartSpot = null;
-			decisionMode = false;
-			decisionPlayer = null;
-			decisionTarget = null;
-			targetEl.classList.remove('is-active');
-			passLineEl.classList.remove('is-active');
-			decisionBox.classList.remove('is-active');
+			clearDecisionState();
 		}
 
 		function render() {
@@ -858,18 +867,107 @@ document.addEventListener('DOMContentLoaded', function () {
 			return best;
 		}
 
-		function startDecisionMode(player) {
+		function getCornerKicker(team) {
+			let best = null;
+			let bestDist = Infinity;
+
+			state.players.forEach(function (player) {
+				if (player.team !== team || player.isGoalie) {
+					return;
+				}
+				const d = distance(player, { x: restartSpot.x, y: restartSpot.y });
+				if (d < bestDist) {
+					bestDist = d;
+					best = player;
+				}
+			});
+
+			return best;
+		}
+
+		function setupBlueCornerPositions() {
+			const isTop = restartSpot.y < FIELD_H / 2;
+
+			state.players.forEach(function (player) {
+				if (player.team === 'blue') {
+					if (player.isGoalie) {
+						player.x = 86;
+						player.y = 315;
+						return;
+					}
+
+					if (player === decisionPlayer) {
+						player.x = restartSpot.x - 18;
+						player.y = restartSpot.y;
+						return;
+					}
+
+					if (player.position === 'forward') {
+						player.x = FIELD_W - 185;
+						if (player.label === 'LF') {
+							player.y = 280;
+						} else if (player.label === 'RF') {
+							player.y = 355;
+						} else {
+							player.y = 315;
+						}
+						return;
+					}
+
+					if (player.position === 'midfielder') {
+						player.x = FIELD_W - 260;
+						player.y = isTop ? 220 : 410;
+						return;
+					}
+
+					if (player.position === 'wing') {
+						player.x = FIELD_W - 320;
+						player.y = isTop ? 155 : 475;
+						return;
+					}
+
+					player.x = FIELD_W - 410;
+					player.y = player.baseHomeY;
+					return;
+				}
+
+				if (player.isGoalie) {
+					player.x = 1034;
+					player.y = 315;
+				} else if (player.position === 'defender') {
+					player.x = FIELD_W - 115;
+					player.y = player.baseHomeY;
+				} else if (player.position === 'midfielder') {
+					player.x = FIELD_W - 165;
+					player.y = player.baseHomeY;
+				} else {
+					player.x = FIELD_W - 235;
+					player.y = player.baseHomeY;
+				}
+			});
+		}
+
+		function startDecisionMode(player, context) {
 			decisionMode = true;
 			running = false;
 			decisionPlayer = player;
+			decisionContext = context || 'normal';
 			decisionTarget = {
 				x: player.team === 'blue' ? player.x + 140 : player.x - 140,
 				y: player.y
 			};
 
-			const best = findBestPassTarget(player);
-			if (best) {
-				decisionTarget = { x: best.x, y: best.y };
+			if (decisionContext === 'corner') {
+				setupBlueCornerPositions();
+				decisionTarget = {
+					x: FIELD_W - 170,
+					y: FIELD_H / 2
+				};
+			} else {
+				const best = findBestPassTarget(player);
+				if (best) {
+					decisionTarget = { x: best.x, y: best.y };
+				}
 			}
 
 			state.players.forEach(function (p) {
@@ -877,10 +975,22 @@ document.addEventListener('DOMContentLoaded', function () {
 			});
 
 			decisionBox.classList.add('is-active');
-			decisionText.textContent = 'Your teammate has the ball. Click or tap where to kick. Every pass gives 51 coins.';
-			setMessage('Choose ball direction');
+			if (decisionContext === 'corner') {
+				decisionText.textContent = 'Blue korner. Click or tap where you want the korner kick to go. You can aim at goal.';
+				setMessage('Choose korner kick');
+			} else {
+				decisionText.textContent = 'Your teammate has the ball. Click or tap where to kick. Click at the goal to shoot.';
+				setMessage('Choose pass or shot');
+			}
 			updateHud();
 			render();
+		}
+
+		function finishDecisionKick() {
+			clearDecisionState();
+			running = true;
+			updateHud();
+			animationId = requestAnimationFrame(loop);
 		}
 
 		function endDecisionModeAndKick(targetX, targetY) {
@@ -897,10 +1007,29 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.ball.x = decisionPlayer.x + nx * 24;
 			state.ball.y = decisionPlayer.y + ny * 24;
 
-			const isShot = (
-				(decisionPlayer.team === 'blue' && targetX > FIELD_W - 120 && targetY > GOAL_TOP - 40 && targetY < GOAL_BOTTOM + 40) ||
-				(decisionPlayer.team === 'red' && targetX < 120 && targetY > GOAL_TOP - 40 && targetY < GOAL_BOTTOM + 40)
-			);
+			const aimedAtRightGoal =
+				targetX >= FIELD_W - 18 &&
+				targetY >= GOAL_TOP &&
+				targetY <= GOAL_BOTTOM;
+
+			if (decisionContext === 'corner') {
+				const cornerPower = aimedAtRightGoal ? getDecisionShotPower() : getDecisionCornerPower();
+				state.ball.vx = nx * cornerPower;
+				state.ball.vy = ny * cornerPower;
+				state.ball.kick_lock_timer = getKickLockTime();
+				state.ball.kick_ignore_player = decisionPlayer;
+				restartType = null;
+				restartTeam = null;
+				restartSpot = null;
+				setMessage(aimedAtRightGoal ? 'Korner shot' : 'Korner taken');
+				finishDecisionKick();
+				return;
+			}
+
+			const isShot =
+				targetX >= FIELD_W - 18 &&
+				targetY >= GOAL_TOP &&
+				targetY <= GOAL_BOTTOM;
 
 			const power = isShot ? getDecisionShotPower() : getDecisionPassPower(len);
 
@@ -910,18 +1039,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.ball.kick_ignore_player = decisionPlayer;
 
 			coins += 51;
-
-			decisionMode = false;
-			running = true;
-			decisionPlayer = null;
-			decisionTarget = null;
-			state.players.forEach(function (p) {
-				p.el.classList.remove('zo-soccer-player--decision');
-			});
-			decisionBox.classList.remove('is-active');
 			setMessage(isShot ? 'Shot taken. +51 coins' : 'Pass made. +51 coins');
-			updateHud();
-			animationId = requestAnimationFrame(loop);
+			finishDecisionKick();
 		}
 
 		function getRoleHomeShift(player, ball) {
@@ -1010,6 +1129,10 @@ document.addEventListener('DOMContentLoaded', function () {
 			const chaseRadius = player.team === 'blue' ? getBlueChaseRadius() : BASE_CHASE_RADIUS;
 
 			if (restartType) {
+				if (restartType === 'corner' && restartTeam === 'blue') {
+					return;
+				}
+
 				if (restartTeam === player.team) {
 					if (restartType === 'corner') {
 						if (player.isGoalie) {
@@ -1107,7 +1230,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function getBallOwner() {
-			if (state.ball.kick_lock_timer > 0) {
+			if (state.ball.kick_lock_timer > 0 || decisionMode) {
 				return null;
 			}
 
@@ -1132,6 +1255,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function maybeAiPassOrShoot(player) {
 			if (restartType) {
+				if (restartType === 'corner' && restartTeam === 'blue') {
+					return;
+				}
 				if (player.team === restartTeam && distance(player, state.ball) < 24) {
 					handleRestartKick(player.team);
 				}
@@ -1139,7 +1265,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			if (player.team === 'blue') {
-				startDecisionMode(player);
+				startDecisionMode(player, 'normal');
 				return;
 			}
 
@@ -1213,7 +1339,16 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.ball.vy = 0;
 			state.ball.kick_lock_timer = 0;
 			state.ball.kick_ignore_player = null;
-			setMessage((team === 'blue' ? 'Blue' : 'Red') + ' korner');
+
+			if (team === 'blue') {
+				const kicker = getCornerKicker('blue');
+				if (kicker) {
+					startDecisionMode(kicker, 'corner');
+				}
+				setMessage('Blue korner');
+			} else {
+				setMessage('Red korner');
+			}
 		}
 
 		function handleRestartKick(team) {
@@ -1224,7 +1359,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (restartType === 'corner') {
 				const targetX = team === 'blue' ? FIELD_W - 220 : 220;
 				const targetY = FIELD_H / 2 + (Math.random() * 140 - 70);
-				const power = team === 'blue' ? getDecisionPassPower(220) : 230;
+				const power = team === 'blue' ? getDecisionCornerPower() : 230;
 				kickBallToward(targetX, targetY, power);
 				state.ball.kick_lock_timer = team === 'blue' ? getKickLockTime() : 0.22;
 				state.ball.kick_ignore_player = null;
@@ -1596,7 +1731,7 @@ if (!function_exists('zo_game_soccer_match_ai_render')) {
 					</div>
 
 					<div class="zo-soccer-help">
-						Blue team upgrades now use whole team stats: speed, smartness, shooting, passing, and defense. We always use korner kicks. Every pass you make gives 51 coins.
+						You can now use blue corner kicks and also shoot directly at goal. When decision mode opens, click inside the right goal mouth to shoot. When a blue corner happens, click where the corner kick should go, including directly at goal.
 					</div>
 
 					<div class="zo-soccer-upgrades">
@@ -1608,25 +1743,25 @@ if (!function_exists('zo_game_soccer_match_ai_render')) {
 							</div>
 							<div class="zo-soccer-upgrade-card">
 								<strong>Smartness</strong>
-								<span>Better spacing and better support.</span>
+								<span>Better spacing and support.</span>
 							</div>
 							<div class="zo-soccer-upgrade-card">
 								<strong>Shooting</strong>
-								<span>Stronger shots when you aim at goal.</span>
+								<span>Stronger shots toward goal.</span>
 							</div>
 							<div class="zo-soccer-upgrade-card">
 								<strong>Passing</strong>
-								<span>Stronger and cleaner passes.</span>
+								<span>Better passes and stronger corners.</span>
 							</div>
 							<div class="zo-soccer-upgrade-card">
 								<strong>Defense</strong>
-								<span>Blue defenders close down and clear better.</span>
+								<span>Better closing down and clearances.</span>
 							</div>
 						</div>
 					</div>
 
 					<div class="zo-soccer-decision">
-						<div class="zo-soccer-decision-text">Your teammate has the ball. Click or tap where to kick. Every pass gives 51 coins.</div>
+						<div class="zo-soccer-decision-text">Click or tap where to kick. Click inside the goal to shoot.</div>
 					</div>
 				</div>
 			</div>
@@ -1640,7 +1775,7 @@ return array(
 	'slug'            => 'soccer-match-ai',
 	'name'            => 'Soccer Match AI',
 	'author'          => 'Asker',
-	'description'     => 'A slow 5 minute soccer match where all players are AI and you can upgrade whole blue team stats.',
+	'description'     => 'A slow 5 minute soccer match where all players are AI, blue corner kicks work, and you can shoot directly at goal.',
 	'render_callback' => 'zo_game_soccer_match_ai_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,
