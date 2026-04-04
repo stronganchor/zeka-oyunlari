@@ -36,7 +36,7 @@ $css = <<<'CSS'
 	border: 2px solid #dfe7d8;
 	border-radius: 12px;
 	padding: 10px 14px;
-	min-width: 122px;
+	min-width: 130px;
 }
 
 .zo-soccer-panel strong {
@@ -47,9 +47,29 @@ $css = <<<'CSS'
 
 .zo-soccer-panel span {
 	display: block;
-	font-size: 13px;
+	font-size: 14px;
 	color: #445244;
 	margin-top: 4px;
+}
+
+.zo-soccer-btn {
+	border: none;
+	border-radius: 10px;
+	padding: 10px 14px;
+	font-size: 15px;
+	font-weight: 700;
+	cursor: pointer;
+	background: #1d2a1d;
+	color: #fff;
+}
+
+.zo-soccer-btn:hover {
+	opacity: 0.92;
+}
+
+.zo-soccer-btn[disabled] {
+	opacity: 0.45;
+	cursor: default;
 }
 
 .zo-soccer-field {
@@ -198,8 +218,7 @@ $css = <<<'CSS'
 .zo-soccer-player,
 .zo-soccer-ball,
 .zo-soccer-target,
-.zo-soccer-pass-line,
-.zo-soccer-preview-dot {
+.zo-soccer-pass-line {
 	position: absolute;
 	transform: translate(-50%, -50%);
 	pointer-events: none;
@@ -336,18 +355,6 @@ $css = <<<'CSS'
 	display: block;
 }
 
-.zo-soccer-preview-dot {
-	width: 7px;
-	height: 7px;
-	border-radius: 50%;
-	background: rgba(255,255,255,0.72);
-	display: none;
-}
-
-.zo-soccer-preview-dot.is-active {
-	display: block;
-}
-
 .zo-soccer-controls {
 	margin-top: 14px;
 	display: flex;
@@ -356,17 +363,11 @@ $css = <<<'CSS'
 	align-items: center;
 }
 
-.zo-soccer-buttons,
-.zo-soccer-actionbar,
-.zo-soccer-cornerbar {
+.zo-soccer-buttons {
 	display: flex;
 	gap: 8px;
 	flex-wrap: wrap;
 	justify-content: center;
-}
-
-.zo-soccer-btn.is-active {
-	background: #1565c0;
 }
 
 .zo-soccer-help,
@@ -489,8 +490,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		const passLineEl = game.querySelector('.zo-soccer-pass-line');
 		const decisionBox = game.querySelector('.zo-soccer-decision');
 		const decisionText = game.querySelector('.zo-soccer-decision-text');
-		const actionButtons = Array.from(game.querySelectorAll('.zo-action-btn'));
-		const cornerButtons = Array.from(game.querySelectorAll('.zo-corner-btn'));
 
 		const FIELD_W = 1120;
 		const FIELD_H = 630;
@@ -498,8 +497,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		const BALL_R = 8;
 		const GOAL_TOP = 250;
 		const GOAL_BOTTOM = 380;
-		const GOAL_LEFT_X = 0;
-		const GOAL_RIGHT_X = FIELD_W;
 		const MATCH_TIME = 300;
 		const BASE_INTERCEPT_RADIUS = 110;
 		const BASE_CHASE_RADIUS = 70;
@@ -529,9 +526,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		let decisionPlayer = null;
 		let decisionTarget = null;
 		let decisionContext = 'normal';
-		let actionMode = 'pass';
-		let cornerMode = 'penalty';
-		let previewDots = [];
 
 		function getBlueSpeedMultiplier() {
 			return 1 + (speedLevel * 0.12);
@@ -552,10 +546,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function getDecisionShotPower() {
 			return BASE_DECISION_SHOT_POWER * (1 + shootingLevel * 0.12);
-		}
-
-		function getDecisionCrossPower() {
-			return 220 + (passingLevel * 14);
 		}
 
 		function getDecisionCornerPower() {
@@ -663,37 +653,11 @@ document.addEventListener('DOMContentLoaded', function () {
 				y: FIELD_H / 2,
 				vx: 0,
 				vy: 0,
-				spin: 0,
 				el: null,
 				kick_lock_timer: 0,
 				kick_ignore_player: null
 			}
 		};
-
-		function buildPreviewDots() {
-			for (let i = 0; i < 24; i++) {
-				const dot = document.createElement('div');
-				dot.className = 'zo-soccer-preview-dot';
-				field.appendChild(dot);
-				previewDots.push(dot);
-			}
-		}
-
-		function hidePreviewDots() {
-			previewDots.forEach(function (dot) {
-				dot.classList.remove('is-active');
-			});
-		}
-
-		function updateActionButtons() {
-			actionButtons.forEach(function (btn) {
-				btn.classList.toggle('is-active', btn.getAttribute('data-action') === actionMode);
-			});
-
-			cornerButtons.forEach(function (btn) {
-				btn.classList.toggle('is-active', btn.getAttribute('data-corner') === cornerMode);
-			});
-		}
 
 		function applyBlueUpgrades() {
 			const speedMultiplier = getBlueSpeedMultiplier();
@@ -745,7 +709,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			buyPassingBtn.disabled = coins < getPassingUpgradeCost();
 			buyDefenseBtn.disabled = coins < getDefenseUpgradeCost();
 
-			updateActionButtons();
 			updateModeLabel();
 		}
 
@@ -788,7 +751,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			decisionBox.classList.remove('is-active');
 			targetEl.classList.remove('is-active');
 			passLineEl.classList.remove('is-active');
-			hidePreviewDots();
 		}
 
 		function resetPositions() {
@@ -805,65 +767,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.ball.y = FIELD_H / 2;
 			state.ball.vx = 0;
 			state.ball.vy = 0;
-			state.ball.spin = 0;
 			state.ball.kick_lock_timer = 0;
 			state.ball.kick_ignore_player = null;
 			restartType = null;
 			restartTeam = null;
 			restartSpot = null;
 			clearDecisionState();
-		}
-
-		function simulateTrajectory(startX, startY, velX, velY, spin) {
-			const points = [];
-			let px = startX;
-			let py = startY;
-			let pvx = velX;
-			let pvy = velY;
-			let pspin = spin;
-
-			for (let i = 0; i < 24; i++) {
-				const oldVx = pvx;
-				pvx += -pvy * pspin * 0.018;
-				pvy += oldVx * pspin * 0.018;
-
-				px += pvx * 0.05;
-				py += pvy * 0.05;
-
-				pvx *= 0.985;
-				pvy *= 0.985;
-				pspin *= 0.985;
-
-				if (py <= BALL_R) {
-					py = BALL_R;
-					pvy *= -0.82;
-				}
-				if (py >= FIELD_H - BALL_R) {
-					py = FIELD_H - BALL_R;
-					pvy *= -0.82;
-				}
-
-				points.push({ x: px, y: py });
-			}
-
-			return points;
-		}
-
-		function renderPreviewDots(startX, startY, velX, velY, spin) {
-			const points = simulateTrajectory(startX, startY, velX, velY, spin);
-			const rect = field.getBoundingClientRect();
-			const scaleX = rect.width / FIELD_W;
-			const scaleY = rect.height / FIELD_H;
-
-			previewDots.forEach(function (dot, index) {
-				if (points[index]) {
-					dot.classList.add('is-active');
-					dot.style.left = (points[index].x * scaleX) + 'px';
-					dot.style.top = (points[index].y * scaleY) + 'px';
-				} else {
-					dot.classList.remove('is-active');
-				}
-			});
 		}
 
 		function render() {
@@ -898,13 +807,9 @@ document.addEventListener('DOMContentLoaded', function () {
 				passLineEl.style.top = startY + 'px';
 				passLineEl.style.width = len + 'px';
 				passLineEl.style.transform = 'translate(0, -50%) rotate(' + angle + 'deg)';
-
-				const kickData = getDecisionKickData(decisionTarget.x, decisionTarget.y);
-				renderPreviewDots(kickData.startX, kickData.startY, kickData.vx, kickData.vy, kickData.spin);
 			} else {
 				targetEl.classList.remove('is-active');
 				passLineEl.classList.remove('is-active');
-				hidePreviewDots();
 			}
 		}
 
@@ -978,26 +883,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			});
 
 			return best;
-		}
-
-		function getCornerPresetTarget() {
-			if (!restartSpot) {
-				return { x: FIELD_W - 150, y: FIELD_H / 2 };
-			}
-
-			const isTop = restartSpot.y < FIELD_H / 2;
-
-			if (cornerMode === 'near_post') {
-				return { x: FIELD_W - 70, y: isTop ? GOAL_TOP + 18 : GOAL_BOTTOM - 18 };
-			}
-			if (cornerMode === 'far_post') {
-				return { x: FIELD_W - 62, y: isTop ? GOAL_BOTTOM - 18 : GOAL_TOP + 18 };
-			}
-			if (cornerMode === 'goal') {
-				return { x: GOAL_RIGHT_X, y: (GOAL_TOP + GOAL_BOTTOM) / 2 };
-			}
-
-			return { x: FIELD_W - 140, y: FIELD_H / 2 };
 		}
 
 		function setupBlueCornerPositions() {
@@ -1074,7 +959,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			if (decisionContext === 'corner') {
 				setupBlueCornerPositions();
-				decisionTarget = getCornerPresetTarget();
+				decisionTarget = {
+					x: FIELD_W - 170,
+					y: FIELD_H / 2
+				};
 			} else {
 				const best = findBestPassTarget(player);
 				if (best) {
@@ -1088,11 +976,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			decisionBox.classList.add('is-active');
 			if (decisionContext === 'corner') {
-				decisionText.textContent = 'Blue korner. Use near post, far post, penalty spot, or goal. You can still click anywhere on the field.';
+				decisionText.textContent = 'Blue korner. Click or tap where you want the korner kick to go. You can aim at goal.';
 				setMessage('Choose korner kick');
 			} else {
-				decisionText.textContent = 'Use pass, shoot, or cross. Click anywhere. Clicking inside the goal also shoots.';
-				setMessage('Choose pass, shot, or cross');
+				decisionText.textContent = 'Your teammate has the ball. Click or tap where to kick. Click at the goal to shoot.';
+				setMessage('Choose pass or shot');
 			}
 			updateHud();
 			render();
@@ -1105,85 +993,53 @@ document.addEventListener('DOMContentLoaded', function () {
 			animationId = requestAnimationFrame(loop);
 		}
 
-		function getDecisionKickData(targetX, targetY) {
-			const dx = targetX - decisionPlayer.x;
-			const dy = targetY - decisionPlayer.y;
-			const len = Math.sqrt(dx * dx + dy * dy) || 1;
-			const nx = dx / len;
-			const ny = dy / len;
-			const startX = decisionPlayer.x + nx * 24;
-			const startY = decisionPlayer.y + ny * 24;
-			const insideGoal =
-				targetX >= FIELD_W - 18 &&
-				targetY >= GOAL_TOP &&
-				targetY <= GOAL_BOTTOM;
-
-			let power = getDecisionPassPower(len);
-			let spin = 0;
-
-			if (decisionContext === 'corner') {
-				if (cornerMode === 'goal' || insideGoal) {
-					power = getDecisionShotPower();
-				} else {
-					power = getDecisionCornerPower();
-				}
-				spin = (targetY - decisionPlayer.y) * 0.0022;
-			} else {
-				if (actionMode === 'shoot' || insideGoal) {
-					power = getDecisionShotPower();
-					spin = (targetY - decisionPlayer.y) * 0.0024;
-				} else if (actionMode === 'cross') {
-					power = getDecisionCrossPower();
-					spin = (targetY - decisionPlayer.y) * 0.0018;
-				} else {
-					power = getDecisionPassPower(len);
-					spin = (targetY - decisionPlayer.y) * 0.0011;
-				}
-			}
-
-			return {
-				startX: startX,
-				startY: startY,
-				vx: nx * power,
-				vy: ny * power,
-				spin: spin
-			};
-		}
-
 		function endDecisionModeAndKick(targetX, targetY) {
 			if (!decisionMode || !decisionPlayer) {
 				return;
 			}
 
-			const kick = getDecisionKickData(targetX, targetY);
+			const dx = targetX - decisionPlayer.x;
+			const dy = targetY - decisionPlayer.y;
+			const len = Math.sqrt(dx * dx + dy * dy) || 1;
+			const nx = dx / len;
+			const ny = dy / len;
 
-			state.ball.x = kick.startX;
-			state.ball.y = kick.startY;
-			state.ball.vx = kick.vx;
-			state.ball.vy = kick.vy;
-			state.ball.spin = kick.spin;
-			state.ball.kick_lock_timer = getKickLockTime();
-			state.ball.kick_ignore_player = decisionPlayer;
+			state.ball.x = decisionPlayer.x + nx * 24;
+			state.ball.y = decisionPlayer.y + ny * 24;
+
+			const aimedAtRightGoal =
+				targetX >= FIELD_W - 18 &&
+				targetY >= GOAL_TOP &&
+				targetY <= GOAL_BOTTOM;
 
 			if (decisionContext === 'corner') {
+				const cornerPower = aimedAtRightGoal ? getDecisionShotPower() : getDecisionCornerPower();
+				state.ball.vx = nx * cornerPower;
+				state.ball.vy = ny * cornerPower;
+				state.ball.kick_lock_timer = getKickLockTime();
+				state.ball.kick_ignore_player = decisionPlayer;
 				restartType = null;
 				restartTeam = null;
 				restartSpot = null;
-				setMessage(cornerMode === 'goal' ? 'Korner shot' : 'Korner taken');
+				setMessage(aimedAtRightGoal ? 'Korner shot' : 'Korner taken');
 				finishDecisionKick();
 				return;
 			}
 
+			const isShot =
+				targetX >= FIELD_W - 18 &&
+				targetY >= GOAL_TOP &&
+				targetY <= GOAL_BOTTOM;
+
+			const power = isShot ? getDecisionShotPower() : getDecisionPassPower(len);
+
+			state.ball.vx = nx * power;
+			state.ball.vy = ny * power;
+			state.ball.kick_lock_timer = getKickLockTime();
+			state.ball.kick_ignore_player = decisionPlayer;
+
 			coins += 51;
-
-			if (actionMode === 'shoot') {
-				setMessage('Shot taken. +51 coins');
-			} else if (actionMode === 'cross') {
-				setMessage('Cross played. +51 coins');
-			} else {
-				setMessage('Pass made. +51 coins');
-			}
-
+			setMessage(isShot ? 'Shot taken. +51 coins' : 'Pass made. +51 coins');
 			finishDecisionKick();
 		}
 
@@ -1214,12 +1070,9 @@ document.addEventListener('DOMContentLoaded', function () {
 				};
 			}
 
-			const runOffset = player.team === 'blue' ? 110 : -110;
-			const runSide = player.label === 'LF' ? -42 : (player.label === 'RF' ? 42 : 0);
-
 			return {
-				x: player.baseHomeX + (player.team === 'blue' ? sideFactor * 0.58 : -sideFactor * 0.58) + runOffset * 0.14,
-				y: player.baseHomeY + (ball.y - player.baseHomeY) * 0.18 + runSide * Math.min(1, Math.abs(ball.x - FIELD_W / 2) / 260)
+				x: player.baseHomeX + (player.team === 'blue' ? sideFactor * 0.58 : -sideFactor * 0.58),
+				y: player.baseHomeY + (ball.y - player.baseHomeY) * 0.18
 			};
 		}
 
@@ -1304,15 +1157,10 @@ document.addEventListener('DOMContentLoaded', function () {
 				targetX = player.team === 'blue' ? 86 : 1034;
 				targetY = clamp(ball.y, 240, 390);
 
-				const goalieThreat = player.team === 'blue' ? ball.x < 205 : ball.x > 915;
-				const crossThreat = player.team === 'blue' ? ball.x > FIELD_W - 185 : ball.x < 185;
-
+				const goalieThreat = player.team === 'blue' ? ball.x < 180 : ball.x > 940;
 				if (goalieThreat) {
 					targetX = player.team === 'blue' ? 58 : 1062;
 					targetY = clamp(ball.y, 220, 410);
-				} else if (crossThreat && ball.y > 150 && ball.y < FIELD_H - 150) {
-					targetX = player.team === 'blue' ? 128 : 992;
-					targetY = clamp(ball.y, 240, 390);
 				}
 			} else {
 				const roleHome = getRoleHomeShift(player, ball);
@@ -1332,20 +1180,6 @@ document.addEventListener('DOMContentLoaded', function () {
 				} else if (ballDist <= chaseRadius && player.position !== 'defender') {
 					targetX = ball.x + (player.team === 'blue' ? -18 : 18);
 					targetY = ball.y;
-				}
-
-				if (player.team === 'blue' && player.position === 'defender') {
-					const enemyPressure = ball.x < 230;
-					if (enemyPressure) {
-						targetX = ball.x - 20;
-						targetY = ball.y;
-					}
-				}
-
-				if (player.team === 'blue' && player.position === 'forward') {
-					const runGap = player.label === 'LF' ? -55 : (player.label === 'RF' ? 55 : 0);
-					targetX += 38;
-					targetY += runGap * Math.min(1, Math.abs(ball.x - FIELD_W / 2) / 280);
 				}
 			}
 
@@ -1440,7 +1274,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			if (closeToGoal || (player.position === 'forward' && Math.random() > 0.55)) {
 				kickBallToward(towardLeft ? -24 : FIELD_W + 24, FIELD_H / 2 + (Math.random() * 130 - 65), getRedShotPower());
-				state.ball.spin = (Math.random() * 2 - 1) * 0.14;
 				state.ball.kick_lock_timer = 0.22;
 				state.ball.kick_ignore_player = player;
 				return;
@@ -1454,7 +1287,6 @@ document.addEventListener('DOMContentLoaded', function () {
 				kickBallToward(towardLeft ? 120 : FIELD_W - 120, FIELD_H / 2, getRedPassPower() + 10);
 			}
 
-			state.ball.spin = 0;
 			state.ball.kick_lock_timer = 0.22;
 			state.ball.kick_ignore_player = player;
 		}
@@ -1474,34 +1306,6 @@ document.addEventListener('DOMContentLoaded', function () {
 					const nx = dx / dist;
 					const ny = dy / dist;
 					const overlap = minDist - dist;
-
-					if (player.isGoalie) {
-						const defendRightGoal = player.team === 'red';
-						const defendLeftGoal = player.team === 'blue';
-						const closeToOwnGoal = defendRightGoal ? state.ball.x > FIELD_W - 120 : state.ball.x < 120;
-
-						if (closeToOwnGoal) {
-							state.ball.x = player.x + (defendRightGoal ? -22 : 22);
-							state.ball.y = player.y;
-							state.ball.vx = defendRightGoal ? -240 : 240;
-							state.ball.vy = (Math.random() * 120) - 60;
-							state.ball.spin = 0;
-							state.ball.kick_lock_timer = 0.20;
-							state.ball.kick_ignore_player = player;
-							return;
-						}
-					}
-
-					if (player.team === 'blue' && player.position === 'defender' && state.ball.x < 210) {
-						state.ball.x = player.x + 24;
-						state.ball.y = player.y;
-						state.ball.vx = 310 + (defenseLevel * 12);
-						state.ball.vy = (Math.random() * 160) - 80;
-						state.ball.spin = 0;
-						state.ball.kick_lock_timer = 0.20;
-						state.ball.kick_ignore_player = player;
-						return;
-					}
 
 					state.ball.x += nx * overlap;
 					state.ball.y += ny * overlap;
@@ -1533,7 +1337,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.ball.y = y;
 			state.ball.vx = 0;
 			state.ball.vy = 0;
-			state.ball.spin = 0;
 			state.ball.kick_lock_timer = 0;
 			state.ball.kick_ignore_player = null;
 
@@ -1558,7 +1361,6 @@ document.addEventListener('DOMContentLoaded', function () {
 				const targetY = FIELD_H / 2 + (Math.random() * 140 - 70);
 				const power = team === 'blue' ? getDecisionCornerPower() : 230;
 				kickBallToward(targetX, targetY, power);
-				state.ball.spin = (Math.random() * 2 - 1) * 0.12;
 				state.ball.kick_lock_timer = team === 'blue' ? getKickLockTime() : 0.22;
 				state.ball.kick_ignore_player = null;
 				setMessage((team === 'blue' ? 'Blue' : 'Red') + ' korner kick');
@@ -1567,50 +1369,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			restartType = null;
 			restartTeam = null;
 			restartSpot = null;
-		}
-
-		function applyBallPhysics(dt) {
-			const oldVx = state.ball.vx;
-			state.ball.vx += -state.ball.vy * state.ball.spin * dt * 4.2;
-			state.ball.vy += oldVx * state.ball.spin * dt * 4.2;
-
-			state.ball.x += state.ball.vx * dt;
-			state.ball.y += state.ball.vy * dt;
-
-			state.ball.vx *= 0.988;
-			state.ball.vy *= 0.988;
-			state.ball.spin *= 0.989;
-		}
-
-		function handlePostRebounds() {
-			const postRadius = 9;
-			const leftPosts = [
-				{ x: 18, y: GOAL_TOP },
-				{ x: 18, y: GOAL_BOTTOM }
-			];
-			const rightPosts = [
-				{ x: FIELD_W - 18, y: GOAL_TOP },
-				{ x: FIELD_W - 18, y: GOAL_BOTTOM }
-			];
-
-			leftPosts.concat(rightPosts).forEach(function (post) {
-				const dx = state.ball.x - post.x;
-				const dy = state.ball.y - post.y;
-				const dist = Math.sqrt(dx * dx + dy * dy);
-				const minDist = BALL_R + postRadius;
-
-				if (dist > 0 && dist < minDist) {
-					const nx = dx / dist;
-					const ny = dy / dist;
-					state.ball.x = post.x + nx * minDist;
-					state.ball.y = post.y + ny * minDist;
-
-					const dot = state.ball.vx * nx + state.ball.vy * ny;
-					state.ball.vx = (state.ball.vx - 2 * dot * nx) * 0.82;
-					state.ball.vy = (state.ball.vy - 2 * dot * ny) * 0.82;
-					state.ball.spin *= 0.7;
-				}
-			});
 		}
 
 		function updateBall(dt) {
@@ -1622,33 +1380,31 @@ document.addEventListener('DOMContentLoaded', function () {
 				}
 			}
 
-			applyBallPhysics(dt);
+			state.ball.x += state.ball.vx * dt;
+			state.ball.y += state.ball.vy * dt;
 
-			if (state.ball.y <= BALL_R) {
+			state.ball.vx *= 0.988;
+			state.ball.vy *= 0.988;
+
+			if (state.ball.y <= BALL_R && state.ball.x > 0 && state.ball.x < FIELD_W) {
 				state.ball.y = BALL_R;
 				state.ball.vy *= -0.84;
-				state.ball.spin *= 0.82;
 			}
-			if (state.ball.y >= FIELD_H - BALL_R) {
+			if (state.ball.y >= FIELD_H - BALL_R && state.ball.x > 0 && state.ball.x < FIELD_W) {
 				state.ball.y = FIELD_H - BALL_R;
 				state.ball.vy *= -0.84;
-				state.ball.spin *= 0.82;
 			}
-
-			handlePostRebounds();
 
 			const inGoalOpening = state.ball.y >= GOAL_TOP && state.ball.y <= GOAL_BOTTOM;
 
 			if (!inGoalOpening) {
-				if (state.ball.x <= BALL_R) {
+				if (state.ball.x <= BALL_R && state.ball.y > 28 && state.ball.y < FIELD_H - 28) {
 					state.ball.x = BALL_R;
 					state.ball.vx *= -0.84;
-					state.ball.spin *= 0.82;
 				}
-				if (state.ball.x >= FIELD_W - BALL_R) {
+				if (state.ball.x >= FIELD_W - BALL_R && state.ball.y > 28 && state.ball.y < FIELD_H - 28) {
 					state.ball.x = FIELD_W - BALL_R;
 					state.ball.vx *= -0.84;
-					state.ball.spin *= 0.82;
 				}
 			}
 
@@ -1883,29 +1639,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			setMessage('Blue defense upgraded');
 		});
 
-		actionButtons.forEach(function (btn) {
-			btn.addEventListener('click', function () {
-				actionMode = btn.getAttribute('data-action');
-				updateActionButtons();
-				render();
-			});
-		});
-
-		cornerButtons.forEach(function (btn) {
-			btn.addEventListener('click', function () {
-				cornerMode = btn.getAttribute('data-corner');
-				if (decisionMode && decisionContext === 'corner') {
-					decisionTarget = getCornerPresetTarget();
-					render();
-				}
-				updateActionButtons();
-			});
-		});
-
 		buildEntities();
-		buildPreviewDots();
 		applyBlueUpgrades();
-		updateActionButtons();
 		resetMatch();
 	});
 });
@@ -1995,21 +1730,8 @@ if (!function_exists('zo_game_soccer_match_ai_render')) {
 						<button type="button" class="zo-soccer-btn zo-buy-defense">Defense (7)</button>
 					</div>
 
-					<div class="zo-soccer-actionbar">
-						<button type="button" class="zo-soccer-btn zo-action-btn is-active" data-action="pass">Pass</button>
-						<button type="button" class="zo-soccer-btn zo-action-btn" data-action="shoot">Shoot</button>
-						<button type="button" class="zo-soccer-btn zo-action-btn" data-action="cross">Cross</button>
-					</div>
-
-					<div class="zo-soccer-cornerbar">
-						<button type="button" class="zo-soccer-btn zo-corner-btn" data-corner="near_post">Near Post</button>
-						<button type="button" class="zo-soccer-btn zo-corner-btn" data-corner="far_post">Far Post</button>
-						<button type="button" class="zo-soccer-btn zo-corner-btn is-active" data-corner="penalty">Penalty Spot</button>
-						<button type="button" class="zo-soccer-btn zo-corner-btn" data-corner="goal">Goal</button>
-					</div>
-
 					<div class="zo-soccer-help">
-						This version adds predicted ball path, pass / shoot / cross buttons, targetable corners, defender clearances, better forward runs, goalkeeper step-out on crosses, curved shots, and rebounds from goalkeeper and posts.
+						You can now use blue corner kicks and also shoot directly at goal. When decision mode opens, click inside the right goal mouth to shoot. When a blue corner happens, click where the corner kick should go, including directly at goal.
 					</div>
 
 					<div class="zo-soccer-upgrades">
@@ -2025,21 +1747,21 @@ if (!function_exists('zo_game_soccer_match_ai_render')) {
 							</div>
 							<div class="zo-soccer-upgrade-card">
 								<strong>Shooting</strong>
-								<span>Stronger direct shots.</span>
+								<span>Stronger shots toward goal.</span>
 							</div>
 							<div class="zo-soccer-upgrade-card">
 								<strong>Passing</strong>
-								<span>Better passes and corners.</span>
+								<span>Better passes and stronger corners.</span>
 							</div>
 							<div class="zo-soccer-upgrade-card">
 								<strong>Defense</strong>
-								<span>Better clearances and pressure.</span>
+								<span>Better closing down and clearances.</span>
 							</div>
 						</div>
 					</div>
 
 					<div class="zo-soccer-decision">
-						<div class="zo-soccer-decision-text">Choose where to kick.</div>
+						<div class="zo-soccer-decision-text">Click or tap where to kick. Click inside the goal to shoot.</div>
 					</div>
 				</div>
 			</div>
@@ -2053,7 +1775,7 @@ return array(
 	'slug'            => 'soccer-match-ai',
 	'name'            => 'Soccer Match AI',
 	'author'          => 'Asker',
-	'description'     => 'A slow 5 minute soccer match with AI players, corner kicks, shooting, trajectory preview, and team upgrades.',
+	'description'     => 'A  5 minute soccer match where all players are AI, blue corner kicks work, and you can shoot directly at goal.',
 	'render_callback' => 'zo_game_soccer_match_ai_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,
