@@ -10,7 +10,7 @@ $inline_style = <<<'CSS'
 }
 
 .zo-game-root--ogretmenden-kac {
-	max-width: 1000px;
+	max-width: 1040px;
 	margin: 0 auto;
 	padding: 16px;
 	font-family: Arial, sans-serif;
@@ -102,11 +102,12 @@ $inline_style = <<<'CSS'
 
 .zo-game-root--ogretmenden-kac .zo-ok-layout {
 	display: grid;
-	grid-template-columns: 1fr 280px;
+	grid-template-columns: 1fr 300px;
 	gap: 16px;
 }
 
 .zo-game-root--ogretmenden-kac .zo-ok-board-wrap {
+	position: relative;
 	background: #f8fafc;
 	border: 1px solid #dbe3ea;
 	border-radius: 18px;
@@ -200,6 +201,81 @@ $inline_style = <<<'CSS'
 	grid-row: 2;
 }
 
+.zo-game-root--ogretmenden-kac .zo-ok-quiz {
+	position: absolute;
+	inset: 24px;
+	display: none;
+	align-items: center;
+	justify-content: center;
+	background: rgba(15, 23, 42, 0.45);
+	border-radius: 18px;
+	z-index: 5;
+}
+
+.zo-game-root--ogretmenden-kac .zo-ok-quiz.is-visible {
+	display: flex;
+}
+
+.zo-game-root--ogretmenden-kac .zo-ok-quiz-card {
+	width: min(520px, 100%);
+	background: #ffffff;
+	border: 1px solid #dbe3ea;
+	border-radius: 18px;
+	padding: 18px;
+	box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+}
+
+.zo-game-root--ogretmenden-kac .zo-ok-quiz-title {
+	margin: 0 0 8px;
+	font-size: 24px;
+	text-align: center;
+	color: #0f172a;
+}
+
+.zo-game-root--ogretmenden-kac .zo-ok-quiz-question {
+	margin: 0 0 14px;
+	text-align: center;
+	font-size: 20px;
+	font-weight: 800;
+	color: #1e293b;
+}
+
+.zo-game-root--ogretmenden-kac .zo-ok-quiz-grid {
+	display: grid;
+	grid-template-columns: 1fr;
+	gap: 10px;
+}
+
+.zo-game-root--ogretmenden-kac .zo-ok-answer-btn {
+	padding: 12px 14px;
+	border: 1px solid #cfd8e3;
+	border-radius: 12px;
+	background: #ffffff;
+	font: inherit;
+	font-size: 16px;
+	font-weight: 700;
+	cursor: pointer;
+	text-align: center;
+}
+
+.zo-game-root--ogretmenden-kac .zo-ok-answer-btn:hover,
+.zo-game-root--ogretmenden-kac .zo-ok-answer-btn:focus {
+	outline: none;
+	background: #eff6ff;
+	border-color: #93c5fd;
+}
+
+.zo-game-root--ogretmenden-kac .zo-ok-status-pill {
+	display: inline-block;
+	margin-top: 10px;
+	padding: 6px 10px;
+	border-radius: 999px;
+	font-size: 12px;
+	font-weight: 700;
+	background: #f1f5f9;
+	color: #334155;
+}
+
 @media (max-width: 900px) {
 	.zo-game-root--ogretmenden-kac .zo-ok-layout {
 		grid-template-columns: 1fr;
@@ -246,30 +322,48 @@ document.addEventListener('DOMContentLoaded', function () {
 		const messageEl = root.querySelector('.zo-ok-message');
 		const touchButtons = root.querySelectorAll('.zo-ok-touch-btn');
 
+		const quizWrap = root.querySelector('.zo-ok-quiz');
+		const quizQuestionEl = root.querySelector('.zo-ok-quiz-question');
+		const answerButtons = root.querySelectorAll('.zo-ok-answer-btn');
+
 		const WIDTH = 760;
 		const HEIGHT = 500;
 		const CELL = 40;
 		const COLS = Math.floor(WIDTH / CELL);
 		const ROWS = Math.floor(HEIGHT / CELL);
 
+		const questions = [
+			{ q: '5 + 3 = ?', correct: '8', wrong: ['7', '9'] },
+			{ q: '10 - 4 = ?', correct: '6', wrong: ['5', '7'] },
+			{ q: '6 + 2 = ?', correct: '8', wrong: ['9', '7'] },
+			{ q: '9 - 3 = ?', correct: '6', wrong: ['7', '5'] },
+			{ q: '4 + 4 = ?', correct: '8', wrong: ['6', '9'] },
+			{ q: '12 - 5 = ?', correct: '7', wrong: ['6', '8'] },
+			{ q: '3 x 3 = ?', correct: '9', wrong: ['6', '8'] },
+			{ q: '2 x 4 = ?', correct: '8', wrong: ['6', '10'] }
+		];
+
 		const config = {
 			easy: {
 				label: 'Kolay',
-				teacherSpeed: 1.55,
+				teacherSpeed: 1.45,
 				playerSpeed: 2.55,
-				deskCount: 14
+				deskCount: 14,
+				questionEvery: 11
 			},
 			medium: {
 				label: 'Orta',
-				teacherSpeed: 1.9,
+				teacherSpeed: 1.8,
 				playerSpeed: 2.55,
-				deskCount: 18
+				deskCount: 18,
+				questionEvery: 9
 			},
 			hard: {
 				label: 'Zor',
-				teacherSpeed: 2.3,
+				teacherSpeed: 2.2,
 				playerSpeed: 2.6,
-				deskCount: 22
+				deskCount: 22,
+				questionEvery: 7
 			}
 		};
 
@@ -291,7 +385,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			},
 			desks: [],
 			books: [],
-			speedBoostTicks: 0
+			speedBoostTicks: 0,
+			teacherAngryTicks: 0,
+			safeTicks: 0,
+			nextQuestionAt: 11,
+			quizActive: false,
+			currentQuestion: null
 		};
 
 		try {
@@ -305,6 +404,17 @@ document.addEventListener('DOMContentLoaded', function () {
 			return Math.floor(Math.random() * (max - min + 1)) + min;
 		}
 
+		function shuffleArray(arr) {
+			const a = arr.slice();
+			for (let i = a.length - 1; i > 0; i--) {
+				const j = Math.floor(Math.random() * (i + 1));
+				const t = a[i];
+				a[i] = a[j];
+				a[j] = t;
+			}
+			return a;
+		}
+
 		function clamp(value, min, max) {
 			return Math.max(min, Math.min(max, value));
 		}
@@ -314,10 +424,6 @@ document.addEventListener('DOMContentLoaded', function () {
 				x: cellX * CELL,
 				y: cellY * CELL
 			};
-		}
-
-		function sameCell(a, b) {
-			return a.cx === b.cx && a.cy === b.cy;
 		}
 
 		function updateStats() {
@@ -380,7 +486,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			const count = config[state.levelKey].deskCount;
 			let tries = 0;
 
-			while (state.desks.length < count && tries < 2000) {
+			while (state.desks.length < count && tries < 2200) {
 				const cx = randInt(1, COLS - 2);
 				const cy = randInt(1, ROWS - 2);
 
@@ -452,11 +558,17 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.survivalTime = 0;
 			state.lastTime = 0;
 			state.speedBoostTicks = 0;
+			state.teacherAngryTicks = 0;
+			state.safeTicks = 0;
+			state.quizActive = false;
+			state.currentQuestion = null;
+			state.nextQuestionAt = config[state.levelKey].questionEvery;
 
 			buildDesks();
 			createCharacters();
 			buildBooks();
 
+			hideQuiz();
 			updateStats();
 			setMessage('Başlamak için "Oyunu Başlat" düğmesine bas.');
 			draw();
@@ -470,11 +582,17 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.survivalTime = 0;
 			state.lastTime = performance.now();
 			state.speedBoostTicks = 0;
+			state.teacherAngryTicks = 0;
+			state.safeTicks = 0;
+			state.quizActive = false;
+			state.currentQuestion = null;
+			state.nextQuestionAt = config[state.levelKey].questionEvery;
 
 			buildDesks();
 			createCharacters();
 			buildBooks();
 
+			hideQuiz();
 			updateStats();
 			setMessage('Öğretmenden kaç. Kitap topla.');
 			requestAnimationFrame(loop);
@@ -483,6 +601,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		function endGame() {
 			state.running = false;
 			state.gameOver = true;
+			hideQuiz();
 
 			if (state.score > state.best) {
 				state.best = state.score;
@@ -494,6 +613,28 @@ document.addEventListener('DOMContentLoaded', function () {
 			updateStats();
 			setMessage('Yakalandın. Skorun: ' + state.score + '.');
 			draw();
+		}
+
+		function teacherCurrentSpeed() {
+			let speed = config[state.levelKey].teacherSpeed;
+			if (state.teacherAngryTicks > 0) {
+				speed += 1.1;
+			}
+			if (state.safeTicks > 0) {
+				speed -= 0.75;
+			}
+			return Math.max(0.8, speed);
+		}
+
+		function playerCurrentSpeed() {
+			let speed = state.player.baseSpeed;
+			if (state.speedBoostTicks > 0) {
+				speed += 0.9;
+			}
+			if (state.safeTicks > 0) {
+				speed += 0.25;
+			}
+			return speed;
 		}
 
 		function moveCharacterToward(obj, targetX, targetY, speed) {
@@ -508,10 +649,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			const step = Math.min(speed, dist);
 			obj.x += (dx / dist) * step;
 			obj.y += (dy / dist) * step;
-		}
-
-		function playerCurrentSpeed() {
-			return state.player.baseSpeed + (state.speedBoostTicks > 0 ? 0.9 : 0);
 		}
 
 		function movePlayer() {
@@ -591,7 +728,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		function moveTeacher() {
 			const step = teacherTargetStep();
 			const pixel = gridToPixel(step.cx, step.cy);
-			moveCharacterToward(state.teacher, pixel.x + 4, pixel.y + 4, state.teacher.speed);
+			moveCharacterToward(state.teacher, pixel.x + 4, pixel.y + 4, teacherCurrentSpeed());
 		}
 
 		function rectHitsDesk(rect) {
@@ -647,6 +784,10 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function checkCaught() {
+			if (state.safeTicks > 0) {
+				return;
+			}
+
 			const px = state.player.x + state.player.size / 2;
 			const py = state.player.y + state.player.size / 2;
 			const tx = state.teacher.x + state.teacher.size / 2;
@@ -655,6 +796,69 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			if (dist < 28) {
 				endGame();
+			}
+		}
+
+		function showQuiz() {
+			const q = questions[randInt(0, questions.length - 1)];
+			const answers = shuffleArray([q.correct].concat(q.wrong));
+
+			state.currentQuestion = {
+				question: q.q,
+				correct: q.correct,
+				answers: answers
+			};
+
+			quizQuestionEl.textContent = q.q;
+			answerButtons.forEach(function (btn, index) {
+				btn.textContent = answers[index] || '';
+				btn.setAttribute('data-answer', answers[index] || '');
+			});
+
+			quizWrap.classList.add('is-visible');
+			state.quizActive = true;
+			state.running = false;
+			setMessage('Öğretmen soru soruyor.');
+		}
+
+		function hideQuiz() {
+			quizWrap.classList.remove('is-visible');
+			state.quizActive = false;
+			state.currentQuestion = null;
+		}
+
+		function maybeAskQuestion() {
+			if (state.quizActive || state.gameOver || !state.running) {
+				return;
+			}
+
+			if (state.survivalTime >= state.nextQuestionAt) {
+				showQuiz();
+				state.nextQuestionAt += config[state.levelKey].questionEvery;
+			}
+		}
+
+		function answerQuestion(answer) {
+			if (!state.quizActive || !state.currentQuestion) {
+				return;
+			}
+
+			if (answer === state.currentQuestion.correct) {
+				state.safeTicks = 260;
+				state.teacherAngryTicks = 0;
+				hideQuiz();
+				state.running = true;
+				state.lastTime = performance.now();
+				setMessage('Doğru. Kısa süre güvendesin.');
+				requestAnimationFrame(loop);
+			} else {
+				state.teacherAngryTicks = 360;
+				state.safeTicks = 0;
+				hideQuiz();
+				state.running = true;
+				state.lastTime = performance.now();
+				setMessage('Yanlış. Öğretmen çok kızdı.');
+				requestAnimationFrame(loop);
 			}
 		}
 
@@ -675,6 +879,15 @@ document.addEventListener('DOMContentLoaded', function () {
 				state.speedBoostTicks -= 1;
 			}
 
+			if (state.teacherAngryTicks > 0) {
+				state.teacherAngryTicks -= 1;
+			}
+
+			if (state.safeTicks > 0) {
+				state.safeTicks -= 1;
+			}
+
+			maybeAskQuestion();
 			updateStats();
 		}
 
@@ -762,12 +975,18 @@ document.addEventListener('DOMContentLoaded', function () {
 				ctx.lineWidth = 3;
 				ctx.strokeRect(state.player.x - 2, state.player.y - 2, state.player.size + 4, state.player.size + 4);
 			}
+
+			if (state.safeTicks > 0) {
+				ctx.strokeStyle = '#06b6d4';
+				ctx.lineWidth = 3;
+				ctx.strokeRect(state.player.x - 5, state.player.y - 5, state.player.size + 10, state.player.size + 10);
+			}
 			ctx.restore();
 		}
 
 		function drawTeacher() {
 			ctx.save();
-			ctx.fillStyle = '#ef4444';
+			ctx.fillStyle = state.teacherAngryTicks > 0 ? '#991b1b' : '#ef4444';
 			ctx.fillRect(state.teacher.x, state.teacher.y, state.teacher.size, state.teacher.size);
 
 			ctx.fillStyle = '#ffffff';
@@ -780,11 +999,21 @@ document.addEventListener('DOMContentLoaded', function () {
 			ctx.fillStyle = '#111827';
 			ctx.font = 'bold 12px Arial';
 			ctx.fillText('Ö', state.teacher.x + 11, state.teacher.y + 34);
+
+			if (state.teacherAngryTicks > 0) {
+				ctx.fillStyle = '#dc2626';
+				ctx.font = 'bold 16px Arial';
+				ctx.fillText('!', state.teacher.x + 14, state.teacher.y - 4);
+			}
 			ctx.restore();
 		}
 
 		function drawOverlay() {
 			if (state.running) {
+				return;
+			}
+
+			if (state.quizActive) {
 				return;
 			}
 
@@ -850,7 +1079,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				e.preventDefault();
 			}
 
-			if (e.code === 'Space' && !state.running) {
+			if (e.code === 'Space' && !state.running && !state.quizActive) {
 				startGame();
 				return;
 			}
@@ -863,8 +1092,10 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 
 		startButton.addEventListener('click', function () {
-			startGame();
-			canvas.focus();
+			if (!state.quizActive) {
+				startGame();
+				canvas.focus();
+			}
 		});
 
 		restartButton.addEventListener('click', function () {
@@ -874,6 +1105,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		levelSelect.addEventListener('change', function () {
 			resetGame();
+		});
+
+		answerButtons.forEach(function (btn) {
+			btn.addEventListener('click', function () {
+				answerQuestion(btn.getAttribute('data-answer'));
+			});
 		});
 
 		touchButtons.forEach(function (btn) {
@@ -917,7 +1154,7 @@ if (!function_exists('zo_ogretmenden_kac_render')) {
 		<div class="zo-game-root zo-game-root--ogretmenden-kac" id="<?php echo esc_attr($game_id); ?>">
 			<div class="zo-ok-wrap">
 				<h2 class="zo-ok-title">Öğretmenden Kaç</h2>
-				<p class="zo-ok-subtitle">Öğretmen seni kovalıyor. Sırların arasından kaç ve kitap topla.</p>
+				<p class="zo-ok-subtitle">Öğretmen seni kovalıyor. Bazen soru sorar. Yanlış yaparsan daha hızlı kovalar.</p>
 
 				<div class="zo-ok-topbar">
 					<div class="zo-ok-stats">
@@ -942,6 +1179,19 @@ if (!function_exists('zo_ogretmenden_kac_render')) {
 					<div class="zo-ok-board-wrap">
 						<canvas class="zo-ok-canvas" width="760" height="500" tabindex="0" aria-label="Öğretmenden kaç oyunu alanı"></canvas>
 
+						<div class="zo-ok-quiz" aria-hidden="true">
+							<div class="zo-ok-quiz-card">
+								<h3 class="zo-ok-quiz-title">Öğretmen Soru Soruyor</h3>
+								<div class="zo-ok-quiz-question">5 + 3 = ?</div>
+								<div class="zo-ok-quiz-grid">
+									<button type="button" class="zo-ok-answer-btn" data-answer="">A</button>
+									<button type="button" class="zo-ok-answer-btn" data-answer="">B</button>
+									<button type="button" class="zo-ok-answer-btn" data-answer="">C</button>
+								</div>
+								<div class="zo-ok-status-pill">Yanlış yaparsan öğretmen hızlanır.</div>
+							</div>
+						</div>
+
 						<div class="zo-ok-touch">
 							<button type="button" class="zo-ok-touch-btn" data-dir="up">↑</button>
 							<button type="button" class="zo-ok-touch-btn" data-dir="left">←</button>
@@ -960,13 +1210,15 @@ if (!function_exists('zo_ogretmenden_kac_render')) {
 							<li>Ok tuşları veya W A S D ile kaç.</li>
 							<li>Turuncu kitapları toplayınca puan kazanırsın.</li>
 							<li>Kitap alınca kısa süre hızlanırsın.</li>
+							<li>Öğretmen soru sorunca cevap ver.</li>
+							<li>Yanlış cevap verirsen öğretmen bir süre daha hızlı olur.</li>
 						</ul>
 
 						<h3>Zorluklar</h3>
 						<ul>
-							<li><strong>Kolay:</strong> Öğretmen daha yavaş.</li>
-							<li><strong>Orta:</strong> Daha hızlı takip eder.</li>
-							<li><strong>Zor:</strong> Daha hızlı ve daha çok sıra var.</li>
+							<li><strong>Kolay:</strong> Daha yavaş takip.</li>
+							<li><strong>Orta:</strong> Daha dengeli hız.</li>
+							<li><strong>Zor:</strong> Daha hızlı takip ve daha sık soru.</li>
 						</ul>
 
 						<p>Boşluk tuşu ile hızlıca başlatabilirsin.</p>
@@ -983,7 +1235,7 @@ return array(
 	'slug'            => 'ogretmenden-kac',
 	'name'            => 'Öğretmenden Kaç',
 	'author'          => 'Arslan',
-	'description'     => 'Öğretmenin öğrenciyi kovaladığı eğlenceli kaçma oyunu.',
+	'description'     => 'Öğretmenin soru sorup yanlış cevapta daha hızlı kovaladığı kaçma oyunu.',
 	'render_callback' => 'zo_ogretmenden_kac_render',
 	'inline_style'    => $inline_style,
 	'inline_script'   => $inline_script,
