@@ -1748,8 +1748,8 @@ if (!function_exists('zo_game_mini_manager_pro_render')) {
 }
 
 return array(
-	'slug'            => 'mini-manager-pro',
-	'name'            => 'Mini Manager Pro',
+	'slug'            => 'mini-manager',
+	'name'            => 'Mini Manager',
 	'author'          => 'Asker',
 	'description'     => 'A bigger soccer manager game with seasons, transfers, league table, tactics, squad management, finances, and commentary.',
 	'render_callback' => 'zo_game_mini_manager_pro_render',
