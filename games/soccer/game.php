@@ -5,29 +5,25 @@ if (!defined('ABSPATH')) {
 }
 
 $css = <<<'CSS'
-.zo-game-root--mini-manager-pro {
-	max-width: 1180px;
+.zo-game-root--soccer-match-ai {
+	max-width: 1200px;
 	margin: 0 auto;
+	text-align: center;
 	font-family: Arial, sans-serif;
-	color: #1f2a1f;
 }
 
-.zo-game-root--mini-manager-pro * {
+.zo-game-root--soccer-match-ai * {
 	box-sizing: border-box;
 }
 
-.zo-mm-wrap {
+.zo-soccer-wrap {
 	background: #f4f7f2;
 	border: 2px solid #d7e0d0;
 	border-radius: 18px;
 	padding: 14px;
 }
 
-.zo-mm-topbar,
-.zo-mm-subbar,
-.zo-mm-action-row,
-.zo-mm-market-actions,
-.zo-mm-squad-actions {
+.zo-soccer-topbar {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 10px;
@@ -35,134 +31,53 @@ $css = <<<'CSS'
 	margin-bottom: 12px;
 }
 
-.zo-mm-panel,
-.zo-mm-card,
-.zo-mm-status,
-.zo-mm-table-card,
-.zo-mm-commentary,
-.zo-mm-help,
-.zo-mm-market,
-.zo-mm-squad,
-.zo-mm-results,
-.zo-mm-finance {
+.zo-soccer-panel {
 	background: #fff;
 	border: 2px solid #dfe7d8;
-	border-radius: 14px;
-	padding: 12px;
+	border-radius: 12px;
+	padding: 10px 14px;
+	min-width: 130px;
 }
 
-.zo-mm-panel {
-	min-width: 120px;
-	text-align: center;
-}
-
-.zo-mm-panel strong {
+.zo-soccer-panel strong {
 	display: block;
 	font-size: 20px;
 	color: #1d2a1d;
 }
 
-.zo-mm-panel span {
+.zo-soccer-panel span {
 	display: block;
-	font-size: 13px;
-	margin-top: 4px;
+	font-size: 14px;
 	color: #445244;
+	margin-top: 4px;
 }
 
-.zo-mm-layout {
-	display: grid;
-	grid-template-columns: 1.1fr 0.9fr;
-	gap: 12px;
-	margin-bottom: 12px;
-}
-
-.zo-mm-left,
-.zo-mm-right {
-	display: flex;
-	flex-direction: column;
-	gap: 12px;
-}
-
-.zo-mm-grid-2 {
-	display: grid;
-	grid-template-columns: 1fr 1fr;
-	gap: 12px;
-}
-
-.zo-mm-card h3,
-.zo-mm-table-card h3,
-.zo-mm-market h3,
-.zo-mm-squad h3,
-.zo-mm-results h3,
-.zo-mm-commentary h3,
-.zo-mm-finance h3,
-.zo-mm-status h3,
-.zo-mm-help h3 {
-	margin: 0 0 10px;
-	font-size: 18px;
-	color: #1d2a1d;
-}
-
-.zo-mm-btn {
+.zo-soccer-btn {
 	border: none;
 	border-radius: 10px;
 	padding: 10px 14px;
-	font-size: 14px;
+	font-size: 15px;
 	font-weight: 700;
 	cursor: pointer;
 	background: #1d2a1d;
 	color: #fff;
 }
 
-.zo-mm-btn:hover {
+.zo-soccer-btn:hover {
 	opacity: 0.92;
 }
 
-.zo-mm-btn[disabled] {
+.zo-soccer-btn[disabled] {
 	opacity: 0.45;
 	cursor: default;
 }
 
-.zo-mm-btn.is-active {
-	background: #1565c0;
-}
-
-.zo-mm-pill-row {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 8px;
-}
-
-.zo-mm-pill {
-	padding: 8px 12px;
-	border-radius: 999px;
-	border: 2px solid #dfe7d8;
-	background: #fff;
-	font-size: 13px;
-	font-weight: 700;
-	cursor: pointer;
-}
-
-.zo-mm-pill.is-active {
-	background: #1565c0;
-	border-color: #1565c0;
-	color: #fff;
-}
-
-.zo-mm-field-wrap {
-	background: #fff;
-	border: 2px solid #dfe7d8;
-	border-radius: 14px;
-	padding: 12px;
-}
-
-.zo-mm-field {
+.zo-soccer-field {
 	position: relative;
 	width: 100%;
-	height: 430px;
-	border-radius: 16px;
-	overflow: hidden;
-	border: 4px solid #fff;
+	max-width: 1120px;
+	height: 630px;
+	margin: 0 auto;
 	background:
 		linear-gradient(
 			to bottom,
@@ -187,20 +102,29 @@ $css = <<<'CSS'
 			#349a4f 90%,
 			#349a4f 100%
 		);
+	border: 4px solid #fff;
+	border-radius: 18px;
+	overflow: hidden;
+	outline: none;
+	user-select: none;
+	touch-action: none;
 }
 
-.zo-mm-line-mid,
-.zo-mm-circle,
-.zo-mm-dot,
-.zo-mm-box-left,
-.zo-mm-box-right,
-.zo-mm-goal-left,
-.zo-mm-goal-right {
+.zo-soccer-line-mid,
+.zo-soccer-circle,
+.zo-soccer-dot,
+.zo-soccer-box-left,
+.zo-soccer-box-right,
+.zo-soccer-goal-left,
+.zo-soccer-goal-right,
+.zo-soccer-smallbox-left,
+.zo-soccer-smallbox-right,
+.zo-soccer-corner-arc {
 	position: absolute;
 	pointer-events: none;
 }
 
-.zo-mm-line-mid {
+.zo-soccer-line-mid {
 	left: 50%;
 	top: 0;
 	width: 4px;
@@ -209,18 +133,18 @@ $css = <<<'CSS'
 	background: rgba(255,255,255,0.95);
 }
 
-.zo-mm-circle {
+.zo-soccer-circle {
 	left: 50%;
 	top: 50%;
-	width: 120px;
-	height: 120px;
-	margin-left: -60px;
-	margin-top: -60px;
+	width: 150px;
+	height: 150px;
+	margin-left: -75px;
+	margin-top: -75px;
 	border: 4px solid rgba(255,255,255,0.95);
 	border-radius: 50%;
 }
 
-.zo-mm-dot {
+.zo-soccer-dot {
 	width: 10px;
 	height: 10px;
 	background: rgba(255,255,255,0.95);
@@ -231,1514 +155,1614 @@ $css = <<<'CSS'
 	margin-top: -5px;
 }
 
-.zo-mm-box-left,
-.zo-mm-box-right {
-	top: 125px;
-	width: 95px;
-	height: 180px;
+.zo-soccer-box-left,
+.zo-soccer-box-right {
+	top: 190px;
+	width: 145px;
+	height: 250px;
 	border: 4px solid rgba(255,255,255,0.95);
 }
 
-.zo-mm-box-left {
+.zo-soccer-smallbox-left,
+.zo-soccer-smallbox-right {
+	top: 250px;
+	width: 65px;
+	height: 130px;
+	border: 4px solid rgba(255,255,255,0.95);
+}
+
+.zo-soccer-box-left,
+.zo-soccer-smallbox-left {
 	left: 0;
 	border-left: none;
 	border-radius: 0 10px 10px 0;
 }
 
-.zo-mm-box-right {
+.zo-soccer-box-right,
+.zo-soccer-smallbox-right {
 	right: 0;
 	border-right: none;
 	border-radius: 10px 0 0 10px;
 }
 
-.zo-mm-goal-left,
-.zo-mm-goal-right {
-	top: 165px;
-	width: 16px;
-	height: 100px;
+.zo-soccer-goal-left,
+.zo-soccer-goal-right {
+	top: 250px;
+	width: 18px;
+	height: 130px;
 	background: rgba(255,255,255,0.95);
 }
 
-.zo-mm-goal-left {
+.zo-soccer-goal-left {
 	left: 0;
 	border-radius: 0 6px 6px 0;
 }
 
-.zo-mm-goal-right {
+.zo-soccer-goal-right {
 	right: 0;
 	border-radius: 6px 0 0 6px;
 }
 
-.zo-mm-player {
-	position: absolute;
-	width: 28px;
-	height: 28px;
-	margin-left: -14px;
-	margin-top: -14px;
+.zo-soccer-corner-arc {
+	width: 34px;
+	height: 34px;
+	border: 4px solid rgba(255,255,255,0.95);
 	border-radius: 50%;
-	border: 2px solid rgba(255,255,255,0.95);
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-size: 9px;
-	font-weight: 700;
-	color: #fff;
 }
 
-.zo-mm-player--blue {
+.zo-soccer-corner-arc--tl { left: -17px; top: -17px; }
+.zo-soccer-corner-arc--tr { right: -17px; top: -17px; }
+.zo-soccer-corner-arc--bl { left: -17px; bottom: -17px; }
+.zo-soccer-corner-arc--br { right: -17px; bottom: -17px; }
+
+.zo-soccer-player,
+.zo-soccer-ball,
+.zo-soccer-target,
+.zo-soccer-pass-line {
+	position: absolute;
+	transform: translate(-50%, -50%);
+	pointer-events: none;
+}
+
+.zo-soccer-player {
+	width: 24px;
+	height: 38px;
+}
+
+.zo-soccer-player__head {
+	position: absolute;
+	left: 50%;
+	top: 1px;
+	width: 12px;
+	height: 12px;
+	margin-left: -6px;
+	border-radius: 50%;
+	background: #f2c59a;
+	border: 1px solid rgba(0,0,0,0.18);
+}
+
+.zo-soccer-player__body {
+	position: absolute;
+	left: 50%;
+	top: 12px;
+	width: 18px;
+	height: 14px;
+	margin-left: -9px;
+	border-radius: 7px 7px 6px 6px;
+	border: 1px solid rgba(0,0,0,0.16);
+}
+
+.zo-soccer-player__legs {
+	position: absolute;
+	left: 50%;
+	top: 26px;
+	width: 18px;
+	height: 10px;
+	margin-left: -9px;
+}
+
+.zo-soccer-player__legs::before,
+.zo-soccer-player__legs::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	width: 4px;
+	height: 10px;
+	background: #202020;
+	border-radius: 3px;
+}
+
+.zo-soccer-player__legs::before { left: 3px; }
+.zo-soccer-player__legs::after { right: 3px; }
+
+.zo-soccer-player__label {
+	position: absolute;
+	left: 50%;
+	top: 38px;
+	transform: translateX(-50%);
+	font-size: 9px;
+	font-weight: 700;
+	line-height: 1;
+	padding: 2px 5px;
+	border-radius: 8px;
+	white-space: nowrap;
+	background: rgba(255,255,255,0.88);
+	color: #1d2a1d;
+}
+
+.zo-soccer-player__marker {
+	position: absolute;
+	left: 50%;
+	top: -12px;
+	transform: translateX(-50%);
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: transparent;
+}
+
+.zo-soccer-player--decision .zo-soccer-player__marker {
+	background: #ffd54f;
+	box-shadow: 0 0 0 3px rgba(255, 213, 79, 0.28);
+}
+
+.zo-soccer-player--blue .zo-soccer-player__body {
 	background: #1e88e5;
 }
 
-.zo-mm-player--red {
+.zo-soccer-player--red .zo-soccer-player__body {
 	background: #e53935;
 }
 
-.zo-mm-row {
-	display: grid;
-	grid-template-columns: 130px 1fr 44px;
-	align-items: center;
-	gap: 8px;
-	margin-bottom: 10px;
-	font-size: 14px;
+.zo-soccer-player--goalie.zo-soccer-player--blue .zo-soccer-player__body {
+	background: #7b1fa2;
 }
 
-.zo-mm-row:last-child {
-	margin-bottom: 0;
+.zo-soccer-player--goalie.zo-soccer-player--red .zo-soccer-player__body {
+	background: #ef6c00;
 }
 
-.zo-mm-row input[type="range"] {
-	width: 100%;
+.zo-soccer-ball {
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	background: radial-gradient(circle at 35% 35%, #ffffff 0%, #ffffff 55%, #ededed 100%);
+	border: 2px solid #222;
+	box-shadow: 0 1px 0 rgba(0,0,0,0.15);
 }
 
-.zo-mm-value {
-	font-weight: 700;
-	text-align: center;
+.zo-soccer-target {
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	border: 3px dashed rgba(255,255,255,0.92);
+	display: none;
 }
 
-.zo-mm-select {
-	width: 100%;
-	padding: 10px 12px;
-	border-radius: 10px;
-	border: 2px solid #dfe7d8;
-	font-size: 14px;
-	background: #fff;
+.zo-soccer-target.is-active {
+	display: block;
 }
 
-.zo-mm-tables {
-	width: 100%;
-	border-collapse: collapse;
-	font-size: 13px;
+.zo-soccer-pass-line {
+	height: 4px;
+	background: rgba(255,255,255,0.92);
+	transform-origin: left center;
+	display: none;
+	border-radius: 4px;
 }
 
-.zo-mm-tables th,
-.zo-mm-tables td {
-	border-bottom: 1px solid #e7ede2;
-	padding: 8px 6px;
-	text-align: left;
+.zo-soccer-pass-line.is-active {
+	display: block;
 }
 
-.zo-mm-tables th {
-	font-size: 12px;
-	color: #526152;
-}
-
-.zo-mm-tables tr:last-child td {
-	border-bottom: none;
-}
-
-.zo-mm-scroll {
-	max-height: 250px;
-	overflow: auto;
-}
-
-.zo-mm-commentary-log,
-.zo-mm-results-log {
-	max-height: 260px;
-	overflow: auto;
-	border-top: 1px solid #e7ede2;
-	padding-top: 8px;
-}
-
-.zo-mm-line {
-	padding: 6px 0;
-	border-bottom: 1px solid #edf2e8;
-	font-size: 13px;
-}
-
-.zo-mm-line:last-child {
-	border-bottom: none;
-}
-
-.zo-mm-market-player,
-.zo-mm-squad-player {
-	display: grid;
-	grid-template-columns: 1.4fr 0.8fr 0.8fr 0.8fr 0.8fr auto;
-	gap: 8px;
-	align-items: center;
-	padding: 8px 0;
-	border-bottom: 1px solid #edf2e8;
-	font-size: 13px;
-}
-
-.zo-mm-market-player:last-child,
-.zo-mm-squad-player:last-child {
-	border-bottom: none;
-}
-
-.zo-mm-tag {
-	display: inline-block;
-	padding: 3px 7px;
-	border-radius: 999px;
-	font-size: 11px;
-	font-weight: 700;
-	background: #e8f1ff;
-	color: #1565c0;
-}
-
-.zo-mm-tag--bad {
-	background: #fff1f1;
-	color: #b3261e;
-}
-
-.zo-mm-tag--good {
-	background: #eef9ec;
-	color: #2e7d32;
-}
-
-.zo-mm-kpi-grid {
-	display: grid;
-	grid-template-columns: repeat(4, 1fr);
+.zo-soccer-controls {
+	margin-top: 14px;
+	display: flex;
+	flex-direction: column;
 	gap: 10px;
+	align-items: center;
 }
 
-.zo-mm-kpi {
+.zo-soccer-buttons {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+	justify-content: center;
+}
+
+.zo-soccer-help,
+.zo-soccer-decision,
+.zo-soccer-upgrades {
+	background: #fff;
+	border: 2px solid #dfe7d8;
+	border-radius: 12px;
+	padding: 10px 14px;
+	font-size: 14px;
+	line-height: 1.45;
+	color: #334233;
+	max-width: 1120px;
+	width: 100%;
+}
+
+.zo-soccer-decision {
+	display: none;
+}
+
+.zo-soccer-decision.is-active {
+	display: block;
+}
+
+.zo-soccer-upgrades-title {
+	font-size: 16px;
+	font-weight: 700;
+	color: #1d2a1d;
+	margin-bottom: 8px;
+}
+
+.zo-soccer-upgrades-grid {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	justify-content: center;
+}
+
+.zo-soccer-upgrade-card {
 	background: #f8faf7;
 	border: 2px solid #dfe7d8;
 	border-radius: 12px;
 	padding: 10px;
-	text-align: center;
+	min-width: 160px;
+	max-width: 210px;
 }
 
-.zo-mm-kpi strong {
+.zo-soccer-upgrade-card strong {
 	display: block;
-	font-size: 18px;
+	margin-bottom: 4px;
+	color: #1d2a1d;
+	font-size: 15px;
 }
 
-.zo-mm-kpi span {
+.zo-soccer-upgrade-card span {
 	display: block;
-	font-size: 12px;
-	margin-top: 4px;
-	color: #526152;
-}
-
-.zo-mm-note {
 	font-size: 13px;
-	color: #526152;
-	margin-top: 8px;
+	margin-bottom: 8px;
 }
 
-@media (max-width: 980px) {
-	.zo-mm-layout {
-		grid-template-columns: 1fr;
-	}
-
-	.zo-mm-grid-2,
-	.zo-mm-kpi-grid {
-		grid-template-columns: 1fr 1fr;
+@media (max-width: 900px) {
+	.zo-soccer-field {
+		height: 560px;
 	}
 }
 
-@media (max-width: 640px) {
-	.zo-mm-field {
-		height: 330px;
+@media (max-width: 700px) {
+	.zo-soccer-field {
+		height: 450px;
 	}
 
-	.zo-mm-grid-2,
-	.zo-mm-kpi-grid {
-		grid-template-columns: 1fr;
+	.zo-soccer-player__label {
+		font-size: 8px;
+	}
+}
+
+@media (max-width: 520px) {
+	.zo-soccer-field {
+		height: 360px;
 	}
 
-	.zo-mm-row {
-		grid-template-columns: 105px 1fr 40px;
+	.zo-soccer-panel {
+		min-width: 104px;
+		padding: 8px 10px;
+	}
+
+	.zo-soccer-help,
+	.zo-soccer-decision,
+	.zo-soccer-upgrades {
 		font-size: 13px;
-	}
-
-	.zo-mm-market-player,
-	.zo-mm-squad-player {
-		grid-template-columns: 1fr;
 	}
 }
 CSS;
 
 $js = <<<'JS'
 document.addEventListener('DOMContentLoaded', function () {
-	const games = document.querySelectorAll('.zo-game-root--mini-manager-pro');
+	const games = document.querySelectorAll('.zo-game-root--soccer-match-ai');
 
 	games.forEach(function (game) {
-		const field = game.querySelector('.zo-mm-field');
-		const formationButtons = Array.from(game.querySelectorAll('.zo-mm-formation'));
-		const mentalityButtons = Array.from(game.querySelectorAll('.zo-mm-mentality'));
-		const styleButtons = Array.from(game.querySelectorAll('.zo-mm-style'));
-		const widthButtons = Array.from(game.querySelectorAll('.zo-mm-width'));
-		const pressButtons = Array.from(game.querySelectorAll('.zo-mm-press'));
-		const markingButtons = Array.from(game.querySelectorAll('.zo-mm-marking'));
-		const simulateBtn = game.querySelector('.zo-mm-simulate');
-		const nextMatchBtn = game.querySelector('.zo-mm-next-match');
-		const resetSeasonBtn = game.querySelector('.zo-mm-reset-season');
-		const buyScoutBtn = game.querySelector('.zo-mm-buy-scout');
-		const buyTrainingBtn = game.querySelector('.zo-mm-buy-training');
-		const buyStadiumBtn = game.querySelector('.zo-mm-buy-stadium');
-		const healAllBtn = game.querySelector('.zo-mm-heal-all');
-		const youthBtn = game.querySelector('.zo-mm-youth');
+		const field = game.querySelector('.zo-soccer-field');
+		const scoreUserEl = game.querySelector('.zo-score-user');
+		const scoreAiEl = game.querySelector('.zo-score-ai');
+		const timerEl = game.querySelector('.zo-status-timer');
+		const messageEl = game.querySelector('.zo-status-message');
+		const modeEl = game.querySelector('.zo-status-mode');
+		const coinsEl = game.querySelector('.zo-status-coins');
+		const speedLevelEl = game.querySelector('.zo-status-speed-level');
+		const smartLevelEl = game.querySelector('.zo-status-smart-level');
+		const shootingLevelEl = game.querySelector('.zo-status-shooting-level');
+		const passingLevelEl = game.querySelector('.zo-status-passing-level');
+		const defenseLevelEl = game.querySelector('.zo-status-defense-level');
+		const restartBtn = game.querySelector('.zo-soccer-restart');
+		const startBtn = game.querySelector('.zo-soccer-start');
+		const buySpeedBtn = game.querySelector('.zo-buy-speed');
+		const buySmartBtn = game.querySelector('.zo-buy-smart');
+		const buyShootingBtn = game.querySelector('.zo-buy-shooting');
+		const buyPassingBtn = game.querySelector('.zo-buy-passing');
+		const buyDefenseBtn = game.querySelector('.zo-buy-defense');
+		const targetEl = game.querySelector('.zo-soccer-target');
+		const passLineEl = game.querySelector('.zo-soccer-pass-line');
+		const decisionBox = game.querySelector('.zo-soccer-decision');
+		const decisionText = game.querySelector('.zo-soccer-decision-text');
 
-		const attackInput = game.querySelector('.zo-mm-attack');
-		const midfieldInput = game.querySelector('.zo-mm-midfield');
-		const defenseInput = game.querySelector('.zo-mm-defense');
-		const energyInput = game.querySelector('.zo-mm-energy');
+		const FIELD_W = 1120;
+		const FIELD_H = 630;
+		const PLAYER_RADIUS = 14;
+		const BALL_R = 8;
+		const GOAL_TOP = 250;
+		const GOAL_BOTTOM = 380;
+		const MATCH_TIME = 300;
+		const BASE_INTERCEPT_RADIUS = 110;
+		const BASE_CHASE_RADIUS = 70;
+		const BASE_DECISION_PASS_POWER = 180;
+		const BASE_DECISION_SHOT_POWER = 340;
+		const BASE_RED_PASS_POWER = 220;
+		const BASE_RED_SHOT_POWER = 250;
+		const BASE_KICK_LOCK = 0.35;
 
-		const attackValue = game.querySelector('.zo-mm-attack-value');
-		const midfieldValue = game.querySelector('.zo-mm-midfield-value');
-		const defenseValue = game.querySelector('.zo-mm-defense-value');
-		const energyValue = game.querySelector('.zo-mm-energy-value');
+		let animationId = null;
+		let lastTime = 0;
+		let running = false;
+		let started = false;
+		let userScore = 0;
+		let aiScore = 0;
+		let remaining = MATCH_TIME;
+		let coins = 0;
+		let speedLevel = 0;
+		let smartLevel = 0;
+		let shootingLevel = 0;
+		let passingLevel = 0;
+		let defenseLevel = 0;
+		let restartType = null;
+		let restartTeam = null;
+		let restartSpot = null;
+		let decisionMode = false;
+		let decisionPlayer = null;
+		let decisionTarget = null;
+		let decisionContext = 'normal';
 
-		const scoreBlue = game.querySelector('.zo-mm-score-blue');
-		const scoreRed = game.querySelector('.zo-mm-score-red');
-		const winsValue = game.querySelector('.zo-mm-wins');
-		const coinsValue = game.querySelector('.zo-mm-coins');
-		const ratingValue = game.querySelector('.zo-mm-rating');
-		const budgetValue = game.querySelector('.zo-mm-budget');
-		const reputationValue = game.querySelector('.zo-mm-reputation');
-		const weekValue = game.querySelector('.zo-mm-week');
-		const divisionValue = game.querySelector('.zo-mm-division');
-		const seasonPointsValue = game.querySelector('.zo-mm-season-points');
-		const sponsorValue = game.querySelector('.zo-mm-sponsor');
-		const homeAwayValue = game.querySelector('.zo-mm-homeaway');
-		const weatherValue = game.querySelector('.zo-mm-weather');
-		const statusText = game.querySelector('.zo-mm-status-text');
-		const quickSummary = game.querySelector('.zo-mm-quick-summary');
+		function getBlueSpeedMultiplier() {
+			return 1 + (speedLevel * 0.12);
+		}
 
-		const statPossession = game.querySelector('.zo-mm-stat-possession');
-		const statShots = game.querySelector('.zo-mm-stat-shots');
-		const statOnTarget = game.querySelector('.zo-mm-stat-ontarget');
-		const statCorners = game.querySelector('.zo-mm-stat-corners');
-		const statCards = game.querySelector('.zo-mm-stat-cards');
-		const statFouls = game.querySelector('.zo-mm-stat-fouls');
-		const statMomentum = game.querySelector('.zo-mm-stat-momentum');
-		const statClean = game.querySelector('.zo-mm-stat-clean');
+		function getBlueInterceptRadius() {
+			return BASE_INTERCEPT_RADIUS * (1 + smartLevel * 0.10 + defenseLevel * 0.08);
+		}
 
-		const commentaryLog = game.querySelector('.zo-mm-commentary-log');
-		const resultsLog = game.querySelector('.zo-mm-results-log');
-		const tableBody = game.querySelector('.zo-mm-league-body');
-		const marketBody = game.querySelector('.zo-mm-market-body');
-		const squadBody = game.querySelector('.zo-mm-squad-body');
-		const financeBody = game.querySelector('.zo-mm-finance-body');
+		function getBlueChaseRadius() {
+			return BASE_CHASE_RADIUS * (1 + smartLevel * 0.10 + defenseLevel * 0.06);
+		}
 
-		let playerNodes = [];
-		let team = null;
-		let season = null;
-		let market = [];
-		let financeLog = [];
-		let lastStats = null;
+		function getDecisionPassPower(len) {
+			const raw = clamp(len * 1.4, BASE_DECISION_PASS_POWER, BASE_DECISION_SHOT_POWER);
+			return raw * (1 + passingLevel * 0.10);
+		}
 
-		const blueFormationMap = {
-			'4-4-2': [
-				{ x: 8, y: 50, t: 'GK' },
-				{ x: 20, y: 18, t: 'D' },
-				{ x: 20, y: 38, t: 'D' },
-				{ x: 20, y: 62, t: 'D' },
-				{ x: 20, y: 82, t: 'D' },
-				{ x: 40, y: 18, t: 'M' },
-				{ x: 40, y: 38, t: 'M' },
-				{ x: 40, y: 62, t: 'M' },
-				{ x: 40, y: 82, t: 'M' },
-				{ x: 62, y: 36, t: 'F' },
-				{ x: 62, y: 64, t: 'F' }
-			],
-			'4-3-3': [
-				{ x: 8, y: 50, t: 'GK' },
-				{ x: 20, y: 18, t: 'D' },
-				{ x: 20, y: 38, t: 'D' },
-				{ x: 20, y: 62, t: 'D' },
-				{ x: 20, y: 82, t: 'D' },
-				{ x: 40, y: 28, t: 'M' },
-				{ x: 40, y: 50, t: 'M' },
-				{ x: 40, y: 72, t: 'M' },
-				{ x: 64, y: 20, t: 'F' },
-				{ x: 68, y: 50, t: 'F' },
-				{ x: 64, y: 80, t: 'F' }
-			],
-			'5-3-2': [
-				{ x: 8, y: 50, t: 'GK' },
-				{ x: 18, y: 12, t: 'D' },
-				{ x: 20, y: 30, t: 'D' },
-				{ x: 20, y: 50, t: 'D' },
-				{ x: 20, y: 70, t: 'D' },
-				{ x: 18, y: 88, t: 'D' },
-				{ x: 42, y: 26, t: 'M' },
-				{ x: 42, y: 50, t: 'M' },
-				{ x: 42, y: 74, t: 'M' },
-				{ x: 64, y: 38, t: 'F' },
-				{ x: 64, y: 62, t: 'F' }
-			]
-		};
+		function getDecisionShotPower() {
+			return BASE_DECISION_SHOT_POWER * (1 + shootingLevel * 0.12);
+		}
 
-		const opponentFormation = [
-			{ x: 92, y: 50, t: 'GK' },
-			{ x: 80, y: 18, t: 'D' },
-			{ x: 80, y: 38, t: 'D' },
-			{ x: 80, y: 62, t: 'D' },
-			{ x: 80, y: 82, t: 'D' },
-			{ x: 60, y: 18, t: 'M' },
-			{ x: 60, y: 38, t: 'M' },
-			{ x: 60, y: 62, t: 'M' },
-			{ x: 60, y: 82, t: 'M' },
-			{ x: 38, y: 36, t: 'F' },
-			{ x: 38, y: 64, t: 'F' }
-		];
+		function getDecisionCornerPower() {
+			return 240 + (passingLevel * 18) + (shootingLevel * 12);
+		}
+
+		function getRedPassPower() {
+			return BASE_RED_PASS_POWER;
+		}
+
+		function getRedShotPower() {
+			return BASE_RED_SHOT_POWER;
+		}
+
+		function getKickLockTime() {
+			return Math.max(0.14, BASE_KICK_LOCK - (smartLevel * 0.04) - (passingLevel * 0.03));
+		}
+
+		function getDefenseTouchPower() {
+			return 36 + (defenseLevel * 8);
+		}
+
+		function getSpeedUpgradeCost() {
+			return 6 + (speedLevel * 6);
+		}
+
+		function getSmartUpgradeCost() {
+			return 8 + (smartLevel * 8);
+		}
+
+		function getShootingUpgradeCost() {
+			return 10 + (shootingLevel * 10);
+		}
+
+		function getPassingUpgradeCost() {
+			return 9 + (passingLevel * 9);
+		}
+
+		function getDefenseUpgradeCost() {
+			return 7 + (defenseLevel * 7);
+		}
 
 		function clamp(value, min, max) {
 			return Math.max(min, Math.min(max, value));
 		}
 
-		function rand(min, max) {
-			return Math.random() * (max - min) + min;
+		function distance(a, b) {
+			const dx = a.x - b.x;
+			const dy = a.y - b.y;
+			return Math.sqrt(dx * dx + dy * dy);
 		}
 
-		function randInt(min, max) {
-			return Math.floor(rand(min, max + 1));
-		}
-
-		function pick(arr) {
-			return arr[Math.floor(Math.random() * arr.length)];
-		}
-
-		function slugify(str) {
-			return str.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-		}
-
-		function setButtonGroup(buttons, value, attr) {
-			buttons.forEach(function (button) {
-				button.classList.toggle('is-active', button.getAttribute(attr) === value);
-			});
-		}
-
-		function addFinance(type, amount, note) {
-			financeLog.unshift({
-				type: type,
-				amount: amount,
-				note: note
-			});
-			financeLog = financeLog.slice(0, 24);
-		}
-
-		function makePlayer(name, pos, ovr, price) {
+		function createPlayer(team, position, label, homeX, homeY, options) {
 			return {
-				id: slugify(name + '-' + pos + '-' + Math.floor(Math.random() * 100000)),
-				name: name,
-				pos: pos,
-				ovr: ovr,
-				price: price,
-				wage: Math.max(1, Math.round(ovr / 8)),
-				morale: randInt(58, 86),
-				energy: randInt(62, 94),
-				injured: false,
-				suspended: false,
-				role: pos === 'F' ? 'Scorer' : (pos === 'M' ? 'Playmaker' : (pos === 'D' ? 'Stopper' : 'Keeper'))
+				team: team,
+				position: position,
+				label: label,
+				x: homeX,
+				y: homeY,
+				homeX: homeX,
+				homeY: homeY,
+				baseHomeX: homeX,
+				baseHomeY: homeY,
+				baseSpeed: options.speed,
+				speed: options.speed,
+				vx: 0,
+				vy: 0,
+				isGoalie: !!options.isGoalie,
+				el: null
 			};
 		}
 
-		function seededSquad() {
-			return [
-				makePlayer('Miran Kaya', 'GK', 60, 14),
-				makePlayer('Eren Demir', 'D', 61, 16),
-				makePlayer('Baran Aslan', 'D', 62, 18),
-				makePlayer('Emir Kaplan', 'D', 59, 12),
-				makePlayer('Yusuf Acar', 'D', 58, 11),
-				makePlayer('Deniz Yalcin', 'D', 57, 10),
-				makePlayer('Arda Sahin', 'M', 63, 20),
-				makePlayer('Kerem Usta', 'M', 61, 15),
-				makePlayer('Talha Cicek', 'M', 60, 14),
-				makePlayer('Mete Can', 'M', 58, 10),
-				makePlayer('Omer Gunes', 'F', 64, 23),
-				makePlayer('Kaan Kurt', 'F', 62, 18),
-				makePlayer('Ali Vural', 'F', 59, 12),
-				makePlayer('Samet Tunc', 'M', 56, 9),
-				makePlayer('Umut Boz', 'D', 55, 8),
-				makePlayer('Riza Cakir', 'GK', 54, 7)
-			];
-		}
+		const bluePlayers = [
+			createPlayer('blue', 'goalie', 'GK', 86, 315, { speed: 82, isGoalie: true }),
+			createPlayer('blue', 'defender', 'CB', 195, 225, { speed: 84 }),
+			createPlayer('blue', 'defender', 'CB', 195, 405, { speed: 84 }),
+			createPlayer('blue', 'wing', 'LW', 340, 110, { speed: 88 }),
+			createPlayer('blue', 'wing', 'RW', 340, 520, { speed: 88 }),
+			createPlayer('blue', 'midfielder', 'CM', 420, 245, { speed: 88 }),
+			createPlayer('blue', 'midfielder', 'CM', 420, 385, { speed: 88 }),
+			createPlayer('blue', 'forward', 'LF', 565, 175, { speed: 90 }),
+			createPlayer('blue', 'forward', 'RF', 565, 455, { speed: 90 }),
+			createPlayer('blue', 'forward', 'ST', 650, 315, { speed: 92 }),
+			createPlayer('blue', 'defender', 'SW', 120, 315, { speed: 82 })
+		];
 
-		function makeMarketPool() {
-			const names = ['Can', 'Mert', 'Taha', 'Ilyas', 'Furkan', 'Burak', 'Onur', 'Berk', 'Tolga', 'Emre', 'Sinan', 'Recep', 'Hakan', 'Batuhan', 'Cenk', 'Akin'];
-			const surnames = ['Kaya', 'Demir', 'Aslan', 'Celik', 'Tas', 'Aydin', 'Sari', 'Kurt', 'Yildiz', 'Kilic', 'Arslan', 'Koc', 'Yaman', 'Acar'];
-			const positions = ['GK', 'D', 'M', 'F'];
-			const list = [];
-			for (let i = 0; i < 16; i++) {
-				const ovr = randInt(52, 76);
-				list.push(makePlayer(pick(names) + ' ' + pick(surnames), pick(positions), ovr, Math.max(6, Math.round(ovr / 3))));
+		const redPlayers = [
+			createPlayer('red', 'goalie', 'GK', 1034, 315, { speed: 82, isGoalie: true }),
+			createPlayer('red', 'defender', 'CB', 925, 225, { speed: 84 }),
+			createPlayer('red', 'defender', 'CB', 925, 405, { speed: 84 }),
+			createPlayer('red', 'wing', 'LW', 780, 110, { speed: 88 }),
+			createPlayer('red', 'wing', 'RW', 780, 520, { speed: 88 }),
+			createPlayer('red', 'midfielder', 'CM', 700, 245, { speed: 88 }),
+			createPlayer('red', 'midfielder', 'CM', 700, 385, { speed: 88 }),
+			createPlayer('red', 'forward', 'LF', 555, 175, { speed: 90 }),
+			createPlayer('red', 'forward', 'RF', 555, 455, { speed: 90 }),
+			createPlayer('red', 'forward', 'ST', 470, 315, { speed: 92 }),
+			createPlayer('red', 'defender', 'SW', 1000, 315, { speed: 82 })
+		];
+
+		const state = {
+			players: bluePlayers.concat(redPlayers),
+			ball: {
+				x: FIELD_W / 2,
+				y: FIELD_H / 2,
+				vx: 0,
+				vy: 0,
+				el: null,
+				kick_lock_timer: 0,
+				kick_ignore_player: null
 			}
-			return list;
+		};
+
+		function applyBlueUpgrades() {
+			const speedMultiplier = getBlueSpeedMultiplier();
+			state.players.forEach(function (player) {
+				if (player.team === 'blue') {
+					player.speed = player.baseSpeed * speedMultiplier;
+				} else {
+					player.speed = player.baseSpeed;
+				}
+			});
 		}
 
-		function initState() {
-			team = {
-				name: 'Blue Town FC',
-				formation: '4-4-2',
-				mentality: 'balanced',
-				style: 'short',
-				width: 'balanced',
-				press: 'medium',
-				marking: 'zonal',
-				attack: 60,
-				midfield: 60,
-				defense: 60,
-				energy: 60,
-				budget: 60,
-				coins: 0,
-				reputation: 1,
-				division: 1,
-				wins: 0,
-				points: 0,
-				sponsor: 10,
-				scoutLevel: 0,
-				trainingLevel: 0,
-				stadiumLevel: 0,
-				youthLevel: 0,
-				squad: seededSquad(),
-				captainId: null
-			};
-
-			team.captainId = team.squad[6].id;
-
-			season = {
-				week: 1,
-				totalWeeks: 14,
-				home: true,
-				weather: 'Clear',
-				fixturesDone: 0,
-				results: [],
-				teams: [
-					{ name: 'Blue Town FC', pts: 0, gf: 0, ga: 0, w: 0, d: 0, l: 0 },
-					{ name: 'River Adana', pts: 0, gf: 0, ga: 0, w: 0, d: 0, l: 0 },
-					{ name: 'Toros SK', pts: 0, gf: 0, ga: 0, w: 0, d: 0, l: 0 },
-					{ name: 'Cukurova Stars', pts: 0, gf: 0, ga: 0, w: 0, d: 0, l: 0 },
-					{ name: 'Yuregir Club', pts: 0, gf: 0, ga: 0, w: 0, d: 0, l: 0 },
-					{ name: 'Delta Spor', pts: 0, gf: 0, ga: 0, w: 0, d: 0, l: 0 },
-					{ name: 'Anatolia 23', pts: 0, gf: 0, ga: 0, w: 0, d: 0, l: 0 },
-					{ name: 'Orange Garden', pts: 0, gf: 0, ga: 0, w: 0, d: 0, l: 0 }
-				]
-			};
-
-			market = makeMarketPool();
-			financeLog = [];
-			lastStats = null;
-			addFinance('Income', 20, 'Starting sponsor money');
+		function updateModeLabel() {
+			if (decisionMode) {
+				modeEl.textContent = decisionContext === 'corner' ? 'Corner' : 'Decision';
+			} else if (running) {
+				modeEl.textContent = 'Live';
+			} else {
+				modeEl.textContent = 'Stopped';
+			}
 		}
 
-		function updateInputsFromTeam() {
-			attackInput.value = String(team.attack);
-			midfieldInput.value = String(team.midfield);
-			defenseInput.value = String(team.defense);
-			energyInput.value = String(team.energy);
-			attackValue.textContent = String(team.attack);
-			midfieldValue.textContent = String(team.midfield);
-			defenseValue.textContent = String(team.defense);
-			energyValue.textContent = String(team.energy);
+		function setMessage(text) {
+			messageEl.textContent = text;
 		}
 
-		function syncTeamFromInputs() {
-			team.attack = parseInt(attackInput.value, 10);
-			team.midfield = parseInt(midfieldInput.value, 10);
-			team.defense = parseInt(defenseInput.value, 10);
-			team.energy = parseInt(energyInput.value, 10);
-			updateInputsFromTeam();
+		function updateHud() {
+			scoreUserEl.textContent = String(userScore);
+			scoreAiEl.textContent = String(aiScore);
+			const mins = Math.floor(remaining / 60);
+			const secs = Math.max(0, Math.ceil(remaining % 60));
+			timerEl.textContent = mins + ':' + String(secs).padStart(2, '0');
+			coinsEl.textContent = String(coins);
+			speedLevelEl.textContent = String(speedLevel);
+			smartLevelEl.textContent = String(smartLevel);
+			shootingLevelEl.textContent = String(shootingLevel);
+			passingLevelEl.textContent = String(passingLevel);
+			defenseLevelEl.textContent = String(defenseLevel);
+
+			buySpeedBtn.textContent = 'Speed (' + getSpeedUpgradeCost() + ')';
+			buySmartBtn.textContent = 'Smart (' + getSmartUpgradeCost() + ')';
+			buyShootingBtn.textContent = 'Shooting (' + getShootingUpgradeCost() + ')';
+			buyPassingBtn.textContent = 'Passing (' + getPassingUpgradeCost() + ')';
+			buyDefenseBtn.textContent = 'Defense (' + getDefenseUpgradeCost() + ')';
+
+			buySpeedBtn.disabled = coins < getSpeedUpgradeCost();
+			buySmartBtn.disabled = coins < getSmartUpgradeCost();
+			buyShootingBtn.disabled = coins < getShootingUpgradeCost();
+			buyPassingBtn.disabled = coins < getPassingUpgradeCost();
+			buyDefenseBtn.disabled = coins < getDefenseUpgradeCost();
+
+			updateModeLabel();
 		}
 
-		function renderTopPanels() {
-			const lastBlue = lastStats ? lastStats.blueGoals : 0;
-			const lastRed = lastStats ? lastStats.redGoals : 0;
-			scoreBlue.textContent = String(lastBlue);
-			scoreRed.textContent = String(lastRed);
-			winsValue.textContent = String(team.wins);
-			coinsValue.textContent = String(team.coins);
-			ratingValue.textContent = String(getTeamOverall());
-			budgetValue.textContent = '$' + team.budget + 'm';
-			reputationValue.textContent = String(team.reputation);
-			weekValue.textContent = String(season.week) + '/' + String(season.totalWeeks);
-			divisionValue.textContent = 'Div ' + String(team.division);
-			seasonPointsValue.textContent = String(team.points);
-			sponsorValue.textContent = '$' + String(team.sponsor) + 'm';
-			homeAwayValue.textContent = season.home ? 'Home' : 'Away';
-			weatherValue.textContent = season.weather;
-			setButtonGroup(formationButtons, team.formation, 'data-formation');
-			setButtonGroup(mentalityButtons, team.mentality, 'data-mentality');
-			setButtonGroup(styleButtons, team.style, 'data-style');
-			setButtonGroup(widthButtons, team.width, 'data-width');
-			setButtonGroup(pressButtons, team.press, 'data-press');
-			setButtonGroup(markingButtons, team.marking, 'data-marking');
-		}
-
-		function clearPlayers() {
-			playerNodes.forEach(function (node) {
+		function buildEntities() {
+			field.querySelectorAll('.zo-soccer-player, .zo-soccer-ball').forEach(function (node) {
 				node.remove();
 			});
-			playerNodes = [];
-		}
 
-		function addPlayer(x, y, label, teamSide) {
-			const node = document.createElement('div');
-			node.className = 'zo-mm-player zo-mm-player--' + teamSide;
-			node.style.left = x + '%';
-			node.style.top = y + '%';
-			node.textContent = label;
-			field.appendChild(node);
-			playerNodes.push(node);
-		}
+			state.players.forEach(function (player) {
+				const el = document.createElement('div');
+				el.className = 'zo-soccer-player ' +
+					(player.team === 'blue' ? 'zo-soccer-player--blue ' : 'zo-soccer-player--red ') +
+					(player.isGoalie ? 'zo-soccer-player--goalie' : '');
 
-		function renderFormation() {
-			clearPlayers();
-			blueFormationMap[team.formation].forEach(function (player) {
-				addPlayer(player.x, player.y, player.t, 'blue');
-			});
-			opponentFormation.forEach(function (player) {
-				addPlayer(player.x, player.y, player.t, 'red');
-			});
-		}
+				el.innerHTML =
+					'<div class="zo-soccer-player__marker"></div>' +
+					'<div class="zo-soccer-player__head"></div>' +
+					'<div class="zo-soccer-player__body"></div>' +
+					'<div class="zo-soccer-player__legs"></div>' +
+					'<div class="zo-soccer-player__label">' + player.label + '</div>';
 
-		function getSquadAverageByPos(pos) {
-			const available = team.squad.filter(function (player) {
-				return player.pos === pos && !player.injured && !player.suspended;
-			});
-			if (!available.length) {
-				return 45;
-			}
-			const total = available.reduce(function (sum, player) {
-				return sum + player.ovr + (player.morale - 50) * 0.10 + (player.energy - 50) * 0.08;
-			}, 0);
-			return total / available.length;
-		}
-
-		function getTeamOverall() {
-			const gk = getSquadAverageByPos('GK');
-			const d = getSquadAverageByPos('D');
-			const m = getSquadAverageByPos('M');
-			const f = getSquadAverageByPos('F');
-			return Math.round((gk * 0.12) + (d * 0.28) + (m * 0.30) + (f * 0.30) + (team.trainingLevel * 1.5));
-		}
-
-		function getFormationBonus() {
-			if (team.formation === '4-3-3') {
-				return { attack: 8, midfield: 2, defense: -2 };
-			}
-			if (team.formation === '5-3-2') {
-				return { attack: -1, midfield: 1, defense: 9 };
-			}
-			return { attack: 3, midfield: 3, defense: 3 };
-		}
-
-		function getTacticBonus() {
-			let attack = 0;
-			let midfield = 0;
-			let defense = 0;
-
-			if (team.mentality === 'attacking') {
-				attack += 8;
-				defense -= 3;
-			}
-			if (team.mentality === 'defensive') {
-				defense += 8;
-				attack -= 3;
-			}
-
-			if (team.style === 'short') {
-				midfield += 6;
-			}
-			if (team.style === 'long') {
-				attack += 5;
-				midfield -= 2;
-			}
-			if (team.style === 'counter') {
-				attack += 6;
-				defense += 2;
-			}
-
-			if (team.width === 'wide') {
-				attack += 3;
-			}
-			if (team.width === 'narrow') {
-				midfield += 3;
-			}
-
-			if (team.press === 'high') {
-				attack += 4;
-				energy -= 0;
-				defense += 1;
-			}
-			if (team.press === 'low') {
-				defense += 4;
-			}
-
-			if (team.marking === 'man') {
-				defense += 3;
-			}
-			if (team.marking === 'zonal') {
-				midfield += 2;
-			}
-
-			return { attack: attack, midfield: midfield, defense: defense };
-		}
-
-		function chooseOpponentName() {
-			const names = season.teams.map(function (t) { return t.name; }).filter(function (name) {
-				return name !== team.name;
-			});
-			return pick(names);
-		}
-
-		function chooseWeather() {
-			return pick(['Clear', 'Rain', 'Windy', 'Hot', 'Cold']);
-		}
-
-		function getWeatherModifiers(weather) {
-			if (weather === 'Rain') {
-				return { attack: -2, midfield: -1, defense: 2 };
-			}
-			if (weather === 'Windy') {
-				return { attack: -1, midfield: -2, defense: 1 };
-			}
-			if (weather === 'Hot') {
-				return { attack: -1, midfield: -1, defense: -1 };
-			}
-			if (weather === 'Cold') {
-				return { attack: 0, midfield: 1, defense: 1 };
-			}
-			return { attack: 0, midfield: 0, defense: 0 };
-		}
-
-		function renderCommentary(lines) {
-			commentaryLog.innerHTML = '';
-			lines.forEach(function (line) {
-				const div = document.createElement('div');
-				div.className = 'zo-mm-line';
-				div.textContent = line;
-				commentaryLog.appendChild(div);
-			});
-		}
-
-		function renderResults() {
-			resultsLog.innerHTML = '';
-			season.results.slice().reverse().forEach(function (line) {
-				const div = document.createElement('div');
-				div.className = 'zo-mm-line';
-				div.textContent = line;
-				resultsLog.appendChild(div);
-			});
-		}
-
-		function sortTable() {
-			season.teams.sort(function (a, b) {
-				const gdA = a.gf - a.ga;
-				const gdB = b.gf - b.ga;
-				if (b.pts !== a.pts) return b.pts - a.pts;
-				if (gdB !== gdA) return gdB - gdA;
-				if (b.gf !== a.gf) return b.gf - a.gf;
-				return a.name.localeCompare(b.name);
-			});
-		}
-
-		function renderLeagueTable() {
-			sortTable();
-			tableBody.innerHTML = '';
-			season.teams.forEach(function (club, index) {
-				const tr = document.createElement('tr');
-				tr.innerHTML = '<td>' + (index + 1) + '</td>' +
-					'<td>' + club.name + '</td>' +
-					'<td>' + club.pts + '</td>' +
-					'<td>' + club.w + '</td>' +
-					'<td>' + club.d + '</td>' +
-					'<td>' + club.l + '</td>' +
-					'<td>' + club.gf + '</td>' +
-					'<td>' + club.ga + '</td>';
-				tableBody.appendChild(tr);
-			});
-		}
-
-		function renderFinance() {
-			financeBody.innerHTML = '';
-			financeLog.forEach(function (item) {
-				const tr = document.createElement('tr');
-				tr.innerHTML = '<td>' + item.type + '</td>' +
-					'<td>' + (item.amount >= 0 ? '+$' + item.amount + 'm' : '-$' + Math.abs(item.amount) + 'm') + '</td>' +
-					'<td>' + item.note + '</td>';
-				financeBody.appendChild(tr);
-			});
-		}
-
-		function renderMarket() {
-			marketBody.innerHTML = '';
-			market.forEach(function (player) {
-				const row = document.createElement('div');
-				row.className = 'zo-mm-market-player';
-				const btnDisabled = team.budget < player.price ? 'disabled' : '';
-				row.innerHTML =
-					'<div><strong>' + player.name + '</strong><div class="zo-mm-note">' + player.role + '</div></div>' +
-					'<div>' + player.pos + '</div>' +
-					'<div>' + player.ovr + '</div>' +
-					'<div>$' + player.price + 'm</div>' +
-					'<div>$' + player.wage + 'm</div>' +
-					'<div><button type="button" class="zo-mm-btn zo-mm-buy-player" data-id="' + player.id + '" ' + btnDisabled + '>Buy</button></div>';
-				marketBody.appendChild(row);
+				field.appendChild(el);
+				player.el = el;
 			});
 
-			marketBody.querySelectorAll('.zo-mm-buy-player').forEach(function (button) {
-				button.addEventListener('click', function () {
-					const id = button.getAttribute('data-id');
-					const player = market.find(function (p) { return p.id === id; });
-					if (!player || team.budget < player.price) {
-						return;
-					}
-					team.budget -= player.price;
-					team.squad.push(player);
-					market = market.filter(function (p) { return p.id !== id; });
-					addFinance('Expense', -player.price, 'Bought ' + player.name);
-					statusText.textContent = player.name + ' joined your squad.';
-					renderAll();
-				});
-			});
+			const ballEl = document.createElement('div');
+			ballEl.className = 'zo-soccer-ball';
+			field.appendChild(ballEl);
+			state.ball.el = ballEl;
 		}
 
-		function getCaptain() {
-			return team.squad.find(function (p) { return p.id === team.captainId; }) || team.squad[0] || null;
+		function clearDecisionState() {
+			decisionMode = false;
+			decisionPlayer = null;
+			decisionTarget = null;
+			decisionContext = 'normal';
+			state.players.forEach(function (p) {
+				p.el.classList.remove('zo-soccer-player--decision');
+			});
+			decisionBox.classList.remove('is-active');
+			targetEl.classList.remove('is-active');
+			passLineEl.classList.remove('is-active');
 		}
 
-		function renderSquad() {
-			squadBody.innerHTML = '';
-			team.squad.forEach(function (player) {
-				const captain = player.id === team.captainId ? '<span class="zo-mm-tag">Captain</span>' : '';
-				const injured = player.injured ? '<span class="zo-mm-tag zo-mm-tag--bad">Injured</span>' : '';
-				const suspended = player.suspended ? '<span class="zo-mm-tag zo-mm-tag--bad">Suspended</span>' : '';
-				const formTag = player.morale >= 75 ? '<span class="zo-mm-tag zo-mm-tag--good">Happy</span>' : (player.morale <= 52 ? '<span class="zo-mm-tag zo-mm-tag--bad">Low morale</span>' : '');
-				const row = document.createElement('div');
-				row.className = 'zo-mm-squad-player';
-				row.innerHTML =
-					'<div><strong>' + player.name + '</strong><div class="zo-mm-note">' + captain + ' ' + injured + ' ' + suspended + ' ' + formTag + '</div></div>' +
-					'<div>' + player.pos + '</div>' +
-					'<div>' + player.ovr + '</div>' +
-					'<div>M ' + player.morale + '</div>' +
-					'<div>E ' + player.energy + '</div>' +
-					'<div>' +
-						'<button type="button" class="zo-mm-btn zo-mm-captain" data-id="' + player.id + '">Captain</button> ' +
-						'<button type="button" class="zo-mm-btn zo-mm-sell" data-id="' + player.id + '">Sell</button>' +
-					'</div>';
-				squadBody.appendChild(row);
+		function resetPositions() {
+			state.players.forEach(function (player) {
+				player.homeX = player.baseHomeX;
+				player.homeY = player.baseHomeY;
+				player.x = player.homeX;
+				player.y = player.homeY;
+				player.vx = 0;
+				player.vy = 0;
+				player.el.classList.remove('zo-soccer-player--decision');
 			});
-
-			squadBody.querySelectorAll('.zo-mm-captain').forEach(function (button) {
-				button.addEventListener('click', function () {
-					team.captainId = button.getAttribute('data-id');
-					statusText.textContent = 'Captain changed.';
-					renderSquad();
-				});
-			});
-
-			squadBody.querySelectorAll('.zo-mm-sell').forEach(function (button) {
-				button.addEventListener('click', function () {
-					const id = button.getAttribute('data-id');
-					if (team.squad.length <= 11) {
-						statusText.textContent = 'You need enough players before selling.';
-						return;
-					}
-					const player = team.squad.find(function (p) { return p.id === id; });
-					if (!player) {
-						return;
-					}
-					const value = Math.max(3, Math.round(player.price * 0.7));
-					team.budget += value;
-					team.squad = team.squad.filter(function (p) { return p.id !== id; });
-					if (team.captainId === id && team.squad.length) {
-						team.captainId = team.squad[0].id;
-					}
-					addFinance('Income', value, 'Sold ' + player.name);
-					statusText.textContent = player.name + ' was sold.';
-					renderAll();
-				});
-			});
+			state.ball.x = FIELD_W / 2;
+			state.ball.y = FIELD_H / 2;
+			state.ball.vx = 0;
+			state.ball.vy = 0;
+			state.ball.kick_lock_timer = 0;
+			state.ball.kick_ignore_player = null;
+			restartType = null;
+			restartTeam = null;
+			restartSpot = null;
+			clearDecisionState();
 		}
 
-		function applySeasonResult(teamName, gf, ga) {
-			const club = season.teams.find(function (t) { return t.name === teamName; });
-			if (!club) {
-				return;
-			}
-			club.gf += gf;
-			club.ga += ga;
-			if (gf > ga) {
-				club.w += 1;
-				club.pts += 3;
-			} else if (gf < ga) {
-				club.l += 1;
+		function render() {
+			const rect = field.getBoundingClientRect();
+			const scaleX = rect.width / FIELD_W;
+			const scaleY = rect.height / FIELD_H;
+
+			state.players.forEach(function (player) {
+				player.el.style.left = (player.x * scaleX) + 'px';
+				player.el.style.top = (player.y * scaleY) + 'px';
+			});
+
+			state.ball.el.style.left = (state.ball.x * scaleX) + 'px';
+			state.ball.el.style.top = (state.ball.y * scaleY) + 'px';
+
+			if (decisionMode && decisionTarget && decisionPlayer) {
+				const startX = decisionPlayer.x * scaleX;
+				const startY = decisionPlayer.y * scaleY;
+				const endX = decisionTarget.x * scaleX;
+				const endY = decisionTarget.y * scaleY;
+				const dx = endX - startX;
+				const dy = endY - startY;
+				const len = Math.sqrt(dx * dx + dy * dy);
+				const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+
+				targetEl.classList.add('is-active');
+				targetEl.style.left = endX + 'px';
+				targetEl.style.top = endY + 'px';
+
+				passLineEl.classList.add('is-active');
+				passLineEl.style.left = startX + 'px';
+				passLineEl.style.top = startY + 'px';
+				passLineEl.style.width = len + 'px';
+				passLineEl.style.transform = 'translate(0, -50%) rotate(' + angle + 'deg)';
 			} else {
-				club.d += 1;
-				club.pts += 1;
+				targetEl.classList.remove('is-active');
+				passLineEl.classList.remove('is-active');
 			}
 		}
 
-		function maybeInjureOrSuspend(matchCommentary) {
-			const active = team.squad.filter(function (p) { return !p.injured && !p.suspended; });
-			if (active.length && Math.random() < 0.12) {
-				const player = pick(active);
-				player.injured = true;
-				matchCommentary.push('74\' - Injury concern: ' + player.name + ' will miss the next match.');
+		function resetMatch() {
+			userScore = 0;
+			aiScore = 0;
+			remaining = MATCH_TIME;
+			started = false;
+			running = false;
+			lastTime = 0;
+			resetPositions();
+			applyBlueUpgrades();
+			updateHud();
+			setMessage('Press Start Match');
+			if (animationId) {
+				cancelAnimationFrame(animationId);
+				animationId = null;
 			}
-			if (active.length && Math.random() < 0.10) {
-				const player = pick(active);
-				player.suspended = true;
-				matchCommentary.push('81\' - Red card risk confirmed. ' + player.name + ' is suspended for the next match.');
-			}
+			render();
 		}
 
-		function ageSquadAfterMatch() {
-			team.squad.forEach(function (player) {
-				player.energy = clamp(player.energy - randInt(4, 10) + team.trainingLevel, 35, 99);
-				player.morale = clamp(player.morale + randInt(-4, 4), 35, 99);
+		function kickBallToward(targetX, targetY, power) {
+			const dx = targetX - state.ball.x;
+			const dy = targetY - state.ball.y;
+			const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+			state.ball.vx = (dx / dist) * power;
+			state.ball.vy = (dy / dist) * power;
+		}
+
+		function findBestPassTarget(player) {
+			const teammates = state.players.filter(function (other) {
+				return other.team === player.team && other !== player;
 			});
+
+			let best = null;
+			let bestScore = -999999;
+
+			teammates.forEach(function (mate) {
+				const forwardScore = player.team === 'blue' ? (mate.x - player.x) : (player.x - mate.x);
+				const spacingScore = 160 - Math.abs(mate.y - player.y);
+				const roleBonus =
+					(mate.position === 'forward' ? 38 : 0) +
+					(mate.position === 'wing' ? 20 : 0) +
+					(mate.position === 'midfielder' ? 12 : 0);
+
+				const smartBonus = player.team === 'blue' ? (smartLevel * 10 + passingLevel * 8) : 0;
+				const total = forwardScore + spacingScore + roleBonus + smartBonus;
+
+				if (total > bestScore) {
+					bestScore = total;
+					best = mate;
+				}
+			});
+
+			return best;
 		}
 
-		function healAndRecoverForNextWeek() {
-			team.squad.forEach(function (player) {
-				player.energy = clamp(player.energy + randInt(5, 12) + team.trainingLevel, 35, 99);
-				if (player.injured && Math.random() < 0.55) {
-					player.injured = false;
+		function getCornerKicker(team) {
+			let best = null;
+			let bestDist = Infinity;
+
+			state.players.forEach(function (player) {
+				if (player.team !== team || player.isGoalie) {
+					return;
 				}
-				if (player.suspended) {
-					player.suspended = false;
+				const d = distance(player, { x: restartSpot.x, y: restartSpot.y });
+				if (d < bestDist) {
+					bestDist = d;
+					best = player;
+				}
+			});
+
+			return best;
+		}
+
+		function setupBlueCornerPositions() {
+			const isTop = restartSpot.y < FIELD_H / 2;
+
+			state.players.forEach(function (player) {
+				if (player.team === 'blue') {
+					if (player.isGoalie) {
+						player.x = 86;
+						player.y = 315;
+						return;
+					}
+
+					if (player === decisionPlayer) {
+						player.x = restartSpot.x - 18;
+						player.y = restartSpot.y;
+						return;
+					}
+
+					if (player.position === 'forward') {
+						player.x = FIELD_W - 185;
+						if (player.label === 'LF') {
+							player.y = 280;
+						} else if (player.label === 'RF') {
+							player.y = 355;
+						} else {
+							player.y = 315;
+						}
+						return;
+					}
+
+					if (player.position === 'midfielder') {
+						player.x = FIELD_W - 260;
+						player.y = isTop ? 220 : 410;
+						return;
+					}
+
+					if (player.position === 'wing') {
+						player.x = FIELD_W - 320;
+						player.y = isTop ? 155 : 475;
+						return;
+					}
+
+					player.x = FIELD_W - 410;
+					player.y = player.baseHomeY;
+					return;
+				}
+
+				if (player.isGoalie) {
+					player.x = 1034;
+					player.y = 315;
+				} else if (player.position === 'defender') {
+					player.x = FIELD_W - 115;
+					player.y = player.baseHomeY;
+				} else if (player.position === 'midfielder') {
+					player.x = FIELD_W - 165;
+					player.y = player.baseHomeY;
+				} else {
+					player.x = FIELD_W - 235;
+					player.y = player.baseHomeY;
 				}
 			});
 		}
 
-		function makeMinuteCommentary(opponentName, stats) {
-			const lines = [];
-			const captain = getCaptain();
-			lines.push('Kickoff - ' + team.name + ' vs ' + opponentName + '.');
-			lines.push('5\' - ' + (season.home ? 'Home crowd' : 'Away support') + ' reacts to the opening exchanges.');
-			if (stats.possession > 53) {
-				lines.push('12\' - Your team controls possession through the middle.');
-			} else {
-				lines.push('12\' - ' + opponentName + ' begins with more of the ball.');
-			}
-			if (team.style === 'counter') {
-				lines.push('21\' - Fast counterattack nearly opens the scoring.');
-			}
-			if (team.press === 'high') {
-				lines.push('29\' - High pressing forces a dangerous turnover.');
-			}
-			lines.push('45\' - Halftime score: ' + stats.halfBlue + '-' + stats.halfRed + '.');
-			if (team.width === 'wide') {
-				lines.push('57\' - Wide play stretches the defense and creates crossing space.');
-			}
-			if (stats.corners >= 4) {
-				lines.push('63\' - Set pieces are becoming important in this match.');
-			}
-			if (captain) {
-				lines.push('70\' - ' + captain.name + ' tries to lift the team as captain.');
-			}
-			lines.push('90\' - Full time: ' + stats.blueGoals + '-' + stats.redGoals + '.');
-			return lines;
-		}
-
-		function simulateMatch() {
-			syncTeamFromInputs();
-			const opponentName = chooseOpponentName();
-			season.weather = chooseWeather();
-			const formBonus = getFormationBonus();
-			const tacticBonus = getTacticBonus();
-			const weatherBonus = getWeatherModifiers(season.weather);
-			const squadAttack = getSquadAverageByPos('F');
-			const squadMid = getSquadAverageByPos('M');
-			const squadDef = getSquadAverageByPos('D');
-			const squadGk = getSquadAverageByPos('GK');
-			const homeBonus = season.home ? 4 : -2;
-			const reputationBonus = team.reputation * 1.2;
-			const scoutBonus = team.scoutLevel * 1.2;
-			const stadiumBonus = season.home ? team.stadiumLevel * 1.3 : 0;
-
-			const blueAttack = team.attack + formBonus.attack + tacticBonus.attack + weatherBonus.attack + (squadAttack - 55) * 0.55 + homeBonus + reputationBonus;
-			const blueMid = team.midfield + formBonus.midfield + tacticBonus.midfield + weatherBonus.midfield + (squadMid - 55) * 0.55 + scoutBonus;
-			const blueDef = team.defense + formBonus.defense + tacticBonus.defense + weatherBonus.defense + (squadDef - 55) * 0.55 + (squadGk - 55) * 0.18 + stadiumBonus;
-
-			const opponentBase = 54 + (season.week * 0.9) + ((team.division - 1) * 4.5);
-			const redAttack = opponentBase + rand(-6, 9);
-			const redMid = opponentBase + rand(-6, 9);
-			const redDef = opponentBase + rand(-6, 9);
-
-			const possession = clamp(Math.round(50 + (blueMid - redMid) * 0.55 + rand(-7, 7)), 31, 69);
-			const blueShots = clamp(Math.round(5 + (blueAttack - redDef) * 0.12 + possession * 0.08 + rand(-2, 3)), 2, 18);
-			const redShots = clamp(Math.round(5 + (redAttack - blueDef) * 0.12 + (100 - possession) * 0.08 + rand(-2, 3)), 2, 18);
-			const blueOnTarget = clamp(Math.round(blueShots * (0.34 + (team.attack + team.trainingLevel) / 260)), 1, blueShots);
-			const redOnTarget = clamp(Math.round(redShots * (0.32 + opponentBase / 260)), 1, redShots);
-			const blueCorners = clamp(Math.round(blueShots * 0.35 + rand(0, 2)), 0, 9);
-			const redCorners = clamp(Math.round(redShots * 0.35 + rand(0, 2)), 0, 9);
-			const blueFouls = clamp(Math.round(8 + rand(-3, 4) + (team.press === 'high' ? 2 : 0)), 4, 18);
-			const redFouls = clamp(Math.round(8 + rand(-3, 4)), 4, 18);
-			const blueCards = clamp(Math.round(blueFouls / 6 + rand(-1, 1)), 0, 4);
-			const redCards = clamp(Math.round(redFouls / 6 + rand(-1, 1)), 0, 4);
-
-			let blueGoals = clamp(Math.round(blueOnTarget * (0.19 + (team.attack + squadAttack - 100) / 420) + rand(-1, 1)), 0, 6);
-			let redGoals = clamp(Math.round(redOnTarget * (0.18 + (redAttack - blueDef) / 430) + rand(-1, 1)), 0, 6);
-
-			const halfBlue = Math.min(blueGoals, Math.round(blueGoals * rand(0.3, 0.7)));
-			const halfRed = Math.min(redGoals, Math.round(redGoals * rand(0.3, 0.7)));
-			const cleanSheet = redGoals === 0 ? 'Yes' : 'No';
-			const momentum = blueGoals > redGoals ? 'Blue Town' : (blueGoals < redGoals ? opponentName : 'Balanced');
-
-			const commentary = makeMinuteCommentary(opponentName, {
-				possession: possession,
-				blueGoals: blueGoals,
-				redGoals: redGoals,
-				halfBlue: halfBlue,
-				halfRed: halfRed,
-				corners: blueCorners
-			});
-
-			maybeInjureOrSuspend(commentary);
-			ageSquadAfterMatch();
-
-			const resultLine = 'Week ' + season.week + ': ' + team.name + ' ' + blueGoals + '-' + redGoals + ' ' + opponentName;
-			season.results.push(resultLine);
-			season.results = season.results.slice(-20);
-
-			applySeasonResult(team.name, blueGoals, redGoals);
-			applySeasonResult(opponentName, redGoals, blueGoals);
-
-			if (blueGoals > redGoals) {
-				team.wins += 1;
-				team.points += 3;
-				team.coins += 12 + team.stadiumLevel;
-				team.budget += 6 + team.sponsor;
-				team.reputation = clamp(team.reputation + 1, 1, 99);
-				statusText.textContent = 'You win the match.';
-				addFinance('Income', 6 + team.sponsor, 'Match win and sponsor bonus');
-			} else if (blueGoals < redGoals) {
-				team.coins += 4;
-				team.budget += 2 + Math.floor(team.sponsor / 2);
-				team.reputation = clamp(team.reputation - 1, 1, 99);
-				statusText.textContent = 'You lose the match.';
-				addFinance('Income', 2 + Math.floor(team.sponsor / 2), 'Participation and sponsor payout');
-			} else {
-				team.points += 1;
-				team.coins += 7;
-				team.budget += 4 + Math.floor(team.sponsor * 0.7);
-				team.reputation = clamp(team.reputation + 0, 1, 99);
-				statusText.textContent = 'The match ends in a draw.';
-				addFinance('Income', 4 + Math.floor(team.sponsor * 0.7), 'Draw and sponsor payout');
-			}
-
-			const wageBill = team.squad.reduce(function (sum, player) { return sum + player.wage; }, 0);
-			team.budget = Math.max(0, team.budget - wageBill);
-			addFinance('Expense', -wageBill, 'Weekly wages');
-
-			quickSummary.textContent = resultLine;
-			lastStats = {
-				blueGoals: blueGoals,
-				redGoals: redGoals,
-				possession: possession + '%',
-				shots: blueShots + ' - ' + redShots,
-				onTarget: blueOnTarget + ' - ' + redOnTarget,
-				corners: blueCorners + ' - ' + redCorners,
-				cards: blueCards + ' - ' + redCards,
-				fouls: blueFouls + ' - ' + redFouls,
-				momentum: momentum,
-				cleanSheet: cleanSheet
+		function startDecisionMode(player, context) {
+			decisionMode = true;
+			running = false;
+			decisionPlayer = player;
+			decisionContext = context || 'normal';
+			decisionTarget = {
+				x: player.team === 'blue' ? player.x + 140 : player.x - 140,
+				y: player.y
 			};
 
-			statPossession.textContent = lastStats.possession;
-			statShots.textContent = lastStats.shots;
-			statOnTarget.textContent = lastStats.onTarget;
-			statCorners.textContent = lastStats.corners;
-			statCards.textContent = lastStats.cards;
-			statFouls.textContent = lastStats.fouls;
-			statMomentum.textContent = lastStats.momentum;
-			statClean.textContent = lastStats.cleanSheet;
+			if (decisionContext === 'corner') {
+				setupBlueCornerPositions();
+				decisionTarget = {
+					x: FIELD_W - 170,
+					y: FIELD_H / 2
+				};
+			} else {
+				const best = findBestPassTarget(player);
+				if (best) {
+					decisionTarget = { x: best.x, y: best.y };
+				}
+			}
 
-			renderCommentary(commentary);
-			renderResults();
-			renderLeagueTable();
-			renderFinance();
-			renderSquad();
-			renderTopPanels();
+			state.players.forEach(function (p) {
+				p.el.classList.toggle('zo-soccer-player--decision', p === player);
+			});
+
+			decisionBox.classList.add('is-active');
+			if (decisionContext === 'corner') {
+				decisionText.textContent = 'Blue korner. Click or tap where you want the korner kick to go. You can aim at goal.';
+				setMessage('Choose korner kick');
+			} else {
+				decisionText.textContent = 'Your teammate has the ball. Click or tap where to kick. Click at the goal to shoot.';
+				setMessage('Choose pass or shot');
+			}
+			updateHud();
+			render();
 		}
 
-		function nextWeek() {
-			if (season.week >= season.totalWeeks) {
-				finishSeason();
+		function finishDecisionKick() {
+			clearDecisionState();
+			running = true;
+			updateHud();
+			animationId = requestAnimationFrame(loop);
+		}
+
+		function endDecisionModeAndKick(targetX, targetY) {
+			if (!decisionMode || !decisionPlayer) {
 				return;
 			}
-			season.week += 1;
-			season.home = !season.home;
-			season.weather = chooseWeather();
-			healAndRecoverForNextWeek();
-			statusText.textContent = 'Week ' + season.week + ' is ready.';
-			renderAll();
-		}
 
-		function finishSeason() {
-			sortTable();
-			const index = season.teams.findIndex(function (club) { return club.name === team.name; });
-			let message = 'Season finished.';
-			if (index === 0) {
-				team.division += 1;
-				team.budget += 20;
-				team.coins += 30;
-				message = 'You won the league and earned promotion.';
-				addFinance('Income', 20, 'Promotion prize money');
-			} else if (index <= 2) {
-				team.budget += 10;
-				team.coins += 18;
-				message = 'Strong season finish.';
-				addFinance('Income', 10, 'League position bonus');
-			} else if (index >= season.teams.length - 2 && team.division > 1) {
-				team.division -= 1;
-				message = 'Relegation. Rebuild and try again.';
+			const dx = targetX - decisionPlayer.x;
+			const dy = targetY - decisionPlayer.y;
+			const len = Math.sqrt(dx * dx + dy * dy) || 1;
+			const nx = dx / len;
+			const ny = dy / len;
+
+			state.ball.x = decisionPlayer.x + nx * 24;
+			state.ball.y = decisionPlayer.y + ny * 24;
+
+			const aimedAtRightGoal =
+				targetX >= FIELD_W - 18 &&
+				targetY >= GOAL_TOP &&
+				targetY <= GOAL_BOTTOM;
+
+			if (decisionContext === 'corner') {
+				const cornerPower = aimedAtRightGoal ? getDecisionShotPower() : getDecisionCornerPower();
+				state.ball.vx = nx * cornerPower;
+				state.ball.vy = ny * cornerPower;
+				state.ball.kick_lock_timer = getKickLockTime();
+				state.ball.kick_ignore_player = decisionPlayer;
+				restartType = null;
+				restartTeam = null;
+				restartSpot = null;
+				setMessage(aimedAtRightGoal ? 'Korner shot' : 'Korner taken');
+				finishDecisionKick();
+				return;
 			}
-			statusText.textContent = message;
-			season.week = season.totalWeeks;
-			renderAll();
+
+			const isShot =
+				targetX >= FIELD_W - 18 &&
+				targetY >= GOAL_TOP &&
+				targetY <= GOAL_BOTTOM;
+
+			const power = isShot ? getDecisionShotPower() : getDecisionPassPower(len);
+
+			state.ball.vx = nx * power;
+			state.ball.vy = ny * power;
+			state.ball.kick_lock_timer = getKickLockTime();
+			state.ball.kick_ignore_player = decisionPlayer;
+
+			coins += 51;
+			setMessage(isShot ? 'Shot taken. +51 coins' : 'Pass made. +51 coins');
+			finishDecisionKick();
 		}
 
-		function resetSeason() {
-			const currentDivision = team.division;
-			const currentBudget = team.budget;
-			const currentCoins = team.coins;
-			const currentRep = team.reputation;
-			const currentWins = team.wins;
-			const currentSquad = team.squad;
-			const currentCaptain = team.captainId;
-			const currentStaff = {
-				scoutLevel: team.scoutLevel,
-				trainingLevel: team.trainingLevel,
-				stadiumLevel: team.stadiumLevel,
-				youthLevel: team.youthLevel,
-				sponsor: team.sponsor
+		function getRoleHomeShift(player, ball) {
+			const sideFactor = player.team === 'blue'
+				? clamp((ball.x - FIELD_W / 2) / 2.8, -90, 140)
+				: clamp((FIELD_W / 2 - ball.x) / 2.8, -90, 140);
+
+			if (player.position === 'defender') {
+				return {
+					x: player.baseHomeX + (player.team === 'blue' ? sideFactor * 0.18 : -sideFactor * 0.18),
+					y: player.baseHomeY + (ball.y - player.baseHomeY) * 0.08
+				};
+			}
+
+			if (player.position === 'wing') {
+				const topWing = player.baseHomeY < FIELD_H / 2;
+				return {
+					x: player.baseHomeX + (player.team === 'blue' ? sideFactor * 0.34 : -sideFactor * 0.34),
+					y: topWing ? clamp(ball.y - 90, 70, 230) : clamp(ball.y + 90, FIELD_H - 230, FIELD_H - 70)
+				};
+			}
+
+			if (player.position === 'midfielder') {
+				return {
+					x: player.baseHomeX + (player.team === 'blue' ? sideFactor * 0.42 : -sideFactor * 0.42),
+					y: player.baseHomeY + (ball.y - player.baseHomeY) * 0.22
+				};
+			}
+
+			return {
+				x: player.baseHomeX + (player.team === 'blue' ? sideFactor * 0.58 : -sideFactor * 0.58),
+				y: player.baseHomeY + (ball.y - player.baseHomeY) * 0.18
 			};
-
-			initState();
-			team.division = currentDivision;
-			team.budget = currentBudget;
-			team.coins = currentCoins;
-			team.reputation = currentRep;
-			team.wins = currentWins;
-			team.squad = currentSquad;
-			team.captainId = currentCaptain;
-			team.scoutLevel = currentStaff.scoutLevel;
-			team.trainingLevel = currentStaff.trainingLevel;
-			team.stadiumLevel = currentStaff.stadiumLevel;
-			team.youthLevel = currentStaff.youthLevel;
-			team.sponsor = currentStaff.sponsor;
-			statusText.textContent = 'New season started.';
-			renderAll();
 		}
 
-		function buyUpgrade(type) {
-			if (type === 'scout') {
-				const cost = 8 + (team.scoutLevel * 6);
-				if (team.coins < cost) return;
-				team.coins -= cost;
-				team.scoutLevel += 1;
-				market = market.concat(makeMarketPool().slice(0, 3).map(function (p) {
-					p.ovr = clamp(p.ovr + team.scoutLevel * 2, 50, 85);
-					p.price = Math.max(6, Math.round(p.ovr / 3));
-					return p;
-				}));
-				statusText.textContent = 'Scout network improved.';
-				return;
+		function getNearestChaser(team) {
+			let best = null;
+			let bestDist = Infinity;
+
+			state.players.forEach(function (player) {
+				if (player.team !== team || player.isGoalie) {
+					return;
+				}
+				const d = distance(player, state.ball);
+				if (d < bestDist) {
+					bestDist = d;
+					best = player;
+				}
+			});
+
+			return best;
+		}
+
+		function getSupportChaser(team, primary) {
+			let best = null;
+			let bestDist = Infinity;
+			const interceptRadius = team === 'blue' ? getBlueInterceptRadius() : BASE_INTERCEPT_RADIUS;
+
+			state.players.forEach(function (player) {
+				if (player.team !== team || player.isGoalie || player === primary) {
+					return;
+				}
+				const d = distance(player, state.ball);
+				if (d < bestDist) {
+					bestDist = d;
+					best = player;
+				}
+			});
+
+			if (bestDist <= interceptRadius) {
+				return best;
 			}
-			if (type === 'training') {
-				const cost = 10 + (team.trainingLevel * 7);
-				if (team.coins < cost) return;
-				team.coins -= cost;
-				team.trainingLevel += 1;
-				team.squad.forEach(function (player) {
-					player.ovr = clamp(player.ovr + 1, 40, 99);
-					player.energy = clamp(player.energy + 4, 35, 99);
-				});
-				statusText.textContent = 'Training improved the squad.';
-				return;
+			return null;
+		}
+
+		function aiMovePlayer(player, dt) {
+			const ball = state.ball;
+			let targetX = player.baseHomeX;
+			let targetY = player.baseHomeY;
+
+			const primaryBlue = getNearestChaser('blue');
+			const primaryRed = getNearestChaser('red');
+			const supportBlue = getSupportChaser('blue', primaryBlue);
+			const supportRed = getSupportChaser('red', primaryRed);
+			const interceptRadius = player.team === 'blue' ? getBlueInterceptRadius() : BASE_INTERCEPT_RADIUS;
+			const chaseRadius = player.team === 'blue' ? getBlueChaseRadius() : BASE_CHASE_RADIUS;
+
+			if (restartType) {
+				if (restartType === 'corner' && restartTeam === 'blue') {
+					return;
+				}
+
+				if (restartTeam === player.team) {
+					if (restartType === 'corner') {
+						if (player.isGoalie) {
+							targetX = player.team === 'blue' ? 86 : 1034;
+							targetY = 315;
+						} else if (player.position === 'wing') {
+							targetX = restartSpot.x + (player.team === 'blue' ? 70 : -70);
+							targetY = clamp(restartSpot.y + (player.baseHomeY < FIELD_H / 2 ? 70 : -70), 85, FIELD_H - 85);
+						} else if (player.position === 'forward') {
+							targetX = player.team === 'blue' ? FIELD_W - 200 : 200;
+							targetY = clamp(player.baseHomeY, 150, FIELD_H - 150);
+						} else {
+							targetX = player.baseHomeX + (player.team === 'blue' ? 45 : -45);
+							targetY = player.baseHomeY;
+						}
+					}
+				} else {
+					targetX = player.baseHomeX;
+					targetY = player.baseHomeY;
+				}
+			} else if (player.isGoalie) {
+				targetX = player.team === 'blue' ? 86 : 1034;
+				targetY = clamp(ball.y, 240, 390);
+
+				const goalieThreat = player.team === 'blue' ? ball.x < 180 : ball.x > 940;
+				if (goalieThreat) {
+					targetX = player.team === 'blue' ? 58 : 1062;
+					targetY = clamp(ball.y, 220, 410);
+				}
+			} else {
+				const roleHome = getRoleHomeShift(player, ball);
+				targetX = roleHome.x;
+				targetY = roleHome.y;
+
+				const primary = player.team === 'blue' ? primaryBlue : primaryRed;
+				const support = player.team === 'blue' ? supportBlue : supportRed;
+				const ballDist = distance(player, ball);
+
+				if (player === primary && ballDist <= interceptRadius) {
+					targetX = ball.x + (player.team === 'blue' ? -4 : 4);
+					targetY = ball.y;
+				} else if (player === support && ballDist <= interceptRadius) {
+					targetX = ball.x + (player.team === 'blue' ? -28 : 28);
+					targetY = ball.y + (player.baseHomeY < FIELD_H / 2 ? -26 : 26);
+				} else if (ballDist <= chaseRadius && player.position !== 'defender') {
+					targetX = ball.x + (player.team === 'blue' ? -18 : 18);
+					targetY = ball.y;
+				}
 			}
-			if (type === 'stadium') {
-				const cost = 12 + (team.stadiumLevel * 8);
-				if (team.coins < cost) return;
-				team.coins -= cost;
-				team.stadiumLevel += 1;
-				team.sponsor += 2;
-				statusText.textContent = 'Stadium upgraded. Better home income.';
-				return;
+
+			const dx = targetX - player.x;
+			const dy = targetY - player.y;
+			const dist = Math.sqrt(dx * dx + dy * dy);
+
+			if (dist > 1) {
+				player.vx = (dx / dist) * player.speed;
+				player.vy = (dy / dist) * player.speed;
+			} else {
+				player.vx *= 0.7;
+				player.vy *= 0.7;
+			}
+
+			player.x += player.vx * dt;
+			player.y += player.vy * dt;
+		}
+
+		function keepPlayersInBounds() {
+			state.players.forEach(function (player) {
+				player.x = clamp(player.x, PLAYER_RADIUS, FIELD_W - PLAYER_RADIUS);
+				player.y = clamp(player.y, PLAYER_RADIUS, FIELD_H - PLAYER_RADIUS);
+			});
+		}
+
+		function separatePlayers() {
+			for (let i = 0; i < state.players.length; i++) {
+				for (let j = i + 1; j < state.players.length; j++) {
+					const a = state.players[i];
+					const b = state.players[j];
+					const dx = b.x - a.x;
+					const dy = b.y - a.y;
+					const dist = Math.sqrt(dx * dx + dy * dy) || 0.01;
+					const minDist = 24;
+
+					if (dist < minDist) {
+						const overlap = (minDist - dist) / 2;
+						const nx = dx / dist;
+						const ny = dy / dist;
+						a.x -= nx * overlap;
+						a.y -= ny * overlap;
+						b.x += nx * overlap;
+						b.y += ny * overlap;
+					}
+				}
 			}
 		}
 
-		function healAll() {
-			const cost = 8;
-			if (team.coins < cost) {
+		function getBallOwner() {
+			if (state.ball.kick_lock_timer > 0 || decisionMode) {
+				return null;
+			}
+
+			let owner = null;
+			let bestDist = Infinity;
+
+			state.players.forEach(function (player) {
+				const d = distance(player, state.ball);
+				if (d < bestDist) {
+					bestDist = d;
+					owner = player;
+				}
+			});
+
+			const controlDistance = 22 - Math.min(4, smartLevel);
+			if (bestDist <= controlDistance) {
+				return owner;
+			}
+
+			return null;
+		}
+
+		function maybeAiPassOrShoot(player) {
+			if (restartType) {
+				if (restartType === 'corner' && restartTeam === 'blue') {
+					return;
+				}
+				if (player.team === restartTeam && distance(player, state.ball) < 24) {
+					handleRestartKick(player.team);
+				}
 				return;
 			}
-			team.coins -= cost;
-			team.squad.forEach(function (player) {
-				player.energy = clamp(player.energy + 18, 35, 99);
-				player.injured = false;
-				player.suspended = false;
-			});
-			statusText.textContent = 'Medical staff refreshed the squad.';
-			renderAll();
-		}
 
-		function addYouthPlayer() {
-			const cost = 10 + (team.youthLevel * 3);
-			if (team.coins < cost) {
+			if (player.team === 'blue') {
+				startDecisionMode(player, 'normal');
 				return;
 			}
-			team.coins -= cost;
-			team.youthLevel += 1;
-			const positions = ['D', 'M', 'F'];
-			const player = makePlayer('Youth Prospect ' + String(team.youthLevel), pick(positions), randInt(56, 70 + team.youthLevel), randInt(8, 18));
-			team.squad.push(player);
-			statusText.textContent = player.name + ' joined from the academy.';
-			renderAll();
+
+			const towardLeft = player.team === 'red';
+			const closeToGoal = towardLeft ? state.ball.x < 210 : state.ball.x > FIELD_W - 210;
+
+			if (closeToGoal || (player.position === 'forward' && Math.random() > 0.55)) {
+				kickBallToward(towardLeft ? -24 : FIELD_W + 24, FIELD_H / 2 + (Math.random() * 130 - 65), getRedShotPower());
+				state.ball.kick_lock_timer = 0.22;
+				state.ball.kick_ignore_player = player;
+				return;
+			}
+
+			const best = findBestPassTarget(player);
+
+			if (best) {
+				kickBallToward(best.x, best.y, getRedPassPower());
+			} else {
+				kickBallToward(towardLeft ? 120 : FIELD_W - 120, FIELD_H / 2, getRedPassPower() + 10);
+			}
+
+			state.ball.kick_lock_timer = 0.22;
+			state.ball.kick_ignore_player = player;
 		}
 
-		function renderAll() {
-			updateInputsFromTeam();
-			renderTopPanels();
-			renderFormation();
-			renderLeagueTable();
-			renderCommentary(lastStats ? [quickSummary.textContent].concat(Array.from(commentaryLog.children).map(function (n) { return n.textContent; }).slice(0, 8)) : ['No match simulated yet.']);
-			renderResults();
-			renderMarket();
-			renderSquad();
-			renderFinance();
-			buyScoutBtn.textContent = 'Scout Upgrade (' + (8 + team.scoutLevel * 6) + ' coins)';
-			buyTrainingBtn.textContent = 'Training Upgrade (' + (10 + team.trainingLevel * 7) + ' coins)';
-			buyStadiumBtn.textContent = 'Stadium Upgrade (' + (12 + team.stadiumLevel * 8) + ' coins)';
-			healAllBtn.textContent = 'Recover Squad (8 coins)';
-			youthBtn.textContent = 'Youth Academy (' + (10 + team.youthLevel * 3) + ' coins)';
+		function pushBallFromPlayers() {
+			state.players.forEach(function (player) {
+				if (state.ball.kick_lock_timer > 0 && player === state.ball.kick_ignore_player) {
+					return;
+				}
+
+				const dx = state.ball.x - player.x;
+				const dy = state.ball.y - player.y;
+				const dist = Math.sqrt(dx * dx + dy * dy);
+				const minDist = PLAYER_RADIUS + BALL_R;
+
+				if (dist > 0 && dist < minDist) {
+					const nx = dx / dist;
+					const ny = dy / dist;
+					const overlap = minDist - dist;
+
+					state.ball.x += nx * overlap;
+					state.ball.y += ny * overlap;
+
+					let touchPower = 36;
+					if (player.team === 'blue') {
+						touchPower = getDefenseTouchPower();
+					}
+
+					state.ball.vx += nx * touchPower;
+					state.ball.vy += ny * touchPower;
+
+					if (player.team === 'blue') {
+						state.ball.vx += 3 + defenseLevel;
+					} else {
+						state.ball.vx -= 3;
+					}
+				}
+			});
 		}
 
-		formationButtons.forEach(function (button) {
-			button.addEventListener('click', function () {
-				team.formation = button.getAttribute('data-formation');
-				renderAll();
+		function setupCorner(team, side, vertical) {
+			restartType = 'corner';
+			restartTeam = team;
+			const x = side === 'left' ? 20 : FIELD_W - 20;
+			const y = vertical === 'top' ? 20 : FIELD_H - 20;
+			restartSpot = { x: x, y: y };
+			state.ball.x = x;
+			state.ball.y = y;
+			state.ball.vx = 0;
+			state.ball.vy = 0;
+			state.ball.kick_lock_timer = 0;
+			state.ball.kick_ignore_player = null;
+
+			if (team === 'blue') {
+				const kicker = getCornerKicker('blue');
+				if (kicker) {
+					startDecisionMode(kicker, 'corner');
+				}
+				setMessage('Blue korner');
+			} else {
+				setMessage('Red korner');
+			}
+		}
+
+		function handleRestartKick(team) {
+			if (!restartType || !restartSpot) {
+				return;
+			}
+
+			if (restartType === 'corner') {
+				const targetX = team === 'blue' ? FIELD_W - 220 : 220;
+				const targetY = FIELD_H / 2 + (Math.random() * 140 - 70);
+				const power = team === 'blue' ? getDecisionCornerPower() : 230;
+				kickBallToward(targetX, targetY, power);
+				state.ball.kick_lock_timer = team === 'blue' ? getKickLockTime() : 0.22;
+				state.ball.kick_ignore_player = null;
+				setMessage((team === 'blue' ? 'Blue' : 'Red') + ' korner kick');
+			}
+
+			restartType = null;
+			restartTeam = null;
+			restartSpot = null;
+		}
+
+		function updateBall(dt) {
+			if (state.ball.kick_lock_timer > 0) {
+				state.ball.kick_lock_timer -= dt;
+				if (state.ball.kick_lock_timer <= 0) {
+					state.ball.kick_lock_timer = 0;
+					state.ball.kick_ignore_player = null;
+				}
+			}
+
+			state.ball.x += state.ball.vx * dt;
+			state.ball.y += state.ball.vy * dt;
+
+			state.ball.vx *= 0.988;
+			state.ball.vy *= 0.988;
+
+			if (state.ball.y <= BALL_R && state.ball.x > 0 && state.ball.x < FIELD_W) {
+				state.ball.y = BALL_R;
+				state.ball.vy *= -0.84;
+			}
+			if (state.ball.y >= FIELD_H - BALL_R && state.ball.x > 0 && state.ball.x < FIELD_W) {
+				state.ball.y = FIELD_H - BALL_R;
+				state.ball.vy *= -0.84;
+			}
+
+			const inGoalOpening = state.ball.y >= GOAL_TOP && state.ball.y <= GOAL_BOTTOM;
+
+			if (!inGoalOpening) {
+				if (state.ball.x <= BALL_R && state.ball.y > 28 && state.ball.y < FIELD_H - 28) {
+					state.ball.x = BALL_R;
+					state.ball.vx *= -0.84;
+				}
+				if (state.ball.x >= FIELD_W - BALL_R && state.ball.y > 28 && state.ball.y < FIELD_H - 28) {
+					state.ball.x = FIELD_W - BALL_R;
+					state.ball.vx *= -0.84;
+				}
+			}
+
+			if (state.ball.x < -16 && inGoalOpening) {
+				aiScore += 1;
+				updateHud();
+				setMessage('Red scored');
+				resetPositions();
+				return;
+			}
+
+			if (state.ball.x > FIELD_W + 16 && inGoalOpening) {
+				userScore += 1;
+				updateHud();
+				setMessage('Blue scored');
+				resetPositions();
+				return;
+			}
+
+			if (!inGoalOpening) {
+				if (state.ball.x < 0 && state.ball.y < 55) {
+					setupCorner('red', 'left', 'top');
+					return;
+				}
+				if (state.ball.x < 0 && state.ball.y > FIELD_H - 55) {
+					setupCorner('red', 'left', 'bottom');
+					return;
+				}
+				if (state.ball.x > FIELD_W && state.ball.y < 55) {
+					setupCorner('blue', 'right', 'top');
+					return;
+				}
+				if (state.ball.x > FIELD_W && state.ball.y > FIELD_H - 55) {
+					setupCorner('blue', 'right', 'bottom');
+					return;
+				}
+			}
+		}
+
+		function updatePlayers(dt) {
+			state.players.forEach(function (player) {
+				aiMovePlayer(player, dt);
 			});
+
+			separatePlayers();
+			keepPlayersInBounds();
+		}
+
+		function loop(ts) {
+			if (!running || decisionMode) {
+				return;
+			}
+
+			if (!lastTime) {
+				lastTime = ts;
+			}
+
+			let dt = (ts - lastTime) / 1000;
+			lastTime = ts;
+
+			if (dt > 0.03) {
+				dt = 0.03;
+			}
+
+			remaining -= dt;
+			if (remaining <= 0) {
+				remaining = 0;
+				running = false;
+				updateHud();
+				render();
+
+				if (userScore > aiScore) {
+					coins += 10;
+					updateHud();
+					setMessage('Blue wins. +10 coins');
+				} else if (userScore < aiScore) {
+					coins += 4;
+					updateHud();
+					setMessage('Red wins. +4 coins');
+				} else {
+					coins += 6;
+					updateHud();
+					setMessage('Draw match. +6 coins');
+				}
+				return;
+			}
+
+			updatePlayers(dt);
+			pushBallFromPlayers();
+			updateBall(dt);
+
+			const owner = getBallOwner();
+			if (owner && !decisionMode) {
+				maybeAiPassOrShoot(owner);
+			}
+
+			updateHud();
+			render();
+
+			if (running && !decisionMode) {
+				animationId = requestAnimationFrame(loop);
+			}
+		}
+
+		function startMatch() {
+			if (running || decisionMode) {
+				return;
+			}
+			if (!started) {
+				userScore = 0;
+				aiScore = 0;
+				remaining = MATCH_TIME;
+				resetPositions();
+				started = true;
+			}
+			applyBlueUpgrades();
+			running = true;
+			lastTime = 0;
+			setMessage('Match in progress');
+			updateHud();
+			field.focus();
+			animationId = requestAnimationFrame(loop);
+		}
+
+		function fieldPointFromEvent(event) {
+			const rect = field.getBoundingClientRect();
+			const clientX = typeof event.clientX === 'number' ? event.clientX : (event.touches && event.touches[0] ? event.touches[0].clientX : rect.left);
+			const clientY = typeof event.clientY === 'number' ? event.clientY : (event.touches && event.touches[0] ? event.touches[0].clientY : rect.top);
+			return {
+				x: clamp(((clientX - rect.left) / rect.width) * FIELD_W, 0, FIELD_W),
+				y: clamp(((clientY - rect.top) / rect.height) * FIELD_H, 0, FIELD_H)
+			};
+		}
+
+		field.addEventListener('mousemove', function (e) {
+			if (!decisionMode) {
+				return;
+			}
+			decisionTarget = fieldPointFromEvent(e);
+			render();
 		});
 
-		mentalityButtons.forEach(function (button) {
-			button.addEventListener('click', function () {
-				team.mentality = button.getAttribute('data-mentality');
-				renderAll();
-			});
+		field.addEventListener('touchmove', function (e) {
+			if (!decisionMode) {
+				return;
+			}
+			e.preventDefault();
+			decisionTarget = fieldPointFromEvent(e);
+			render();
+		}, { passive: false });
+
+		field.addEventListener('mousedown', function (e) {
+			if (!decisionMode) {
+				return;
+			}
+			e.preventDefault();
+			const point = fieldPointFromEvent(e);
+			endDecisionModeAndKick(point.x, point.y);
 		});
 
-		styleButtons.forEach(function (button) {
-			button.addEventListener('click', function () {
-				team.style = button.getAttribute('data-style');
-				renderAll();
-			});
+		field.addEventListener('touchstart', function (e) {
+			if (!decisionMode) {
+				return;
+			}
+			e.preventDefault();
+			const point = fieldPointFromEvent(e);
+			endDecisionModeAndKick(point.x, point.y);
+		}, { passive: false });
+
+		startBtn.addEventListener('click', function () {
+			startMatch();
 		});
 
-		widthButtons.forEach(function (button) {
-			button.addEventListener('click', function () {
-				team.width = button.getAttribute('data-width');
-				renderAll();
-			});
+		restartBtn.addEventListener('click', function () {
+			resetMatch();
+			field.focus();
 		});
 
-		pressButtons.forEach(function (button) {
-			button.addEventListener('click', function () {
-				team.press = button.getAttribute('data-press');
-				renderAll();
-			});
+		buySpeedBtn.addEventListener('click', function () {
+			const cost = getSpeedUpgradeCost();
+			if (coins < cost) {
+				return;
+			}
+			coins -= cost;
+			speedLevel += 1;
+			applyBlueUpgrades();
+			updateHud();
+			setMessage('Blue speed upgraded');
 		});
 
-		markingButtons.forEach(function (button) {
-			button.addEventListener('click', function () {
-				team.marking = button.getAttribute('data-marking');
-				renderAll();
-			});
+		buySmartBtn.addEventListener('click', function () {
+			const cost = getSmartUpgradeCost();
+			if (coins < cost) {
+				return;
+			}
+			coins -= cost;
+			smartLevel += 1;
+			updateHud();
+			setMessage('Blue smart upgraded');
 		});
 
-		[attackInput, midfieldInput, defenseInput, energyInput].forEach(function (input) {
-			input.addEventListener('input', function () {
-				syncTeamFromInputs();
-				renderTopPanels();
-			});
+		buyShootingBtn.addEventListener('click', function () {
+			const cost = getShootingUpgradeCost();
+			if (coins < cost) {
+				return;
+			}
+			coins -= cost;
+			shootingLevel += 1;
+			updateHud();
+			setMessage('Blue shooting upgraded');
 		});
 
-		simulateBtn.addEventListener('click', function () {
-			simulateMatch();
+		buyPassingBtn.addEventListener('click', function () {
+			const cost = getPassingUpgradeCost();
+			if (coins < cost) {
+				return;
+			}
+			coins -= cost;
+			passingLevel += 1;
+			updateHud();
+			setMessage('Blue passing upgraded');
 		});
 
-		nextMatchBtn.addEventListener('click', function () {
-			nextWeek();
+		buyDefenseBtn.addEventListener('click', function () {
+			const cost = getDefenseUpgradeCost();
+			if (coins < cost) {
+				return;
+			}
+			coins -= cost;
+			defenseLevel += 1;
+			updateHud();
+			setMessage('Blue defense upgraded');
 		});
 
-		resetSeasonBtn.addEventListener('click', function () {
-			resetSeason();
-		});
-
-		buyScoutBtn.addEventListener('click', function () {
-			buyUpgrade('scout');
-			renderAll();
-		});
-
-		buyTrainingBtn.addEventListener('click', function () {
-			buyUpgrade('training');
-			renderAll();
-		});
-
-		buyStadiumBtn.addEventListener('click', function () {
-			buyUpgrade('stadium');
-			renderAll();
-		});
-
-		healAllBtn.addEventListener('click', function () {
-			healAll();
-		});
-
-		youthBtn.addEventListener('click', function () {
-			addYouthPlayer();
-		});
-
-		initState();
-		updateInputsFromTeam();
-		quickSummary.textContent = 'No match played yet.';
-		statPossession.textContent = '-';
-		statShots.textContent = '-';
-		statOnTarget.textContent = '-';
-		statCorners.textContent = '-';
-		statCards.textContent = '-';
-		statFouls.textContent = '-';
-		statMomentum.textContent = '-';
-		statClean.textContent = '-';
-		commentaryLog.innerHTML = '<div class="zo-mm-line">No match simulated yet.</div>';
-		renderAll();
+		buildEntities();
+		applyBlueUpgrades();
+		resetMatch();
 	});
 });
 JS;
 
-if (!function_exists('zo_game_mini_manager_pro_render')) {
-	function zo_game_mini_manager_pro_render($post_id = 0, $module = array()) {
-		$instance_id = 'zo-mini-manager-pro-' . ($post_id ? absint($post_id) : wp_rand(1000, 999999));
+if (!function_exists('zo_game_soccer_match_ai_render')) {
+	function zo_game_soccer_match_ai_render($post_id = 0, $module = array()) {
+		$instance_id = 'zo-soccer-match-ai-' . ($post_id ? absint($post_id) : wp_rand(1000, 999999));
 
 		ob_start();
 		?>
-		<div class="zo-game-root zo-game-root--mini-manager-pro" id="<?php echo esc_attr($instance_id); ?>">
-			<div class="zo-mm-wrap">
-				<div class="zo-mm-topbar">
-					<div class="zo-mm-panel"><strong class="zo-mm-score-blue">0</strong><span>Your Goals</span></div>
-					<div class="zo-mm-panel"><strong class="zo-mm-score-red">0</strong><span>Enemy Goals</span></div>
-					<div class="zo-mm-panel"><strong class="zo-mm-wins">0</strong><span>Wins</span></div>
-					<div class="zo-mm-panel"><strong class="zo-mm-coins">0</strong><span>Coins</span></div>
-					<div class="zo-mm-panel"><strong class="zo-mm-rating">60</strong><span>Team Rating</span></div>
-					<div class="zo-mm-panel"><strong class="zo-mm-budget">$60m</strong><span>Budget</span></div>
-					<div class="zo-mm-panel"><strong class="zo-mm-reputation">1</strong><span>Reputation</span></div>
+		<div class="zo-game-root zo-game-root--soccer-match-ai" id="<?php echo esc_attr($instance_id); ?>">
+			<div class="zo-soccer-wrap">
+				<div class="zo-soccer-topbar">
+					<div class="zo-soccer-panel">
+						<strong class="zo-score-user">0</strong>
+						<span>Blue Team</span>
+					</div>
+					<div class="zo-soccer-panel">
+						<strong class="zo-score-ai">0</strong>
+						<span>Red Team</span>
+					</div>
+					<div class="zo-soccer-panel">
+						<strong class="zo-status-timer">5:00</strong>
+						<span>Match Time</span>
+					</div>
+					<div class="zo-soccer-panel">
+						<strong class="zo-status-coins">0</strong>
+						<span>Coins</span>
+					</div>
+					<div class="zo-soccer-panel">
+						<strong class="zo-status-speed-level">0</strong>
+						<span>Speed</span>
+					</div>
+					<div class="zo-soccer-panel">
+						<strong class="zo-status-smart-level">0</strong>
+						<span>Smartness</span>
+					</div>
+					<div class="zo-soccer-panel">
+						<strong class="zo-status-shooting-level">0</strong>
+						<span>Shooting</span>
+					</div>
+					<div class="zo-soccer-panel">
+						<strong class="zo-status-passing-level">0</strong>
+						<span>Passing</span>
+					</div>
+					<div class="zo-soccer-panel">
+						<strong class="zo-status-defense-level">0</strong>
+						<span>Defense</span>
+					</div>
+					<div class="zo-soccer-panel">
+						<strong class="zo-status-mode">Stopped</strong>
+						<span>Game Mode</span>
+					</div>
+					<div class="zo-soccer-panel">
+						<strong class="zo-status-message">Press Start Match</strong>
+						<span>Status</span>
+					</div>
 				</div>
 
-				<div class="zo-mm-subbar">
-					<div class="zo-mm-panel"><strong class="zo-mm-week">1/14</strong><span>Week</span></div>
-					<div class="zo-mm-panel"><strong class="zo-mm-division">Div 1</strong><span>League</span></div>
-					<div class="zo-mm-panel"><strong class="zo-mm-season-points">0</strong><span>Season Points</span></div>
-					<div class="zo-mm-panel"><strong class="zo-mm-sponsor">$10m</strong><span>Sponsor</span></div>
-					<div class="zo-mm-panel"><strong class="zo-mm-homeaway">Home</strong><span>Match Type</span></div>
-					<div class="zo-mm-panel"><strong class="zo-mm-weather">Clear</strong><span>Weather</span></div>
+				<div class="zo-soccer-field" tabindex="0" aria-label="Soccer field game area">
+					<div class="zo-soccer-line-mid"></div>
+					<div class="zo-soccer-circle"></div>
+					<div class="zo-soccer-dot"></div>
+					<div class="zo-soccer-box-left"></div>
+					<div class="zo-soccer-box-right"></div>
+					<div class="zo-soccer-smallbox-left"></div>
+					<div class="zo-soccer-smallbox-right"></div>
+					<div class="zo-soccer-goal-left"></div>
+					<div class="zo-soccer-goal-right"></div>
+					<div class="zo-soccer-corner-arc zo-soccer-corner-arc--tl"></div>
+					<div class="zo-soccer-corner-arc zo-soccer-corner-arc--tr"></div>
+					<div class="zo-soccer-corner-arc zo-soccer-corner-arc--bl"></div>
+					<div class="zo-soccer-corner-arc zo-soccer-corner-arc--br"></div>
+					<div class="zo-soccer-target"></div>
+					<div class="zo-soccer-pass-line"></div>
 				</div>
 
-				<div class="zo-mm-layout">
-					<div class="zo-mm-left">
-						<div class="zo-mm-grid-2">
-							<div class="zo-mm-card">
-								<h3>Formation</h3>
-								<div class="zo-mm-pill-row">
-									<button type="button" class="zo-mm-pill zo-mm-formation is-active" data-formation="4-4-2">4-4-2</button>
-									<button type="button" class="zo-mm-pill zo-mm-formation" data-formation="4-3-3">4-3-3</button>
-									<button type="button" class="zo-mm-pill zo-mm-formation" data-formation="5-3-2">5-3-2</button>
-								</div>
-								<div class="zo-mm-note">Choose your shape for the season and each match.</div>
-							</div>
+				<div class="zo-soccer-controls">
+					<div class="zo-soccer-buttons">
+						<button type="button" class="zo-soccer-btn zo-soccer-start">Start Match</button>
+						<button type="button" class="zo-soccer-btn zo-soccer-restart">Restart</button>
+						<button type="button" class="zo-soccer-btn zo-buy-speed">Speed (6)</button>
+						<button type="button" class="zo-soccer-btn zo-buy-smart">Smart (8)</button>
+						<button type="button" class="zo-soccer-btn zo-buy-shooting">Shooting (10)</button>
+						<button type="button" class="zo-soccer-btn zo-buy-passing">Passing (9)</button>
+						<button type="button" class="zo-soccer-btn zo-buy-defense">Defense (7)</button>
+					</div>
 
-							<div class="zo-mm-card">
-								<h3>Mentality</h3>
-								<div class="zo-mm-pill-row">
-									<button type="button" class="zo-mm-pill zo-mm-mentality is-active" data-mentality="balanced">Balanced</button>
-									<button type="button" class="zo-mm-pill zo-mm-mentality" data-mentality="attacking">Attacking</button>
-									<button type="button" class="zo-mm-pill zo-mm-mentality" data-mentality="defensive">Defensive</button>
-								</div>
-							</div>
-						</div>
+					<div class="zo-soccer-help">
+						You can now use blue corner kicks and also shoot directly at goal. When decision mode opens, click inside the right goal mouth to shoot. When a blue corner happens, click where the corner kick should go, including directly at goal.
+					</div>
 
-						<div class="zo-mm-grid-2">
-							<div class="zo-mm-card">
-								<h3>Style</h3>
-								<div class="zo-mm-pill-row">
-									<button type="button" class="zo-mm-pill zo-mm-style is-active" data-style="short">Short Pass</button>
-									<button type="button" class="zo-mm-pill zo-mm-style" data-style="long">Long Ball</button>
-									<button type="button" class="zo-mm-pill zo-mm-style" data-style="counter">Counter</button>
-								</div>
+					<div class="zo-soccer-upgrades">
+						<div class="zo-soccer-upgrades-title">Team Upgrades</div>
+						<div class="zo-soccer-upgrades-grid">
+							<div class="zo-soccer-upgrade-card">
+								<strong>Speed</strong>
+								<span>Blue players run faster.</span>
 							</div>
-
-							<div class="zo-mm-card">
-								<h3>Width</h3>
-								<div class="zo-mm-pill-row">
-									<button type="button" class="zo-mm-pill zo-mm-width is-active" data-width="balanced">Balanced</button>
-									<button type="button" class="zo-mm-pill zo-mm-width" data-width="wide">Wide</button>
-									<button type="button" class="zo-mm-pill zo-mm-width" data-width="narrow">Narrow</button>
-								</div>
+							<div class="zo-soccer-upgrade-card">
+								<strong>Smartness</strong>
+								<span>Better spacing and support.</span>
 							</div>
-						</div>
-
-						<div class="zo-mm-grid-2">
-							<div class="zo-mm-card">
-								<h3>Press</h3>
-								<div class="zo-mm-pill-row">
-									<button type="button" class="zo-mm-pill zo-mm-press" data-press="low">Low</button>
-									<button type="button" class="zo-mm-pill zo-mm-press is-active" data-press="medium">Medium</button>
-									<button type="button" class="zo-mm-pill zo-mm-press" data-press="high">High</button>
-								</div>
+							<div class="zo-soccer-upgrade-card">
+								<strong>Shooting</strong>
+								<span>Stronger shots toward goal.</span>
 							</div>
-
-							<div class="zo-mm-card">
-								<h3>Marking</h3>
-								<div class="zo-mm-pill-row">
-									<button type="button" class="zo-mm-pill zo-mm-marking is-active" data-marking="zonal">Zonal</button>
-									<button type="button" class="zo-mm-pill zo-mm-marking" data-marking="man">Man</button>
-								</div>
+							<div class="zo-soccer-upgrade-card">
+								<strong>Passing</strong>
+								<span>Better passes and stronger corners.</span>
 							</div>
-						</div>
-
-						<div class="zo-mm-card">
-							<h3>Tactics Sliders</h3>
-							<div class="zo-mm-row">
-								<label for="<?php echo esc_attr($instance_id); ?>-attack">Attack</label>
-								<input id="<?php echo esc_attr($instance_id); ?>-attack" class="zo-mm-attack" type="range" min="30" max="99" value="60">
-								<div class="zo-mm-value zo-mm-attack-value">60</div>
-							</div>
-							<div class="zo-mm-row">
-								<label for="<?php echo esc_attr($instance_id); ?>-midfield">Midfield</label>
-								<input id="<?php echo esc_attr($instance_id); ?>-midfield" class="zo-mm-midfield" type="range" min="30" max="99" value="60">
-								<div class="zo-mm-value zo-mm-midfield-value">60</div>
-							</div>
-							<div class="zo-mm-row">
-								<label for="<?php echo esc_attr($instance_id); ?>-defense">Defense</label>
-								<input id="<?php echo esc_attr($instance_id); ?>-defense" class="zo-mm-defense" type="range" min="30" max="99" value="60">
-								<div class="zo-mm-value zo-mm-defense-value">60</div>
-							</div>
-							<div class="zo-mm-row">
-								<label for="<?php echo esc_attr($instance_id); ?>-energy">Energy</label>
-								<input id="<?php echo esc_attr($instance_id); ?>-energy" class="zo-mm-energy" type="range" min="30" max="99" value="60">
-								<div class="zo-mm-value zo-mm-energy-value">60</div>
-							</div>
-						</div>
-
-						<div class="zo-mm-field-wrap">
-							<div class="zo-mm-field">
-								<div class="zo-mm-line-mid"></div>
-								<div class="zo-mm-circle"></div>
-								<div class="zo-mm-dot"></div>
-								<div class="zo-mm-box-left"></div>
-								<div class="zo-mm-box-right"></div>
-								<div class="zo-mm-goal-left"></div>
-								<div class="zo-mm-goal-right"></div>
+							<div class="zo-soccer-upgrade-card">
+								<strong>Defense</strong>
+								<span>Better closing down and clearances.</span>
 							</div>
 						</div>
 					</div>
 
-					<div class="zo-mm-right">
-						<div class="zo-mm-status">
-							<h3>Match Status</h3>
-							<div class="zo-mm-status-text">Set your tactics and simulate a match.</div>
-							<div class="zo-mm-note zo-mm-quick-summary">No match played yet.</div>
-						</div>
-
-						<div class="zo-mm-action-row">
-							<button type="button" class="zo-mm-btn zo-mm-simulate">Simulate Match</button>
-							<button type="button" class="zo-mm-btn zo-mm-next-match">Next Week</button>
-							<button type="button" class="zo-mm-btn zo-mm-reset-season">New Season</button>
-						</div>
-
-						<div class="zo-mm-finance">
-							<h3>Staff and Club Upgrades</h3>
-							<div class="zo-mm-market-actions">
-								<button type="button" class="zo-mm-btn zo-mm-buy-scout">Scout Upgrade</button>
-								<button type="button" class="zo-mm-btn zo-mm-buy-training">Training Upgrade</button>
-								<button type="button" class="zo-mm-btn zo-mm-buy-stadium">Stadium Upgrade</button>
-								<button type="button" class="zo-mm-btn zo-mm-heal-all">Recover Squad</button>
-								<button type="button" class="zo-mm-btn zo-mm-youth">Youth Academy</button>
-							</div>
-							<div class="zo-mm-scroll">
-								<table class="zo-mm-tables">
-									<thead>
-										<tr><th>Type</th><th>Amount</th><th>Note</th></tr>
-									</thead>
-									<tbody class="zo-mm-finance-body"></tbody>
-								</table>
-							</div>
-						</div>
-
-						<div class="zo-mm-status">
-							<h3>Match Stats</h3>
-							<div class="zo-mm-kpi-grid">
-								<div class="zo-mm-kpi"><strong class="zo-mm-stat-possession">-</strong><span>Possession</span></div>
-								<div class="zo-mm-kpi"><strong class="zo-mm-stat-shots">-</strong><span>Shots</span></div>
-								<div class="zo-mm-kpi"><strong class="zo-mm-stat-ontarget">-</strong><span>On Target</span></div>
-								<div class="zo-mm-kpi"><strong class="zo-mm-stat-corners">-</strong><span>Corners</span></div>
-								<div class="zo-mm-kpi"><strong class="zo-mm-stat-cards">-</strong><span>Cards</span></div>
-								<div class="zo-mm-kpi"><strong class="zo-mm-stat-fouls">-</strong><span>Fouls</span></div>
-								<div class="zo-mm-kpi"><strong class="zo-mm-stat-momentum">-</strong><span>Momentum</span></div>
-								<div class="zo-mm-kpi"><strong class="zo-mm-stat-clean">-</strong><span>Clean Sheet</span></div>
-							</div>
-						</div>
+					<div class="zo-soccer-decision">
+						<div class="zo-soccer-decision-text">Click or tap where to kick. Click inside the goal to shoot.</div>
 					</div>
-				</div>
-
-				<div class="zo-mm-grid-2">
-					<div class="zo-mm-table-card">
-						<h3>League Table</h3>
-						<div class="zo-mm-scroll">
-							<table class="zo-mm-tables">
-								<thead>
-									<tr><th>#</th><th>Club</th><th>Pts</th><th>W</th><th>D</th><th>L</th><th>GF</th><th>GA</th></tr>
-								</thead>
-								<tbody class="zo-mm-league-body"></tbody>
-							</table>
-						</div>
-					</div>
-
-					<div class="zo-mm-results">
-						<h3>Recent Results</h3>
-						<div class="zo-mm-results-log"></div>
-					</div>
-				</div>
-
-				<div class="zo-mm-grid-2">
-					<div class="zo-mm-market">
-						<h3>Transfer Market</h3>
-						<div class="zo-mm-scroll">
-							<div class="zo-mm-market-body"></div>
-						</div>
-					</div>
-
-					<div class="zo-mm-squad">
-						<h3>Your Squad</h3>
-						<div class="zo-mm-scroll">
-							<div class="zo-mm-squad-body"></div>
-						</div>
-					</div>
-				</div>
-
-				<div class="zo-mm-commentary">
-					<h3>Minute Commentary</h3>
-					<div class="zo-mm-commentary-log"></div>
-				</div>
-
-				<div class="zo-mm-help">
-					<h3>How to Play</h3>
-					You manage the club. Pick a formation. Set mentality, passing style, width, pressing, and marking. Adjust attack, midfield, defense, and energy. Buy players, sell players, choose a captain, grow your staff, handle injuries, and try to win the season table. This version includes a season mode, league table, transfer market, budget, wages, youth academy, weather, home and away effects, morale, suspensions, commentary, and progression.
 				</div>
 			</div>
 		</div>
@@ -1748,11 +1772,11 @@ if (!function_exists('zo_game_mini_manager_pro_render')) {
 }
 
 return array(
-	'slug'            => 'mini-manager',
-	'name'            => 'Mini Manager',
+	'slug'            => 'soccer-match-ai',
+	'name'            => 'Soccer Match AI',
 	'author'          => 'Asker',
-	'description'     => 'A bigger soccer manager game with seasons, transfers, league table, tactics, squad management, finances, and commentary.',
-	'render_callback' => 'zo_game_mini_manager_pro_render',
+	'description'     => 'A  5 minute soccer match where all players are AI, blue corner kicks work, and you can shoot directly at goal.',
+	'render_callback' => 'zo_game_soccer_match_ai_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,
 );
