@@ -252,6 +252,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			'amerika': 'usa',
 			'america': 'usa',
 			'usa': 'usa',
+			'america birlesik devletleri': 'usa',
+			'amerika birlesik devletleri': 'usa',
 			'america birleşik devletleri': 'usa',
 			'amerika birleşik devletleri': 'usa',
 			'brezilya': 'brazil',
@@ -700,9 +702,9 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 JS;
 
-if (!function_exists('zo_game_country_quiz_render')) {
-	function zo_game_country_quiz_render($post_id = 0, $module = array()) {
-		$instance_id = 'zo-country-quiz-' . ($post_id ? absint($post_id) : wp_rand(1000, 999999));
+if (!function_exists('zo_game_arslan_country_quiz_render')) {
+	function zo_game_arslan_country_quiz_render($post_id = 0, $module = array()) {
+		$instance_id = 'zo-arslan-country-quiz-' . ($post_id ? absint($post_id) : wp_rand(1000, 999999));
 
 		ob_start();
 		?>
@@ -744,11 +746,11 @@ if (!function_exists('zo_game_country_quiz_render')) {
 }
 
 return array(
-	'slug'            => 'country-quiz',
+	'slug'            => 'arslan-country-quiz',
 	'name'            => 'Country Quiz Coins',
 	'author'          => 'Arslan',
 	'description'     => 'Write a country name and answer 100 quiz questions to win or lose coins.',
-	'render_callback' => 'zo_game_country_quiz_render',
+	'render_callback' => 'zo_game_arslan_country_quiz_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,
 );
