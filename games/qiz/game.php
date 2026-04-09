@@ -73,156 +73,71 @@ document.addEventListener('DOMContentLoaded', function () {
 		const finishText = root.querySelector('.zo-u100-finish-text');
 
 		const countries = {
-			turkey: {
-				name: 'Turkey',
-				display: 'Türkiye',
-				aliases: ['turkey', 'türkiye', 'turkiye'],
-				capital: 'Ankara',
-				continent: 'Asia',
-				currency: 'Turkish lira',
-				language: 'Turkish',
-				flag: 'red',
-				famousFood: 'baklava',
-				landmark: 'Hagia Sophia',
-				city: 'Istanbul',
-				nationalAnimal: 'gray wolf',
-				sea: 'Black Sea'
-			},
-			usa: {
-				name: 'United States',
-				display: 'Amerika Birleşik Devletleri',
-				aliases: ['usa', 'united states', 'america', 'amerika', 'abd'],
-				capital: 'Washington, D.C.',
-				continent: 'North America',
-				currency: 'US dollar',
-				language: 'English',
-				flag: 'red, white, and blue',
-				famousFood: 'burger',
-				landmark: 'Statue of Liberty',
-				city: 'New York',
-				nationalAnimal: 'bald eagle',
-				sea: 'Atlantic Ocean'
-			},
-			germany: {
-				name: 'Germany',
-				display: 'Almanya',
-				aliases: ['germany', 'almanya', 'deutschland'],
-				capital: 'Berlin',
-				continent: 'Europe',
-				currency: 'euro',
-				language: 'German',
-				flag: 'black, red, and gold',
-				famousFood: 'pretzel',
-				landmark: 'Brandenburg Gate',
-				city: 'Munich',
-				nationalAnimal: 'eagle',
-				sea: 'North Sea'
-			},
-			france: {
-				name: 'France',
-				display: 'Fransa',
-				aliases: ['france', 'fransa'],
-				capital: 'Paris',
-				continent: 'Europe',
-				currency: 'euro',
-				language: 'French',
-				flag: 'blue, white, and red',
-				famousFood: 'croissant',
-				landmark: 'Eiffel Tower',
-				city: 'Lyon',
-				nationalAnimal: 'rooster',
-				sea: 'Atlantic Ocean'
-			},
-			japan: {
-				name: 'Japan',
-				display: 'Japonya',
-				aliases: ['japan', 'japonya', 'nippon'],
-				capital: 'Tokyo',
-				continent: 'Asia',
-				currency: 'yen',
-				language: 'Japanese',
-				flag: 'white with a red circle',
-				famousFood: 'sushi',
-				landmark: 'Mount Fuji',
-				city: 'Osaka',
-				nationalAnimal: 'green pheasant',
-				sea: 'Pacific Ocean'
-			},
-			brazil: {
-				name: 'Brazil',
-				display: 'Brezilya',
-				aliases: ['brazil', 'brezilya', 'brasil'],
-				capital: 'Brasilia',
-				continent: 'South America',
-				currency: 'real',
-				language: 'Portuguese',
-				flag: 'green, yellow, and blue',
-				famousFood: 'feijoada',
-				landmark: 'Christ the Redeemer',
-				city: 'Rio de Janeiro',
-				nationalAnimal: 'jaguar',
-				sea: 'Atlantic Ocean'
-			},
-			italy: {
-				name: 'Italy',
-				display: 'İtalya',
-				aliases: ['italy', 'italya', 'italia'],
-				capital: 'Rome',
-				continent: 'Europe',
-				currency: 'euro',
-				language: 'Italian',
-				flag: 'green, white, and red',
-				famousFood: 'pizza',
-				landmark: 'Colosseum',
-				city: 'Milan',
-				nationalAnimal: 'Italian wolf',
-				sea: 'Mediterranean Sea'
-			},
-			spain: {
-				name: 'Spain',
-				display: 'İspanya',
-				aliases: ['spain', 'ispanya', 'i̇spanya', 'españa', 'espana'],
-				capital: 'Madrid',
-				continent: 'Europe',
-				currency: 'euro',
-				language: 'Spanish',
-				flag: 'red and yellow',
-				famousFood: 'paella',
-				landmark: 'Sagrada Familia',
-				city: 'Barcelona',
-				nationalAnimal: 'bull',
-				sea: 'Mediterranean Sea'
-			},
-			uk: {
-				name: 'United Kingdom',
-				display: 'İngiltere / Birleşik Krallık',
-				aliases: ['uk', 'united kingdom', 'britain', 'england', 'ingiltere', 'birleşik krallık', 'birlesik krallik'],
-				capital: 'London',
-				continent: 'Europe',
-				currency: 'pound sterling',
-				language: 'English',
-				flag: 'Union Jack',
-				famousFood: 'fish and chips',
-				landmark: 'Big Ben',
-				city: 'Manchester',
-				nationalAnimal: 'lion',
-				sea: 'North Sea'
-			},
-			russia: {
-				name: 'Russia',
-				display: 'Rusya',
-				aliases: ['russia', 'rusya', 'rossiya'],
-				capital: 'Moscow',
-				continent: 'Europe and Asia',
-				currency: 'ruble',
-				language: 'Russian',
-				flag: 'white, blue, and red',
-				famousFood: 'borscht',
-				landmark: 'Saint Basil’s Cathedral',
-				city: 'Saint Petersburg',
-				nationalAnimal: 'brown bear',
-				sea: 'Arctic Ocean'
-			}
+			turkey:{name:'Turkey',display:'Türkiye',aliases:['turkey','türkiye','turkiye'],capital:'Ankara',continent:'Asia',currency:'Turkish lira',language:'Turkish'},
+			usa:{name:'United States',display:'Amerika Birleşik Devletleri',aliases:['usa','united states','america','amerika','abd'],capital:'Washington, D.C.',continent:'North America',currency:'US dollar',language:'English'},
+			germany:{name:'Germany',display:'Almanya',aliases:['germany','almanya','deutschland'],capital:'Berlin',continent:'Europe',currency:'euro',language:'German'},
+			france:{name:'France',display:'Fransa',aliases:['france','fransa'],capital:'Paris',continent:'Europe',currency:'euro',language:'French'},
+			japan:{name:'Japan',display:'Japonya',aliases:['japan','japonya','nippon'],capital:'Tokyo',continent:'Asia',currency:'yen',language:'Japanese'},
+			brazil:{name:'Brazil',display:'Brezilya',aliases:['brazil','brezilya','brasil'],capital:'Brasilia',continent:'South America',currency:'real',language:'Portuguese'},
+			italy:{name:'Italy',display:'İtalya',aliases:['italy','italya','italia'],capital:'Rome',continent:'Europe',currency:'euro',language:'Italian'},
+			spain:{name:'Spain',display:'İspanya',aliases:['spain','ispanya','i̇spanya','espana','españa'],capital:'Madrid',continent:'Europe',currency:'euro',language:'Spanish'},
+			uk:{name:'United Kingdom',display:'İngiltere / Birleşik Krallık',aliases:['uk','united kingdom','britain','england','ingiltere','birleşik krallık','birlesik krallik'],capital:'London',continent:'Europe',currency:'pound sterling',language:'English'},
+			russia:{name:'Russia',display:'Rusya',aliases:['russia','rusya','rossiya'],capital:'Moscow',continent:'Europe and Asia',currency:'ruble',language:'Russian'},
+
+			algeria:{name:'Algeria',display:'Cezayir',aliases:['algeria','cezayir'],capital:'Algiers',continent:'Africa',currency:'Algerian dinar',language:'Arabic'},
+			angola:{name:'Angola',display:'Angola',aliases:['angola'],capital:'Luanda',continent:'Africa',currency:'kwanza',language:'Portuguese'},
+			benin:{name:'Benin',display:'Benin',aliases:['benin'],capital:'Porto-Novo',continent:'Africa',currency:'West African CFA franc',language:'French'},
+			botswana:{name:'Botswana',display:'Botsvana',aliases:['botswana','botsvana'],capital:'Gaborone',continent:'Africa',currency:'pula',language:'English'},
+			burkinafaso:{name:'Burkina Faso',display:'Burkina Faso',aliases:['burkina faso'],capital:'Ouagadougou',continent:'Africa',currency:'West African CFA franc',language:'French'},
+			burundi:{name:'Burundi',display:'Burundi',aliases:['burundi'],capital:'Gitega',continent:'Africa',currency:'Burundian franc',language:'Kirundi'},
+			caboverde:{name:'Cabo Verde',display:'Cape Verde / Cabo Verde',aliases:['cabo verde','cape verde'],capital:'Praia',continent:'Africa',currency:'Cape Verdean escudo',language:'Portuguese'},
+			cameroon:{name:'Cameroon',display:'Kamerun',aliases:['cameroon','kamerun'],capital:'Yaounde',continent:'Africa',currency:'Central African CFA franc',language:'French'},
+			car:{name:'Central African Republic',display:'Orta Afrika Cumhuriyeti',aliases:['central african republic','orta afrika cumhuriyeti'],capital:'Bangui',continent:'Africa',currency:'Central African CFA franc',language:'French'},
+			chad:{name:'Chad',display:'Çad',aliases:['chad','çad','cad'],capital:"N'Djamena",continent:'Africa',currency:'Central African CFA franc',language:'French'},
+			comoros:{name:'Comoros',display:'Komorlar',aliases:['comoros','komorlar'],capital:'Moroni',continent:'Africa',currency:'Comorian franc',language:'Arabic'},
+			drcongo:{name:'Democratic Republic of the Congo',display:'Kongo Demokratik Cumhuriyeti',aliases:['democratic republic of the congo','dr congo','congo kinshasa','kongo demokratik cumhuriyeti'],capital:'Kinshasa',continent:'Africa',currency:'Congolese franc',language:'French'},
+			congorep:{name:'Republic of the Congo',display:'Kongo Cumhuriyeti',aliases:['republic of the congo','congo brazzaville','kongo cumhuriyeti'],capital:'Brazzaville',continent:'Africa',currency:'Central African CFA franc',language:'French'},
+			djibouti:{name:'Djibouti',display:'Cibuti',aliases:['djibouti','cibuti'],capital:'Djibouti',continent:'Africa',currency:'Djiboutian franc',language:'Arabic'},
+			egypt:{name:'Egypt',display:'Mısır',aliases:['egypt','misir','mısır'],capital:'Cairo',continent:'Africa',currency:'Egyptian pound',language:'Arabic'},
+			equatorialguinea:{name:'Equatorial Guinea',display:'Ekvator Ginesi',aliases:['equatorial guinea','ekvator ginesi'],capital:'Malabo',continent:'Africa',currency:'Central African CFA franc',language:'Spanish'},
+			eritrea:{name:'Eritrea',display:'Eritre',aliases:['eritrea','eritre'],capital:'Asmara',continent:'Africa',currency:'nakfa',language:'Tigrinya'},
+			eswatini:{name:'Eswatini',display:'Esvatini',aliases:['eswatini','swaziland','esvatini'],capital:'Mbabane',continent:'Africa',currency:'lilangeni',language:'Swazi'},
+			ethiopia:{name:'Ethiopia',display:'Etiyopya',aliases:['ethiopia','etiyopya'],capital:'Addis Ababa',continent:'Africa',currency:'birr',language:'Amharic'},
+			gabon:{name:'Gabon',display:'Gabon',aliases:['gabon'],capital:'Libreville',continent:'Africa',currency:'Central African CFA franc',language:'French'},
+			gambia:{name:'Gambia',display:'Gambiya',aliases:['gambia','gambiya'],capital:'Banjul',continent:'Africa',currency:'dalasi',language:'English'},
+			ghana:{name:'Ghana',display:'Gana',aliases:['ghana','gana'],capital:'Accra',continent:'Africa',currency:'cedi',language:'English'},
+			guinea:{name:'Guinea',display:'Gine',aliases:['guinea','gine'],capital:'Conakry',continent:'Africa',currency:'Guinean franc',language:'French'},
+			guineabissau:{name:'Guinea-Bissau',display:'Gine-Bissau',aliases:['guinea-bissau','gine-bissau'],capital:'Bissau',continent:'Africa',currency:'West African CFA franc',language:'Portuguese'},
+			ivorycoast:{name:'Ivory Coast',display:'Fildişi Sahili',aliases:['ivory coast',"cote d'ivoire",'côte d’ivoire','fildişi sahili','fildisi sahili'],capital:'Yamoussoukro',continent:'Africa',currency:'West African CFA franc',language:'French'},
+			kenya:{name:'Kenya',display:'Kenya',aliases:['kenya'],capital:'Nairobi',continent:'Africa',currency:'Kenyan shilling',language:'Swahili'},
+			lesotho:{name:'Lesotho',display:'Lesotho',aliases:['lesotho'],capital:'Maseru',continent:'Africa',currency:'loti',language:'English'},
+			liberia:{name:'Liberia',display:'Liberya',aliases:['liberia','liberya'],capital:'Monrovia',continent:'Africa',currency:'Liberian dollar',language:'English'},
+			libya:{name:'Libya',display:'Libya',aliases:['libya'],capital:'Tripoli',continent:'Africa',currency:'Libyan dinar',language:'Arabic'},
+			madagascar:{name:'Madagascar',display:'Madagaskar',aliases:['madagascar','madagaskar'],capital:'Antananarivo',continent:'Africa',currency:'ariary',language:'Malagasy'},
+			malawi:{name:'Malawi',display:'Malavi',aliases:['malawi','malavi'],capital:'Lilongwe',continent:'Africa',currency:'kwacha',language:'English'},
+			mali:{name:'Mali',display:'Mali',aliases:['mali'],capital:'Bamako',continent:'Africa',currency:'West African CFA franc',language:'French'},
+			mauritania:{name:'Mauritania',display:'Moritanya',aliases:['mauritania','moritanya'],capital:'Nouakchott',continent:'Africa',currency:'ouguiya',language:'Arabic'},
+			mauritius:{name:'Mauritius',display:'Mauritius',aliases:['mauritius'],capital:'Port Louis',continent:'Africa',currency:'Mauritian rupee',language:'English'},
+			morocco:{name:'Morocco',display:'Fas',aliases:['morocco','fas'],capital:'Rabat',continent:'Africa',currency:'Moroccan dirham',language:'Arabic'},
+			mozambique:{name:'Mozambique',display:'Mozambik',aliases:['mozambique','mozambik'],capital:'Maputo',continent:'Africa',currency:'metical',language:'Portuguese'},
+			namibia:{name:'Namibia',display:'Namibya',aliases:['namibia','namibya'],capital:'Windhoek',continent:'Africa',currency:'Namibian dollar',language:'English'},
+			niger:{name:'Niger',display:'Nijer',aliases:['niger','nijer'],capital:'Niamey',continent:'Africa',currency:'West African CFA franc',language:'French'},
+			nigeria:{name:'Nigeria',display:'Nijerya',aliases:['nigeria','nijerya'],capital:'Abuja',continent:'Africa',currency:'naira',language:'English'},
+			rwanda:{name:'Rwanda',display:'Ruanda',aliases:['rwanda','ruanda'],capital:'Kigali',continent:'Africa',currency:'Rwandan franc',language:'Kinyarwanda'},
+			saotome:{name:'Sao Tome and Principe',display:'Sao Tome ve Principe',aliases:['sao tome and principe','são tomé and príncipe','sao tome ve principe'],capital:'Sao Tome',continent:'Africa',currency:'dobra',language:'Portuguese'},
+			senegal:{name:'Senegal',display:'Senegal',aliases:['senegal'],capital:'Dakar',continent:'Africa',currency:'West African CFA franc',language:'French'},
+			seychelles:{name:'Seychelles',display:'Seyşeller',aliases:['seychelles','seyseller','seyşeller'],capital:'Victoria',continent:'Africa',currency:'Seychellois rupee',language:'English'},
+			sierraleone:{name:'Sierra Leone',display:'Sierra Leone',aliases:['sierra leone'],capital:'Freetown',continent:'Africa',currency:'leone',language:'English'},
+			somalia:{name:'Somalia',display:'Somali',aliases:['somalia','somali'],capital:'Mogadishu',continent:'Africa',currency:'Somali shilling',language:'Somali'},
+			southafrica:{name:'South Africa',display:'Güney Afrika',aliases:['south africa','guney afrika','güney afrika'],capital:'Pretoria',continent:'Africa',currency:'rand',language:'English'},
+			southsudan:{name:'South Sudan',display:'Güney Sudan',aliases:['south sudan','guney sudan','güney sudan'],capital:'Juba',continent:'Africa',currency:'South Sudanese pound',language:'English'},
+			sudan:{name:'Sudan',display:'Sudan',aliases:['sudan'],capital:'Khartoum',continent:'Africa',currency:'Sudanese pound',language:'Arabic'},
+			tanzania:{name:'Tanzania',display:'Tanzanya',aliases:['tanzania','tanzanya'],capital:'Dodoma',continent:'Africa',currency:'Tanzanian shilling',language:'Swahili'},
+			togo:{name:'Togo',display:'Togo',aliases:['togo'],capital:'Lome',continent:'Africa',currency:'West African CFA franc',language:'French'},
+			tunisia:{name:'Tunisia',display:'Tunus',aliases:['tunisia','tunus'],capital:'Tunis',continent:'Africa',currency:'Tunisian dinar',language:'Arabic'},
+			uganda:{name:'Uganda',display:'Uganda',aliases:['uganda'],capital:'Kampala',continent:'Africa',currency:'Ugandan shilling',language:'English'},
+			zambia:{name:'Zambia',display:'Zambiya',aliases:['zambia','zambiya'],capital:'Lusaka',continent:'Africa',currency:'Zambian kwacha',language:'English'},
+			zimbabwe:{name:'Zimbabwe',display:'Zimbabve',aliases:['zimbabwe','zimbabve'],capital:'Harare',continent:'Africa',currency:'Zimbabwe Gold',language:'English'}
 		};
 
 		const state = {
@@ -259,20 +174,6 @@ document.addEventListener('DOMContentLoaded', function () {
 				.trim();
 		}
 
-		function findCountryByInput(text) {
-			const n = normalize(text);
-			const keys = Object.keys(countries);
-			for (let i = 0; i < keys.length; i++) {
-				const c = countries[keys[i]];
-				for (let j = 0; j < c.aliases.length; j++) {
-					if (normalize(c.aliases[j]) === n) {
-						return c;
-					}
-				}
-			}
-			return null;
-		}
-
 		function shuffle(arr) {
 			const a = arr.slice();
 			for (let i = a.length - 1; i > 0; i--) {
@@ -282,6 +183,26 @@ document.addEventListener('DOMContentLoaded', function () {
 				a[j] = t;
 			}
 			return a;
+		}
+
+		function unique(arr) {
+			return arr.filter(function (v, i) {
+				return arr.indexOf(v) === i;
+			});
+		}
+
+		function findCountryByInput(text) {
+			const n = normalize(text);
+			const all = Object.values(countries);
+			for (let i = 0; i < all.length; i++) {
+				const c = all[i];
+				for (let j = 0; j < c.aliases.length; j++) {
+					if (normalize(c.aliases[j]) === n) {
+						return c;
+					}
+				}
+			}
+			return null;
 		}
 
 		function otherCountries(currentName) {
@@ -295,15 +216,24 @@ document.addEventListener('DOMContentLoaded', function () {
 			const pool = shuffle(otherCountries(currentCountry.name));
 			for (let i = 0; i < pool.length && vals.length < count; i++) {
 				const v = pool[i][key];
-				if (v !== currentCountry[key] && vals.indexOf(v) === -1) {
+				if (v && v !== currentCountry[key] && vals.indexOf(v) === -1) {
 					vals.push(v);
 				}
 			}
 			return vals;
 		}
 
+		function pickOtherCountryNames(currentCountry, count, useDisplay) {
+			const out = [];
+			const pool = shuffle(otherCountries(currentCountry.name));
+			for (let i = 0; i < pool.length && out.length < count; i++) {
+				out.push(useDisplay ? pool[i].display : pool[i].name);
+			}
+			return out;
+		}
+
 		function makeQuestion(text, correct, wrongs) {
-			const options = shuffle([correct].concat(wrongs.slice(0, 3)));
+			const options = shuffle(unique([correct].concat(wrongs)).slice(0, 4));
 			return {
 				text: text,
 				correct: correct,
@@ -314,55 +244,35 @@ document.addEventListener('DOMContentLoaded', function () {
 		function buildCountryQuestionPool(country) {
 			const pool = [];
 
-			pool.push(makeQuestion(country.display + ' ülkesinin başkenti hangisidir?', country.capital, pickOtherValues(country, 'capital', 3)));
-			pool.push(makeQuestion('What is the capital of ' + country.name + '?', country.capital, pickOtherValues(country, 'capital', 3)));
+			if (country.capital) {
+				pool.push(makeQuestion(country.display + ' ülkesinin başkenti hangisidir?', country.capital, pickOtherValues(country, 'capital', 3)));
+				pool.push(makeQuestion('What is the capital of ' + country.name + '?', country.capital, pickOtherValues(country, 'capital', 3)));
+				pool.push(makeQuestion(country.capital + ' hangi ülkenin başkentidir?', country.display, pickOtherCountryNames(country, 3, true)));
+				pool.push(makeQuestion('Which country has the capital ' + country.capital + '?', country.name, pickOtherCountryNames(country, 3, false)));
+			}
 
-			pool.push(makeQuestion(country.display + ' hangi kıtadadır?', country.continent, pickOtherValues(country, 'continent', 3)));
-			pool.push(makeQuestion(country.name + ' is in which continent?', country.continent, pickOtherValues(country, 'continent', 3)));
+			if (country.continent) {
+				pool.push(makeQuestion(country.display + ' hangi kıtadadır?', country.continent, pickOtherValues(country, 'continent', 3)));
+				pool.push(makeQuestion(country.name + ' is in which continent?', country.continent, pickOtherValues(country, 'continent', 3)));
+			}
 
-			pool.push(makeQuestion(country.display + ' para birimi nedir?', country.currency, pickOtherValues(country, 'currency', 3)));
-			pool.push(makeQuestion('What is the currency of ' + country.name + '?', country.currency, pickOtherValues(country, 'currency', 3)));
+			if (country.currency) {
+				pool.push(makeQuestion(country.display + ' para birimi nedir?', country.currency, pickOtherValues(country, 'currency', 3)));
+				pool.push(makeQuestion('What is the currency of ' + country.name + '?', country.currency, pickOtherValues(country, 'currency', 3)));
+				pool.push(makeQuestion(country.currency + ' hangi ülkenin para birimidir?', country.display, pickOtherCountryNames(country, 3, true)));
+				pool.push(makeQuestion('Which country uses ' + country.currency + '?', country.name, pickOtherCountryNames(country, 3, false)));
+			}
 
-			pool.push(makeQuestion(country.display + ' ülkesinde en yaygın dil hangisidir?', country.language, pickOtherValues(country, 'language', 3)));
-			pool.push(makeQuestion('What language is mainly spoken in ' + country.name + '?', country.language, pickOtherValues(country, 'language', 3)));
+			if (country.language) {
+				pool.push(makeQuestion(country.display + ' ülkesinde yaygın dil hangisidir?', country.language, pickOtherValues(country, 'language', 3)));
+				pool.push(makeQuestion('What language is mainly spoken in ' + country.name + '?', country.language, pickOtherValues(country, 'language', 3)));
+				pool.push(makeQuestion(country.language + ' dili hangi ülkeyle ilişkilidir?', country.display, pickOtherCountryNames(country, 3, true)));
+				pool.push(makeQuestion('Which country is linked with the ' + country.language + ' language?', country.name, pickOtherCountryNames(country, 3, false)));
+			}
 
-			pool.push(makeQuestion(country.display + ' bayrağı en çok hangi renklerle bilinir?', country.flag, pickOtherValues(country, 'flag', 3)));
-			pool.push(makeQuestion('Which landmark is strongly linked with ' + country.name + '?', country.landmark, pickOtherValues(country, 'landmark', 3)));
-
-			pool.push(makeQuestion(country.display + ' ile en çok ilişkilendirilen yemek hangisidir?', country.famousFood, pickOtherValues(country, 'famousFood', 3)));
-			pool.push(makeQuestion('Which food is strongly linked with ' + country.name + '?', country.famousFood, pickOtherValues(country, 'famousFood', 3)));
-
-			pool.push(makeQuestion(country.display + ' ile bağlantılı ünlü yapı hangisidir?', country.landmark, pickOtherValues(country, 'landmark', 3)));
-			pool.push(makeQuestion(country.name + ' is associated with which famous place?', country.landmark, pickOtherValues(country, 'landmark', 3)));
-
-			pool.push(makeQuestion(country.display + ' içinde bulunan ünlü şehirlerden biri hangisidir?', country.city, pickOtherValues(country, 'city', 3)));
-			pool.push(makeQuestion('Which city belongs to ' + country.name + '?', country.city, pickOtherValues(country, 'city', 3)));
-
-			pool.push(makeQuestion(country.display + ' ile ilişkilendirilen hayvan hangisidir?', country.nationalAnimal, pickOtherValues(country, 'nationalAnimal', 3)));
-			pool.push(makeQuestion('Which animal is linked with ' + country.name + '?', country.nationalAnimal, pickOtherValues(country, 'nationalAnimal', 3)));
-
-			pool.push(makeQuestion(country.display + ' ile bağlantılı deniz veya okyanus hangisidir?', country.sea, pickOtherValues(country, 'sea', 3)));
-			pool.push(makeQuestion('Which sea or ocean is connected with ' + country.name + '?', country.sea, pickOtherValues(country, 'sea', 3)));
-
-			const allCountries = Object.values(countries);
-
-			pool.push(makeQuestion('Which country has the capital ' + country.capital + '?', country.name, shuffle(allCountries.filter(c => c.name !== country.name).map(c => c.name)).slice(0,3)));
-			pool.push(makeQuestion(country.capital + ' hangi ülkenin başkentidir?', country.display, shuffle(allCountries.filter(c => c.name !== country.name).map(c => c.display)).slice(0,3)));
-
-			pool.push(makeQuestion('Which country uses ' + country.currency + '?', country.name, shuffle(allCountries.filter(c => c.name !== country.name).map(c => c.name)).slice(0,3)));
-			pool.push(makeQuestion(country.currency + ' hangi ülkenin para birimidir?', country.display, shuffle(allCountries.filter(c => c.name !== country.name).map(c => c.display)).slice(0,3)));
-
-			pool.push(makeQuestion('Which country is linked with ' + country.landmark + '?', country.name, shuffle(allCountries.filter(c => c.name !== country.name).map(c => c.name)).slice(0,3)));
-			pool.push(makeQuestion(country.landmark + ' hangi ülkeyle ilişkilidir?', country.display, shuffle(allCountries.filter(c => c.name !== country.name).map(c => c.display)).slice(0,3)));
-
-			pool.push(makeQuestion('Which country is linked with ' + country.famousFood + '?', country.name, shuffle(allCountries.filter(c => c.name !== country.name).map(c => c.name)).slice(0,3)));
-			pool.push(makeQuestion(country.famousFood + ' hangi ülkeyle daha çok ilişkilidir?', country.display, shuffle(allCountries.filter(c => c.name !== country.name).map(c => c.display)).slice(0,3)));
-
-			pool.push(makeQuestion('Which country mainly speaks ' + country.language + '?', country.name, shuffle(allCountries.filter(c => c.name !== country.name).map(c => c.name)).slice(0,3)));
-			pool.push(makeQuestion(country.language + ' dili en çok hangi ülkede konuşulur?', country.display, shuffle(allCountries.filter(c => c.name !== country.name).map(c => c.display)).slice(0,3)));
-
-			pool.push(makeQuestion('Which country is connected with ' + country.city + '?', country.name, shuffle(allCountries.filter(c => c.name !== country.name).map(c => c.name)).slice(0,3)));
-			pool.push(makeQuestion(country.city + ' hangi ülkededir?', country.display, shuffle(allCountries.filter(c => c.name !== country.name).map(c => c.display)).slice(0,3)));
+			pool.push(makeQuestion(country.display + ' hangi kıtaya daha çok aittir?', country.continent || 'Africa', ['Europe', 'Asia', 'South America']));
+			pool.push(makeQuestion('Choose the correct country name.', country.name, pickOtherCountryNames(country, 3, false)));
+			pool.push(makeQuestion('Doğru ülke adını seç.', country.display, pickOtherCountryNames(country, 3, true)));
 
 			return pool;
 		}
@@ -372,7 +282,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			const out = [];
 			let rounds = 0;
 
-			while (out.length < 100 && rounds < 20) {
+			while (out.length < 100 && rounds < 40) {
 				const shuffled = shuffle(basePool);
 				for (let i = 0; i < shuffled.length && out.length < 100; i++) {
 					out.push({
@@ -466,7 +376,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		function startGame() {
 			const country = findCountryByInput(input.value);
 			if (!country) {
-				setMessage('Bu sürümde bu ülke tanımlı değil. Desteklenen ülkeler sağ tarafta.');
+				setMessage('Bu ülke tanımlı değil. Şimdi Afrika ülkeleri de eklendi.');
 				return;
 			}
 
@@ -527,7 +437,7 @@ if (!function_exists('zo_ulke_100_soru_render')) {
 				<div class="zo-u100-layout">
 					<div class="zo-u100-main">
 						<div class="zo-u100-input-row">
-							<input type="text" class="zo-u100-input" placeholder="Örnek: Türkiye, Turkey, Almanya, Germany, Japonya, Japan">
+							<input type="text" class="zo-u100-input" placeholder="Örnek: Türkiye, Turkey, Cezayir, Algeria, Kenya, Fas, Morocco">
 							<button type="button" class="zo-u100-btn zo-u100-btn--primary zo-u100-start">Başlat</button>
 							<button type="button" class="zo-u100-btn zo-u100-btn--danger zo-u100-reset">Sıfırla</button>
 						</div>
@@ -563,21 +473,13 @@ if (!function_exists('zo_ulke_100_soru_render')) {
 							<li>Yanlış cevap: -5 coin</li>
 						</ul>
 
-						<h3>Desteklenen Ülkeler</h3>
+						<h3>Şimdi Eklenenler</h3>
 						<ul>
-							<li>Türkiye / Turkey</li>
-							<li>Amerika / USA / United States</li>
-							<li>Almanya / Germany</li>
-							<li>Fransa / France</li>
-							<li>Japonya / Japan</li>
-							<li>Brezilya / Brazil</li>
-							<li>İtalya / Italy</li>
-							<li>İspanya / Spain</li>
-							<li>İngiltere / UK / United Kingdom</li>
-							<li>Rusya / Russia</li>
+							<li>Tüm Afrika ülkeleri eklendi.</li>
+							<li>Örnekler: Cezayir, Fas, Tunus, Libya, Mısır, Kenya, Nijerya, Güney Afrika, Tanzanya, Uganda, Senegal, Sudan.</li>
 						</ul>
 
-						<p>İstersen sonraki sürümde buna daha fazla ülke ekleyebilirim.</p>
+						<p>Sonraki sürümde Asya ve Avrupa ülkelerini daha da genişletebilirim.</p>
 					</div>
 				</div>
 			</div>
@@ -591,7 +493,7 @@ return array(
 	'slug'            => 'ulke-100-soru',
 	'name'            => 'Ülke 100 Soru',
 	'author'          => 'Arslan',
-	'description'     => 'Ülke adını yazınca o ülke hakkında 100 soru açan coinli quiz oyunu.',
+	'description'     => 'Ülke adını yazınca o ülke hakkında 100 soru açan coinli quiz oyunu. Afrika ülkeleri eklendi.',
 	'render_callback' => 'zo_ulke_100_soru_render',
 	'inline_style'    => $inline_style,
 	'inline_script'   => $inline_script,
