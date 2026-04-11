@@ -47,7 +47,7 @@ if (!function_exists('zo_game_echo_cartographer_render')) {
 					<div class="zo-ec__sidebar">
 						<div class="zo-ec__legend">
 							<p class="zo-ec__legend-title">Legend</p>
-							div class="zo-ec__legend-items">
+							<div class="zo-ec__legend-items">
 								<span><i class="zo-ec__swatch is-drone"></i>You</span>
 								<span><i class="zo-ec__swatch is-exit"></i>Exit</span>
 								<span><i class="zo-ec__swatch is-trap"></i>Trap</span>

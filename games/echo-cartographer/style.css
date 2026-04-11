@@ -1,0 +1,379 @@
+.zo-game-root.zo-game-root--echo-cartographer {
+	max-width: 1120px;
+	margin: 24px auto;
+	color: #e8f0ff;
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec {
+	--ec-bg: #09111f;
+	--ec-panel: rgba(10, 20, 37, 0.92);
+	--ec-panel-strong: rgba(13, 28, 48, 0.96);
+	--ec-line: rgba(122, 179, 255, 0.22);
+	--ec-soft: #8ca4c7;
+	--ec-bright: #eff7ff;
+	--ec-cyan: #77e9ff;
+	--ec-teal: #23c7aa;
+	--ec-gold: #ffd166;
+	--ec-danger: #ff6b81;
+	--ec-amber: #ff9f43;
+	padding: 24px;
+	border: 1px solid var(--ec-line);
+	border-radius: 28px;
+	background:
+		radial-gradient(circle at top, rgba(62, 115, 173, 0.24), transparent 32%),
+		radial-gradient(circle at bottom right, rgba(24, 199, 179, 0.16), transparent 24%),
+		linear-gradient(160deg, #08101d 0%, #0c1424 48%, #09111f 100%);
+	box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__panel {
+	display: flex;
+	justify-content: space-between;
+	gap: 20px;
+	align-items: flex-start;
+	margin-bottom: 18px;
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__eyebrow {
+	margin: 0 0 10px;
+	font-size: 12px;
+	letter-spacing: 0.18em;
+	text-transform: uppercase;
+	color: var(--ec-cyan);
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__title {
+	margin: 0;
+	font-size: clamp(30px, 4vw, 44px);
+	line-height: 1.05;
+	color: var(--ec-bright);
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__intro {
+	max-width: 480px;
+	margin: 0;
+	font-size: 15px;
+	line-height: 1.6;
+	color: var(--ec-soft);
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__stats {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 12px;
+	margin-bottom: 20px;
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__stat,
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__legend,
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__notes,
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__controls,
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__board-wrap {
+	border: 1px solid var(--ec-line);
+	border-radius: 20px;
+	background: var(--ec-panel);
+	backdrop-filter: blur(6px);
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__stat {
+	padding: 14px 16px;
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__stat-label {
+	display: block;
+	margin-bottom: 6px;
+	font-size: 11px;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--ec-soft);
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__stat strong {
+	font-size: 24px;
+	line-height: 1;
+	color: var(--ec-bright);
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__layout {
+	display: grid;
+	grid-template-columns: minmax(0, 1.3fr) minmax(300px, 0.9fr);
+	gap: 18px;
+	align-items: start;
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__board-wrap {
+	padding: 18px;
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__board {
+	display: grid;
+	grid-template-columns: repeat(9, minmax(0, 1fr));
+	gap: 6px;
+	max-width: 100%;
+	aspect-ratio: 1 / 1;
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__cell {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 12px;
+	aspect-ratio: 1 / 1;
+	border: 1px solid rgba(125, 161, 211, 0.09);
+	background: rgba(255, 255, 255, 0.04);
+	font-size: clamp(14px, 2vw, 18px);
+	font-weight: 700;
+	transition: transform 0.16s ease, background 0.16s ease, border-color 0.16s ease, opacity 0.16s ease;
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__cell::after {
+	content: "";
+	position: absolute;
+	inset: 3px;
+	border-radius: 9px;
+	opacity: 0;
+	transition: opacity 0.16s ease;
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__cell.is-dark {
+	background: rgba(1, 4, 10, 0.9);
+	border-color: rgba(62, 89, 125, 0.08);
+	color: transparent;
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__cell.is-memory {
+	background: rgba(35, 58, 91, 0.34);
+	border-color: rgba(98, 141, 194, 0.18);
+	color: rgba(220, 238, 255, 0.42);
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__cell.is-visible {
+	border-color: rgba(119, 233, 255, 0.36);
+	background: rgba(58, 114, 173, 0.2);
+	color: var(--ec-bright);
+	box-shadow: 0 0 24px rgba(80, 170, 255, 0.15);
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__cell.is-visible::after {
+	opacity: 1;
+	background: radial-gradient(circle, rgba(119, 233, 255, 0.12), transparent 70%);
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__cell.is-wall.is-visible,
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__cell.is-wall.is-memory {
+	background: linear-gradient(180deg, rgba(104, 129, 168, 0.32), rgba(39, 53, 74, 0.48));
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__cell.is-hidden.is-visible {
+	background: linear-gradient(180deg, rgba(35, 199, 170, 0.28), rgba(18, 87, 79, 0.52));
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__cell.is-trap.is-visible {
+	background: linear-gradient(180deg, rgba(255, 159, 67, 0.34), rgba(97, 42, 17, 0.6));
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__cell.is-exit.is-visible,
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__cell.is-exit.is-memory {
+	background: linear-gradient(180deg, rgba(255, 209, 102, 0.36), rgba(112, 86, 24, 0.62));
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__cell.is-player {
+	transform: scale(1.04);
+	border-color: rgba(119, 233, 255, 0.85);
+	box-shadow: 0 0 0 2px rgba(10, 20, 37, 0.8), 0 0 24px rgba(119, 233, 255, 0.32);
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__cell.is-player::after {
+	opacity: 1;
+	background: radial-gradient(circle, rgba(119, 233, 255, 0.42), transparent 65%);
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__cell.is-enemy.is-visible {
+	background: linear-gradient(180deg, rgba(255, 107, 129, 0.36), rgba(115, 25, 41, 0.68));
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__sidebar {
+	display: grid;
+	gap: 14px;
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__legend,
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__notes,
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__controls {
+	padding: 18px;
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__legend-title,
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__notes-title {
+	margin: 0 0 12px;
+	font-size: 15px;
+	font-weight: 700;
+	color: var(--ec-bright);
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__legend-items {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 10px 14px;
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__legend-items span {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 14px;
+	color: var(--ec-soft);
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__swatch {
+	display: inline-block;
+	width: 14px;
+	height: 14px;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.2);
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__swatch.is-drone {
+	background: var(--ec-cyan);
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__swatch.is-exit {
+	background: var(--ec-gold);
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__swatch.is-trap {
+	background: var(--ec-amber);
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__swatch.is-enemy {
+	background: var(--ec-danger);
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__swatch.is-hidden {
+	background: var(--ec-teal);
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__move-pad {
+	display: grid;
+	gap: 10px;
+	justify-items: center;
+	margin-bottom: 14px;
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__move-row {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 10px;
+	width: 100%;
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__move,
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__pulse,
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__restart {
+	border: 0;
+	border-radius: 14px;
+	padding: 13px 14px;
+	font-size: 14px;
+	font-weight: 700;
+	cursor: pointer;
+	transition: transform 0.12s ease, box-shadow 0.16s ease, opacity 0.16s ease, background 0.16s ease;
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__move {
+	width: 100%;
+	color: var(--ec-bright);
+	background: linear-gradient(180deg, rgba(66, 96, 136, 0.9), rgba(30, 46, 67, 0.94));
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__pulse {
+	color: #042233;
+	background: linear-gradient(180deg, #77e9ff, #29bfe4);
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__restart {
+	color: var(--ec-bright);
+	background: linear-gradient(180deg, rgba(33, 199, 170, 0.92), rgba(12, 136, 112, 0.94));
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__move:hover,
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__pulse:hover,
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__restart:hover {
+	transform: translateY(-1px);
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__move:active,
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__pulse:active,
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__restart:active {
+	transform: translateY(1px);
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__actions {
+	display: grid;
+	gap: 10px;
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__notes-list {
+	margin: 0;
+	padding-left: 18px;
+	color: var(--ec-soft);
+	font-size: 14px;
+	line-height: 1.6;
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__message {
+	margin: 0;
+	padding: 14px 16px;
+	border-radius: 16px;
+	border: 1px solid rgba(119, 233, 255, 0.14);
+	background: var(--ec-panel-strong);
+	font-size: 14px;
+	line-height: 1.6;
+	color: var(--ec-bright);
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__message.is-danger {
+	border-color: rgba(255, 107, 129, 0.28);
+	color: #ffd7de;
+}
+
+.zo-game-root.zo-game-root--echo-cartographer .zo-ec__message.is-success {
+	border-color: rgba(35, 199, 170, 0.3);
+	color: #d9fff6;
+}
+
+@media (max-width: 920px) {
+	.zo-game-root.zo-game-root--echo-cartographer .zo-ec__panel,
+	.zo-game-root.zo-game-root--echo-cartographer .zo-ec__layout {
+		grid-template-columns: 1fr;
+		display: grid;
+	}
+
+	.zo-game-root.zo-game-root--echo-cartographer .zo-ec__stats {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+}
+
+@media (max-width: 640px) {
+	.zo-game-root.zo-game-root--echo-cartographer .zo-ec {
+		padding: 16px;
+		border-radius: 22px;
+	}
+
+	.zo-game-root.zo-game-root--echo-cartographer .zo-ec__stats,
+	.zo-game-root.zo-game-root--echo-cartographer .zo-ec__legend-items {
+		grid-template-columns: 1fr;
+	}
+
+	.zo-game-root.zo-game-root--echo-cartographer .zo-ec__board-wrap,
+	.zo-game-root.zo-game-root--echo-cartographer .zo-ec__legend,
+	.zo-game-root.zo-game-root--echo-cartographer .zo-ec__notes,
+	.zo-game-root.zo-game-root--echo-cartographer .zo-ec__controls {
+		padding: 14px;
+	}
+
+	.zo-game-root.zo-game-root--echo-cartographer .zo-ec__board {
+		gap: 4px;
+	}
+}
