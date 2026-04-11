@@ -351,12 +351,12 @@
 
 					if (tile === '#') {
 						classes.push('is-wall');
-						symbol = visible || remembered ? '█' : '';
+						symbol = visible || remembered ? '#' : '';
 						label = 'Wall';
 					} else if (tile === 'H') {
 						if (state.discoveredHidden.has(keyFor({ x: x, y: y }))) {
 							classes.push('is-hidden');
-							symbol = visible || remembered ? '·' : '';
+							symbol = visible || remembered ? '.' : '';
 							label = 'Hidden path';
 						} else {
 							classes.push('is-wall');
@@ -364,7 +364,7 @@
 							label = 'Unknown structure';
 						}
 					} else {
-						symbol = visible || remembered ? '·' : '';
+						symbol = visible || remembered ? '.' : '';
 						label = 'Floor';
 					}
 
@@ -388,7 +388,7 @@
 
 					if (state.player.x === x && state.player.y === y) {
 						classes.push('is-player');
-						symbol = '◉';
+						symbol = 'D';
 						label = 'Drone';
 					}
 
