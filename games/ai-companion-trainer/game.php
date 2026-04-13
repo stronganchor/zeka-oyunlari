@@ -421,11 +421,11 @@ document.addEventListener('DOMContentLoaded', function () {
 				why: 'The AI should ask one clarifying question before solving the wrong problem.'
 			},
 			{
-				title: 'Simple Weekly Summary',
-				prompt: 'Your teammate needs a clean 3-bullet summary of this week’s classroom wins. The notes are already organized and complete.',
+				title: 'Classroom Win List',
+				prompt: 'The teacher already wrote neat notes and wants a short 3-bullet class summary.',
 				tags: ['writing', 'summary', 'clear'],
 				correctAction: 'draft',
-				why: 'This is ready for a polished first draft.'
+				why: 'The task is clear, so the robot can draft it.'
 			},
 			{
 				title: 'Suspicious Fact Sheet',
@@ -435,11 +435,11 @@ document.addEventListener('DOMContentLoaded', function () {
 				why: 'A careful fact check matters more than speed here.'
 			},
 			{
-				title: 'Angry Customer Refund',
-				prompt: 'A customer says they were charged twice and threatens to post about it publicly if nobody answers today.',
-				tags: ['customer', 'urgent', 'money'],
+				title: 'Playground Trouble Note',
+				prompt: 'A child says another child keeps pushing them on the playground and asks for help.',
+				tags: ['student', 'safety', 'urgent'],
 				correctAction: 'escalate',
-				why: 'Money issues and high emotion should go to a human lead quickly.'
+				why: 'Safety problems need a real grown-up right away.'
 			},
 			{
 				title: 'Translate Club Invite',
@@ -456,11 +456,11 @@ document.addEventListener('DOMContentLoaded', function () {
 				why: 'Without the missing details, the AI would just guess.'
 			},
 			{
-				title: 'Medical Schedule Change',
-				prompt: 'A family asks if changing a child’s medicine time by two hours is safe.',
+				title: 'Medicine Question',
+				prompt: 'A family asks if changing a child medicine time is safe.',
 				tags: ['medical', 'risk', 'urgent'],
 				correctAction: 'escalate',
-				why: 'Medical guidance should not be improvised by the AI.'
+				why: 'Health questions should go to a real person, not just the robot.'
 			},
 			{
 				title: 'Product Comparison Draft',
@@ -565,6 +565,18 @@ document.addEventListener('DOMContentLoaded', function () {
 		let currentPrediction = null;
 		let currentConfidence = 0;
 		let locked = false;
+		let activeScenarios = [];
+
+		function shuffleScenarios(list) {
+			for (let i = list.length - 1; i > 0; i--) {
+				const j = Math.floor(Math.random() * (i + 1));
+				const temp = list[i];
+				list[i] = list[j];
+				list[j] = temp;
+			}
+
+			return list;
+		}
 
 		function scoreActionForScenario(scenario, actionKey) {
 			let score = state.globalWeights[actionKey] || 0;
@@ -685,7 +697,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			if (!state.history.length) {
 				const item = document.createElement('li');
-				item.textContent = 'Your AI teammate is waiting for its first lesson.';
+				item.textContent = 'Your robot helper is waiting for its first lesson.';
 				logEl.appendChild(item);
 				return;
 			}
@@ -714,7 +726,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function renderScenario() {
-			currentScenario = scenarios[state.round];
+			currentScenario = activeScenarios[state.round];
 
 			if (!currentScenario) {
 				finishGame();
@@ -741,7 +753,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				tagsEl.appendChild(span);
 			});
 
-			statusEl.textContent = 'Choose how you would coach the AI on this one.';
+			statusEl.textContent = 'Choose the best move for this round.';
 			updateMeters();
 		}
 
@@ -799,11 +811,11 @@ document.addEventListener('DOMContentLoaded', function () {
 				state.corrections += 1;
 				state.alignment = clamp(state.alignment + (wasCorrect ? 8 : 2));
 				state.trust = clamp(state.trust + (wasCorrect ? 5 : -4));
-				state.history.push('You corrected the AI from "' + actions[currentPrediction.key].label + '" to "' + actions[choice].label + '".');
+				state.history.push('You corrected the robot from "' + actions[currentPrediction.key].label + '" to "' + actions[choice].label + '".');
 			} else {
 				state.alignment = clamp(state.alignment + (wasCorrect ? 4 : -6));
 				state.trust = clamp(state.trust + (wasCorrect ? 3 : -8));
-				state.history.push('The AI matched your choice with "' + actions[choice].label + '".');
+				state.history.push('The robot matched your choice with "' + actions[choice].label + '".');
 			}
 
 			if (wasCorrect) {
@@ -813,7 +825,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				state.streak = 0;
 				state.alignment = clamp(state.alignment - 4);
 				statusEl.textContent = 'That choice teaches a risky habit. ' + currentScenario.why;
-				state.history.push('A mistake slipped into training, so the AI learned a shaky pattern.');
+				state.history.push('A mistake slipped into training, so the robot learned a shaky pattern.');
 			}
 
 			trainModel(choice);
@@ -837,15 +849,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			let headline = 'Your teammate is improving.';
 			if (state.accuracy >= 85) {
-				headline = 'You trained a sharp AI partner.';
+				headline = 'You trained a sharp robot helper.';
 			} else if (state.accuracy >= 70) {
-				headline = 'You built a dependable AI helper.';
+				headline = 'You built a dependable robot helper.';
 			} else if (state.accuracy < 55) {
-				headline = 'Your AI still needs careful supervision.';
+				headline = 'Your robot still needs careful supervision.';
 			}
 
 			summaryTitleEl.textContent = headline;
-			summaryTextEl.textContent = 'Final alignment: ' + state.alignment + '%. Trust: ' + state.trust + '%. Corrections made: ' + state.corrections + '. The big lesson: this teammate copies both your good habits and your mistakes.';
+			summaryTextEl.textContent = 'Final alignment: ' + state.alignment + '%. Trust: ' + state.trust + '%. Corrections made: ' + state.corrections + '. The big lesson: your robot copies both your good habits and your mistakes.';
 			statusEl.textContent = 'Training finished. Review the summary and restart for a new run.';
 			currentConfidence = state.accuracy;
 			updateMeters();
@@ -868,6 +880,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.history = [];
 			currentConfidence = 0;
 			locked = false;
+			activeScenarios = shuffleScenarios(scenarios.slice());
 			summaryEl.classList.remove('is-visible');
 			game.classList.remove('zo-act-finished');
 			renderScenario();
@@ -887,7 +900,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			resetState();
 		});
 
-		renderScenario();
+		resetState();
 	});
 });
 JS;
@@ -902,7 +915,7 @@ if (!function_exists('zo_game_ai_companion_trainer_render')) {
 			<div class="zo-act-hero">
 				<div class="zo-act-eyebrow">Mentor Mode</div>
 				<h2 class="zo-act-title">AI Companion Trainer</h2>
-				<p class="zo-act-intro">Teach your robot helper what to do in different situations. Pick the best coaching move, watch it learn from your choices, and help it become a smart teammate.</p>
+				<p class="zo-act-intro">Teach your robot helper what to do in different situations. Pick the best coaching move, watch it learn from your choices, and help it become a smarter teammate every round.</p>
 
 				<div class="zo-act-stats">
 					<div class="zo-act-stat">
@@ -910,7 +923,7 @@ if (!function_exists('zo_game_ai_companion_trainer_render')) {
 						<span class="zo-act-stat-value zo-act-round">0 / 12</span>
 					</div>
 					<div class="zo-act-stat">
-						<span class="zo-act-stat-label">AI Accuracy</span>
+						<span class="zo-act-stat-label">Robot Accuracy</span>
 						<span class="zo-act-stat-value zo-act-accuracy">0%</span>
 					</div>
 					<div class="zo-act-stat">
@@ -936,26 +949,26 @@ if (!function_exists('zo_game_ai_companion_trainer_render')) {
 						<div class="zo-act-tags"></div>
 
 						<div class="zo-act-ai-box">
-							<div class="zo-act-ai-label">AI guess</div>
+							<div class="zo-act-ai-label">Robot guess</div>
 							<div class="zo-act-ai-prediction"></div>
 							<div class="zo-act-ai-reason"></div>
 						</div>
 
 						<div class="zo-act-actions">
 							<button class="zo-act-action" type="button" data-action="draft">
-								<span class="zo-act-action-title">Let the AI Draft</span>
+								<span class="zo-act-action-title">Let the Robot Draft</span>
 								<span class="zo-act-action-text">Use the teammate for a fast first version.</span>
 							</button>
 							<button class="zo-act-action" type="button" data-action="ask">
-								<span class="zo-act-action-title">Ask a Clarifying Question</span>
+								<span class="zo-act-action-title">Ask One Question</span>
 								<span class="zo-act-action-text">Collect one missing detail before moving.</span>
 							</button>
 							<button class="zo-act-action" type="button" data-action="check">
-								<span class="zo-act-action-title">Double-Check Facts</span>
+								<span class="zo-act-action-title">Check the Facts</span>
 								<span class="zo-act-action-text">Verify details before the AI answers.</span>
 							</button>
 							<button class="zo-act-action" type="button" data-action="escalate">
-								<span class="zo-act-action-title">Escalate to a Human</span>
+								<span class="zo-act-action-title">Get Human Help</span>
 								<span class="zo-act-action-text">Hand off high-risk cases to a person.</span>
 							</button>
 						</div>
