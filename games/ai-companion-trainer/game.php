@@ -902,7 +902,7 @@ if (!function_exists('zo_game_ai_companion_trainer_render')) {
 			<div class="zo-act-hero">
 				<div class="zo-act-eyebrow">Mentor Mode</div>
 				<h2 class="zo-act-title">AI Companion Trainer</h2>
-				<p class="zo-act-intro">Coach an AI teammate through tricky requests, missing information, and risky situations. It learns from every choice you make, including the bad ones, so your habits shape how reliable it becomes.</p>
+				<p class="zo-act-intro">Teach your robot helper what to do in different situations. Pick the best coaching move, watch it learn from your choices, and help it become a smart teammate.</p>
 
 				<div class="zo-act-stats">
 					<div class="zo-act-stat">
@@ -960,7 +960,7 @@ if (!function_exists('zo_game_ai_companion_trainer_render')) {
 							</button>
 						</div>
 
-						<div class="zo-act-status"></div>
+						<div class="zo-act-status">Pick a coaching move to train your AI helper.</div>
 						<div class="zo-act-progress">
 							<div class="zo-act-progress-fill"></div>
 						</div>
@@ -1024,8 +1024,8 @@ if (!function_exists('zo_game_ai_companion_trainer_render')) {
 return array(
 	'slug'            => 'ai-companion-trainer',
 	'name'            => 'AI Companion Trainer',
-	'author'          => 'Codex',
-	'description'     => 'Train an AI teammate by choosing when it should draft, ask, verify, or escalate.',
+	'author'          => 'Asker',
+	'description'     => 'Train a robot helper by choosing when it should draft, ask, verify, or get human help.',
 	'render_callback' => 'zo_game_ai_companion_trainer_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,
