@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.2.7.703
+ * Version: 1.2.7.704
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -236,6 +236,46 @@ function zo_get_current_request_url() {
 	$url = home_url(wp_unslash($_SERVER['REQUEST_URI']));
 
 	return is_string($url) ? esc_url_raw($url) : '';
+}
+
+function zo_get_requested_game_slug() {
+	if (is_singular('zeka_oyunu')) {
+		$post_id = get_queried_object_id();
+		$slug    = zo_resolve_game_slug_for_post($post_id);
+
+		return $slug !== '' ? $slug : '';
+	}
+
+	if (empty($_GET['zo_game_module']) || !is_string($_GET['zo_game_module'])) {
+		return '';
+	}
+
+	$slug = sanitize_title(wp_unslash($_GET['zo_game_module']));
+
+	return $slug !== '' && zo_get_game_module($slug) ? $slug : '';
+}
+
+function zo_get_game_module_fallback_url($slug) {
+	$slug = sanitize_title($slug);
+
+	if ($slug === '' || !zo_get_game_module($slug)) {
+		return '';
+	}
+
+	$base_url = get_post_type_archive_link('zeka_oyunu');
+
+	if (!is_string($base_url) || $base_url === '') {
+		$base_url = home_url('/');
+	}
+
+	$url = add_query_arg('zo_game_module', $slug, $base_url);
+
+	$back_url = zo_get_current_request_url();
+	if ($back_url !== '') {
+		$url = add_query_arg('zo_back', $back_url, $url);
+	}
+
+	return $url;
 }
 
 function zo_get_game_launch_url($post) {
@@ -609,15 +649,11 @@ function zo_maybe_enqueue_current_game_assets() {
 		return;
 	}
 
-	if (is_singular('zeka_oyunu')) {
+	$requested_slug = zo_get_requested_game_slug();
+
+	if ($requested_slug !== '') {
 		wp_enqueue_script('jquery');
-
-		$post_id = get_queried_object_id();
-		$slug    = zo_resolve_game_slug_for_post($post_id);
-
-		if ($slug) {
-			zo_enqueue_game_assets_by_slug($slug);
-		}
+		zo_enqueue_game_assets_by_slug($requested_slug);
 	}
 
 	if (is_singular()) {
@@ -919,7 +955,7 @@ function zo_games_grid_shortcode($atts = array()) {
 		$post    = $posts_by_slug[$slug] ?? null;
 		$title   = $post instanceof WP_Post ? get_the_title($post) : $module['name'];
 		$excerpt = $post instanceof WP_Post ? get_the_excerpt($post) : '';
-		$url     = $post instanceof WP_Post ? zo_get_game_launch_url($post) : '';
+		$url     = $post instanceof WP_Post ? zo_get_game_launch_url($post) : zo_get_game_module_fallback_url($slug);
 
 		$has_results = true;
 		$shown++;
@@ -977,14 +1013,9 @@ function zo_games_grid_shortcode($atts = array()) {
 add_shortcode('zeka_oyunlari_grid', 'zo_games_grid_shortcode');
 
 function zo_locate_game_template($template) {
-	if (!is_singular('zeka_oyunu')) {
-		return $template;
-	}
+	$slug = zo_get_requested_game_slug();
 
-	$post_id = get_queried_object_id();
-	$slug    = zo_resolve_game_slug_for_post($post_id);
-
-	if ($slug === '' || !zo_get_game_module($slug)) {
+	if ($slug === '') {
 		return $template;
 	}
 

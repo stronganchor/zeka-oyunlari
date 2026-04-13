@@ -4,7 +4,7 @@ if (!defined('ABSPATH')) {
 }
 
 $post_id = get_queried_object_id();
-$slug    = function_exists('zo_resolve_game_slug_for_post') ? zo_resolve_game_slug_for_post($post_id) : '';
+$slug    = function_exists('zo_get_requested_game_slug') ? zo_get_requested_game_slug() : '';
 $module  = $slug !== '' && function_exists('zo_get_game_module') ? zo_get_game_module($slug) : null;
 
 if (!$module || !is_array($module)) {
@@ -15,7 +15,7 @@ if (!$module || !is_array($module)) {
 }
 
 $back_url   = function_exists('zo_get_game_back_url') ? zo_get_game_back_url($post_id) : home_url('/');
-$page_title = get_the_title($post_id);
+$page_title = $post_id ? get_the_title($post_id) : '';
 
 if (!is_string($page_title) || $page_title === '') {
 	$page_title = (string) $module['name'];
