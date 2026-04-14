@@ -188,6 +188,14 @@ $css = <<<'CSS'
 	color: #b0581c;
 }
 
+.zo-game-root--binary-puzzle .zo-bp-helper {
+	margin-top: 10px;
+	text-align: center;
+	font-size: 14px;
+	font-weight: 700;
+	color: #62809b;
+}
+
 @media (max-width: 640px) {
 	.zo-game-root.zo-game-root--binary-puzzle {
 		padding: 14px;
@@ -219,6 +227,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		const size = 6;
 		const boardEl = game.querySelector('.zo-bp-board');
 		const statusEl = game.querySelector('.zo-bp-status');
+		const helperEl = game.querySelector('.zo-bp-helper');
 		const mistakesEl = game.querySelector('.zo-bp-mistakes');
 		const filledEl = game.querySelector('.zo-bp-filled');
 		const winsEl = game.querySelector('.zo-bp-wins');
@@ -313,10 +322,6 @@ document.addEventListener('DOMContentLoaded', function () {
 				className += ' is-given';
 			} else if (state.board[row][col] !== null) {
 				className += ' is-player';
-
-				if (state.board[row][col] !== state.solution[row][col]) {
-					className += ' is-bad';
-				}
 			}
 
 			return className;
@@ -424,6 +429,18 @@ document.addEventListener('DOMContentLoaded', function () {
 			statusEl.textContent = message;
 		}
 
+		function updateHelper() {
+			const problems = getRuleProblems();
+
+			if (problems === 0) {
+				helperEl.textContent = 'Rule check: looking good so far.';
+			} else if (problems === 1) {
+				helperEl.textContent = 'Rule check: 1 row or column rule is currently broken.';
+			} else {
+				helperEl.textContent = 'Rule check: ' + problems + ' row or column rules are currently broken.';
+			}
+		}
+
 		function renderBoard() {
 			boardEl.innerHTML = '';
 			boardEl.style.gridTemplateColumns = 'repeat(' + size + ', 1fr)';
@@ -448,13 +465,10 @@ document.addEventListener('DOMContentLoaded', function () {
 								state.board[row][col] = null;
 							}
 
-							if (state.board[row][col] !== null && state.board[row][col] !== state.solution[row][col]) {
-								state.mistakes += 1;
-							}
-
 							renderBoard();
 							updateStats();
-							setStatus('Keep going. No three same in a row, and no repeated full rows or columns.', '');
+							updateHelper();
+							setStatus('Keep going. Follow the binary rules and fill the full grid.', '');
 						});
 					}
 
@@ -468,6 +482,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			createPuzzle(puzzleIndex);
 			renderBoard();
 			updateStats();
+			updateHelper();
 			setStatus('Fill the empty squares with 0 or 1.', '');
 		}
 
@@ -476,11 +491,15 @@ document.addEventListener('DOMContentLoaded', function () {
 			const problems = getRuleProblems();
 
 			if (filled < size * size) {
+				state.mistakes += 1;
+				updateStats();
 				setStatus('The grid is not full yet. Fill every square first.', 'is-warn');
 				return;
 			}
 
 			if (problems > 0) {
+				state.mistakes += 1;
+				updateStats();
 				setStatus('Almost there. One or more row or column rules are broken.', 'is-warn');
 				return;
 			}
@@ -504,6 +523,8 @@ document.addEventListener('DOMContentLoaded', function () {
 					startLevel();
 				}, 900);
 			} else {
+				state.mistakes += 1;
+				updateStats();
 				setStatus('The rules look okay, but a few squares are still wrong. Try again.', 'is-warn');
 			}
 		});
@@ -519,6 +540,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			renderBoard();
 			updateStats();
+			updateHelper();
 			setStatus('Player moves cleared. Try the puzzle again.', '');
 		});
 
@@ -553,7 +575,7 @@ if (!function_exists('zo_game_binary_puzzle_render')) {
 						<span class="zo-bp-stat-value zo-bp-filled">0/36</span>
 					</div>
 					<div class="zo-bp-stat">
-						<span class="zo-bp-stat-label">Mistakes</span>
+						<span class="zo-bp-stat-label">Failed Checks</span>
 						<span class="zo-bp-stat-value zo-bp-mistakes">0</span>
 					</div>
 					<div class="zo-bp-stat">
@@ -578,6 +600,7 @@ if (!function_exists('zo_game_binary_puzzle_render')) {
 				</div>
 
 				<div class="zo-bp-status">Fill the empty squares with 0 or 1.</div>
+				<div class="zo-bp-helper">Rule check: looking good so far.</div>
 			</div>
 		</div>
 		<?php
