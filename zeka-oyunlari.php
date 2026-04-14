@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.2.7.708
+ * Version: 1.2.7.710
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -751,21 +751,6 @@ function zo_enqueue_grid_styles() {
 	justify-content: flex-start;
 	margin: 0 0 20px;
 }
-.zo-games-grid__intro {
-	margin: 0 0 20px;
-}
-.zo-games-grid__heading {
-	margin: 0 0 8px;
-	font-size: clamp(1.8rem, 2.5vw, 2.4rem);
-	line-height: 1.15;
-	color: #111827;
-}
-.zo-games-grid__subheading {
-	margin: 0;
-	max-width: 760px;
-	color: #4b5563;
-	line-height: 1.55;
-}
 .zo-games-grid__home {
 	display: inline-flex;
 	align-items: center;
@@ -919,7 +904,6 @@ function zo_games_grid_shortcode($atts = array()) {
 		array(
 			'author' => '',
 			'limit'  => '-1',
-			'title'  => '',
 		),
 		$atts,
 		'zeka_oyunlari_grid'
@@ -927,7 +911,6 @@ function zo_games_grid_shortcode($atts = array()) {
 
 	$author_filter    = sanitize_title($atts['author']);
 	$limit            = (int) $atts['limit'];
-	$title            = is_string($atts['title']) ? trim($atts['title']) : '';
 	$modules          = zo_get_game_modules();
 	$show_home_button = false;
 
@@ -953,21 +936,6 @@ function zo_games_grid_shortcode($atts = array()) {
 	$shown       = 0;
 
 	echo '<div class="zo-games-grid-wrap">';
-
-	if ($title === '' && $author_filter === 'arslan') {
-		$title = 'Arslanın Oyunları';
-	}
-
-	if ($title !== '') {
-		echo '<div class="zo-games-grid__intro">';
-		echo '<h2 class="zo-games-grid__heading">' . esc_html($title) . '</h2>';
-
-		if ($author_filter === 'arslan') {
-			echo '<p class="zo-games-grid__subheading">Arslan tarafindan yapilan mevcut oyunlar burada birlikte gosterilir.</p>';
-		}
-
-		echo '</div>';
-	}
 
 	if ($show_home_button) {
 		echo '<div class="zo-games-grid__toolbar"><a class="zo-games-grid__home" href="' . esc_url($home_url) . '">Ana Sayfaya Dön</a></div>';
@@ -1043,26 +1011,6 @@ function zo_games_grid_shortcode($atts = array()) {
 	return ob_get_clean();
 }
 add_shortcode('zeka_oyunlari_grid', 'zo_games_grid_shortcode');
-
-function zo_arslanin_oyunlari_shortcode($atts = array()) {
-	$atts = shortcode_atts(
-		array(
-			'limit' => '-1',
-			'title' => 'Arslanın Oyunları',
-		),
-		$atts,
-		'arslanin_oyunlari'
-	);
-
-	return zo_games_grid_shortcode(
-		array(
-			'author' => 'Arslan',
-			'limit'  => $atts['limit'],
-			'title'  => $atts['title'],
-		)
-	);
-}
-add_shortcode('arslanin_oyunlari', 'zo_arslanin_oyunlari_shortcode');
 
 function zo_locate_game_template($template) {
 	$slug = zo_get_requested_game_slug();

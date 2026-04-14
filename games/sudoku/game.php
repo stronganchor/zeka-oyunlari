@@ -49,6 +49,7 @@ if (!function_exists('zo_game_sudoku_render')) {
 
 					<div class="zo-sudoku__actions">
 						<button type="button" class="zo-sudoku__button zo-sudoku__button--primary" data-action="new">New Puzzle</button>
+						<button type="button" class="zo-sudoku__button" data-action="notes" aria-pressed="false">Notes: Off</button>
 						<button type="button" class="zo-sudoku__button" data-action="reset">Reset</button>
 						<button type="button" class="zo-sudoku__button" data-action="check">Check</button>
 						<button type="button" class="zo-sudoku__button" data-action="hint">Hint</button>
@@ -87,7 +88,7 @@ if (!function_exists('zo_game_sudoku_render')) {
 						<div class="zo-sudoku__card">
 							<h4 class="zo-sudoku__card-title">How To Play</h4>
 							<p class="zo-sudoku__card-copy">
-								Click a blank square, then type on your keyboard or use the number pad. Wrong checks raise your mistake count.
+								Click a blank square, then type on your keyboard or use the number pad. Turn notes on to write small candidate numbers before choosing the final answer.
 							</p>
 						</div>
 

@@ -148,6 +148,11 @@
 	color: #fff;
 }
 
+.zo-game-root--sudoku .zo-sudoku__button.is-active {
+	background: linear-gradient(180deg, #1f7a5a 0%, #14543f 100%);
+	color: #fff;
+}
+
 .zo-game-root--sudoku .zo-sudoku__layout {
 	display: grid;
 	grid-template-columns: minmax(0, 1.4fr) minmax(280px, 0.8fr);
@@ -172,6 +177,9 @@
 
 .zo-game-root--sudoku .zo-sudoku__cell {
 	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	aspect-ratio: 1;
 	min-width: 0;
 	border: 0;
@@ -196,6 +204,12 @@
 	cursor: default;
 }
 
+.zo-game-root--sudoku .zo-sudoku__cell.is-noted {
+	align-items: stretch;
+	justify-content: stretch;
+	padding: 4px;
+}
+
 .zo-game-root--sudoku .zo-sudoku__cell.is-selected {
 	background: #fff3c4;
 }
@@ -216,6 +230,28 @@
 .zo-game-root--sudoku .zo-sudoku__cell.is-wrong::after {
 	border-width: 3px;
 	border-color: #d94a4a;
+}
+
+.zo-game-root--sudoku .zo-sudoku__notes {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	width: 100%;
+	height: 100%;
+	gap: 2px;
+	align-items: center;
+	justify-items: center;
+	font-size: clamp(9px, 1.5vw, 12px);
+	font-weight: 700;
+	line-height: 1;
+	color: #4e6882;
+}
+
+.zo-game-root--sudoku .zo-sudoku__note {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	height: 100%;
 }
 
 .zo-game-root--sudoku .zo-sudoku__cell[data-col="2"],

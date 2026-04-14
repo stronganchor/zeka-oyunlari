@@ -147,6 +147,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		const timerEl = game.querySelector('[data-role="timer"]');
 		const statusEl = game.querySelector('[data-role="status"]');
 		const newBtn = game.querySelector('[data-action="new"]');
+		const notesBtn = game.querySelector('[data-action="notes"]');
 		const resetBtn = game.querySelector('[data-action="reset"]');
 		const checkBtn = game.querySelector('[data-action="check"]');
 		const hintBtn = game.querySelector('[data-action="hint"]');
@@ -154,11 +155,13 @@ document.addEventListener('DOMContentLoaded', function () {
 		let board = [];
 		let startBoard = [];
 		let solution = [];
+		let notes = [];
 		let selectedIndex = -1;
 		let mistakes = 0;
 		let seconds = 0;
 		let timerId = null;
 		let solved = false;
+		let noteMode = false;
 		const usedByLevel = {
 			easy: [],
 			medium: [],
@@ -181,6 +184,42 @@ document.addEventListener('DOMContentLoaded', function () {
 			mistakesEl.textContent = String(mistakes);
 		}
 
+		function updateNotesButton() {
+			notesBtn.textContent = noteMode ? 'Notes: On' : 'Notes: Off';
+			notesBtn.classList.toggle('is-active', noteMode);
+			notesBtn.setAttribute('aria-pressed', noteMode ? 'true' : 'false');
+		}
+
+		function renderCellContent(cell, index) {
+			const value = board[index];
+			const noteList = notes[index] || [];
+
+			if (value !== '0') {
+				cell.textContent = value;
+				cell.classList.remove('is-noted');
+				return;
+			}
+
+			if (!noteList.length) {
+				cell.textContent = '';
+				cell.classList.remove('is-noted');
+				return;
+			}
+
+			const noteGrid = document.createElement('span');
+			noteGrid.className = 'zo-sudoku__notes';
+
+			for (let digit = 1; digit <= 9; digit += 1) {
+				const note = document.createElement('span');
+				note.className = 'zo-sudoku__note';
+				note.textContent = noteList.includes(String(digit)) ? String(digit) : '';
+				noteGrid.appendChild(note);
+			}
+
+			cell.replaceChildren(noteGrid);
+			cell.classList.add('is-noted');
+		}
+
 		function renderSelection() {
 			const selectedRow = selectedIndex >= 0 ? Math.floor(selectedIndex / 9) : -1;
 			const selectedCol = selectedIndex >= 0 ? selectedIndex % 9 : -1;
@@ -190,9 +229,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			Array.from(boardEl.children).forEach(function (cell, index) {
 				const row = Math.floor(index / 9);
 				const col = index % 9;
-				const value = board[index] === '0' ? '' : board[index];
 
-				cell.textContent = value;
+				renderCellContent(cell, index);
 				cell.classList.toggle('is-selected', index === selectedIndex);
 				cell.classList.toggle(
 					'is-related',
@@ -247,7 +285,37 @@ document.addEventListener('DOMContentLoaded', function () {
 				return;
 			}
 
+			if (noteMode) {
+				if (board[selectedIndex] !== '0') {
+					setStatus(statusEl, 'Clear the final number first if you want to add candidates to this square.', 'warning');
+					return;
+				}
+
+				if (value === '0') {
+					notes[selectedIndex] = [];
+					renderSelection();
+					setStatus(statusEl, 'Notes cleared from the selected square.', '');
+					return;
+				}
+
+				const currentNotes = notes[selectedIndex] || [];
+				if (currentNotes.includes(value)) {
+					notes[selectedIndex] = currentNotes.filter(function (entry) {
+						return entry !== value;
+					});
+					setStatus(statusEl, 'Candidate ' + value + ' removed from the selected square.', '');
+				} else {
+					notes[selectedIndex] = currentNotes.concat(value).sort();
+					setStatus(statusEl, 'Candidate ' + value + ' added to the selected square.', '');
+				}
+
+				renderSelection();
+				updateStats();
+				return;
+			}
+
 			board[selectedIndex] = value === '0' ? '0' : value;
+			notes[selectedIndex] = [];
 			renderSelection();
 			updateStats();
 
@@ -301,12 +369,17 @@ document.addEventListener('DOMContentLoaded', function () {
 			startBoard = toCells(selection.data.puzzle);
 			solution = toCells(selection.data.solution);
 			board = startBoard.slice();
+			notes = Array.from({ length: 81 }, function () {
+				return [];
+			});
 			selectedIndex = -1;
 			mistakes = 0;
 			seconds = 0;
 			solved = false;
+			noteMode = false;
 			timerEl.textContent = '00:00';
 			setStatus(statusEl, 'New ' + level + ' puzzle ready. Choose an empty square to begin.', '');
+			updateNotesButton();
 			buildBoard();
 			updateStats();
 			startTimer();
@@ -314,6 +387,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function resetPuzzle() {
 			board = startBoard.slice();
+			notes = Array.from({ length: 81 }, function () {
+				return [];
+			});
 			selectedIndex = -1;
 			solved = false;
 			renderSelection();
@@ -366,6 +442,11 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 
 		newBtn.addEventListener('click', loadPuzzle);
+		notesBtn.addEventListener('click', function () {
+			noteMode = !noteMode;
+			updateNotesButton();
+			setStatus(statusEl, noteMode ? 'Notes mode is on. Added numbers will appear as small candidates.' : 'Notes mode is off. Added numbers will be final answers.', '');
+		});
 		resetBtn.addEventListener('click', resetPuzzle);
 		checkBtn.addEventListener('click', function () {
 			if (solved) {
@@ -410,6 +491,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			board[target] = solution[target];
+			notes[target] = [];
 			selectedIndex = target;
 			renderSelection();
 			updateStats();
