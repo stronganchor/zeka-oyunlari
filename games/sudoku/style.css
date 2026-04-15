@@ -172,7 +172,7 @@
 	border-radius: 18px;
 	overflow: hidden;
 	background: #284766;
-	gap: 1px;
+	gap: 0;
 }
 
 .zo-game-root--sudoku .zo-sudoku__cell {
@@ -182,8 +182,8 @@
 	justify-content: center;
 	aspect-ratio: 1;
 	min-width: 0;
-	border: 0;
-	background: #ffffff;
+	border: 1px solid #92adc6;
+	background: #fbfdff;
 	color: #203246;
 	font-size: clamp(20px, 2.7vw, 30px);
 	font-weight: 800;
@@ -196,6 +196,16 @@
 	inset: 0;
 	border: 0 solid transparent;
 	pointer-events: none;
+}
+
+.zo-game-root--sudoku .zo-sudoku__cell[data-col="2"],
+.zo-game-root--sudoku .zo-sudoku__cell[data-col="5"] {
+	border-right: 3px solid #284766;
+}
+
+.zo-game-root--sudoku .zo-sudoku__cell[data-row="2"],
+.zo-game-root--sudoku .zo-sudoku__cell[data-row="5"] {
+	border-bottom: 3px solid #284766;
 }
 
 .zo-game-root--sudoku .zo-sudoku__cell.is-given {
