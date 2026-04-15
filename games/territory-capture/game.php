@@ -541,7 +541,7 @@ if (!function_exists('zo_game_territory_capture_render')) {
 return array(
 	'slug'            => 'territory-capture',
 	'name'            => 'Territory Capture',
-	'author'          => 'Copilot',
+	'author'          => 'Asker',
 	'description'     => 'A turn-based strategy game where you compete with AI to control the most territory on a grid.',
 	'render_callback' => 'zo_game_territory_capture_render',
 	'inline_style'    => $css,
