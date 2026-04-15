@@ -12,6 +12,32 @@ $css = <<<'CSS'
 	font-family: Arial, sans-serif;
 }
 
+.game-setup {
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 12px;
+	margin: 20px 0;
+}
+
+.game-setup select,
+.game-setup button {
+	padding: 8px 12px;
+	font-size: 14px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+}
+
+.game-setup button {
+	background-color: #2196F3;
+	color: white;
+	cursor: pointer;
+}
+
+.game-setup button:hover {
+	background-color: #1976d2;
+}
+
 .territory-board {
 	display: grid;
 	grid-template-columns: repeat(6, 1fr);
@@ -19,6 +45,12 @@ $css = <<<'CSS'
 	margin: 22px auto;
 	width: min(360px, 100%);
 	aspect-ratio: 1;
+	transition: all 0.3s ease;
+}
+
+.territory-board.board-8 {
+	grid-template-columns: repeat(8, 1fr);
+	width: min(480px, 100%);
 }
 
 .territory-cell {
@@ -32,6 +64,7 @@ $css = <<<'CSS'
 	font-weight: 700;
 	cursor: default;
 	transition: transform 0.2s, box-shadow 0.2s, background-color 0.2s;
+	animation: none;
 }
 
 .territory-cell.valid {
@@ -41,6 +74,16 @@ $css = <<<'CSS'
 
 .territory-cell.valid:hover {
 	transform: scale(1.04);
+}
+
+.territory-cell.claimed {
+	animation: claimPulse 0.5s ease-out;
+}
+
+@keyframes claimPulse {
+	0% { transform: scale(1); }
+	50% { transform: scale(1.1); }
+	100% { transform: scale(1); }
 }
 
 .territory-cell.neutral {
@@ -152,6 +195,10 @@ button {
 		flex-direction: column;
 		align-items: stretch;
 	}
+	.game-setup {
+		flex-direction: column;
+		align-items: center;
+	}
 }
 CSS;
 
@@ -165,6 +212,8 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		let board = [];
+		let boardSize = 6;
+		let difficulty = 'medium';
 		let currentPlayer = 'player';
 		let gameOver = false;
 		let playerSpecialUsed = false;
@@ -177,6 +226,9 @@ document.addEventListener('DOMContentLoaded', function () {
 		const specialInfo = game.querySelector('.special-info');
 		const specialBtn = game.querySelector('.special-btn');
 		const restartBtn = game.querySelector('.restart-btn');
+		const difficultySelect = game.querySelector('.difficulty-select');
+		const sizeSelect = game.querySelector('.size-select');
+		const startBtn = game.querySelector('.start-btn');
 
 		const directions = [
 			[-1, 0],
@@ -187,17 +239,19 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function initBoard() {
 			board = [];
-			for (let i = 0; i < 6; i++) {
+			for (let i = 0; i < boardSize; i++) {
 				board[i] = [];
-				for (let j = 0; j < 6; j++) {
+				for (let j = 0; j < boardSize; j++) {
 					board[i][j] = 'neutral';
 				}
 			}
 
+			// Starting positions
+			const startPos = boardSize - 1;
 			board[0][0] = 'player';
 			board[0][1] = 'player';
-			board[5][5] = 'ai';
-			board[5][4] = 'ai';
+			board[startPos][startPos] = 'ai';
+			board[startPos][startPos - 1] = 'ai';
 
 			currentPlayer = 'player';
 			gameOver = false;
@@ -208,6 +262,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			specialBtn.textContent = 'Use Reinforce';
 			messageElement.textContent = 'Choose a cell to expand or attack.';
 
+			boardElement.className = 'territory-board' + (boardSize === 8 ? ' board-8' : '');
+			boardElement.style.gridTemplateColumns = `repeat(${boardSize}, 1fr)`;
+
 			renderBoard();
 			updateInfo();
 		}
@@ -216,8 +273,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			boardElement.innerHTML = '';
 			const validMoves = getValidCells(currentPlayer);
 
-			for (let i = 0; i < 6; i++) {
-				for (let j = 0; j < 6; j++) {
+			for (let i = 0; i < boardSize; i++) {
+				for (let j = 0; j < boardSize; j++) {
 					const cell = document.createElement('div');
 					cell.className = 'territory-cell ' + board[i][j];
 					if (!gameOver && currentPlayer === 'player' && isCellInList(validMoves, i, j)) {
@@ -239,8 +296,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function getValidCells(owner) {
 			const valid = [];
-			for (let i = 0; i < 6; i++) {
-				for (let j = 0; j < 6; j++) {
+			for (let i = 0; i < boardSize; i++) {
+				for (let j = 0; j < boardSize; j++) {
 					if (board[i][j] !== owner && isValidMove(i, j, owner)) {
 						valid.push([i, j]);
 					}
@@ -278,7 +335,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			for (let dir of directions) {
 				const nr = row + dir[0];
 				const nc = col + dir[1];
-				if (nr >= 0 && nr < 6 && nc >= 0 && nc < 6 && board[nr][nc] === owner) {
+				if (nr >= 0 && nr < boardSize && nc >= 0 && nc < boardSize && board[nr][nc] === owner) {
 					return true;
 				}
 			}
@@ -295,18 +352,21 @@ document.addEventListener('DOMContentLoaded', function () {
 				success = true;
 			} else {
 				action = 'attacked';
-				if (actor === 'player') {
-					success = Math.random() < 0.7;
-					if (success) {
-						board[row][col] = 'player';
-					}
-				} else {
-					success = Math.random() < 0.6;
-					if (success) {
-						board[row][col] = 'ai';
-					}
+				let successRate = actor === 'player' ? 0.7 : (difficulty === 'easy' ? 0.4 : difficulty === 'hard' ? 0.8 : 0.6);
+				success = Math.random() < successRate;
+				if (success) {
+					board[row][col] = actor;
 				}
 			}
+
+			// Add animation class
+			setTimeout(function() {
+				const cell = boardElement.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+				if (cell) {
+					cell.classList.add('claimed');
+					setTimeout(function() { cell.classList.remove('claimed'); }, 500);
+				}
+			}, 10);
 
 			renderBoard();
 			updateInfo();
@@ -328,8 +388,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function getAllNeutralAdjacentTo(owner) {
 			const cells = [];
-			for (let i = 0; i < 6; i++) {
-				for (let j = 0; j < 6; j++) {
+			for (let i = 0; i < boardSize; i++) {
+				for (let j = 0; j < boardSize; j++) {
 					if (board[i][j] !== 'neutral') {
 						continue;
 					}
@@ -343,7 +403,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function aiMove() {
 			const reinforceTargets = getAllNeutralAdjacentTo('ai');
-			if (!aiSpecialUsed && reinforceTargets.length > 0 && Math.random() < 0.25) {
+			const reinforceChance = difficulty === 'easy' ? 0.1 : difficulty === 'hard' ? 0.4 : 0.25;
+			if (!aiSpecialUsed && reinforceTargets.length > 0 && Math.random() < reinforceChance) {
 				const choice = reinforceTargets[Math.floor(Math.random() * reinforceTargets.length)];
 				board[choice[0]][choice[1]] = 'ai';
 				aiSpecialUsed = true;
@@ -389,7 +450,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			for (let dir of directions) {
 				const nr = row + dir[0];
 				const nc = col + dir[1];
-				if (nr >= 0 && nr < 6 && nc >= 0 && nc < 6 && board[nr][nc] === owner) {
+				if (nr >= 0 && nr < boardSize && nc >= 0 && nc < boardSize && board[nr][nc] === owner) {
 					count++;
 				}
 			}
@@ -399,8 +460,8 @@ document.addEventListener('DOMContentLoaded', function () {
 		function updateInfo() {
 			let playerCount = 0;
 			let aiCount = 0;
-			for (let i = 0; i < 6; i++) {
-				for (let j = 0; j < 6; j++) {
+			for (let i = 0; i < boardSize; i++) {
+				for (let j = 0; j < boardSize; j++) {
 					if (board[i][j] === 'player') {
 						playerCount++;
 					} else if (board[i][j] === 'ai') {
@@ -450,8 +511,8 @@ document.addEventListener('DOMContentLoaded', function () {
 				gameOver = true;
 				let playerCount = 0;
 				let aiCount = 0;
-				for (let i = 0; i < 6; i++) {
-					for (let j = 0; j < 6; j++) {
+				for (let i = 0; i < boardSize; i++) {
+					for (let j = 0; j < boardSize; j++) {
 						if (board[i][j] === 'player') {
 							playerCount++;
 						} else if (board[i][j] === 'ai') {
@@ -498,10 +559,19 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		});
 
+		startBtn.addEventListener('click', function () {
+			difficulty = difficultySelect.value;
+			boardSize = parseInt(sizeSelect.value, 10);
+			initBoard();
+		});
+
 		restartBtn.addEventListener('click', function () {
 			initBoard();
 		});
 
+		// Initial setup
+		boardSize = parseInt(sizeSelect.value, 10);
+		difficulty = difficultySelect.value;
 		initBoard();
 	});
 });
@@ -515,16 +585,30 @@ if (!function_exists('zo_game_territory_capture_render')) {
 		?>
 		<div class="zo-game-root zo-game-root--territory-capture" id="<?php echo esc_attr($instance_id); ?>">
 			<h2>Territory Capture</h2>
+			<div class="game-setup">
+				<label>Board Size: <select class="size-select">
+					<option value="6">6x6</option>
+					<option value="8">8x8</option>
+				</select></label>
+				<label>Difficulty: <select class="difficulty-select">
+					<option value="easy">Easy</option>
+					<option value="medium">Medium</option>
+					<option value="hard">Hard</option>
+				</select></label>
+				<button class="start-btn">Start New Game</button>
+			</div>
 			<p>Click on cells adjacent to your green territory to expand. Attack red cells to try to capture them!</p>
 			<div class="game-info">
-				<div class="turn-info">Your turn</div>
-				<div class="score-info">You: 1 | AI: 1</div>
+				<div class="info-row">
+					<div class="turn-info">Your turn</div>
+					<div class="score-info">You: 1 | AI: 1</div>
+				</div>
 				<div class="message">Choose a cell to expand or attack.</div>
 				<div class="legend">
 					<span><span class="legend-dot player"></span>You</span>
 					<span><span class="legend-dot ai"></span>AI</span>
 					<span><span class="legend-dot neutral"></span>Neutral</span>
-			</div>
+				</div>
 				<div class="special-info">Reinforce available</div>
 			</div>
 			<div class="territory-board"></div>
@@ -542,7 +626,7 @@ return array(
 	'slug'            => 'territory-capture',
 	'name'            => 'Territory Capture',
 	'author'          => 'Asker',
-	'description'     => 'A turn-based strategy game where you compete with AI to control the most territory on a grid.',
+	'description'     => 'A turn-based strategy game where you compete with AI to control the most territory on a grid. Choose difficulty and board size, expand your territory, and use special reinforce actions.',
 	'render_callback' => 'zo_game_territory_capture_render',
 	'inline_style'    => $css,
 	'inline_script'    => $js,
