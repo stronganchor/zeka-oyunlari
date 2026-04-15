@@ -266,19 +266,20 @@
 
 .zo-game-root--sudoku .zo-sudoku__cell[data-col="2"],
 .zo-game-root--sudoku .zo-sudoku__cell[data-col="5"] {
-	box-shadow: inset -3px 0 0 #284766;
+	border-right: 3px solid #284766 !important;
 }
 
 .zo-game-root--sudoku .zo-sudoku__cell[data-row="2"],
 .zo-game-root--sudoku .zo-sudoku__cell[data-row="5"] {
-	box-shadow: inset 0 -3px 0 #284766;
+	border-bottom: 3px solid #284766 !important;
 }
 
 .zo-game-root--sudoku .zo-sudoku__cell[data-col="2"][data-row="2"],
 .zo-game-root--sudoku .zo-sudoku__cell[data-col="5"][data-row="2"],
 .zo-game-root--sudoku .zo-sudoku__cell[data-col="2"][data-row="5"],
 .zo-game-root--sudoku .zo-sudoku__cell[data-col="5"][data-row="5"] {
-	box-shadow: inset -3px 0 0 #284766, inset 0 -3px 0 #284766;
+	border-right: 3px solid #284766 !important;
+	border-bottom: 3px solid #284766 !important;
 }
 
 .zo-game-root--sudoku .zo-sudoku__keypad {
