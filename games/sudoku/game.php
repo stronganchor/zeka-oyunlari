@@ -34,6 +34,10 @@ if (!function_exists('zo_game_sudoku_render')) {
 							<span class="zo-sudoku__stat-label">Time</span>
 							<strong class="zo-sudoku__stat-value" data-role="timer">00:00</strong>
 						</div>
+						<div class="zo-sudoku__stat">
+							<span class="zo-sudoku__stat-label">Best Time</span>
+							<strong class="zo-sudoku__stat-value" data-role="best-time">--:--</strong>
+						</div>
 					</div>
 				</div>
 
@@ -53,6 +57,7 @@ if (!function_exists('zo_game_sudoku_render')) {
 						<button type="button" class="zo-sudoku__button" data-action="reset">Reset</button>
 						<button type="button" class="zo-sudoku__button" data-action="check">Check</button>
 						<button type="button" class="zo-sudoku__button" data-action="hint">Hint</button>
+						<button type="button" class="zo-sudoku__button" data-action="undo">Undo</button>
 					</div>
 				</div>
 

@@ -40,8 +40,16 @@ document.addEventListener('DOMContentLoaded', function () {
 				solution: '987654321246173985351928746128537694634892157795461832519286473472319568863745219'
 			},
 			{
-				puzzle: '005300000800000020070010500400005300010070006003200080060500009004000030000009700',
-				solution: '145327698839654127672918543496185372218473956753296481367542819984761235521839764'
+				puzzle: '000000907000420180000705026100904000050000040000507009920108000034059000507000000',
+				solution: '648379207752481369189725346136894527574362048923517689291638475485219673367045821'
+			},
+			{
+				puzzle: '003502900000040000106000305900251008070408030800763001308000104000020000005104800',
+				solution: '873562914952147638116839375924251786379468152681793421538926147647321589215684793'
+			},
+			{
+				puzzle: '000158000002060800030000040027030510000000000046080790050000080004070100000325000',
+				solution: '694158327572463891831679542927031546385742619146589273559216384214378965768325149'
 			}
 		]
 	};
@@ -146,11 +154,13 @@ document.addEventListener('DOMContentLoaded', function () {
 		const mistakesEl = game.querySelector('[data-role="mistakes"]');
 		const timerEl = game.querySelector('[data-role="timer"]');
 		const statusEl = game.querySelector('[data-role="status"]');
+		const bestTimeEl = game.querySelector('[data-role="best-time"]');
 		const newBtn = game.querySelector('[data-action="new"]');
 		const notesBtn = game.querySelector('[data-action="notes"]');
 		const resetBtn = game.querySelector('[data-action="reset"]');
 		const checkBtn = game.querySelector('[data-action="check"]');
 		const hintBtn = game.querySelector('[data-action="hint"]');
+		const undoBtn = game.querySelector('[data-action="undo"]');
 
 		let board = [];
 		let startBoard = [];
@@ -162,6 +172,8 @@ document.addEventListener('DOMContentLoaded', function () {
 		let timerId = null;
 		let solved = false;
 		let noteMode = false;
+		let history = [];
+		let bestKey;
 		const usedByLevel = {
 			easy: [],
 			medium: [],
@@ -268,6 +280,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			solved = true;
 			window.clearInterval(timerId);
 			setStatus(statusEl, 'Puzzle solved. Every row, column, and box is correct.', 'success');
+
+			const best = localStorage.getItem(bestKey);
+			if (!best || seconds < parseInt(best)) {
+				localStorage.setItem(bestKey, seconds.toString());
+				bestTimeEl.textContent = formatTime(seconds);
+			}
 		}
 
 		function applyValue(rawValue) {
@@ -312,6 +330,14 @@ document.addEventListener('DOMContentLoaded', function () {
 				renderSelection();
 				updateStats();
 				return;
+			}
+
+			if (value !== board[selectedIndex]) {
+				history.push({
+					index: selectedIndex,
+					oldValue: board[selectedIndex],
+					oldNotes: notes[selectedIndex].slice()
+				});
 			}
 
 			board[selectedIndex] = value === '0' ? '0' : value;
@@ -366,6 +392,10 @@ document.addEventListener('DOMContentLoaded', function () {
 				usedByLevel[level].shift();
 			}
 
+			bestKey = 'sudoku-best-' + level;
+			const best = localStorage.getItem(bestKey);
+			bestTimeEl.textContent = best ? formatTime(parseInt(best)) : '--:--';
+
 			startBoard = toCells(selection.data.puzzle);
 			solution = toCells(selection.data.solution);
 			board = startBoard.slice();
@@ -376,6 +406,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			mistakes = 0;
 			seconds = 0;
 			solved = false;
+			history = [];
 			noteMode = false;
 			timerEl.textContent = '00:00';
 			setStatus(statusEl, 'New ' + level + ' puzzle ready. Choose an empty square to begin.', '');
@@ -392,6 +423,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			});
 			selectedIndex = -1;
 			solved = false;
+			history = [];
 			renderSelection();
 			updateStats();
 			setStatus(statusEl, 'Puzzle reset to the starting clues.', '');
@@ -490,6 +522,12 @@ document.addEventListener('DOMContentLoaded', function () {
 				return;
 			}
 
+			history.push({
+				index: target,
+				oldValue: board[target],
+				oldNotes: notes[target].slice()
+			});
+
 			board[target] = solution[target];
 			notes[target] = [];
 			selectedIndex = target;
@@ -497,6 +535,26 @@ document.addEventListener('DOMContentLoaded', function () {
 			updateStats();
 			setStatus(statusEl, 'Hint used: square filled with the correct number.', '');
 			checkWin();
+		});
+
+		undoBtn.addEventListener('click', function () {
+			if (solved) {
+				setStatus(statusEl, 'Cannot undo after solving.', '');
+				return;
+			}
+
+			if (history.length === 0) {
+				setStatus(statusEl, 'No moves to undo.', '');
+				return;
+			}
+
+			const last = history.pop();
+			board[last.index] = last.oldValue;
+			notes[last.index] = last.oldNotes;
+			selectedIndex = last.index;
+			renderSelection();
+			updateStats();
+			setStatus(statusEl, 'Undid the last move.', '');
 		});
 
 		difficultyEl.addEventListener('change', loadPuzzle);
