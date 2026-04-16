@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.3.13
+ * Version: 1.3.19
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -101,9 +101,13 @@ function zo_load_game_module_file($file) {
 		return $loaded_modules[$file];
 	}
 
+	ob_start();
+	$module = null;
+
 	try {
 		$module = require $file;
 	} catch (Throwable $throwable) {
+		ob_end_clean();
 		error_log(
 			sprintf(
 				'[Zeka Oyunlari] Skipping broken game module "%1$s": %2$s in %3$s on line %4$d',
@@ -119,10 +123,30 @@ function zo_load_game_module_file($file) {
 		return null;
 	}
 
+	$extra_output = ob_get_clean();
+
 	if (!is_array($module)) {
+		if ($extra_output !== '') {
+			error_log(
+				sprintf(
+					'[Zeka Oyunlari] Ignoring unexpected output while loading game module "%1$s"',
+					basename(dirname($file))
+				)
+			);
+		}
+
 		$loaded_modules[$file] = null;
 
 		return null;
+	}
+
+	if ($extra_output !== '') {
+		error_log(
+			sprintf(
+				'[Zeka Oyunlari] Discarded output while loading game module "%1$s"',
+				basename(dirname($file))
+			)
+		);
 	}
 
 	$loaded_modules[$file] = $module;
@@ -134,6 +158,15 @@ function zo_load_game_modules() {
 	static $modules = null;
 
 	if ($modules !== null) {
+		return $modules;
+	}
+
+	if ((function_exists('wp_doing_ajax') && wp_doing_ajax()) ||
+		(defined('REST_REQUEST') && REST_REQUEST) ||
+		(defined('DOING_CRON') && DOING_CRON) ||
+		(defined('WP_CLI') && WP_CLI)
+	) {
+		$modules = array();
 		return $modules;
 	}
 
@@ -191,7 +224,6 @@ function zo_load_game_modules() {
 
 	return $modules;
 }
-add_action('plugins_loaded', 'zo_load_game_modules', 1);
 
 function zo_get_game_modules() {
 	return zo_load_game_modules();
