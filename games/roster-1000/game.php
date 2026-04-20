@@ -437,7 +437,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			const speed = +(2.1 + ((seed % 7) * 0.12) + (archetype.speed * 0.85)).toFixed(2);
 			const fireRate = +(0.45 + ((seed % 5) * 0.06) + (archetype.rate * 0.3)).toFixed(2);
 			const hp = Math.round(90 + ((seed % 11) * 8) + (tierBoost * 55) + (archetype.power * 18));
-			const price = id === 1 ? 0 : Math.round(40 + (tier * 28) + ((seed % 25) * 7));
+			const price = id === 1 ? 0 : Math.round(90 + (tier * 55) + ((seed % 25) * 13) + (id * 0.8));
 			return {
 				id: id,
 				name: archetype.name + ' #' + String(id),
