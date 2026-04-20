@@ -193,6 +193,38 @@ $css = <<<'CSS'
 	color: #5f7690;
 }
 
+.zo-game-root--roster-1000 .zo-r1-shop-meta {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 10px;
+	margin-bottom: 10px;
+}
+
+.zo-game-root--roster-1000 .zo-r1-total {
+	font-size: 13px;
+	font-weight: 700;
+	color: #47607d;
+}
+
+.zo-game-root--roster-1000 .zo-r1-jump {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+}
+
+.zo-game-root--roster-1000 .zo-r1-input {
+	width: 96px;
+	border: 1px solid #bfdbfe;
+	border-radius: 12px;
+	padding: 10px 12px;
+	font: inherit;
+	font-size: 14px;
+	color: #12335c;
+	background: #ffffff;
+}
+
 .zo-game-root--roster-1000 .zo-r1-roster {
 	display: grid;
 	grid-template-columns: 1fr;
@@ -340,6 +372,9 @@ document.addEventListener('DOMContentLoaded', function () {
 		const rosterEl = game.querySelector('.zo-r1-roster');
 		const statusEl = game.querySelector('.zo-r1-status');
 		const pageLabelEl = game.querySelector('.zo-r1-page-label');
+		const totalEl = game.querySelector('.zo-r1-total');
+		const jumpInput = game.querySelector('.zo-r1-jump-input');
+		const jumpButton = game.querySelector('.zo-r1-jump-btn');
 
 		const coinsEl = game.querySelector('.zo-r1-coins');
 		const levelEl = game.querySelector('.zo-r1-level');
@@ -432,6 +467,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			heroEl.textContent = getCharacter(state.selectedId).name;
 			winsEl.textContent = String(state.wins);
 			pageLabelEl.textContent = 'Page ' + String(state.page + 1) + ' / ' + String(Math.ceil(TOTAL_CHARACTERS / PAGE_SIZE));
+			totalEl.textContent = 'Showing heroes ' + String((state.page * PAGE_SIZE) + 1) + '-' + String(Math.min(TOTAL_CHARACTERS, ((state.page + 1) * PAGE_SIZE))) + ' of ' + String(TOTAL_CHARACTERS);
 		}
 
 		function createHero() {
@@ -631,6 +667,19 @@ document.addEventListener('DOMContentLoaded', function () {
 					}
 				});
 			});
+		}
+
+		function jumpToHero() {
+			const id = parseInt(jumpInput.value || '0', 10);
+			if (id < 1 || id > TOTAL_CHARACTERS) {
+				setStatus('Enter a hero number from 1 to 1000.');
+				return;
+			}
+
+			state.page = Math.floor((id - 1) / PAGE_SIZE);
+			renderRoster();
+			updateHud();
+			setStatus('Jumped to hero #' + String(id) + '.');
 		}
 
 		function fireProjectile(from, target, damage, color, speed, friendly) {
@@ -1036,6 +1085,17 @@ document.addEventListener('DOMContentLoaded', function () {
 			updateHud();
 		});
 
+		jumpButton.addEventListener('click', function () {
+			jumpToHero();
+		});
+
+		jumpInput.addEventListener('keydown', function (event) {
+			if (event.key === 'Enter') {
+				event.preventDefault();
+				jumpToHero();
+			}
+		});
+
 		resetForSelectedHero(true);
 		game.setAttribute('tabindex', '0');
 	});
@@ -1108,6 +1168,14 @@ if (!function_exists('zo_game_roster_1000_render')) {
 								<button type="button" class="zo-r1-page-btn zo-r1-prev-page">Prev</button>
 								<span class="zo-r1-page-label">Page 1 / 84</span>
 								<button type="button" class="zo-r1-page-btn zo-r1-next-page">Next</button>
+							</div>
+						</div>
+
+						<div class="zo-r1-shop-meta">
+							<div class="zo-r1-total">Showing heroes 1-12 of 1000</div>
+							<div class="zo-r1-jump">
+								<input type="number" min="1" max="1000" step="1" class="zo-r1-input zo-r1-jump-input" placeholder="Hero #" aria-label="Jump to hero number">
+								<button type="button" class="zo-r1-btn zo-r1-btn--secondary zo-r1-jump-btn">Go</button>
 							</div>
 						</div>
 
