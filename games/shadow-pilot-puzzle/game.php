@@ -104,3 +104,4 @@ return array(
 	'inline_script' => $js,
 );
 ?>
+

@@ -97,10 +97,12 @@ if (!function_exists('zo_game_silent_decoder_vault')) {
 return array(
 	'slug' => 'silent-decoder-vault',
 	'name' => 'Silent Decoder Vault',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Decode silent signals to unlock vault nodes in sequence.',
 	'render_callback' => 'zo_game_silent_decoder_vault',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
+

@@ -97,10 +97,12 @@ if (!function_exists('zo_game_turbo_maze_memory')) {
 return array(
 	'slug' => 'turbo-maze-memory',
 	'name' => 'Turbo Maze Memory',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Race through turbo mazes and remember changing wall patterns.',
 	'render_callback' => 'zo_game_turbo_maze_memory',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
+
