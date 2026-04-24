@@ -97,11 +97,12 @@ if (!function_exists('zo_game_shadow_builder_circuit')) {
 return array(
 	'slug' => 'shadow-builder-circuit',
 	'name' => 'Shadow Builder Circuit',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Build safe circuits while shadows distort your placement window.',
 	'render_callback' => 'zo_game_shadow_builder_circuit',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

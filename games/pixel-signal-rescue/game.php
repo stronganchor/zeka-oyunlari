@@ -97,11 +97,12 @@ if (!function_exists('zo_game_pixel_signal_rescue')) {
 return array(
 	'slug' => 'pixel-signal-rescue',
 	'name' => 'Pixel Signal Rescue',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Rescue lost signal beacons while avoiding drifting pixel noise.',
 	'render_callback' => 'zo_game_pixel_signal_rescue',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

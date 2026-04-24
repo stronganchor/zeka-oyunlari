@@ -97,11 +97,12 @@ if (!function_exists('zo_game_nova_courier_vault')) {
 return array(
 	'slug' => 'nova-courier-vault',
 	'name' => 'Nova Courier Vault',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Deliver data capsules through nova storms and unstable gates.',
 	'render_callback' => 'zo_game_nova_courier_vault',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

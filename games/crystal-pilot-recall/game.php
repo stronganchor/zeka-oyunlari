@@ -97,11 +97,12 @@ if (!function_exists('zo_game_crystal_pilot_recall')) {
 return array(
 	'slug' => 'crystal-pilot-recall',
 	'name' => 'Crystal Pilot Recall',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Recall and replay crystal flight patterns to clear each checkpoint.',
 	'render_callback' => 'zo_game_crystal_pilot_recall',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

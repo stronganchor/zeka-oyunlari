@@ -97,11 +97,12 @@ if (!function_exists('zo_game_echo_maze_vault')) {
 return array(
 	'slug' => 'echo-maze-vault',
 	'name' => 'Echo Maze Vault',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Traverse acoustic mazes and free data from a silent archive.',
 	'render_callback' => 'zo_game_echo_maze_vault',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

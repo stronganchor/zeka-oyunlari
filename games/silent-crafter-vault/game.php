@@ -97,11 +97,12 @@ if (!function_exists('zo_game_silent_crafter_vault')) {
 return array(
 	'slug' => 'silent-crafter-vault',
 	'name' => 'Silent Crafter Vault',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Create silent tools needed to crack a sealed vault sequence.',
 	'render_callback' => 'zo_game_silent_crafter_vault',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

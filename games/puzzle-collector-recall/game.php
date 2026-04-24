@@ -97,11 +97,12 @@ if (!function_exists('zo_game_puzzle_collector_recall')) {
 return array(
 	'slug' => 'puzzle-collector-recall',
 	'name' => 'Puzzle Collector Recall',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Collect puzzle fragments and recall their order under stress.',
 	'render_callback' => 'zo_game_puzzle_collector_recall',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

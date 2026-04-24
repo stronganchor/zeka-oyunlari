@@ -97,11 +97,12 @@ if (!function_exists('zo_game_echo_pilot_quest')) {
 return array(
 	'slug' => 'echo-pilot-quest',
 	'name' => 'Echo Pilot Quest',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Fly by listening to echoes and piloting through fog barriers.',
 	'render_callback' => 'zo_game_echo_pilot_quest',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

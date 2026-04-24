@@ -97,11 +97,12 @@ if (!function_exists('zo_game_pixel_runner_rescue')) {
 return array(
 	'slug' => 'pixel-runner-rescue',
 	'name' => 'Pixel Runner Rescue',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Rescue a lost avatar through a fast pixel river chase.',
 	'render_callback' => 'zo_game_pixel_runner_rescue',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

@@ -97,11 +97,12 @@ if (!function_exists('zo_game_orbit_signal_rescue')) {
 return array(
 	'slug' => 'orbit-signal-rescue',
 	'name' => 'Orbit Signal Rescue',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Reroute orbit signals and rescue beacon pilots mid-flight.',
 	'render_callback' => 'zo_game_orbit_signal_rescue',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

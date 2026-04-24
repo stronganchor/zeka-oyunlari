@@ -97,11 +97,12 @@ if (!function_exists('zo_game_orbit_runner_sprint')) {
 return array(
 	'slug' => 'orbit-runner-sprint',
 	'name' => 'Orbit Runner Sprint',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Pilot around rotating rings to collect cores before time runs out.',
 	'render_callback' => 'zo_game_orbit_runner_sprint',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

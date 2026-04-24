@@ -97,11 +97,12 @@ if (!function_exists('zo_game_shadow_cipher_vault')) {
 return array(
 	'slug' => 'shadow-cipher-vault',
 	'name' => 'Shadow Cipher Vault',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Use shadow ciphers to crack layered security in total darkness.',
 	'render_callback' => 'zo_game_shadow_cipher_vault',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

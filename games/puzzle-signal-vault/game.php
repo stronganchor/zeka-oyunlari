@@ -97,11 +97,12 @@ if (!function_exists('zo_game_puzzle_signal_vault')) {
 return array(
 	'slug' => 'puzzle-signal-vault',
 	'name' => 'Puzzle Signal Vault',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Decode color-shift signals to open vault doors in sequence.',
 	'render_callback' => 'zo_game_puzzle_signal_vault',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

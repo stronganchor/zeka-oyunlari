@@ -97,11 +97,12 @@ if (!function_exists('zo_game_echo_decoder_circuit')) {
 return array(
 	'slug' => 'echo-decoder-circuit',
 	'name' => 'Echo Decoder Circuit',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Trace hidden echo patterns to complete a failing circuit.',
 	'render_callback' => 'zo_game_echo_decoder_circuit',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

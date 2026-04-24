@@ -97,11 +97,12 @@ if (!function_exists('zo_game_nova_maze_shift')) {
 return array(
 	'slug' => 'nova-maze-shift',
 	'name' => 'Nova Maze Shift',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Shift dimensions in a maze as nova winds alter passage priorities.',
 	'render_callback' => 'zo_game_nova_maze_shift',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

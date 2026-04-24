@@ -97,11 +97,12 @@ if (!function_exists('zo_game_orbit_builder_recall')) {
 return array(
 	'slug' => 'orbit-builder-recall',
 	'name' => 'Orbit Builder Recall',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Plan and recall orbital paths to build a stable ring colony.',
 	'render_callback' => 'zo_game_orbit_builder_recall',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

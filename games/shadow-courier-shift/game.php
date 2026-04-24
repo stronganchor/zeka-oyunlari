@@ -97,11 +97,12 @@ if (!function_exists('zo_game_shadow_courier_shift')) {
 return array(
 	'slug' => 'shadow-courier-shift',
 	'name' => 'Shadow Courier Shift',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Sneak deliveries through shadow zones while the layout rotates.',
 	'render_callback' => 'zo_game_shadow_courier_shift',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

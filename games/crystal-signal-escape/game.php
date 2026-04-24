@@ -97,11 +97,12 @@ if (!function_exists('zo_game_crystal_signal_escape')) {
 return array(
 	'slug' => 'crystal-signal-escape',
 	'name' => 'Crystal Signal Escape',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Follow crystal frequencies to escape an escalating lockdown.',
 	'render_callback' => 'zo_game_crystal_signal_escape',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

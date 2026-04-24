@@ -97,11 +97,12 @@ if (!function_exists('zo_game_orbit_architect_recall')) {
 return array(
 	'slug' => 'orbit-architect-recall',
 	'name' => 'Orbit Architect Recall',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Restore orbital stations by recalling broken station blueprints.',
 	'render_callback' => 'zo_game_orbit_architect_recall',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

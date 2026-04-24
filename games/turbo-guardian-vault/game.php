@@ -97,11 +97,12 @@ if (!function_exists('zo_game_turbo_guardian_vault')) {
 return array(
 	'slug' => 'turbo-guardian-vault',
 	'name' => 'Turbo Guardian Vault',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Guard and upgrade a turbo vault engine against fast intruders.',
 	'render_callback' => 'zo_game_turbo_guardian_vault',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

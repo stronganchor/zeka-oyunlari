@@ -97,11 +97,12 @@ if (!function_exists('zo_game_orbit_decoder_memory')) {
 return array(
 	'slug' => 'orbit-decoder-memory',
 	'name' => 'Orbit Decoder Memory',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Read orbiting data streams and restore missing memory packets.',
 	'render_callback' => 'zo_game_orbit_decoder_memory',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

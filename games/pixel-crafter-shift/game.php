@@ -97,11 +97,12 @@ if (!function_exists('zo_game_pixel_crafter_shift')) {
 return array(
 	'slug' => 'pixel-crafter-shift',
 	'name' => 'Pixel Crafter Shift',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Shift pixel zones to craft useful shapes and score bonuses.',
 	'render_callback' => 'zo_game_pixel_crafter_shift',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

@@ -97,11 +97,12 @@ if (!function_exists('zo_game_quantum_maze_sprint')) {
 return array(
 	'slug' => 'quantum-maze-sprint',
 	'name' => 'Quantum Maze Sprint',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Solve quantum maze branches while the walls phase in real time.',
 	'render_callback' => 'zo_game_quantum_maze_sprint',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

@@ -97,11 +97,12 @@ if (!function_exists('zo_game_turbo_signal_puzzle')) {
 return array(
 	'slug' => 'turbo-signal-puzzle',
 	'name' => 'Turbo Signal Puzzle',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Sort high-speed signals before a turbo countdown ends.',
 	'render_callback' => 'zo_game_turbo_signal_puzzle',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

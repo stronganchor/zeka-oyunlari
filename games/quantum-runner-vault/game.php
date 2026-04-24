@@ -97,11 +97,12 @@ if (!function_exists('zo_game_quantum_runner_vault')) {
 return array(
 	'slug' => 'quantum-runner-vault',
 	'name' => 'Quantum Runner Vault',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Run quantum lanes to secure vault gates before resets occur.',
 	'render_callback' => 'zo_game_quantum_runner_vault',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

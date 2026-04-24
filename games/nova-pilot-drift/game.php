@@ -97,11 +97,12 @@ if (!function_exists('zo_game_nova_pilot_drift')) {
 return array(
 	'slug' => 'nova-pilot-drift',
 	'name' => 'Nova Pilot Drift',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Pilot through drifting asteroids while your controls subtly desync.',
 	'render_callback' => 'zo_game_nova_pilot_drift',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

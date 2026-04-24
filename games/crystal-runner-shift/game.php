@@ -97,11 +97,12 @@ if (!function_exists('zo_game_crystal_runner_shift')) {
 return array(
 	'slug' => 'crystal-runner-shift',
 	'name' => 'Crystal Runner Shift',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Sprint across crystal platforms and ride rhythm pulses to survive.',
 	'render_callback' => 'zo_game_crystal_runner_shift',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

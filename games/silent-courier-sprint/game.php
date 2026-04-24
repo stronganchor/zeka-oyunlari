@@ -97,11 +97,12 @@ if (!function_exists('zo_game_silent_courier_sprint')) {
 return array(
 	'slug' => 'silent-courier-sprint',
 	'name' => 'Silent Courier Sprint',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Run silent deliveries and keep noise levels below a breaking point.',
 	'render_callback' => 'zo_game_silent_courier_sprint',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

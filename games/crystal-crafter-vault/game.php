@@ -97,11 +97,12 @@ if (!function_exists('zo_game_crystal_crafter_vault')) {
 return array(
 	'slug' => 'crystal-crafter-vault',
 	'name' => 'Crystal Crafter Vault',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Build protective crystal vaults before security cycles trigger.',
 	'render_callback' => 'zo_game_crystal_crafter_vault',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

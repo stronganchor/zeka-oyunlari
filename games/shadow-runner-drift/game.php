@@ -97,11 +97,12 @@ if (!function_exists('zo_game_shadow_runner_drift')) {
 return array(
 	'slug' => 'shadow-runner-drift',
 	'name' => 'Shadow Runner Drift',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Dash through drifting smoke layers with shrinking visibility.',
 	'render_callback' => 'zo_game_shadow_runner_drift',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

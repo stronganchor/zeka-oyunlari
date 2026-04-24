@@ -97,11 +97,12 @@ if (!function_exists('zo_game_turbo_decoder_recall')) {
 return array(
 	'slug' => 'turbo-decoder-recall',
 	'name' => 'Turbo Decoder Recall',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Recover shredded data by recalling turbo-cycled code pages.',
 	'render_callback' => 'zo_game_turbo_decoder_recall',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

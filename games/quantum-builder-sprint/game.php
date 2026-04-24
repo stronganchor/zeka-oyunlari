@@ -97,11 +97,12 @@ if (!function_exists('zo_game_quantum_builder_sprint')) {
 return array(
 	'slug' => 'quantum-builder-sprint',
 	'name' => 'Quantum Builder Sprint',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Build quantum supports at speed to hold open an unstable bridge.',
 	'render_callback' => 'zo_game_quantum_builder_sprint',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

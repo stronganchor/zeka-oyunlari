@@ -97,11 +97,12 @@ if (!function_exists('zo_game_neon_guardian_pulse')) {
 return array(
 	'slug' => 'neon-guardian-pulse',
 	'name' => 'Neon Guardian Pulse',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Pulse-match neon guardians to keep the perimeter energized.',
 	'render_callback' => 'zo_game_neon_guardian_pulse',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

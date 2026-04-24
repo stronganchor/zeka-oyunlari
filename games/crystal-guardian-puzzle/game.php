@@ -97,11 +97,12 @@ if (!function_exists('zo_game_crystal_guardian_puzzle')) {
 return array(
 	'slug' => 'crystal-guardian-puzzle',
 	'name' => 'Crystal Guardian Puzzle',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Protect a magical guardian and solve reflective spatial puzzles.',
 	'render_callback' => 'zo_game_crystal_guardian_puzzle',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

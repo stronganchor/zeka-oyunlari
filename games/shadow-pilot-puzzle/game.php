@@ -97,11 +97,12 @@ if (!function_exists('zo_game_shadow_pilot_puzzle')) {
 return array(
 	'slug' => 'shadow-pilot-puzzle',
 	'name' => 'Shadow Pilot Puzzle',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Pilot through dark zones and solve puzzle gates on the way out.',
 	'render_callback' => 'zo_game_shadow_pilot_puzzle',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

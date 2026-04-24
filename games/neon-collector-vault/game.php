@@ -97,11 +97,12 @@ if (!function_exists('zo_game_neon_collector_vault')) {
 return array(
 	'slug' => 'neon-collector-vault',
 	'name' => 'Neon Collector Vault',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Collect bright relics and stabilize a leaking reactor vault.',
 	'render_callback' => 'zo_game_neon_collector_vault',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

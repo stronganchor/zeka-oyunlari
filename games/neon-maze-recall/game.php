@@ -97,11 +97,12 @@ if (!function_exists('zo_game_neon_maze_recall')) {
 return array(
 	'slug' => 'neon-maze-recall',
 	'name' => 'Neon Maze Recall',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Navigate luminous mazes with a short-term memory sequence.',
 	'render_callback' => 'zo_game_neon_maze_recall',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

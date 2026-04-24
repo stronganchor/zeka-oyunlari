@@ -97,11 +97,12 @@ if (!function_exists('zo_game_crystal_maze_sprint')) {
 return array(
 	'slug' => 'crystal-maze-sprint',
 	'name' => 'Crystal Maze Sprint',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Race with reflective clues through glittering crystal mazes.',
 	'render_callback' => 'zo_game_crystal_maze_sprint',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

@@ -97,11 +97,12 @@ if (!function_exists('zo_game_quantum_decoder_drift')) {
 return array(
 	'slug' => 'quantum-decoder-drift',
 	'name' => 'Quantum Decoder Drift',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Hold signal lock while the world drifts out of phase.',
 	'render_callback' => 'zo_game_quantum_decoder_drift',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

@@ -97,11 +97,12 @@ if (!function_exists('zo_game_neon_signal_circuit')) {
 return array(
 	'slug' => 'neon-signal-circuit',
 	'name' => 'Neon Signal Circuit',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Reconnect neon lines in time with a failing signal circuit.',
 	'render_callback' => 'zo_game_neon_signal_circuit',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

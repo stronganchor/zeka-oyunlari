@@ -97,11 +97,12 @@ if (!function_exists('zo_game_puzzle_crafter_drift')) {
 return array(
 	'slug' => 'puzzle-crafter-drift',
 	'name' => 'Puzzle Crafter Drift',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Craft shifting puzzle tiles and keep your score growing.',
 	'render_callback' => 'zo_game_puzzle_crafter_drift',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

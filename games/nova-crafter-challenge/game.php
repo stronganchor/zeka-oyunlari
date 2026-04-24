@@ -97,11 +97,12 @@ if (!function_exists('zo_game_nova_crafter_challenge')) {
 return array(
 	'slug' => 'nova-crafter-challenge',
 	'name' => 'Nova Crafter Challenge',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Forge stable nova modules in a pressure cooking crafting loop.',
 	'render_callback' => 'zo_game_nova_crafter_challenge',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

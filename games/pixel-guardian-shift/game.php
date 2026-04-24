@@ -97,11 +97,12 @@ if (!function_exists('zo_game_pixel_guardian_shift')) {
 return array(
 	'slug' => 'pixel-guardian-shift',
 	'name' => 'Pixel Guardian Shift',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Shift between pixel layers and keep the guardian shield alive.',
 	'render_callback' => 'zo_game_pixel_guardian_shift',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

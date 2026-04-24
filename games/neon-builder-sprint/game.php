@@ -97,11 +97,12 @@ if (!function_exists('zo_game_neon_builder_sprint')) {
 return array(
 	'slug' => 'neon-builder-sprint',
 	'name' => 'Neon Builder Sprint',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Build neon rails quickly while deadlines and hazards rise.',
 	'render_callback' => 'zo_game_neon_builder_sprint',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

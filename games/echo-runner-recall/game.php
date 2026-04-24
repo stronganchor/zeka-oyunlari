@@ -97,11 +97,12 @@ if (!function_exists('zo_game_echo_runner_recall')) {
 return array(
 	'slug' => 'echo-runner-recall',
 	'name' => 'Echo Runner Recall',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Recall sound marks and outpace a pursuing patrol safely.',
 	'render_callback' => 'zo_game_echo_runner_recall',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

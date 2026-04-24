@@ -97,11 +97,12 @@ if (!function_exists('zo_game_nova_signal_shift')) {
 return array(
 	'slug' => 'nova-signal-shift',
 	'name' => 'Nova Signal Shift',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Shift your signal lane before the nova flare changes everything.',
 	'render_callback' => 'zo_game_nova_signal_shift',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 

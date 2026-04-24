@@ -97,11 +97,12 @@ if (!function_exists('zo_game_puzzle_builder_rescue')) {
 return array(
 	'slug' => 'puzzle-builder-rescue',
 	'name' => 'Puzzle Builder Rescue',
-	'author' => 'Arslan',
+	'author' => 'asker',
 	'description' => 'Assemble puzzle blocks under pressure to rescue trapped crew.',
 	'render_callback' => 'zo_game_puzzle_builder_rescue',
 	'inline_style' => $css,
 	'inline_script' => $js,
 );
 ?>
+
 
