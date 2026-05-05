@@ -21,6 +21,39 @@ function zo_pca_current_user_can_manage() {
 	return current_user_can('edit_posts');
 }
 
+function zo_pca_sanitize_shared_puzzles($list) {
+	if (!is_array($list)) {
+		return array();
+	}
+
+	$clean = array();
+
+	foreach ($list as $item) {
+		if (!is_array($item)) {
+			continue;
+		}
+
+		$name = isset($item['name']) ? sanitize_text_field((string) $item['name']) : '';
+		$code = isset($item['code']) ? preg_replace('/[^A-Za-z0-9+\/=]/', '', (string) $item['code']) : '';
+		$data = $code !== '' ? base64_decode($code, true) : false;
+
+		if ($name === '' || $data === false || strlen($data) !== 64 || preg_match('/[^01SG]/', $data)) {
+			continue;
+		}
+
+		$clean[] = array(
+			'name' => substr($name, 0, 80),
+			'code' => $code,
+		);
+
+		if (count($clean) >= 100) {
+			break;
+		}
+	}
+
+	return $clean;
+}
+
 function zo_pca_save_shared() {
 	check_ajax_referer('zo_pca_nonce', 'nonce');
 
@@ -35,22 +68,25 @@ function zo_pca_save_shared() {
 		wp_send_json_error('Missing data');
 	}
 
-	if (strlen($name) > 80 || strlen($code) > 512 || !preg_match('/^[A-Za-z0-9+\/=]+$/', $code)) {
+	$decoded = base64_decode($code, true);
+
+	if (strlen($name) > 80 || strlen($code) > 512 || $decoded === false || strlen($decoded) !== 64 || preg_match('/[^01SG]/', $decoded)) {
 		wp_send_json_error('Invalid puzzle data');
 	}
 
-	$list = get_option('zo_pca_shared_puzzles', array());
+	$list = zo_pca_sanitize_shared_puzzles(get_option('zo_pca_shared_puzzles', array()));
 	$list[] = array(
 		'name' => $name,
 		'code' => $code
 	);
+	$list = zo_pca_sanitize_shared_puzzles($list);
 
 	update_option('zo_pca_shared_puzzles', $list);
 	wp_send_json_success($list);
 }
 
 function zo_pca_get_shared() {
-	$list = get_option('zo_pca_shared_puzzles', array());
+	$list = zo_pca_sanitize_shared_puzzles(get_option('zo_pca_shared_puzzles', array()));
 	wp_send_json_success($list);
 }
 
@@ -62,7 +98,7 @@ function zo_pca_delete_shared() {
 	}
 
 	$index = isset($_POST['index']) ? intval($_POST['index']) : -1;
-	$list = get_option('zo_pca_shared_puzzles', array());
+	$list = zo_pca_sanitize_shared_puzzles(get_option('zo_pca_shared_puzzles', array()));
 
 	if (isset($list[$index])) {
 		array_splice($list, $index, 1);
@@ -172,7 +208,19 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function loadPuzzle(code) {
-			const data = atob(code);
+			let data = '';
+			try {
+				data = atob(code);
+			} catch (error) {
+				statusEl.textContent = 'This shared puzzle is blocked because its data is invalid.';
+				return;
+			}
+
+			if (data.length !== size * size || /[^01SG]/.test(data)) {
+				statusEl.textContent = 'This shared puzzle is blocked because its data is invalid.';
+				return;
+			}
+
 			start = null;
 			goal = null;
 			data.split('').forEach(function (ch, i) {
@@ -247,7 +295,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		const saveButton = game.querySelector('.zo-pca-save');
 		if (saveButton) {
 		saveButton.onclick = function () {
-			const name = prompt('Puzzle name:');
+			const name = (prompt('Puzzle name:') || '').trim().slice(0, 80);
 			if (!name) return;
 
 			fetch(ajaxUrl, {
@@ -275,9 +323,30 @@ document.addEventListener('DOMContentLoaded', function () {
 		};
 		}
 
+		function isValidSharedPuzzle(item) {
+			if (!item || typeof item.name !== 'string' || typeof item.code !== 'string') {
+				return false;
+			}
+
+			try {
+				const data = atob(item.code);
+				return item.name.length > 0 && item.name.length <= 80 && data.length === size * size && !/[^01SG]/.test(data);
+			} catch (error) {
+				return false;
+			}
+		}
+
 		function renderShared(list) {
 			sharedBox.innerHTML = '';
+			if (!Array.isArray(list)) {
+				return;
+			}
+
 			list.forEach(function (item, index) {
+				if (!isValidSharedPuzzle(item)) {
+					return;
+				}
+
 				const wrapper = document.createElement('div');
 
 				const playBtn = document.createElement('button');

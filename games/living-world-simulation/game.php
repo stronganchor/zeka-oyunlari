@@ -857,7 +857,15 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.feed.forEach(function (entry) {
 				const row = document.createElement('div');
 				row.className = 'zo-lw-row';
-				row.innerHTML = '<strong>Town</strong><span>' + entry + '</span>';
+
+				const source = document.createElement('strong');
+				source.textContent = 'Town';
+
+				const text = document.createElement('span');
+				text.textContent = entry;
+
+				row.appendChild(source);
+				row.appendChild(text);
 				feedList.appendChild(row);
 			});
 		}

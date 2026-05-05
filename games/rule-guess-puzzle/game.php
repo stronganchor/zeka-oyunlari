@@ -321,11 +321,20 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     askBtn.addEventListener('click', function () {
-        askerResponse.innerHTML = `
-            <strong>🤖 AI Assistant:</strong><br>
-            ${levels[currentLevel].detailedExplanation}<br><br>
-            <strong>Try these examples:</strong> ${levels[currentLevel].examples.join(', ')}
-        `;
+        askerResponse.textContent = '';
+
+        const title = document.createElement('strong');
+        title.textContent = 'AI Assistant:';
+        askerResponse.appendChild(title);
+        askerResponse.appendChild(document.createElement('br'));
+        askerResponse.appendChild(document.createTextNode(levels[currentLevel].detailedExplanation));
+        askerResponse.appendChild(document.createElement('br'));
+        askerResponse.appendChild(document.createElement('br'));
+
+        const examplesTitle = document.createElement('strong');
+        examplesTitle.textContent = 'Try these examples:';
+        askerResponse.appendChild(examplesTitle);
+        askerResponse.appendChild(document.createTextNode(' ' + levels[currentLevel].examples.join(', ')));
         askerResponse.style.display = 'block';
         askerResponse.scrollIntoView({ behavior: 'smooth' });
     });
