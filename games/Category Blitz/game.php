@@ -333,7 +333,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.history.slice().reverse().forEach(function (entry) {
 				const item = document.createElement('div');
 				item.className = 'cb-history-item';
-				item.innerHTML = '<strong>' + entry.letter + ' - ' + entry.category + '</strong>: ' + entry.answer + ' (' + entry.result + ')';
+
+				const label = document.createElement('strong');
+				label.textContent = entry.letter + ' - ' + entry.category;
+
+				item.appendChild(label);
+				item.appendChild(document.createTextNode(': ' + entry.answer + ' (' + entry.result + ')'));
 				els.history.appendChild(item);
 			});
 		}

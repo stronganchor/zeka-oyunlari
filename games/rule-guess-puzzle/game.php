@@ -232,9 +232,13 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function testValue(value, level) {
+        if (!/^\d{1,3}$/.test(value)) {
+            return { message: 'Invalid input. Please enter digits only, from 0 to 999.', correct: false, displayValue: value.slice(0, 12) };
+        }
+
         const number = parseInt(value, 10);
         if (Number.isNaN(number) || number < 0 || number > 999) {
-            return { message: 'Invalid input. Please enter a number between 0 and 999.', correct: false };
+            return { message: 'Invalid input. Please enter a number between 0 and 999.', correct: false, displayValue: value.slice(0, 12) };
         }
 
         let correct = false;
@@ -253,7 +257,7 @@ document.addEventListener('DOMContentLoaded', function () {
             message = correct ? '✓ Correct! ' + number + ' is prime.' : '✗ Incorrect. ' + number + ' is not prime.';
         }
 
-        return { message, correct };
+        return { message, correct, displayValue: String(number) };
     }
 
     function updateLevel(level) {
@@ -283,10 +287,17 @@ document.addEventListener('DOMContentLoaded', function () {
         const result = testValue(input, currentLevel);
         const item = document.createElement('div');
         item.className = 'result-item';
-        item.innerHTML = `
-            <span class="result-input">${input}</span>
-            <span class="result-output ${result.correct ? 'correct' : 'incorrect'}">${result.message}</span>
-        `;
+
+        const inputSpan = document.createElement('span');
+        inputSpan.className = 'result-input';
+        inputSpan.textContent = result.displayValue;
+
+        const outputSpan = document.createElement('span');
+        outputSpan.className = 'result-output ' + (result.correct ? 'correct' : 'incorrect');
+        outputSpan.textContent = result.message;
+
+        item.appendChild(inputSpan);
+        item.appendChild(outputSpan);
         resultsList.appendChild(item);
         inputField.value = '';
 
