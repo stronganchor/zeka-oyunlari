@@ -161,8 +161,7 @@ function zo_load_game_modules() {
 		return $modules;
 	}
 
-	if ((function_exists('wp_doing_ajax') && wp_doing_ajax()) ||
-		(defined('REST_REQUEST') && REST_REQUEST) ||
+	if ((defined('REST_REQUEST') && REST_REQUEST) ||
 		(defined('DOING_CRON') && DOING_CRON) ||
 		(defined('WP_CLI') && WP_CLI)
 	) {
@@ -362,6 +361,11 @@ function zo_sync_game_module_posts() {
 	static $done = false;
 
 	if ($done || wp_installing() || !post_type_exists('zeka_oyunu')) {
+		return;
+	}
+
+	if (function_exists('wp_doing_ajax') && wp_doing_ajax()) {
+		zo_get_game_modules();
 		return;
 	}
 

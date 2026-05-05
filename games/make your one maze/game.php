@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 	games.forEach(function (game) {
 
-		const ajaxUrl = window.location.origin + '/wp-admin/admin-ajax.php';
+		const ajaxUrl = game.dataset.ajaxUrl;
 		const nonce = game.dataset.nonce;
 		const canManage = game.dataset.canManage === '1';
 
@@ -266,8 +266,11 @@ document.addEventListener('DOMContentLoaded', function () {
 					statusEl.textContent = 'Saved to system.';
 					renderShared(data.data);
 				} else {
-					statusEl.textContent = data.data;
+					statusEl.textContent = data.data || 'Could not save puzzle.';
 				}
+			})
+			.catch(() => {
+				statusEl.textContent = 'Could not reach the puzzle save service.';
 			});
 		};
 		}
@@ -324,6 +327,9 @@ document.addEventListener('DOMContentLoaded', function () {
 					if (data.success) {
 						renderShared(data.data);
 					}
+				})
+				.catch(() => {
+					statusEl.textContent = 'Could not load shared puzzles.';
 				});
 		}
 
@@ -342,6 +348,7 @@ if (!function_exists('zo_game_puzzle_creator_pro_render')) {
 	function zo_game_puzzle_creator_pro_render($post_id = 0, $module = array()) {
 
 		$instance_id = 'zo-puzzle-creator-pro-' . ($post_id ? absint($post_id) : wp_rand(1000, 999999));
+		$ajax_url = admin_url('admin-ajax.php');
 		$nonce = wp_create_nonce('zo_pca_nonce');
 		$can_manage = zo_pca_current_user_can_manage();
 
@@ -349,6 +356,7 @@ if (!function_exists('zo_game_puzzle_creator_pro_render')) {
 		?>
 		<div class="zo-game-root zo-game-root--puzzle-creator-admin"
 		     id="<?php echo esc_attr($instance_id); ?>"
+		     data-ajax-url="<?php echo esc_url($ajax_url); ?>"
 		     data-nonce="<?php echo esc_attr($nonce); ?>"
 		     data-can-manage="<?php echo $can_manage ? '1' : '0'; ?>"
 		     tabindex="0">
