@@ -1559,13 +1559,21 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			if (!active.length) {
-				activePowers.innerHTML = '<span class="zo-car-power-pill is-empty">' + t().noPowerups + '</span>';
+				activePowers.textContent = '';
+				const empty = document.createElement('span');
+				empty.className = 'zo-car-power-pill is-empty';
+				empty.textContent = t().noPowerups;
+				activePowers.appendChild(empty);
 				return;
 			}
 
-			activePowers.innerHTML = active.map(function (label) {
-				return '<span class="zo-car-power-pill">' + label + '</span>';
-			}).join('');
+			activePowers.textContent = '';
+			active.forEach(function (label) {
+				const pill = document.createElement('span');
+				pill.className = 'zo-car-power-pill';
+				pill.textContent = label;
+				activePowers.appendChild(pill);
+			});
 		}
 
 		function setEventBanner(text) {

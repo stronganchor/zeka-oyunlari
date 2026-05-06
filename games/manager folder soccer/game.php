@@ -946,19 +946,34 @@ document.addEventListener('DOMContentLoaded', function () {
 			});
 		}
 
+		function appendCell(row, value) {
+			const cell = document.createElement('td');
+			cell.textContent = String(value);
+			row.appendChild(cell);
+		}
+
+		function appendDiv(parent, value) {
+			const div = document.createElement('div');
+			div.textContent = String(value);
+			parent.appendChild(div);
+			return div;
+		}
+
+		function appendTag(parent, text, className) {
+			const tag = document.createElement('span');
+			tag.className = className || 'zo-mm-tag';
+			tag.textContent = text;
+			parent.appendChild(tag);
+		}
+
 		function renderLeagueTable() {
 			sortTable();
 			tableBody.innerHTML = '';
 			season.teams.forEach(function (club, index) {
 				const tr = document.createElement('tr');
-				tr.innerHTML = '<td>' + (index + 1) + '</td>' +
-					'<td>' + club.name + '</td>' +
-					'<td>' + club.pts + '</td>' +
-					'<td>' + club.w + '</td>' +
-					'<td>' + club.d + '</td>' +
-					'<td>' + club.l + '</td>' +
-					'<td>' + club.gf + '</td>' +
-					'<td>' + club.ga + '</td>';
+				[index + 1, club.name, club.pts, club.w, club.d, club.l, club.gf, club.ga].forEach(function (value) {
+					appendCell(tr, value);
+				});
 				tableBody.appendChild(tr);
 			});
 		}
@@ -967,9 +982,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			financeBody.innerHTML = '';
 			financeLog.forEach(function (item) {
 				const tr = document.createElement('tr');
-				tr.innerHTML = '<td>' + item.type + '</td>' +
-					'<td>' + (item.amount >= 0 ? '+$' + item.amount + 'm' : '-$' + Math.abs(item.amount) + 'm') + '</td>' +
-					'<td>' + item.note + '</td>';
+				appendCell(tr, item.type);
+				appendCell(tr, item.amount >= 0 ? '+$' + item.amount + 'm' : '-$' + Math.abs(item.amount) + 'm');
+				appendCell(tr, item.note);
 				financeBody.appendChild(tr);
 			});
 		}
@@ -979,14 +994,31 @@ document.addEventListener('DOMContentLoaded', function () {
 			market.forEach(function (player) {
 				const row = document.createElement('div');
 				row.className = 'zo-mm-market-player';
-				const btnDisabled = team.budget < player.price ? 'disabled' : '';
-				row.innerHTML =
-					'<div><strong>' + player.name + '</strong><div class="zo-mm-note">' + player.role + '</div></div>' +
-					'<div>' + player.pos + '</div>' +
-					'<div>' + player.ovr + '</div>' +
-					'<div>$' + player.price + 'm</div>' +
-					'<div>$' + player.wage + 'm</div>' +
-					'<div><button type="button" class="zo-mm-btn zo-mm-buy-player" data-id="' + player.id + '" ' + btnDisabled + '>Buy</button></div>';
+
+				const info = document.createElement('div');
+				const name = document.createElement('strong');
+				name.textContent = player.name;
+				const role = document.createElement('div');
+				role.className = 'zo-mm-note';
+				role.textContent = player.role;
+				info.appendChild(name);
+				info.appendChild(role);
+
+				const actionWrap = document.createElement('div');
+				const buyButton = document.createElement('button');
+				buyButton.type = 'button';
+				buyButton.className = 'zo-mm-btn zo-mm-buy-player';
+				buyButton.dataset.id = player.id;
+				buyButton.disabled = team.budget < player.price;
+				buyButton.textContent = 'Buy';
+				actionWrap.appendChild(buyButton);
+
+				row.appendChild(info);
+				appendDiv(row, player.pos);
+				appendDiv(row, player.ovr);
+				appendDiv(row, '$' + player.price + 'm');
+				appendDiv(row, '$' + player.wage + 'm');
+				row.appendChild(actionWrap);
 				marketBody.appendChild(row);
 			});
 
@@ -1014,22 +1046,52 @@ document.addEventListener('DOMContentLoaded', function () {
 		function renderSquad() {
 			squadBody.innerHTML = '';
 			team.squad.forEach(function (player) {
-				const captain = player.id === team.captainId ? '<span class="zo-mm-tag">Captain</span>' : '';
-				const injured = player.injured ? '<span class="zo-mm-tag zo-mm-tag--bad">Injured</span>' : '';
-				const suspended = player.suspended ? '<span class="zo-mm-tag zo-mm-tag--bad">Suspended</span>' : '';
-				const formTag = player.morale >= 75 ? '<span class="zo-mm-tag zo-mm-tag--good">Happy</span>' : (player.morale <= 52 ? '<span class="zo-mm-tag zo-mm-tag--bad">Low morale</span>' : '');
 				const row = document.createElement('div');
 				row.className = 'zo-mm-squad-player';
-				row.innerHTML =
-					'<div><strong>' + player.name + '</strong><div class="zo-mm-note">' + captain + ' ' + injured + ' ' + suspended + ' ' + formTag + '</div></div>' +
-					'<div>' + player.pos + '</div>' +
-					'<div>' + player.ovr + '</div>' +
-					'<div>M ' + player.morale + '</div>' +
-					'<div>E ' + player.energy + '</div>' +
-					'<div>' +
-						'<button type="button" class="zo-mm-btn zo-mm-captain" data-id="' + player.id + '">Captain</button> ' +
-						'<button type="button" class="zo-mm-btn zo-mm-sell" data-id="' + player.id + '">Sell</button>' +
-					'</div>';
+
+				const info = document.createElement('div');
+				const name = document.createElement('strong');
+				name.textContent = player.name;
+				const note = document.createElement('div');
+				note.className = 'zo-mm-note';
+				if (player.id === team.captainId) {
+					appendTag(note, 'Captain');
+				}
+				if (player.injured) {
+					appendTag(note, 'Injured', 'zo-mm-tag zo-mm-tag--bad');
+				}
+				if (player.suspended) {
+					appendTag(note, 'Suspended', 'zo-mm-tag zo-mm-tag--bad');
+				}
+				if (player.morale >= 75) {
+					appendTag(note, 'Happy', 'zo-mm-tag zo-mm-tag--good');
+				} else if (player.morale <= 52) {
+					appendTag(note, 'Low morale', 'zo-mm-tag zo-mm-tag--bad');
+				}
+				info.appendChild(name);
+				info.appendChild(note);
+
+				const actionWrap = document.createElement('div');
+				const captainButton = document.createElement('button');
+				captainButton.type = 'button';
+				captainButton.className = 'zo-mm-btn zo-mm-captain';
+				captainButton.dataset.id = player.id;
+				captainButton.textContent = 'Captain';
+				const sellButton = document.createElement('button');
+				sellButton.type = 'button';
+				sellButton.className = 'zo-mm-btn zo-mm-sell';
+				sellButton.dataset.id = player.id;
+				sellButton.textContent = 'Sell';
+				actionWrap.appendChild(captainButton);
+				actionWrap.appendChild(document.createTextNode(' '));
+				actionWrap.appendChild(sellButton);
+
+				row.appendChild(info);
+				appendDiv(row, player.pos);
+				appendDiv(row, player.ovr);
+				appendDiv(row, 'M ' + player.morale);
+				appendDiv(row, 'E ' + player.energy);
+				row.appendChild(actionWrap);
 				squadBody.appendChild(row);
 			});
 
@@ -1516,7 +1578,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		statFouls.textContent = '-';
 		statMomentum.textContent = '-';
 		statClean.textContent = '-';
-		commentaryLog.innerHTML = '<div class="zo-mm-line">No match simulated yet.</div>';
+		renderCommentary(['No match simulated yet.']);
 		renderAll();
 	});
 });
