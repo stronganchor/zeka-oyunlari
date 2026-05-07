@@ -120,6 +120,9 @@ $inline_script = !empty($module['inline_script']) && is_string($module['inline_s
 			}
 		}
 	</style>
+	<?php if (function_exists('zo_get_input_blocker_css')) : ?>
+	<style><?php echo zo_get_input_blocker_css(); ?></style>
+	<?php endif; ?>
 	<?php if ($style_url !== '') : ?>
 	<link rel="stylesheet" href="<?php echo esc_url($style_url); ?>">
 	<?php endif; ?>
@@ -143,6 +146,9 @@ $inline_script = !empty($module['inline_script']) && is_string($module['inline_s
 	<?php endif; ?>
 	<?php if ($inline_script !== '') : ?>
 	<script><?php echo $inline_script; ?></script>
+	<?php endif; ?>
+	<?php if (function_exists('zo_get_input_blocker_js')) : ?>
+	<script><?php echo zo_get_input_blocker_js(); ?></script>
 	<?php endif; ?>
 </body>
 </html>

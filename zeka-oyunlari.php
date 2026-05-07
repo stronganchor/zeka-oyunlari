@@ -606,6 +606,191 @@ function zo_get_script_handle($slug) {
 	return 'zo-game-script-' . sanitize_title($slug);
 }
 
+function zo_get_input_blocker_style_handle() {
+	return 'zo-game-input-blockers-style';
+}
+
+function zo_get_input_blocker_script_handle() {
+	return 'zo-game-input-blockers';
+}
+
+function zo_get_input_blocker_css() {
+	return '
+.zo-game-shell,
+.zo-game-root {
+	-webkit-tap-highlight-color: transparent;
+	-webkit-touch-callout: none;
+	overscroll-behavior: contain;
+	touch-action: none;
+	user-select: none;
+}
+
+.zo-game-shell input,
+.zo-game-shell textarea,
+.zo-game-shell select,
+.zo-game-shell [contenteditable="true"],
+.zo-game-root input,
+.zo-game-root textarea,
+.zo-game-root select,
+.zo-game-root [contenteditable="true"] {
+	touch-action: manipulation;
+	user-select: text;
+}
+';
+}
+
+function zo_get_input_blocker_js() {
+	return <<<'JS'
+(function () {
+	if (window.__zoGameInputBlockersReady) {
+		return;
+	}
+
+	window.__zoGameInputBlockersReady = true;
+
+	var blockedKeys = {
+		ArrowUp: true,
+		ArrowDown: true,
+		ArrowLeft: true,
+		ArrowRight: true,
+		Space: true,
+		PageUp: true,
+		PageDown: true,
+		Home: true,
+		End: true
+	};
+	var lastActiveGame = null;
+
+	function getGameRoot(element) {
+		if (!element || element === document || element === window) {
+			return null;
+		}
+
+		if (element.closest) {
+			return element.closest('.zo-game-shell, .zo-game-root');
+		}
+
+		return null;
+	}
+
+	function isEditable(element) {
+		if (!element || !element.closest) {
+			return false;
+		}
+
+		return !!element.closest('input, textarea, select, [contenteditable="true"], [contenteditable=""]');
+	}
+
+	function isInteractive(element) {
+		if (!element || !element.closest) {
+			return false;
+		}
+
+		return !!element.closest('button, a, input, textarea, select, label, summary, [role="button"], [contenteditable="true"], [contenteditable=""]');
+	}
+
+	function findSingleGameRoot() {
+		var games = document.querySelectorAll('.zo-game-shell, .zo-game-root');
+		return games.length === 1 ? games[0] : null;
+	}
+
+	function normalizeKey(event) {
+		if (event.code === 'Space' || event.key === ' ') {
+			return 'Space';
+		}
+
+		return event.key || event.code || '';
+	}
+
+	function ensureFocusable(game) {
+		if (game && !game.hasAttribute('tabindex')) {
+			game.setAttribute('tabindex', '0');
+		}
+	}
+
+	function handlePointerDown(event) {
+		var game = getGameRoot(event.target);
+
+		if (!game) {
+			lastActiveGame = null;
+			return;
+		}
+
+		lastActiveGame = game;
+		ensureFocusable(game);
+
+		if (!isInteractive(event.target) && game.focus) {
+			game.focus({ preventScroll: true });
+		}
+	}
+
+	function handleKeyDown(event) {
+		if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) {
+			return;
+		}
+
+		var key = normalizeKey(event);
+		if (!blockedKeys[key]) {
+			return;
+		}
+
+		if (isEditable(event.target) || isInteractive(event.target)) {
+			return;
+		}
+
+		var game = getGameRoot(event.target) || getGameRoot(document.activeElement) || lastActiveGame || findSingleGameRoot();
+		if (!game) {
+			return;
+		}
+
+		event.preventDefault();
+	}
+
+	function handleTouchMove(event) {
+		if (getGameRoot(event.target)) {
+			event.preventDefault();
+		}
+	}
+
+	document.addEventListener('pointerdown', handlePointerDown, true);
+	document.addEventListener('keydown', handleKeyDown, true);
+	document.addEventListener('touchmove', handleTouchMove, { passive: false, capture: true });
+
+	document.querySelectorAll('.zo-game-shell, .zo-game-root').forEach(ensureFocusable);
+})();
+JS;
+}
+
+function zo_register_input_blocker_assets() {
+	wp_register_style(
+		zo_get_input_blocker_style_handle(),
+		false,
+		array(),
+		ZO_PLUGIN_VERSION
+	);
+	wp_add_inline_style(zo_get_input_blocker_style_handle(), zo_get_input_blocker_css());
+
+	wp_register_script(
+		zo_get_input_blocker_script_handle(),
+		false,
+		array(),
+		ZO_PLUGIN_VERSION,
+		true
+	);
+	wp_add_inline_script(zo_get_input_blocker_script_handle(), zo_get_input_blocker_js());
+}
+add_action('wp_enqueue_scripts', 'zo_register_input_blocker_assets', 4);
+
+function zo_enqueue_input_blocker_assets() {
+	if (wp_style_is(zo_get_input_blocker_style_handle(), 'registered')) {
+		wp_enqueue_style(zo_get_input_blocker_style_handle());
+	}
+
+	if (wp_script_is(zo_get_input_blocker_script_handle(), 'registered')) {
+		wp_enqueue_script(zo_get_input_blocker_script_handle());
+	}
+}
+
 function zo_register_game_assets() {
 	$modules = zo_get_game_modules();
 
@@ -661,6 +846,8 @@ function zo_enqueue_game_assets_by_slug($slug) {
 	if (!$slug || !$module) {
 		return;
 	}
+
+	zo_enqueue_input_blocker_assets();
 
 	$style_handle  = zo_get_style_handle($slug);
 	$script_handle = zo_get_script_handle($slug);
