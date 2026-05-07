@@ -259,6 +259,18 @@ function zo_resolve_game_slug_for_post($post_id) {
 	return zo_get_game_module($fallback_slug) ? $fallback_slug : '';
 }
 
+function zo_verify_nonce($nonce_name, $nonce_action) {
+	if (empty($_REQUEST[$nonce_name]) || !is_string($_REQUEST[$nonce_name])) {
+		return false;
+	}
+
+	return wp_verify_nonce(wp_unslash($_REQUEST[$nonce_name]), $nonce_action) !== false;
+}
+
+function zo_get_nonce($nonce_action) {
+	return wp_create_nonce($nonce_action);
+}
+
 function zo_get_current_request_url() {
 	if (empty($_SERVER['REQUEST_URI']) || !is_string($_SERVER['REQUEST_URI'])) {
 		return '';
@@ -281,6 +293,10 @@ function zo_get_requested_game_slug() {
 		return '';
 	}
 
+	if (!empty($_GET['zo_nonce']) && is_string($_GET['zo_nonce']) && !zo_verify_nonce('zo_nonce', 'zo_game_module')) {
+		return '';
+	}
+
 	$slug = sanitize_title(wp_unslash($_GET['zo_game_module']));
 
 	return $slug !== '' && zo_get_game_module($slug) ? $slug : '';
@@ -300,6 +316,7 @@ function zo_get_game_module_fallback_url($slug) {
 	}
 
 	$url = add_query_arg('zo_game_module', $slug, $base_url);
+	$url = add_query_arg('zo_nonce', zo_get_nonce('zo_game_module'), $url);
 
 	$back_url = zo_get_current_request_url();
 	if ($back_url !== '') {
@@ -328,11 +345,15 @@ function zo_get_game_back_url($post_id = 0) {
 	$current_url = $post_id ? get_permalink($post_id) : '';
 
 	if (!empty($_GET['zo_back']) && is_string($_GET['zo_back'])) {
-		$candidate = wp_unslash($_GET['zo_back']);
-		$candidate = wp_validate_redirect($candidate, '');
+		if (!empty($_GET['zo_nonce']) && is_string($_GET['zo_nonce']) && !zo_verify_nonce('zo_nonce', 'zo_game_module')) {
+			// Nonce validation failed, skip the zo_back parameter
+		} else {
+			$candidate = wp_unslash($_GET['zo_back']);
+			$candidate = wp_validate_redirect($candidate, '');
 
-		if ($candidate !== '' && $candidate !== $current_url) {
-			return $candidate;
+			if ($candidate !== '' && $candidate !== $current_url) {
+				return $candidate;
+			}
 		}
 	}
 
@@ -513,6 +534,7 @@ add_action('add_meta_boxes', 'zo_add_game_meta_box');
 
 function zo_render_game_meta_box($post) {
 	wp_nonce_field('zo_save_game_module', 'zo_game_module_nonce');
+	wp_nonce_field('zo_save_game_meta', 'zo_meta_save_nonce');
 
 	$selected = zo_get_game_slug_for_post($post->ID);
 	$modules  = zo_get_game_modules();
@@ -551,6 +573,10 @@ function zo_render_game_meta_box($post) {
 
 function zo_save_game_meta($post_id) {
 	if (!isset($_POST['zo_game_module_nonce']) || !wp_verify_nonce($_POST['zo_game_module_nonce'], 'zo_save_game_module')) {
+		return;
+	}
+
+	if (!isset($_POST['zo_meta_save_nonce']) || !wp_verify_nonce($_POST['zo_meta_save_nonce'], 'zo_save_game_meta')) {
 		return;
 	}
 
