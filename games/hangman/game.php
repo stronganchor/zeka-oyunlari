@@ -255,9 +255,9 @@ document.addEventListener('DOMContentLoaded', function () {
 	games.forEach(function (game) {
 		const words = [
 			'python', 'anahtar', 'lezzetli', 'asker', 'rastgele',  'yakala',
-			'ingilizce', 'pencere', 'kitap',  'kazan', 'pokemon',
+			'ingilizce', 'pencere', 'kitap',  'kazan', 'gezegen',
 			'test', 'dosya', 'harf', 'adama asmaca', 'fil', 'komik',
-			'made', 'bilgisayar', 'girdi', 'defter', 'harika', 'minecraft', 'maden',
+			'made', 'bilgisayar', 'girdi', 'defter', 'harika', 'macera', 'maden',
 			'klavye', 'televizyon', 'adam', 'oyuncak', 'okul', 'masa', 'kalem'
 		];
 

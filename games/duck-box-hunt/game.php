@@ -400,7 +400,7 @@ if (!function_exists('zo_game_duck_box_hunt_render')) {
 		<div class="zo-game-root zo-game-root--duck-box-hunt" id="<?php echo esc_attr($instance_id); ?>">
 			<div class="zo-dbh-shell">
 				<h2 class="zo-dbh-title">Duck Box Hunt</h2>
-				<p class="zo-dbh-subtitle">A new game inspired by the fast reward feeling of Fight O. Check 5 boxes, find the hidden duck, and earn 5 coins for every correct pick until you discover all 30 ducks.</p>
+				<p class="zo-dbh-subtitle">Check 5 boxes, find the hidden duck, and earn 5 coins for every correct pick until you discover all 30 ducks.</p>
 
 				<div class="zo-dbh-topbar">
 					<div class="zo-dbh-stat">Round<br><span data-role="round">1</span></div>

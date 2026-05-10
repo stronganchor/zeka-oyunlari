@@ -275,8 +275,8 @@ document.addEventListener('DOMContentLoaded', function () {
 				emoji: '⛏️',
 				fill: '#fed7aa'
 			},
-			creeperish: {
-				key: 'creeperish',
+			blastcube: {
+				key: 'blastcube',
 				name: 'Boom Cube',
 				cost: 58,
 				hp: 44,
@@ -371,7 +371,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				return;
 			}
 
-			const options = ['blockkid', 'blockkid', 'miner', 'creeperish'];
+			const options = ['blockkid', 'blockkid', 'miner', 'blastcube'];
 			const pick = options[Math.floor(Math.random() * options.length)];
 			const def = unitDefs[pick];
 
@@ -673,7 +673,7 @@ if (!function_exists('zo_monster_vs_block_world_render')) {
 		<div class="zo-game-root zo-game-root--monster-vs-block-world" id="<?php echo esc_attr($game_id); ?>">
 			<div class="zo-mvb-wrap">
 				<h2 class="zo-mvb-title">Monster Team vs Block World</h2>
-				<p class="zo-mvb-subtitle">A safe fan-style version of the crossover idea. Left side sends monster fighters. Right side sends block-world defenders.</p>
+				<p class="zo-mvb-subtitle">Left side sends creature fighters. Right side sends blocky defenders in a simple base battle.</p>
 
 				<div class="zo-mvb-topbar">
 					<div class="zo-mvb-stats">
@@ -731,7 +731,7 @@ return array(
 	'slug'            => 'monster-vs-block-world',
 	'name'            => 'Monster Team vs Block World',
 	'author'          => 'Arslan',
-	'description'     => 'A monster team versus block world battle game inspired by the crossover idea.',
+	'description'     => 'A creature team versus blocky defender base battle.',
 	'render_callback' => 'zo_monster_vs_block_world_render',
 	'inline_style'    => $inline_style,
 	'inline_script'   => $inline_script,

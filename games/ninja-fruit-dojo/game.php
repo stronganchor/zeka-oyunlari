@@ -2,11 +2,11 @@
 if (!defined('ABSPATH')) { exit; }
 require_once dirname(__DIR__) . '/_arslan_arcade_engine.php';
 return zo_arslan_arcade_game_module(array(
-	'slug' => 'ninja-fruit-dojo',
-	'name' => 'Ninja Fruit Dojo',
+	'slug' => 'fruit-target-dojo',
+	'name' => 'Fruit Target Dojo',
 	'description' => 'Dash through the dojo collecting fruit targets.',
-	'goal' => 'Slice fruit tokens by collecting them and dodge bamboo traps.',
-	'hero' => 'Ninja',
+	'goal' => 'Collect fruit tokens and dodge bamboo traps.',
+	'hero' => 'Runner',
 	'item' => 'Fruit',
 	'hazard' => 'Trap',
 	'heroColor' => '#111827',

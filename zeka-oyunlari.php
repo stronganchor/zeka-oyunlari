@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.3.59.arslan.asker
+ * Version: 1.4.59.arslan.asker
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -721,6 +721,18 @@ function zo_get_input_blocker_css() {
 	overscroll-behavior: contain;
 	touch-action: none;
 	user-select: none;
+	-webkit-user-drag: none;
+	user-drag: none;
+}
+
+.zo-game-shell img,
+.zo-game-shell canvas,
+.zo-game-shell svg,
+.zo-game-root img,
+.zo-game-root canvas,
+.zo-game-root svg {
+	-webkit-user-drag: none;
+	user-drag: none;
 }
 
 .zo-game-shell input,
@@ -755,7 +767,102 @@ function zo_get_input_blocker_js() {
 		PageUp: true,
 		PageDown: true,
 		Home: true,
-		End: true
+		End: true,
+		Backspace: true,
+		Delete: true,
+		Enter: true,
+		Escape: true,
+		Esc: true,
+		Spacebar: true,
+		Insert: true,
+		w: true,
+		a: true,
+		s: true,
+		d: true,
+		q: true,
+		e: true,
+		r: true,
+		f: true,
+		z: true,
+		x: true,
+		c: true,
+		v: true,
+		i: true,
+		j: true,
+		k: true,
+		l: true,
+		p: true,
+		W: true,
+		A: true,
+		S: true,
+		D: true,
+		Q: true,
+		E: true,
+		R: true,
+		F: true,
+		Z: true,
+		X: true,
+		C: true,
+		V: true,
+		I: true,
+		J: true,
+		K: true,
+		L: true,
+		P: true
+	};
+	var blockedCodes = {
+		ArrowUp: true,
+		ArrowDown: true,
+		ArrowLeft: true,
+		ArrowRight: true,
+		Space: true,
+		PageUp: true,
+		PageDown: true,
+		Home: true,
+		End: true,
+		Backspace: true,
+		Delete: true,
+		Enter: true,
+		Escape: true,
+		Insert: true,
+		ShiftLeft: true,
+		ShiftRight: true,
+		KeyW: true,
+		KeyA: true,
+		KeyS: true,
+		KeyD: true,
+		KeyQ: true,
+		KeyE: true,
+		KeyR: true,
+		KeyF: true,
+		KeyZ: true,
+		KeyX: true,
+		KeyC: true,
+		KeyV: true,
+		KeyI: true,
+		KeyJ: true,
+		KeyK: true,
+		KeyL: true,
+		KeyP: true,
+		Numpad8: true,
+		Numpad4: true,
+		Numpad2: true,
+		Numpad6: true,
+		NumpadEnter: true,
+		NumpadAdd: true,
+		NumpadSubtract: true,
+		NumpadMultiply: true,
+		NumpadDivide: true,
+		Digit0: true,
+		Digit1: true,
+		Digit2: true,
+		Digit3: true,
+		Digit4: true,
+		Digit5: true,
+		Digit6: true,
+		Digit7: true,
+		Digit8: true,
+		Digit9: true
 	};
 	var lastActiveGame = null;
 
@@ -787,6 +894,10 @@ function zo_get_input_blocker_js() {
 		return !!element.closest('button, a, input, textarea, select, label, summary, [role="button"], [contenteditable="true"], [contenteditable=""]');
 	}
 
+	function isSafeTarget(element) {
+		return isEditable(element) || isInteractive(element);
+	}
+
 	function findSingleGameRoot() {
 		var games = document.querySelectorAll('.zo-game-shell, .zo-game-root');
 		return games.length === 1 ? games[0] : null;
@@ -806,33 +917,42 @@ function zo_get_input_blocker_js() {
 		}
 	}
 
-	function handlePointerDown(event) {
+	function rememberGameFromEvent(event) {
 		var game = getGameRoot(event.target);
+
+		if (!game) {
+			return null;
+		}
+
+		lastActiveGame = game;
+		ensureFocusable(game);
+		return game;
+	}
+
+	function handlePointerDown(event) {
+		var game = rememberGameFromEvent(event);
 
 		if (!game) {
 			lastActiveGame = null;
 			return;
 		}
 
-		lastActiveGame = game;
-		ensureFocusable(game);
-
 		if (!isInteractive(event.target) && game.focus) {
 			game.focus({ preventScroll: true });
 		}
 	}
 
-	function handleKeyDown(event) {
+	function handleKeyBlock(event) {
 		if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey) {
 			return;
 		}
 
 		var key = normalizeKey(event);
-		if (!blockedKeys[key]) {
+		if (!blockedKeys[key] && !blockedCodes[event.code]) {
 			return;
 		}
 
-		if (isEditable(event.target) || isInteractive(event.target)) {
+		if (isSafeTarget(event.target)) {
 			return;
 		}
 
@@ -850,9 +970,33 @@ function zo_get_input_blocker_js() {
 		}
 	}
 
+	function handleWheel(event) {
+		if (!event.ctrlKey && getGameRoot(event.target) && !isSafeTarget(event.target)) {
+			event.preventDefault();
+		}
+	}
+
+	function handleGameOnlyDefault(event) {
+		if (getGameRoot(event.target) && !isSafeTarget(event.target)) {
+			event.preventDefault();
+		}
+	}
+
 	document.addEventListener('pointerdown', handlePointerDown, true);
-	document.addEventListener('keydown', handleKeyDown, true);
+	document.addEventListener('pointerover', rememberGameFromEvent, true);
+	document.addEventListener('keydown', handleKeyBlock, true);
+	document.addEventListener('keyup', handleKeyBlock, true);
+	document.addEventListener('keypress', handleKeyBlock, true);
 	document.addEventListener('touchmove', handleTouchMove, { passive: false, capture: true });
+	document.addEventListener('wheel', handleWheel, { passive: false, capture: true });
+	document.addEventListener('dragstart', handleGameOnlyDefault, true);
+	document.addEventListener('selectstart', handleGameOnlyDefault, true);
+	document.addEventListener('contextmenu', handleGameOnlyDefault, true);
+	document.addEventListener('auxclick', handleGameOnlyDefault, true);
+	document.addEventListener('dblclick', handleGameOnlyDefault, true);
+	document.addEventListener('gesturestart', handleGameOnlyDefault, true);
+	document.addEventListener('gesturechange', handleGameOnlyDefault, true);
+	document.addEventListener('gestureend', handleGameOnlyDefault, true);
 
 	document.querySelectorAll('.zo-game-shell, .zo-game-root').forEach(ensureFocusable);
 })();

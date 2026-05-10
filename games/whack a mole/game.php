@@ -11,7 +11,7 @@ $css = <<<'CSS'
 	text-align: center;
 }
 
-.zo-game-root--whack-a-mole {
+.zo-game-root--mole-pop {
 	font-family: Arial, sans-serif;
 	background: linear-gradient(180deg, #dff3ff 0%, #eff9ff 100%);
 	color: #1d2a1d;
@@ -21,25 +21,25 @@ $css = <<<'CSS'
 	border: 2px solid #b9dff0;
 }
 
-.zo-game-root--whack-a-mole * {
+.zo-game-root--mole-pop * {
 	box-sizing: border-box;
 }
 
-.zo-game-root--whack-a-mole .wam-title {
+.zo-game-root--mole-pop .wam-title {
 	font-size: 30px;
 	font-weight: 700;
 	margin-bottom: 8px;
 	color: #216b2f;
 }
 
-.zo-game-root--whack-a-mole .wam-instructions {
+.zo-game-root--mole-pop .wam-instructions {
 	font-size: 15px;
 	line-height: 1.5;
 	color: #3f5540;
 	margin-bottom: 14px;
 }
 
-.zo-game-root--whack-a-mole .wam-topbar {
+.zo-game-root--mole-pop .wam-topbar {
 	display: flex;
 	justify-content: center;
 	gap: 12px;
@@ -47,7 +47,7 @@ $css = <<<'CSS'
 	margin-bottom: 14px;
 }
 
-.zo-game-root--whack-a-mole .wam-stat {
+.zo-game-root--mole-pop .wam-stat {
 	background: #ffffff;
 	border: 1px solid #bfd6e2;
 	border-radius: 999px;
@@ -57,14 +57,14 @@ $css = <<<'CSS'
 	min-width: 130px;
 }
 
-.zo-game-root--whack-a-mole .wam-board-wrap {
+.zo-game-root--mole-pop .wam-board-wrap {
 	position: relative;
 	width: 100%;
 	max-width: 640px;
 	margin: 0 auto 14px;
 }
 
-.zo-game-root--whack-a-mole .wam-board {
+.zo-game-root--mole-pop .wam-board {
 	position: relative;
 	width: 100%;
 	aspect-ratio: 5 / 6;
@@ -76,7 +76,7 @@ $css = <<<'CSS'
 	user-select: none;
 }
 
-.zo-game-root--whack-a-mole .wam-hole {
+.zo-game-root--mole-pop .wam-hole {
 	position: absolute;
 	width: 18%;
 	height: 10%;
@@ -87,7 +87,7 @@ $css = <<<'CSS'
 	z-index: 1;
 }
 
-.zo-game-root--whack-a-mole .wam-mole {
+.zo-game-root--mole-pop .wam-mole {
 	position: absolute;
 	width: 12.6%;
 	height: 12%;
@@ -96,11 +96,11 @@ $css = <<<'CSS'
 	z-index: 2;
 }
 
-.zo-game-root--whack-a-mole .wam-mole[hidden] {
+.zo-game-root--mole-pop .wam-mole[hidden] {
 	display: none;
 }
 
-.zo-game-root--whack-a-mole .wam-mole-head {
+.zo-game-root--mole-pop .wam-mole-head {
 	position: absolute;
 	left: 50%;
 	top: 50%;
@@ -112,7 +112,7 @@ $css = <<<'CSS'
 	border-radius: 50%;
 }
 
-.zo-game-root--whack-a-mole .wam-eye {
+.zo-game-root--mole-pop .wam-eye {
 	position: absolute;
 	top: 28%;
 	width: 16%;
@@ -123,7 +123,7 @@ $css = <<<'CSS'
 	z-index: 3;
 }
 
-.zo-game-root--whack-a-mole .wam-eye::after {
+.zo-game-root--mole-pop .wam-eye::after {
 	content: '';
 	position: absolute;
 	left: 35%;
@@ -134,15 +134,15 @@ $css = <<<'CSS'
 	border-radius: 50%;
 }
 
-.zo-game-root--whack-a-mole .wam-eye--left {
+.zo-game-root--mole-pop .wam-eye--left {
 	left: 24%;
 }
 
-.zo-game-root--whack-a-mole .wam-eye--right {
+.zo-game-root--mole-pop .wam-eye--right {
 	right: 24%;
 }
 
-.zo-game-root--whack-a-mole .wam-nose {
+.zo-game-root--mole-pop .wam-nose {
 	position: absolute;
 	left: 50%;
 	top: 54%;
@@ -155,7 +155,7 @@ $css = <<<'CSS'
 	z-index: 3;
 }
 
-.zo-game-root--whack-a-mole .wam-tooth {
+.zo-game-root--mole-pop .wam-tooth {
 	position: absolute;
 	top: 66%;
 	width: 10%;
@@ -165,15 +165,15 @@ $css = <<<'CSS'
 	z-index: 3;
 }
 
-.zo-game-root--whack-a-mole .wam-tooth--left {
+.zo-game-root--mole-pop .wam-tooth--left {
 	left: 43%;
 }
 
-.zo-game-root--whack-a-mole .wam-tooth--right {
+.zo-game-root--mole-pop .wam-tooth--right {
 	left: 53%;
 }
 
-.zo-game-root--whack-a-mole .wam-overlay {
+.zo-game-root--mole-pop .wam-overlay {
 	position: absolute;
 	inset: 0;
 	display: flex;
@@ -184,11 +184,11 @@ $css = <<<'CSS'
 	z-index: 5;
 }
 
-.zo-game-root--whack-a-mole .wam-overlay[hidden] {
+.zo-game-root--mole-pop .wam-overlay[hidden] {
 	display: none;
 }
 
-.zo-game-root--whack-a-mole .wam-panel {
+.zo-game-root--mole-pop .wam-panel {
 	background: rgba(255,255,255,0.96);
 	border: 2px solid #222;
 	border-radius: 18px;
@@ -197,28 +197,28 @@ $css = <<<'CSS'
 	width: 100%;
 }
 
-.zo-game-root--whack-a-mole .wam-panel-title {
+.zo-game-root--mole-pop .wam-panel-title {
 	font-size: 32px;
 	font-weight: 700;
 	margin-bottom: 10px;
 	color: #d93030;
 }
 
-.zo-game-root--whack-a-mole .wam-panel-text {
+.zo-game-root--mole-pop .wam-panel-text {
 	font-size: 17px;
 	line-height: 1.5;
 	color: #222;
 	margin-bottom: 14px;
 }
 
-.zo-game-root--whack-a-mole .wam-btn-row {
+.zo-game-root--mole-pop .wam-btn-row {
 	display: flex;
 	justify-content: center;
 	flex-wrap: wrap;
 	gap: 10px;
 }
 
-.zo-game-root--whack-a-mole .wam-btn {
+.zo-game-root--mole-pop .wam-btn {
 	appearance: none;
 	border: 1px solid #5578d8;
 	background: #2c4f9e;
@@ -231,28 +231,28 @@ $css = <<<'CSS'
 	min-width: 150px;
 }
 
-.zo-game-root--whack-a-mole .wam-btn:hover,
-.zo-game-root--whack-a-mole .wam-btn:focus {
+.zo-game-root--mole-pop .wam-btn:hover,
+.zo-game-root--mole-pop .wam-btn:focus {
 	background: #3a63c2;
 	outline: none;
 }
 
-.zo-game-root--whack-a-mole .wam-controls {
+.zo-game-root--mole-pop .wam-controls {
 	font-size: 14px;
 	color: #445444;
 	line-height: 1.5;
 }
 
 @media (max-width: 640px) {
-	.zo-game-root--whack-a-mole .wam-title {
+	.zo-game-root--mole-pop .wam-title {
 		font-size: 26px;
 	}
 
-	.zo-game-root--whack-a-mole .wam-panel-title {
+	.zo-game-root--mole-pop .wam-panel-title {
 		font-size: 28px;
 	}
 
-	.zo-game-root--whack-a-mole .wam-btn {
+	.zo-game-root--mole-pop .wam-btn {
 		width: 100%;
 	}
 }
@@ -260,7 +260,7 @@ CSS;
 
 $js = <<<'JS'
 document.addEventListener('DOMContentLoaded', function () {
-	const games = document.querySelectorAll('.zo-game-root--whack-a-mole');
+	const games = document.querySelectorAll('.zo-game-root--mole-pop');
 
 	games.forEach(function (game) {
 		const GAME_TIME = 30;
@@ -395,7 +395,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.countdownTimerId = window.setTimeout(tickTimer, 1000);
 		}
 
-		function whackMole() {
+		function tapMole() {
 			if (state.gameOver || !state.running || state.currentHoleIndex === null) {
 				return;
 			}
@@ -413,13 +413,13 @@ document.addEventListener('DOMContentLoaded', function () {
 		moleEl.addEventListener('click', function (e) {
 			e.preventDefault();
 			e.stopPropagation();
-			whackMole();
+			tapMole();
 		});
 
 		moleEl.addEventListener('pointerdown', function (e) {
 			e.preventDefault();
 			e.stopPropagation();
-			whackMole();
+			tapMole();
 		});
 
 		startBtn.addEventListener('click', function () {
@@ -459,20 +459,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		updateHud();
 		moleEl.hidden = true;
-		showOverlay('Whack-a-Mole', 'Click the mole to score. You have 30 seconds.', true);
+		showOverlay('mole-pop', 'Tap the target to score. You have 30 seconds.', true);
 	});
 });
 JS;
 
-if (!function_exists('zo_game_whack_a_mole_render')) {
-	function zo_game_whack_a_mole_render($post_id = 0, $module = array()) {
-		$instance_id = 'zo-whack-a-mole-' . ($post_id ? absint($post_id) : wp_rand(1000, 999999));
+if (!function_exists('zo_game_mole_pop_render')) {
+	function zo_game_mole_pop_render($post_id = 0, $module = array()) {
+		$instance_id = 'zo-mole-pop-' . ($post_id ? absint($post_id) : wp_rand(1000, 999999));
 
 		ob_start();
 		?>
-		<div class="zo-game-root zo-game-root--whack-a-mole" id="<?php echo esc_attr($instance_id); ?>" tabindex="0">
-			<div class="wam-title">Whack-a-Mole</div>
-			<div class="wam-instructions">Click the mole to score points. You have 30 seconds. Press R to restart.</div>
+		<div class="zo-game-root zo-game-root--mole-pop" id="<?php echo esc_attr($instance_id); ?>" tabindex="0">
+			<div class="wam-title">mole-pop</div>
+			<div class="wam-instructions">Tap the target to score points. You have 30 seconds. Press R to restart.</div>
 
 			<div class="wam-topbar">
 				<div class="wam-stat">Score: <span data-role="score">0</span></div>
@@ -492,8 +492,8 @@ if (!function_exists('zo_game_whack_a_mole_render')) {
 
 					<div class="wam-overlay" data-role="overlay">
 						<div class="wam-panel">
-							<div class="wam-panel-title" data-role="overlay-title">Whack-a-Mole</div>
-							<div class="wam-panel-text" data-role="overlay-text">Click the mole to score. You have 30 seconds.</div>
+							<div class="wam-panel-title" data-role="overlay-title">mole-pop</div>
+							<div class="wam-panel-text" data-role="overlay-text">Tap the target to score. You have 30 seconds.</div>
 							<div class="wam-btn-row">
 								<button type="button" class="wam-btn" data-role="start-btn">Start</button>
 								<button type="button" class="wam-btn" data-role="restart-btn">Restart</button>
@@ -503,7 +503,7 @@ if (!function_exists('zo_game_whack_a_mole_render')) {
 				</div>
 			</div>
 
-			<div class="wam-controls">Mouse or touch: whack the mole. Keyboard: R = restart.</div>
+			<div class="wam-controls">Mouse or touch: tap the target. Keyboard: R = restart.</div>
 		</div>
 		<?php
 		return ob_get_clean();
@@ -511,11 +511,11 @@ if (!function_exists('zo_game_whack_a_mole_render')) {
 }
 
 return array(
-	'slug'            => 'whack-a-mole',
-	'name'            => 'Whack-a-Mole',
+	'slug'            => 'mole-pop',
+	'name'            => 'mole-pop',
 	'author'          => 'Arslan',
-	'description'     => 'A browser-based whack-a-mole game with score, timer, restart, and touch support.',
-	'render_callback' => 'zo_game_whack_a_mole_render',
+	'description'     => 'A browser-based target pop game with score, timer, restart, and touch support.',
+	'render_callback' => 'zo_game_mole_pop_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,
 );

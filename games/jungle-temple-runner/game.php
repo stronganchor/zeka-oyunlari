@@ -2,9 +2,9 @@
 if (!defined('ABSPATH')) { exit; }
 require_once dirname(__DIR__) . '/_arslan_arcade_engine.php';
 return zo_arslan_arcade_game_module(array(
-	'slug' => 'jungle-temple-runner',
-	'name' => 'Jungle Temple Runner',
-	'description' => 'Sprint through a jungle temple collecting relics.',
+	'slug' => 'jungle-relic-sprint',
+	'name' => 'Jungle Relic Sprint',
+	'description' => 'Sprint through jungle ruins collecting relics.',
 	'goal' => 'Collect ancient relics and dodge rolling temple stones.',
 	'hero' => 'Runner',
 	'item' => 'Relic',

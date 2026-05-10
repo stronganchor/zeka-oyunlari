@@ -885,7 +885,7 @@ return array(
 	'slug' => 'sound-citadel-rescue',
 	'name' => 'Sound Citadel Rescue',
 	'author' => 'asker',
-	'description' => 'A castle defense concept where you rescue trapped spirits by placing sonic wards across lanes. Curses move in darkness, and sound cues are your primary guide for where danger is strongest.',
+	'description' => 'A castle defense concept where you rescue trapped spirits by placing sound wards across lanes. Curses move in darkness, and sound cues are your primary guide for where danger is strongest.',
 	'render_callback' => 'zo_game_sound_citadel_rescue_render',
 	'inline_style' => $css,
 	'inline_script' => $js,

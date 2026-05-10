@@ -572,7 +572,7 @@ if (!function_exists('zo_game_the_46th_rule')) {
 					<div class="zo-rule46__credit">
 						<span><strong>Idea asker:</strong> Asker</span>
 						<span><strong>Game author:</strong> Asker + Codex</span>
-						<span><strong>Design note:</strong> Inspired by hard rule-discovery logic games.</span>
+						<span><strong>Design note:</strong> Test patterns, compare outcomes, and prove the hidden rule.</span>
 					</div>
 					<ul class="zo-rule46__rules" aria-label="Game goals">
 						<li>Test sequences of 4 to 6 symbols.</li>

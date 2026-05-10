@@ -881,8 +881,8 @@ if (!function_exists('zo_wit_bases_render')) {
 		?>
 		<div class="zo-game-root zo-game-root--wit-bases">
 			<div class="zo-wb-wrap">
-				<h2 class="zo-wb-title">Wit Bases</h2>
-				<p class="zo-wb-subtitle">Outwitters-style turn-based base battle on a bigger hex map.</p>
+				<h2 class="zo-wb-title">Command Bases</h2>
+				<p class="zo-wb-subtitle">Turn-based base battle on a bigger hex map where every action spends command points.</p>
 
 				<div class="zo-wb-topbar">
 					<div class="zo-wb-stats">
@@ -945,10 +945,10 @@ if (!function_exists('zo_wit_bases_render')) {
 }
 
 return array(
-	'slug'            => 'wit-bases',
-	'name'            => 'Wit Bases',
+	'slug'            => 'command-bases',
+	'name'            => 'Command Bases',
 	'author'          => 'Arslan',
-	'description'     => 'An Outwitters-style turn-based base tactics game.',
+	'description'     => 'A turn-based base tactics game with command points, captures, and unit positioning.',
 	'render_callback' => 'zo_wit_bases_render',
 	'inline_style'    => $inline_style,
 	'inline_script'   => $inline_script,

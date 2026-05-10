@@ -888,7 +888,7 @@ if (!function_exists('zo_wit_bases_render')) {
 		<div class="zo-game-root zo-game-root--wit-bases" id="<?php echo esc_attr($game_id); ?>">
 			<div class="zo-wb-wrap">
 				<h2 class="zo-wb-title">Wit Bases</h2>
-				<p class="zo-wb-subtitle">Big-map turn-based base battle inspired by wit-based tactics games.</p>
+				<p class="zo-wb-subtitle">Big-map turn-based base battle where every move spends limited command points.</p>
 
 				<div class="zo-wb-topbar">
 					<div class="zo-wb-stats">
