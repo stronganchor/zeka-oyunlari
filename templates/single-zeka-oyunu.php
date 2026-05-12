@@ -26,12 +26,19 @@ $style_url = function_exists('zo_get_game_style_url') ? zo_get_game_style_url($m
 $script_url = function_exists('zo_get_game_script_url') ? zo_get_game_script_url($module) : '';
 $inline_style = !empty($module['inline_style']) && is_string($module['inline_style']) ? $module['inline_style'] : '';
 $inline_script = !empty($module['inline_script']) && is_string($module['inline_script']) ? $module['inline_script'] : '';
+$module_description = !empty($module['description']) && is_string($module['description']) ? trim(wp_strip_all_tags($module['description'])) : '';
+$seo_description = trim($page_title . ' oyna. Çocuk zeka oyunları ve ücretsiz zeka oyunları koleksiyonunda tarayıcıdan hemen oynanabilen eğlenceli bir oyun.');
+
+if ($module_description !== '') {
+	$seo_description = trim($page_title . ' oyna. ' . $module_description . ' Çocuk zeka oyunları ve ücretsiz zeka oyunları koleksiyonunda yer alır.');
+}
 ?>
 <!doctype html>
 <html <?php language_attributes(); ?>>
 <head>
 	<meta charset="<?php bloginfo('charset'); ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="<?php echo esc_attr($seo_description); ?>">
 	<title><?php echo esc_html($page_title . ($site_name ? ' | ' . $site_name : '')); ?></title>
 	<?php if (function_exists('wp_site_icon')) { wp_site_icon(); } ?>
 	<style>
