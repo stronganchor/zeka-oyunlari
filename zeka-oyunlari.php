@@ -235,6 +235,26 @@ function zo_get_game_module($slug) {
 	return isset($modules[$slug]) ? $modules[$slug] : null;
 }
 
+function zo_get_game_style_url($module) {
+	if (!is_array($module) || empty($module['dir']) || empty($module['url'])) {
+		return '';
+	}
+
+	$style_file = trailingslashit($module['dir']) . 'style.css';
+
+	return file_exists($style_file) ? trailingslashit($module['url']) . 'style.css' : '';
+}
+
+function zo_get_game_script_url($module) {
+	if (!is_array($module) || empty($module['dir']) || empty($module['url'])) {
+		return '';
+	}
+
+	$script_file = trailingslashit($module['dir']) . 'script.js';
+
+	return file_exists($script_file) ? trailingslashit($module['url']) . 'script.js' : '';
+}
+
 function zo_get_game_slug_for_post($post_id) {
 	return sanitize_title((string) get_post_meta($post_id, '_zo_game_slug', true));
 }
