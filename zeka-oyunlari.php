@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.4.60.arslan.asker
+ * Version: 1.4.61.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -1458,7 +1458,7 @@ function zo_games_grid_shortcode($atts = array()) {
 		echo '<div class="zo-games-grid__toolbar"><a class="zo-games-grid__home" href="' . esc_url($home_url) . '">Ana Sayfaya Dön</a></div>';
 	}
 
-	echo '<p class="zo-games-grid__intro">Çocuk zeka oyunları ve ücretsiz zeka oyunları arasından seçim yap, tarayıcıda hemen oyna.</p>';
+	echo '<p class="zo-games-grid__intro">Çocuk zeka oyunları, ilkokul zeka oyunları, ücretsiz zeka oyunları, online zeka oyunları, eğitici zeka oyunları, mantık oyunları ve hafıza oyunları arasından seçim yap, tarayıcıda hemen oyna.</p>';
 
 	echo '<div class="zo-games-grid">';
 

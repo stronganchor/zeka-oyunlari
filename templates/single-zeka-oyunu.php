@@ -27,10 +27,10 @@ $script_url = function_exists('zo_get_game_script_url') ? zo_get_game_script_url
 $inline_style = !empty($module['inline_style']) && is_string($module['inline_style']) ? $module['inline_style'] : '';
 $inline_script = !empty($module['inline_script']) && is_string($module['inline_script']) ? $module['inline_script'] : '';
 $module_description = !empty($module['description']) && is_string($module['description']) ? trim(wp_strip_all_tags($module['description'])) : '';
-$seo_description = trim($page_title . ' oyna. Çocuk zeka oyunları ve ücretsiz zeka oyunları koleksiyonunda tarayıcıdan hemen oynanabilen eğlenceli bir oyun.');
+$seo_description = trim($page_title . ' oyna. Çocuk zeka oyunları, ilkokul zeka oyunları, ücretsiz zeka oyunları, online zeka oyunları, eğitici zeka oyunları, mantık oyunları ve hafıza oyunları koleksiyonunda tarayıcıdan hemen oynanabilen eğlenceli bir oyun.');
 
 if ($module_description !== '') {
-	$seo_description = trim($page_title . ' oyna. ' . $module_description . ' Çocuk zeka oyunları ve ücretsiz zeka oyunları koleksiyonunda yer alır.');
+	$seo_description = trim($page_title . ' oyna. ' . $module_description . ' Çocuk zeka oyunları, ilkokul zeka oyunları, ücretsiz zeka oyunları, online zeka oyunları, eğitici zeka oyunları, mantık oyunları ve hafıza oyunları koleksiyonunda yer alır.');
 }
 ?>
 <!doctype html>
