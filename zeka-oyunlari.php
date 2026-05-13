@@ -1462,7 +1462,7 @@ function zo_games_grid_shortcode($atts = array()) {
 		echo '<div class="zo-games-grid__toolbar"><a class="zo-games-grid__home" href="' . esc_url($home_url) . '">Ana Sayfaya Dön</a></div>';
 	}
 
-	echo '<p class="zo-games-grid__intro"><strong>TR:</strong> zeka oyunları, çocuk zeka oyunları, ilkokul zeka oyunları, ücretsiz online eğitici zeka oyunları, yaşlılar için hafıza oyunları. <strong>EN:</strong> brain games, logic games, memory games for kids, memory games for older people. <strong>DE:</strong> Denkspiele, Logikspiele, Gedächtnisspiele für Kinder, Gedächtnisspiele für ältere Menschen.</p>';
+	echo '<p class="zo-games-grid__intro"><strong>TR:</strong> Çocuklar, ilkokul öğrencileri ve yaşlılar için ücretsiz online eğitici zeka oyunları, mantık oyunları ve hafıza oyunları oynayın. <strong>EN:</strong> Play free online educational brain games, logic games, and memory games for kids, primary school students, and older people. <strong>DE:</strong> Spielen Sie kostenlose online Lern-Denkspiele, Logikspiele und Gedächtnisspiele für Kinder, Grundschüler und ältere Menschen.</p>';
 
 	echo '<div class="zo-games-grid">';
 

@@ -27,7 +27,7 @@ $script_url = function_exists('zo_get_game_script_url') ? zo_get_game_script_url
 $inline_style = !empty($module['inline_style']) && is_string($module['inline_style']) ? $module['inline_style'] : '';
 $inline_script = !empty($module['inline_script']) && is_string($module['inline_script']) ? $module['inline_script'] : '';
 $module_description = !empty($module['description']) && is_string($module['description']) ? trim(wp_strip_all_tags($module['description'])) : '';
-$seo_keywords = 'TR: zeka oyunları, çocuk zeka oyunları, ilkokul zeka oyunları, ücretsiz online eğitici zeka oyunları, yaşlılar için hafıza oyunları. EN: brain games, logic games, memory games for kids, memory games for older people. DE: Denkspiele, Logikspiele, Gedächtnisspiele für Kinder, Gedächtnisspiele für ältere Menschen.';
+$seo_keywords = 'TR: Çocuklar, ilkokul öğrencileri ve yaşlılar için ücretsiz online eğitici zeka oyunları, mantık oyunları ve hafıza oyunları oynayın. EN: Play free online educational brain games, logic games, and memory games for kids, primary school students, and older people. DE: Spielen Sie kostenlose online Lern-Denkspiele, Logikspiele und Gedächtnisspiele für Kinder, Grundschüler und ältere Menschen.';
 $seo_description = trim($page_title . ' oyna. ' . $seo_keywords);
 
 if ($module_description !== '') {
