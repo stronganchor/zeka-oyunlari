@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.4.61.asker.arslan
+ * Version: 1.4.62.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -1268,6 +1268,10 @@ function zo_enqueue_grid_styles() {
 	font-size: 1.05rem;
 	line-height: 1.6;
 }
+.zo-games-grid__intro strong {
+	color: #111827;
+	font-weight: 700;
+}
 .zo-games-grid__home {
 	display: inline-flex;
 	align-items: center;
@@ -1458,7 +1462,7 @@ function zo_games_grid_shortcode($atts = array()) {
 		echo '<div class="zo-games-grid__toolbar"><a class="zo-games-grid__home" href="' . esc_url($home_url) . '">Ana Sayfaya Dön</a></div>';
 	}
 
-	echo '<p class="zo-games-grid__intro">Çocuk zeka oyunları, ilkokul zeka oyunları, ücretsiz zeka oyunları, online zeka oyunları, eğitici zeka oyunları, mantık oyunları ve hafıza oyunları arasından seçim yap, tarayıcıda hemen oyna.</p>';
+	echo '<p class="zo-games-grid__intro"><strong>TR:</strong> zeka oyunları, çocuk zeka oyunları, ilkokul zeka oyunları, ücretsiz online eğitici zeka oyunları, yaşlılar için hafıza oyunları. <strong>EN:</strong> brain games, logic games, memory games for kids, memory games for older people. <strong>DE:</strong> Denkspiele, Logikspiele, Gedächtnisspiele für Kinder, Gedächtnisspiele für ältere Menschen.</p>';
 
 	echo '<div class="zo-games-grid">';
 
