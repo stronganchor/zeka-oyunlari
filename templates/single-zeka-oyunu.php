@@ -21,6 +21,10 @@ if (!is_string($page_title) || $page_title === '') {
 	$page_title = (string) $module['name'];
 }
 
+if (!empty($module['author']) && strcasecmp(trim((string) $module['author']), 'Asker') === 0 && !empty($module['name'])) {
+	$page_title = (string) $module['name'];
+}
+
 $site_name = get_bloginfo('name');
 $style_url = function_exists('zo_get_game_style_url') ? zo_get_game_style_url($module) : '';
 $script_url = function_exists('zo_get_game_script_url') ? zo_get_game_script_url($module) : '';

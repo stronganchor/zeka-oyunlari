@@ -154,6 +154,254 @@ function zo_load_game_module_file($file) {
 	return $loaded_modules[$file];
 }
 
+function zo_get_asker_multilingual_game_metadata($slug) {
+	$items = array(
+		'adam-asmaca' => array(
+			'name' => 'TR: Adam Asmaca | EN: Hangman | DE: Galgenmännchen',
+			'description' => 'TR: Çocuklar için ipuçlu, puan takipli ve tekrar oynanabilir bir Adam Asmaca oyunu. EN: A replayable Hangman game for kids with hints and score tracking. DE: Ein wiederholbares Galgenmännchen-Spiel für Kinder mit Hinweisen und Punktestand.',
+		),
+		'adana-clock' => array(
+			'name' => 'TR: Adana Saati | EN: Adana Clock | DE: Adana-Uhr',
+			'description' => 'TR: Adana saatini saniyelerle gösteren basit bir tarayıcı saati. EN: A simple browser clock showing the current time in Adana with seconds. DE: Eine einfache Browser-Uhr, die die aktuelle Uhrzeit in Adana mit Sekunden zeigt.',
+		),
+		'ai-companion-trainer' => array(
+			'name' => 'TR: Yapay Zeka Yardımcı Eğitmeni | EN: AI Companion Trainer | DE: KI-Begleiter-Trainer',
+			'description' => 'TR: Robot yardımcının ne zaman yazması, sorması, doğrulaması veya insandan yardım alması gerektiğini seçerek eğit. EN: Train a robot helper by choosing when it should draft, ask, verify, or get human help. DE: Trainiere einen Roboterhelfer, indem du entscheidest, wann er schreiben, fragen, prüfen oder menschliche Hilfe holen soll.',
+		),
+		'angle-match' => array(
+			'name' => 'TR: Açı Eşleştirme | EN: Angle Match | DE: Winkel-Match',
+			'description' => 'TR: Hedef açıyı yakalamak için göstergeyi çevirilen basit bir açı oyunu. EN: A simple angle game where players rotate a pointer to match the target angle. DE: Ein einfaches Winkelspiel, bei dem Spieler einen Zeiger auf den Zielwinkel drehen.',
+		),
+		'berlin-clock' => array(
+			'name' => 'TR: Berlin Saati | EN: Berlin Clock | DE: Berlin-Uhr',
+			'description' => 'TR: Berlin, Almanya saatini saniyelerle gösteren basit bir tarayıcı saati. EN: A simple browser clock showing Berlin, Germany time with seconds. DE: Eine einfache Browser-Uhr, die die Berliner Zeit in Deutschland mit Sekunden zeigt.',
+		),
+		'binary-puzzle' => array(
+			'name' => 'TR: İkili Bulmaca | EN: Binary Puzzle | DE: Binärrätsel',
+			'description' => 'TR: Satır ve sütun kurallarına göre 0 ve 1 ile ızgarayı doldur. EN: Fill the grid with 0 and 1 using binary puzzle row and column rules. DE: Fülle das Raster nach Zeilen- und Spaltenregeln mit 0 und 1.',
+		),
+		'breakout-levels' => array(
+			'name' => 'TR: Blok Kırma Seviyeleri | EN: Breakout Levels | DE: Breakout-Level',
+			'description' => 'TR: 10 seviyeli blok kırma oyunu; her seviyede daha fazla blok vardır ve 15 can ile oynanır. EN: A 10-level breakout game with more blocks on each level and 15 lives to play. DE: Ein Breakout-Spiel mit 10 Leveln, mehr Blöcken pro Level und 15 Leben.',
+		),
+		'bug-sort-station' => array(
+			'name' => 'TR: Böcek Sıralama İstasyonu | EN: Bug Sort Station | DE: Käfer-Sortierstation',
+			'description' => 'TR: Kaçmadan önce gelen böcekleri doğru istasyona yönlendirerek sınıflandır. EN: Classify arriving bugs by using the correct station before they escape. DE: Sortiere ankommende Käfer an der richtigen Station, bevor sie entkommen.',
+		),
+		'car-lane-switch' => array(
+			'name' => 'TR: Araba Şerit Değiştirme | EN: Car Lane Switch | DE: Auto-Spurwechsel',
+			'description' => 'TR: 5 şeritli, yüksek kamera açılı, ok tuşları, duraklatma ve gerçek turbo düğmesi olan yavaş tempolu sürüş oyunu. EN: A slower lane-switching driving game with 5 lanes, a higher camera view, arrow keys, pause controls, and a real turbo-use button. DE: Ein ruhigeres Spurwechsel-Fahrspiel mit 5 Spuren, höherer Kamera, Pfeiltasten, Pause und echtem Turbo-Knopf.',
+		),
+		'chess-ai' => array(
+			'name' => 'TR: Yapay Zekaya Karşı Satranç | EN: Chess vs AI | DE: Schach gegen KI',
+			'description' => 'TR: Çok kolaydan çok zora kadar bilgisayar rakiplere karşı satranç oyna. EN: Play chess against computer opponents from very easy to very hard. DE: Spiele Schach gegen Computergegner von sehr leicht bis sehr schwer.',
+		),
+		'color-code-rescue' => array(
+			'name' => 'TR: Renk Kodu Kurtarma | EN: Color Code Rescue | DE: Farbcode-Rettung',
+			'description' => 'TR: Renk sırasını izle ve kodu kurtarmak için aynı sırayı tekrar et. EN: Watch a color sequence and repeat it to save the code. DE: Merke dir eine Farbfolge und wiederhole sie, um den Code zu retten.',
+		),
+		'cryptogram-decoder' => array(
+			'name' => 'TR: Şifreli Yazı Çözücü | EN: Cryptogram Decoder | DE: Kryptogramm-Entschlüssler',
+			'description' => 'TR: Harf değiştirme ipuçlarını kullanarak gizli cümleyi çöz. EN: Decode a secret phrase using letter substitution and solve the cryptogram. DE: Entschlüssle einen geheimen Satz mit Buchstabentausch und löse das Kryptogramm.',
+		),
+		'dama-ai' => array(
+			'name' => 'TR: Yapay Zekaya Karşı Dama | EN: Dama vs AI | DE: Dama gegen KI',
+			'description' => 'TR: Beyaz taşlarla basit bir yapay zekaya karşı oynanan çocuk dostu Dama oyunu. EN: A kid-friendly Dama board game where you play white against a simple AI. DE: Ein kinderfreundliches Dama-Brettspiel, in dem du mit Weiß gegen eine einfache KI spielst.',
+		),
+		'echo-cartographer' => array(
+			'name' => 'TR: Yankı Haritacısı | EN: Echo Cartographer | DE: Echo-Kartograf',
+			'description' => 'TR: Her taramanın harabeleri gösterdiği ama ses avcısı düşmanları çektiği sonar-gizlilik labirenti. EN: A sonar-stealth maze where each scan reveals the ruins but attracts sound-hunting enemies. DE: Ein Sonar-Schleichlabyrinth, in dem jeder Scan Ruinen zeigt, aber geräuschjagende Gegner anlockt.',
+		),
+		'grid-path-puzzle' => array(
+			'name' => 'TR: Izgara Yol Bulmaca | EN: Grid Path Puzzle | DE: Raster-Weg-Rätsel',
+			'description' => 'TR: Başlangıçtan hedefe giderken duvarlardan kaçılan basit bir yol bulma oyunu. EN: A simple path-finding game where players move from start to goal while avoiding walls. DE: Ein einfaches Wegfindespiel, bei dem Spieler vom Start zum Ziel gehen und Wände vermeiden.',
+		),
+		'hizli-tikla' => array(
+			'name' => 'TR: Hızlı Tıkla | EN: Fast Click | DE: Schnell Klicken',
+			'description' => 'TR: 10 saniye içinde olabildiğince çok tıklamaya çalışılan basit bir oyun. EN: A simple game where players try to click as many times as possible in 10 seconds. DE: Ein einfaches Spiel, bei dem Spieler in 10 Sekunden so oft wie möglich klicken.',
+		),
+		'kelime-karistirma' => array(
+			'name' => 'TR: Kelime Karıştırma | EN: Word Scramble | DE: Wortsalat',
+			'description' => 'TR: Çocuklar için Türkçe kelime tahmin etme oyunu; karışık harfleri çöz, ipucu kullan ve puan topla. EN: A Turkish word guessing game for kids; solve scrambled letters, use hints, and collect points. DE: Ein türkisches Wortratespiel für Kinder; löse durcheinandergewürfelte Buchstaben, nutze Hinweise und sammle Punkte.',
+		),
+		'kids-calculator' => array(
+			'name' => 'TR: Çocuklar İçin Basit Hesap Makinesi | EN: Simple Calculator for Kids | DE: Einfacher Rechner für Kinder',
+			'description' => 'TR: Toplama, çıkarma, çarpma, bölme, üs alma ve karekök içeren çocuklar için basit hesap oyunu. EN: A simple calculator game for kids with add, subtract, multiply, divide, power, and square root. DE: Ein einfaches Rechenspiel für Kinder mit Addition, Subtraktion, Multiplikation, Division, Potenzen und Quadratwurzel.',
+		),
+		'lantern-hunt' => array(
+			'name' => 'TR: Fener Avı | EN: Lantern Hunt | DE: Laternenjagd',
+			'description' => 'TR: Satır ve sütun ipuçlarıyla hücreleri aç ve tüm fener çiftlerini eşleştir. EN: Reveal one cell at a time by row or column hints and match all lantern pairs. DE: Decke mithilfe von Zeilen- oder Spaltenhinweisen Zellen auf und finde alle Laternenpaare.',
+		),
+		'london-clock' => array(
+			'name' => 'TR: Londra Saati | EN: London Clock | DE: London-Uhr',
+			'description' => 'TR: Londra saatini saniyelerle gösteren basit bir tarayıcı saati. EN: A simple browser clock showing London time with seconds. DE: Eine einfache Browser-Uhr, die die Londoner Zeit mit Sekunden zeigt.',
+		),
+		'memory-match-animals' => array(
+			'name' => 'TR: Hayvan Hafıza Eşleştirme | EN: Memory Match Animals | DE: Tier-Memory',
+			'description' => 'TR: Hayvan çiftleri, deneme sayısı, zamanlayıcı ve yeniden başlatma içeren çocuklar için hafıza kartı oyunu. EN: A memory matching card game for kids with animal pairs, attempts, timer, and restart. DE: Ein Memory-Kartenspiel für Kinder mit Tierpaaren, Versuchen, Timer und Neustart.',
+		),
+		'micro-garden' => array(
+			'name' => 'TR: Mikro Bahçe | EN: Micro Garden | DE: Mikro-Garten',
+			'description' => 'TR: Bitkiyi büyütmek için Su, Güneş ve Kompost adımlarını doğru sırayla uygula. EN: Read the sequence and apply Water, Sun, Compost in the right order to grow the plant. DE: Lies die Reihenfolge und nutze Wasser, Sonne und Kompost in der richtigen Ordnung, um die Pflanze wachsen zu lassen.',
+		),
+		'mini-manager' => array(
+			'name' => 'TR: Mini Menajer | EN: Mini Manager | DE: Mini-Manager',
+			'description' => 'TR: Sezonlar, transferler, lig tablosu, taktikler, kadro yönetimi, finans ve anlatım içeren büyük futbol menajerliği oyunu. EN: A bigger soccer manager game with seasons, transfers, league table, tactics, squad management, finances, and commentary. DE: Ein größeres Fußballmanager-Spiel mit Saisons, Transfers, Tabelle, Taktik, Kaderverwaltung, Finanzen und Kommentar.',
+		),
+		'mini-maze-builder' => array(
+			'name' => 'TR: Mini Labirent Kurucu | EN: Mini Maze Builder | DE: Mini-Labyrinth-Bauer',
+			'description' => 'TR: Duvarlar inşa et ve başlangıçtan bitişe en az bir geçerli yol bırak. EN: Build walls and keep one valid path from start to finish. DE: Baue Wände und lasse mindestens einen gültigen Weg vom Start bis zum Ziel frei.',
+		),
+		'mini-paint' => array(
+			'name' => 'TR: Mini Boyama Stüdyosu | EN: Mini Paint Studio | DE: Mini-Malstudio',
+			'description' => 'TR: Şekiller, yazı, seçim, kırpma, çıkartmalar, emoji, çerçeveler, çevirme, döndürme ve klavye kısayolları olan basit bir çizim editörü. EN: A simple Paint-style image editor with shapes, text, selection, crop, stickers, emoji, frames, flip, rotate, and keyboard shortcuts. DE: Ein einfacher Bildeditor im Paint-Stil mit Formen, Text, Auswahl, Zuschneiden, Stickern, Emoji, Rahmen, Spiegeln, Drehen und Tastenkürzeln.',
+		),
+		'misir-hazine' => array(
+			'name' => 'TR: Mısır Hazine Oyunu | EN: Egypt Treasure Game | DE: Ägypten-Schatzspiel',
+			'description' => 'TR: Piramitte gizli hazineyi bulmaya çalışılan Mısır temalı oyun. EN: An Egypt-themed game where players try to find the hidden treasure inside the pyramid. DE: Ein Ägypten-Spiel, in dem Spieler den versteckten Schatz in der Pyramide finden.',
+		),
+		'mirror-axiom' => array(
+			'name' => 'TR: Ayna Aksiyomu | EN: Mirror Axiom | DE: Spiegel-Axiom',
+			'description' => 'TR: Her tıklamanın iki eksende de yansıdığı zor bir simetri bulmacası. EN: A hard symmetry puzzle where every click reflects across both axes. DE: Ein schweres Symmetrie-Rätsel, bei dem jeder Klick über beide Achsen gespiegelt wird.',
+		),
+		'mirror-maze' => array(
+			'name' => 'TR: Ayna Labirenti | EN: Mirror Maze | DE: Spiegel-Labyrinth',
+			'description' => 'TR: Aynaları çevirerek lazer ışığını hedefe yönlendirdiğin bulmaca oyunu. EN: A puzzle game where players rotate mirrors to guide a laser beam to the target. DE: Ein Rätselspiel, in dem Spieler Spiegel drehen, um einen Laserstrahl zum Ziel zu führen.',
+		),
+		'munich-clock' => array(
+			'name' => 'TR: Münih Saati | EN: Munich Clock | DE: München-Uhr',
+			'description' => 'TR: Münih, Almanya saatini saniyelerle gösteren basit bir tarayıcı saati. EN: A simple browser clock showing Munich, Germany time with seconds. DE: Eine einfache Browser-Uhr, die die Münchner Zeit in Deutschland mit Sekunden zeigt.',
+		),
+		'orbit-match' => array(
+			'name' => 'TR: Yörünge Eşleştirme | EN: Orbit Match | DE: Orbit-Match',
+			'description' => 'TR: Her yörünge sembolünü hedef desene uyacak şekilde döndür. EN: Rotate each orbit symbol to align with the target pattern. DE: Drehe jedes Orbit-Symbol, bis es zum Zielmuster passt.',
+		),
+		'paris-clock' => array(
+			'name' => 'TR: Paris Saati | EN: Paris Clock | DE: Paris-Uhr',
+			'description' => 'TR: Paris saatini saniyelerle gösteren basit bir tarayıcı saati. EN: A simple browser clock showing Paris time with seconds. DE: Eine einfache Browser-Uhr, die die Pariser Zeit mit Sekunden zeigt.',
+		),
+		'pipe-connect' => array(
+			'name' => 'TR: Boru Bağlantısı | EN: Pipe Connect | DE: Rohrverbindung',
+			'description' => 'TR: Kaynak ve hedef arasında boruları çevirerek bağlantı kurulan basit bir bulmaca oyunu. EN: A simple puzzle game where players rotate pipes to connect the source and the target. DE: Ein einfaches Rätselspiel, in dem Spieler Rohre drehen, um Quelle und Ziel zu verbinden.',
+		),
+		'puzzle-creator-pro' => array(
+			'name' => 'TR: Bulmaca Oluşturucu Pro | EN: Puzzle Creator Pro | DE: Puzzle-Ersteller Pro',
+			'description' => 'TR: Editör hesabıyla bulmacalar oluştur ve sistem genelinde paylaş. EN: Create puzzles and share them system-wide from an editor account. DE: Erstelle mit einem Editor-Konto Rätsel und teile sie im ganzen System.',
+		),
+		'rain-collector' => array(
+			'name' => 'TR: Yağmur Toplayıcı | EN: Rain Collector | DE: Regen-Sammler',
+			'description' => 'TR: Geçerli hedefle eşleşen düşen harfleri topla. EN: Collect falling letters that match the current target. DE: Sammle fallende Buchstaben, die zum aktuellen Ziel passen.',
+		),
+		'robot-designer' => array(
+			'name' => 'TR: Robot Tasarımcısı | EN: Robot Designer | DE: Roboter-Designer',
+			'description' => 'TR: Bir robot tasarla ve özelliklerini farklı görevlere uygun hale getir. EN: Build a robot and match its stats to different missions. DE: Baue einen Roboter und passe seine Werte an verschiedene Missionen an.',
+		),
+		'rock-paper-scissors' => array(
+			'name' => 'TR: Taş Kağıt Makas | EN: Rock Paper Scissors | DE: Schere Stein Papier',
+			'description' => 'TR: Puan takibi ve yeniden başlatma içeren çocuklar için basit Taş Kağıt Makas oyunu. EN: A simple rock paper scissors game for kids with score tracking and restart. DE: Ein einfaches Schere-Stein-Papier-Spiel für Kinder mit Punktestand und Neustart.',
+		),
+		'roster-1000' => array(
+			'name' => 'TR: 1000 Karakter Arenası | EN: Roster 1000 | DE: Roster 1000',
+			'description' => 'TR: 1000 satın alınabilir karakter, her seviyede zorlaşan yapay zeka, dalga başına daha çok düşman ve her galibiyette 50 coin içeren sonsuz arena oyunu. EN: An endless arena game with 1000 buyable characters, harder AI every level, more enemies per wave, and 50 coins for every win. DE: Ein endloses Arenaspiel mit 1000 kaufbaren Figuren, schwererer KI pro Level, mehr Gegnern pro Welle und 50 Münzen für jeden Sieg.',
+		),
+		'rule-guess-puzzle' => array(
+			'name' => 'TR: Kural Tahmin Bulmacası | EN: Rule Guess Puzzle | DE: Regel-Rätsel',
+			'description' => 'TR: Sayıları deneyip geri bildirimi izleyerek gizli kuralı keşfettiğin bir bulmaca oyunu. EN: A hidden-rule puzzle game where players test numbers and discover the secret rule by observing feedback. DE: Ein Rätselspiel mit versteckter Regel, bei dem Spieler Zahlen testen und durch Rückmeldungen die geheime Regel entdecken.',
+		),
+		'rule-switch-rush' => array(
+			'name' => 'TR: Kural Değiştirme Yarışı | EN: Rule Switch Rush | DE: Regelwechsel-Rennen',
+			'description' => 'TR: Kural değişirken oyuncuların doğru yönü seçmesi gereken hızlı refleks ve düşünme oyunu. EN: A fast reflex and thinking game where the rule changes and players must choose the correct direction. DE: Ein schnelles Reaktions- und Denkspiel, bei dem sich die Regel ändert und Spieler die richtige Richtung wählen.',
+		),
+		'shadow-path' => array(
+			'name' => 'TR: Gölge Yolu | EN: Shadow Path | DE: Schattenpfad',
+			'description' => 'TR: Gizli yolu izle ve hücreleri doğru sırayla tekrar et. EN: Watch a hidden path and repeat the cells in order. DE: Merke dir einen versteckten Pfad und wiederhole die Felder in der richtigen Reihenfolge.',
+		),
+		'shop-builder' => array(
+			'name' => 'TR: Dükkan Kurucu | EN: Shop Builder | DE: Laden-Bauer',
+			'description' => 'TR: Satış yaparak para kazanılan ve yükseltmelerle büyüyen basit bir dükkan kurma oyunu. EN: A simple shop-building game where players earn money by selling items and grow with upgrades. DE: Ein einfaches Laden-Aufbauspiel, in dem Spieler durch Verkäufe Geld verdienen und mit Upgrades wachsen.',
+		),
+		'silent-simon-says' => array(
+			'name' => 'TR: Sessiz Simon Diyor | EN: Silent Simon Says | DE: Stilles Simon Sagt',
+			'description' => 'TR: Her komutta yalnızca zıt hareketi takip et. EN: Follow only the opposite action for each command. DE: Folge bei jedem Befehl nur der gegenteiligen Aktion.',
+		),
+		'soccer-match-ai' => array(
+			'name' => 'TR: Yapay Zeka Futbol Maçı | EN: Soccer Match AI | DE: KI-Fußballspiel',
+			'description' => 'TR: Tüm oyuncuların yapay zeka olduğu, kornerlerin çalıştığı ve doğrudan kaleye şut atabildiğin 5 dakikalık futbol maçı. EN: A 5-minute soccer match where all players are AI, blue corner kicks work, and you can shoot directly at goal. DE: Ein 5-minütiges Fußballspiel, in dem alle Spieler KI sind, blaue Ecken funktionieren und du direkt aufs Tor schießen kannst.',
+		),
+		'sound-pattern-builder' => array(
+			'name' => 'TR: Ses Deseni Kurucu | EN: Sound Pattern Builder | DE: Klangmuster-Bauer',
+			'description' => 'TR: Bir ses desenini dinle ve hayvanlara dokunarak aynı sırayı tekrar et. EN: Listen to a sound pattern and repeat it by tapping animals. DE: Höre ein Klangmuster und wiederhole es, indem du Tiere antippst.',
+		),
+		'sound-rule-rush' => array(
+			'name' => 'TR: Ses Kuralı Yarışı | EN: Sound Rule Rush | DE: Klangregel-Rennen',
+			'description' => 'TR: Kurallar değişirken sesleri doğru aileye ayırdığın hızlı refleks ve düşünme oyunu. EN: A fast reflex and thinking game where players sort sounds into the correct family as the rules change. DE: Ein schnelles Reaktions- und Denkspiel, bei dem Spieler Klänge bei wechselnden Regeln der richtigen Familie zuordnen.',
+		),
+		'sudoku' => array(
+			'name' => 'TR: Sudoku | EN: Sudoku | DE: Sudoku',
+			'description' => 'TR: Kolay, orta ve zor tahtaları olan klasik 9x9 Sudoku bulmacası. EN: A classic 9x9 Sudoku puzzle with easy, medium, and hard boards. DE: Ein klassisches 9x9-Sudoku mit leichten, mittleren und schweren Brettern.',
+		),
+		'territory-capture' => array(
+			'name' => 'TR: Bölge Ele Geçirme | EN: Territory Capture | DE: Gebiet Erobern',
+			'description' => 'TR: Izgarada en çok bölgeyi kontrol etmek için yapay zekayla yarıştığın sıra tabanlı strateji oyunu. EN: A turn-based strategy game where you compete with AI to control the most territory on a grid. DE: Ein rundenbasiertes Strategiespiel, in dem du gegen KI um die meisten Gebiete auf einem Raster kämpfst.',
+		),
+		'territory-fill' => array(
+			'name' => 'TR: Bölge Doldurma | EN: Territory Fill | DE: Gebiet Füllen',
+			'description' => 'TR: Hamleler bitmeden en geniş alanı almak için oynanan ızgara kontrol oyunu. EN: A grid control game where players claim the most area before moves run out. DE: Ein Raster-Kontrollspiel, bei dem Spieler vor Ablauf der Züge die größte Fläche sichern.',
+		),
+		'the-46th-rule' => array(
+			'name' => 'TR: 46. Kural | EN: The 46th Rule | DE: Die 46. Regel',
+			'description' => 'TR: Oyuncunun sembol anahtarlarını test edip mantığı kanıtladığı çok zor gizli kural çıkarım oyunu. EN: A very hard hidden-rule deduction game where the player tests symbol keys and proves the logic. DE: Ein sehr schweres Deduktionsspiel mit versteckter Regel, in dem der Spieler Symbolschlüssel testet und die Logik beweist.',
+		),
+		'time-loop-runner' => array(
+			'name' => 'TR: Zaman Döngüsü Koşucusu | EN: Time Loop Runner | DE: Zeitschleifen-Läufer',
+			'description' => 'TR: 5 adımlık diziyi izle ve çarpmadan aynı hareketleri tekrar et. EN: Watch a 5 step sequence and replay the moves without crashing. DE: Merke dir eine Folge aus 5 Schritten und wiederhole die Bewegungen ohne Zusammenstoß.',
+		),
+		'time-traveler-puzzle' => array(
+			'name' => 'TR: Zaman Yolcusu Bulmacası | EN: Time Traveler Puzzle | DE: Zeitreise-Rätsel',
+			'description' => 'TR: Bölümün geçmiş ve gelecek sürümleri arasında geçiş yaparak mantık bulmacalarını çöz. EN: Solve logic puzzles by switching between past and future versions of the level. DE: Löse Logikrätsel, indem du zwischen Vergangenheits- und Zukunftsversionen des Levels wechselst.',
+		),
+		'tr-search-launcher' => array(
+			'name' => 'TR: Türkçe Arama Başlatıcı | EN: TR Search Launcher | DE: Türkischer Suchstarter',
+			'description' => 'TR: Ürün aramalarını birden fazla sitede hızlıca açmak için tarayıcı tabanlı Türkçe alışveriş arama başlatıcısı. EN: A browser-based Turkish shopping search launcher for quickly opening product searches across multiple sites. DE: Ein browserbasierter türkischer Einkaufs-Suchstarter, um Produktsuchen schnell auf mehreren Seiten zu öffnen.',
+		),
+		'wisconsin-clock' => array(
+			'name' => 'TR: Wisconsin Saati | EN: Wisconsin Clock | DE: Wisconsin-Uhr',
+			'description' => 'TR: Wisconsin saatini saniyelerle gösteren basit bir tarayıcı saati. EN: A simple browser clock showing Wisconsin time with seconds. DE: Eine einfache Browser-Uhr, die die Wisconsin-Zeit mit Sekunden zeigt.',
+		),
+		'word-balloon-pop' => array(
+			'name' => 'TR: Kelime Balonu Patlat | EN: Word Balloon Pop | DE: Wortballon-Platzen',
+			'description' => 'TR: Süre dolmadan doğru cevabı taşıyan balonu bul ve patlat. EN: Find and pop the balloon with the correct answer before time runs out. DE: Finde und platze den Ballon mit der richtigen Antwort, bevor die Zeit abläuft.',
+		),
+	);
+
+	return isset($items[$slug]) ? $items[$slug] : null;
+}
+
+function zo_apply_asker_multilingual_game_metadata($module) {
+	if (empty($module['slug']) || empty($module['author']) || !is_string($module['author'])) {
+		return $module;
+	}
+
+	if (strcasecmp(trim($module['author']), 'Asker') !== 0) {
+		return $module;
+	}
+
+	$metadata = zo_get_asker_multilingual_game_metadata(sanitize_title($module['slug']));
+	if (!is_array($metadata)) {
+		return $module;
+	}
+
+	if (!empty($metadata['name'])) {
+		$module['name'] = $metadata['name'];
+	}
+
+	if (!empty($metadata['description'])) {
+		$module['description'] = $metadata['description'];
+	}
+
+	return $module;
+}
+
 function zo_load_game_modules() {
 	static $modules = null;
 
@@ -215,6 +463,7 @@ function zo_load_game_modules() {
 		$module['author_key']    = $author !== '' ? sanitize_title($author) : '';
 		$module['inline_style']  = $inline_style;
 		$module['inline_script'] = $inline_script;
+		$module                  = zo_apply_asker_multilingual_game_metadata($module);
 
 		$modules[$slug] = $module;
 	}
@@ -1276,13 +1525,16 @@ function zo_enqueue_grid_styles() {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
+	max-width: 100%;
 	min-height: 42px;
 	padding: 0 16px;
 	border-radius: 999px;
 	background: #1d4ed8;
 	color: #fff;
 	font-weight: 600;
+	line-height: 1.25;
 	text-decoration: none;
+	text-align: center;
 }
 .zo-games-grid__home:hover,
 .zo-games-grid__home:focus {
@@ -1459,7 +1711,7 @@ function zo_games_grid_shortcode($atts = array()) {
 	echo '<div class="zo-games-grid-wrap">';
 
 	if ($show_home_button) {
-		echo '<div class="zo-games-grid__toolbar"><a class="zo-games-grid__home" href="' . esc_url($home_url) . '">Ana Sayfaya Dön</a></div>';
+		echo '<div class="zo-games-grid__toolbar"><a class="zo-games-grid__home" href="' . esc_url($home_url) . '">Ana Sayfaya Dön / Go to the home page / Zur Startseite</a></div>';
 	}
 
 	echo '<p class="zo-games-grid__intro"><strong>TR:</strong> Çocuklar, ilkokul öğrencileri ve yaşlılar için ücretsiz online eğitici zeka oyunları, mantık oyunları ve hafıza oyunları oynayın. <strong>EN:</strong> Play free online educational brain games, logic games, and memory games for kids, primary school students, and older people. <strong>DE:</strong> Spielen Sie kostenlose online Lern-Denkspiele, Logikspiele und Gedächtnisspiele für Kinder, Grundschüler und ältere Menschen.</p>';
@@ -1483,10 +1735,16 @@ function zo_games_grid_shortcode($atts = array()) {
 			break;
 		}
 
-		$title   = $post instanceof WP_Post ? get_the_title($post) : $module['name'];
-		$excerpt = $post instanceof WP_Post ? get_the_excerpt($post) : '';
+		$is_asker_game = !empty($module['author']) && is_string($module['author']) && strcasecmp(trim($module['author']), 'Asker') === 0;
+		$title         = $post instanceof WP_Post ? get_the_title($post) : $module['name'];
+		$excerpt       = $post instanceof WP_Post ? get_the_excerpt($post) : '';
 		$url     = $post instanceof WP_Post ? zo_get_game_launch_url($post) : zo_get_game_module_fallback_url($slug);
 		$author  = zo_get_game_owner_label($owner);
+
+		if ($is_asker_game) {
+			$title   = $module['name'];
+			$excerpt = !empty($module['description']) && is_string($module['description']) ? $module['description'] : $excerpt;
+		}
 
 		$has_results = true;
 		$shown++;
