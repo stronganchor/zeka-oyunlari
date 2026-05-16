@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.4.68.asker.arslan
+ * Version: 1.4.69.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-define('ZO_PLUGIN_VERSION', '1.4.67.asker.arslan');
+define('ZO_PLUGIN_VERSION', '1.4.68.asker.arslan');
 define('ZO_PLUGIN_FILE', __FILE__);
 define('ZO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('ZO_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -494,9 +494,30 @@ function zo_get_interface_text($key, $lang = '') {
 			'en' => 'play',
 			'de' => 'spielen',
 		),
+		'language_unavailable' => array(
+			'tr' => 'Bu oyun seçili dilde kullanılamıyor.',
+			'en' => 'This game is not available in the selected language.',
+			'de' => 'Dieses Spiel ist in der ausgewählten Sprache nicht verfügbar.',
+		),
 	);
 
 	return isset($text[$key][$lang]) ? $text[$key][$lang] : '';
+}
+
+function zo_get_game_language_availability($slug) {
+	$restricted = array(
+		'adam-asmaca' => array('tr'),
+	);
+
+	$slug = sanitize_title($slug);
+
+	return isset($restricted[$slug]) ? $restricted[$slug] : array_keys(zo_get_language_options());
+}
+
+function zo_is_game_available_for_language($slug, $lang = '') {
+	$lang = array_key_exists($lang, zo_get_language_options()) ? $lang : zo_get_current_language();
+
+	return in_array($lang, zo_get_game_language_availability($slug), true);
 }
 
 function zo_get_localized_text($text, $lang = '') {
@@ -738,6 +759,14 @@ function zo_get_game_owner_for_module($module) {
 	}
 
 	return zo_normalize_game_owner($module['author_key']);
+}
+
+function zo_get_owner_games_url($owner, $lang = '') {
+	$owner = zo_normalize_game_owner($owner);
+	$lang  = array_key_exists($lang, zo_get_language_options()) ? $lang : zo_get_current_language();
+	$path  = $owner === 'asker' ? '/askerin-oyunlari/' : '/arslanin-oyunlari/';
+
+	return add_query_arg('zo_lang', $lang, home_url($path));
 }
 
 function zo_resolve_game_slug_for_post($post_id) {
@@ -1631,6 +1660,12 @@ function zo_maybe_enqueue_current_game_assets() {
 add_action('wp_enqueue_scripts', 'zo_maybe_enqueue_current_game_assets', 20);
 
 function zo_render_game($slug, $post_id = 0) {
+	$language = zo_get_current_language();
+
+	if (!zo_is_game_available_for_language($slug, $language)) {
+		return '';
+	}
+
 	$module = zo_get_game_module($slug);
 
 	if (!$module) {
@@ -1969,6 +2004,10 @@ function zo_games_grid_shortcode($atts = array()) {
 	echo '<div class="zo-games-grid">';
 
 	foreach ($modules as $slug => $module) {
+		if (!zo_is_game_available_for_language($slug, $language)) {
+			continue;
+		}
+
 		$post         = $posts_by_slug[$slug] ?? null;
 		$owner        = $post instanceof WP_Post ? zo_get_game_owner_for_post($post->ID) : '';
 		$module_owner = zo_get_game_owner_for_module($module);

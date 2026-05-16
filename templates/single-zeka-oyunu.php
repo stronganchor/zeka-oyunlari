@@ -18,6 +18,18 @@ $back_url   = function_exists('zo_get_game_back_url') ? zo_get_game_back_url($po
 $language   = function_exists('zo_get_current_language') ? zo_get_current_language() : 'tr';
 $page_title = $post_id ? get_the_title($post_id) : '';
 
+if (function_exists('zo_is_game_available_for_language') && !zo_is_game_available_for_language($slug, $language)) {
+	$owner = $post_id && function_exists('zo_get_game_owner_for_post') ? zo_get_game_owner_for_post($post_id) : '';
+
+	if ($owner === '' && function_exists('zo_get_game_owner_for_module')) {
+		$owner = zo_get_game_owner_for_module($module);
+	}
+
+	$redirect_url = function_exists('zo_get_owner_games_url') ? zo_get_owner_games_url($owner, $language) : home_url('/');
+	wp_safe_redirect($redirect_url, 302);
+	exit;
+}
+
 if (!is_string($page_title) || $page_title === '') {
 	$page_title = (string) $module['name'];
 }
