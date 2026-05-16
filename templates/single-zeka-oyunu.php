@@ -22,17 +22,15 @@ if (!is_string($page_title) || $page_title === '') {
 	$page_title = (string) $module['name'];
 }
 
-$game_owner = $post_id && function_exists('zo_get_game_owner_for_post') ? zo_get_game_owner_for_post($post_id) : '';
-$is_asker_game = $game_owner === 'asker' || (!empty($module['author']) && strcasecmp(trim((string) $module['author']), 'Asker') === 0);
-$asker_metadata = null;
+$display_metadata = null;
 
-if ($is_asker_game && function_exists('zo_get_asker_display_game_metadata')) {
-	$asker_metadata = zo_get_asker_display_game_metadata($module);
+if (function_exists('zo_get_game_display_metadata')) {
+	$display_metadata = zo_get_game_display_metadata($module);
 }
 
-if (is_array($asker_metadata) && !empty($asker_metadata['name'])) {
-	$page_title = (string) $asker_metadata['name'];
-} elseif ($is_asker_game && !empty($module['name'])) {
+if (is_array($display_metadata) && !empty($display_metadata['name'])) {
+	$page_title = (string) $display_metadata['name'];
+} elseif (!empty($module['name'])) {
 	$page_title = (string) $module['name'];
 }
 
@@ -48,8 +46,8 @@ $inline_style = !empty($module['inline_style']) && is_string($module['inline_sty
 $inline_script = !empty($module['inline_script']) && is_string($module['inline_script']) ? $module['inline_script'] : '';
 $module_description = !empty($module['description']) && is_string($module['description']) ? trim(wp_strip_all_tags($module['description'])) : '';
 
-if (is_array($asker_metadata) && !empty($asker_metadata['description'])) {
-	$module_description = trim(wp_strip_all_tags((string) $asker_metadata['description']));
+if (is_array($display_metadata) && !empty($display_metadata['description'])) {
+	$module_description = trim(wp_strip_all_tags((string) $display_metadata['description']));
 }
 
 if (function_exists('zo_get_localized_text')) {

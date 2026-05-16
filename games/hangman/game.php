@@ -253,7 +253,7 @@ document.addEventListener('DOMContentLoaded', function () {
 	const games = document.querySelectorAll('.zo-game-root--adam-asmaca');
 
 	games.forEach(function (game) {
-		const words = [
+		const fallbackWords = [
 			'python', 'anahtar', 'lezzetli', 'asker', 'rastgele',  'yakala',
 			'ingilizce', 'pencere', 'kitap',  'kazan', 'gezegen',
 			'test', 'dosya', 'harf', 'adama asmaca', 'fil', 'komik',
@@ -261,6 +261,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			'klavye', 'televizyon', 'adam', 'oyuncak', 'okul', 'masa', 'kalem'
 		];
 
+		const words = JSON.parse(game.getAttribute('data-words') || '[]');
+		const messages = JSON.parse(game.getAttribute('data-messages') || '{}');
+		const wordList = words.length ? words : fallbackWords;
 		const maxAttempts = 10;
 		const canvas = game.querySelector('.zo-aa-canvas');
 		const ctx = canvas.getContext('2d');
@@ -285,7 +288,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		let roundActive = true;
 
 		function randomWord() {
-			return words[Math.floor(Math.random() * words.length)];
+			return wordList[Math.floor(Math.random() * wordList.length)];
 		}
 
 		function displayWord() {
@@ -405,11 +408,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			if (win) {
 				wins += 1;
-				setMessage('Kazandın. Kelime: ' + word.toUpperCase(), 'is-info');
+				setMessage((messages.win || 'You won. Word: ') + word.toUpperCase(), 'is-info');
 			} else {
 				losses += 1;
 				wordEl.textContent = word.toUpperCase().split('').join(' ');
-				setMessage('Oyun bitti. Kelime: ' + word.toUpperCase(), 'is-bad');
+				setMessage((messages.loss || 'Game over. Word: ') + word.toUpperCase(), 'is-bad');
 			}
 
 			inputEl.disabled = true;
@@ -424,7 +427,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			if (guessedLetters.has(letter)) {
-				setMessage('Bu harfi zaten denedin.', 'is-warn');
+				setMessage(messages.already || 'You already tried that letter.', 'is-warn');
 				return;
 			}
 
@@ -436,7 +439,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			if (word.indexOf(letter) !== -1) {
-				setMessage('Doğru tahmin.', 'is-good');
+				setMessage(messages.correct || 'Correct guess.', 'is-good');
 				updateUI();
 
 				const allFound = word.split('').every(function (ch) {
@@ -448,7 +451,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				}
 			} else {
 				attempts -= 1;
-				setMessage('Yanlış tahmin.', 'is-bad');
+				setMessage(messages.wrong || 'Wrong guess.', 'is-bad');
 				redrawFigure();
 				updateUI();
 
@@ -470,7 +473,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			if (!/^[a-z]$/.test(letter)) {
-				setMessage('Tek bir harf gir.', 'is-bad');
+				setMessage(messages.oneLetter || 'Enter one letter.', 'is-bad');
 				return;
 			}
 
@@ -483,13 +486,13 @@ document.addEventListener('DOMContentLoaded', function () {
 			});
 
 			if (!remaining.length) {
-				setMessage('İpucuna gerek yok.', 'is-info');
+				setMessage(messages.noHintNeeded || 'No hint needed.', 'is-info');
 				updateUI();
 				return;
 			}
 
 			if (attempts <= 0 || !roundActive) {
-				setMessage('İpucu kullanılamaz.', 'is-bad');
+				setMessage(messages.hintUnavailable || 'Hint is unavailable.', 'is-bad');
 				updateUI();
 				return;
 			}
@@ -503,7 +506,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				keyButton.disabled = true;
 			}
 
-			setMessage('İpucu kullanıldı. Açılan harf: ' + reveal.toUpperCase() + ' (-1)', 'is-hint');
+			setMessage((messages.hintUsed || 'Hint used. Revealed letter: ') + reveal.toUpperCase() + ' (-1)', 'is-hint');
 			redrawFigure();
 			updateUI();
 
@@ -561,12 +564,65 @@ JS;
 if (!function_exists('zo_game_adam_asmaca_render')) {
 	function zo_game_adam_asmaca_render($post_id = 0, $module = array()) {
 		$instance_id = 'zo-adam-asmaca-' . ($post_id ? absint($post_id) : wp_rand(1000, 999999));
+		$lang = function_exists('zo_get_current_language') ? zo_get_current_language() : 'tr';
+		$words = array(
+			'tr' => array('anahtar', 'lezzetli', 'asker', 'rastgele', 'yakala', 'pencere', 'kitap', 'kazan', 'gezegen', 'dosya', 'harf', 'fil', 'komik', 'bilgisayar', 'girdi', 'defter', 'harika', 'macera', 'maden', 'klavye', 'televizyon', 'adam', 'oyuncak', 'okul', 'masa', 'kalem'),
+			'en' => array('planet', 'window', 'school', 'pencil', 'computer', 'keyboard', 'adventure', 'notebook', 'elephant', 'random', 'catch', 'letter', 'treasure', 'garden', 'castle', 'puzzle', 'memory', 'rocket', 'button', 'winner'),
+			'de' => array('fenster', 'schule', 'stift', 'computer', 'tastatur', 'abenteuer', 'heft', 'elefant', 'zufall', 'buch', 'brief', 'schatz', 'garten', 'burg', 'raetsel', 'gedaechtnis', 'rakete', 'knopf', 'gewinner', 'planet'),
+		);
+		$text = array(
+			'tr' => array(
+				'title' => 'Adam Asmaca',
+				'description' => 'Bir harf tahmin et. Yanlış tahminlerde çizim tamamlanır. Kelimeyi bitir ve kazan.',
+				'placeholder' => 'Harf',
+				'guess' => 'Tahmin',
+				'hint' => 'İpucu (-1)',
+				'restart' => 'Tekrar',
+				'attempts' => 'Hak',
+				'wins' => 'Kazanç',
+				'losses' => 'Kayıp',
+				'remaining' => 'Kalan Harf',
+				'guessed' => 'Denenen harfler',
+			),
+			'en' => array(
+				'title' => 'Hangman',
+				'description' => 'Guess one letter at a time. Wrong guesses complete the drawing. Finish the word to win.',
+				'placeholder' => 'Letter',
+				'guess' => 'Guess',
+				'hint' => 'Hint (-1)',
+				'restart' => 'Restart',
+				'attempts' => 'Tries',
+				'wins' => 'Wins',
+				'losses' => 'Losses',
+				'remaining' => 'Letters Left',
+				'guessed' => 'Tried letters',
+			),
+			'de' => array(
+				'title' => 'Galgenmännchen',
+				'description' => 'Rate jeweils einen Buchstaben. Falsche Tipps vervollständigen die Zeichnung. Löse das Wort, um zu gewinnen.',
+				'placeholder' => 'Buchstabe',
+				'guess' => 'Raten',
+				'hint' => 'Hinweis (-1)',
+				'restart' => 'Neu',
+				'attempts' => 'Versuche',
+				'wins' => 'Gewinne',
+				'losses' => 'Verluste',
+				'remaining' => 'Übrige Buchstaben',
+				'guessed' => 'Versuchte Buchstaben',
+			),
+		);
+		$messages = array(
+			'tr' => array('win' => 'Kazandın. Kelime: ', 'loss' => 'Oyun bitti. Kelime: ', 'already' => 'Bu harfi zaten denedin.', 'correct' => 'Doğru tahmin.', 'wrong' => 'Yanlış tahmin.', 'oneLetter' => 'Tek bir harf gir.', 'noHintNeeded' => 'İpucuna gerek yok.', 'hintUnavailable' => 'İpucu kullanılamaz.', 'hintUsed' => 'İpucu kullanıldı. Açılan harf: '),
+			'en' => array('win' => 'You won. Word: ', 'loss' => 'Game over. Word: ', 'already' => 'You already tried that letter.', 'correct' => 'Correct guess.', 'wrong' => 'Wrong guess.', 'oneLetter' => 'Enter one letter.', 'noHintNeeded' => 'No hint needed.', 'hintUnavailable' => 'Hint is unavailable.', 'hintUsed' => 'Hint used. Revealed letter: '),
+			'de' => array('win' => 'Gewonnen. Wort: ', 'loss' => 'Spiel vorbei. Wort: ', 'already' => 'Diesen Buchstaben hast du schon versucht.', 'correct' => 'Richtig geraten.', 'wrong' => 'Falsch geraten.', 'oneLetter' => 'Gib einen Buchstaben ein.', 'noHintNeeded' => 'Kein Hinweis nötig.', 'hintUnavailable' => 'Hinweis nicht verfügbar.', 'hintUsed' => 'Hinweis benutzt. Aufgedeckter Buchstabe: '),
+		);
+		$lang = isset($text[$lang]) ? $lang : 'tr';
 
 		ob_start();
 		?>
-		<div class="zo-game-root zo-game-root--adam-asmaca" id="<?php echo esc_attr($instance_id); ?>">
-			<h2 class="zo-aa-title">Adam Asmaca</h2>
-			<p class="zo-aa-desc">Bir harf tahmin et. Yanlış tahminlerde çizim tamamlanır. Kelimeyi bitir ve kazan.</p>
+		<div class="zo-game-root zo-game-root--adam-asmaca" id="<?php echo esc_attr($instance_id); ?>" data-words="<?php echo esc_attr(wp_json_encode($words[$lang])); ?>" data-messages="<?php echo esc_attr(wp_json_encode($messages[$lang])); ?>">
+			<h2 class="zo-aa-title"><?php echo esc_html($text[$lang]['title']); ?></h2>
+			<p class="zo-aa-desc"><?php echo esc_html($text[$lang]['description']); ?></p>
 
 			<div class="zo-aa-top">
 				<div class="zo-aa-canvas-wrap">
@@ -577,35 +633,35 @@ if (!function_exists('zo_game_adam_asmaca_render')) {
 					<div class="zo-aa-word">_ _ _ _</div>
 
 					<div class="zo-aa-input-row">
-						<input type="text" maxlength="1" class="zo-aa-input" placeholder="Harf" />
-						<button type="button" class="zo-aa-button zo-aa-button--guess">Tahmin</button>
-						<button type="button" class="zo-aa-button zo-aa-button--hint">İpucu (-1)</button>
-						<button type="button" class="zo-aa-button zo-aa-button--restart">Tekrar</button>
+						<input type="text" maxlength="1" class="zo-aa-input" placeholder="<?php echo esc_attr($text[$lang]['placeholder']); ?>" />
+						<button type="button" class="zo-aa-button zo-aa-button--guess"><?php echo esc_html($text[$lang]['guess']); ?></button>
+						<button type="button" class="zo-aa-button zo-aa-button--hint"><?php echo esc_html($text[$lang]['hint']); ?></button>
+						<button type="button" class="zo-aa-button zo-aa-button--restart"><?php echo esc_html($text[$lang]['restart']); ?></button>
 					</div>
 
 					<div class="zo-aa-message" aria-live="polite"></div>
 
 					<div class="zo-aa-stats">
 						<div class="zo-aa-stat">
-							<span class="zo-aa-stat-label">Hak</span>
+							<span class="zo-aa-stat-label"><?php echo esc_html($text[$lang]['attempts']); ?></span>
 							<span class="zo-aa-stat-value zo-aa-attempts">10</span>
 						</div>
 						<div class="zo-aa-stat">
-							<span class="zo-aa-stat-label">Kazanç</span>
+							<span class="zo-aa-stat-label"><?php echo esc_html($text[$lang]['wins']); ?></span>
 							<span class="zo-aa-stat-value zo-aa-wins">0</span>
 						</div>
 						<div class="zo-aa-stat">
-							<span class="zo-aa-stat-label">Kayıp</span>
+							<span class="zo-aa-stat-label"><?php echo esc_html($text[$lang]['losses']); ?></span>
 							<span class="zo-aa-stat-value zo-aa-losses">0</span>
 						</div>
 						<div class="zo-aa-stat">
-							<span class="zo-aa-stat-label">Kalan Harf</span>
+							<span class="zo-aa-stat-label"><?php echo esc_html($text[$lang]['remaining']); ?></span>
 							<span class="zo-aa-stat-value zo-aa-remaining">0</span>
 						</div>
 					</div>
 
 					<div class="zo-aa-guessed">
-						Denenen harfler: <strong class="zo-aa-guessed-text">—</strong>
+						<?php echo esc_html($text[$lang]['guessed']); ?>: <strong class="zo-aa-guessed-text">-</strong>
 					</div>
 				</div>
 			</div>

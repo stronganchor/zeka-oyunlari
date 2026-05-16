@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.4.67.asker.arslan
+ * Version: 1.4.68.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-define('ZO_PLUGIN_VERSION', '1.4.63.asker.arslan');
+define('ZO_PLUGIN_VERSION', '1.4.67.asker.arslan');
 define('ZO_PLUGIN_FILE', __FILE__);
 define('ZO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('ZO_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -439,7 +439,7 @@ function zo_get_fallback_multilingual_game_metadata($module) {
 
 	if ($description !== '') {
 		$metadata['description'] = sprintf(
-			'TR: %1$s, Asker tarafından yapılan ve tarayıcıda oynanan bir oyundur. EN: %2$s DE: %1$s ist ein von Asker erstelltes Browserspiel.',
+			'TR: %1$s, tarayıcıda oynanan bir oyundur. EN: %2$s DE: %1$s ist ein Browserspiel.',
 			$name,
 			$description
 		);
@@ -554,6 +554,19 @@ function zo_get_localized_text($text, $lang = '') {
 function zo_get_asker_display_game_metadata($module) {
 	if (empty($module['slug'])) {
 		return null;
+	}
+
+	$metadata = zo_get_asker_multilingual_game_metadata(sanitize_title($module['slug']));
+	if (!is_array($metadata)) {
+		$metadata = zo_get_fallback_multilingual_game_metadata($module);
+	}
+
+	return is_array($metadata) ? $metadata : null;
+}
+
+function zo_get_game_display_metadata($module) {
+	if (empty($module['slug'])) {
+		return zo_get_fallback_multilingual_game_metadata($module);
 	}
 
 	$metadata = zo_get_asker_multilingual_game_metadata(sanitize_title($module['slug']));
@@ -1972,17 +1985,11 @@ function zo_games_grid_shortcode($atts = array()) {
 			break;
 		}
 
-		$is_asker_game = $owner === 'asker' || (!empty($module['author']) && is_string($module['author']) && strcasecmp(trim($module['author']), 'Asker') === 0);
-		$title         = $post instanceof WP_Post ? get_the_title($post) : $module['name'];
-		$excerpt       = $post instanceof WP_Post ? get_the_excerpt($post) : '';
-		$url     = $post instanceof WP_Post ? zo_get_game_launch_url($post) : zo_get_game_module_fallback_url($slug);
-		$author  = zo_get_game_owner_label($owner);
-
-		if ($is_asker_game) {
-			$metadata = zo_get_asker_display_game_metadata($module);
-			$title    = !empty($metadata['name']) ? $metadata['name'] : $module['name'];
-			$excerpt  = !empty($metadata['description']) ? $metadata['description'] : $excerpt;
-		}
+		$metadata = zo_get_game_display_metadata($module);
+		$title    = !empty($metadata['name']) ? $metadata['name'] : ($post instanceof WP_Post ? get_the_title($post) : $module['name']);
+		$excerpt  = !empty($metadata['description']) ? $metadata['description'] : ($post instanceof WP_Post ? get_the_excerpt($post) : '');
+		$url      = $post instanceof WP_Post ? zo_get_game_launch_url($post) : zo_get_game_module_fallback_url($slug);
+		$author   = zo_get_game_owner_label($owner);
 
 		$title   = zo_get_localized_text($title, $language);
 		$excerpt = zo_get_localized_text($excerpt, $language);
@@ -2024,10 +2031,6 @@ function zo_games_grid_shortcode($atts = array()) {
 
 		if ($excerpt !== '') {
 			echo '<p class="zo-games-grid__excerpt">' . esc_html($excerpt) . '</p>';
-		}
-
-		if (!$is_asker_game && $title !== $module['name']) {
-			echo '<div class="zo-games-grid__module">' . esc_html($module['name']) . '</div>';
 		}
 
 		if ($url !== '') {
