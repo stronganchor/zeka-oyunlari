@@ -21,7 +21,17 @@ if (!is_string($page_title) || $page_title === '') {
 	$page_title = (string) $module['name'];
 }
 
-if (!empty($module['author']) && strcasecmp(trim((string) $module['author']), 'Asker') === 0 && !empty($module['name'])) {
+$game_owner = $post_id && function_exists('zo_get_game_owner_for_post') ? zo_get_game_owner_for_post($post_id) : '';
+$is_asker_game = $game_owner === 'asker' || (!empty($module['author']) && strcasecmp(trim((string) $module['author']), 'Asker') === 0);
+$asker_metadata = null;
+
+if ($is_asker_game && function_exists('zo_get_asker_display_game_metadata')) {
+	$asker_metadata = zo_get_asker_display_game_metadata($module);
+}
+
+if (is_array($asker_metadata) && !empty($asker_metadata['name'])) {
+	$page_title = (string) $asker_metadata['name'];
+} elseif ($is_asker_game && !empty($module['name'])) {
 	$page_title = (string) $module['name'];
 }
 
@@ -31,6 +41,10 @@ $script_url = function_exists('zo_get_game_script_url') ? zo_get_game_script_url
 $inline_style = !empty($module['inline_style']) && is_string($module['inline_style']) ? $module['inline_style'] : '';
 $inline_script = !empty($module['inline_script']) && is_string($module['inline_script']) ? $module['inline_script'] : '';
 $module_description = !empty($module['description']) && is_string($module['description']) ? trim(wp_strip_all_tags($module['description'])) : '';
+
+if (is_array($asker_metadata) && !empty($asker_metadata['description'])) {
+	$module_description = trim(wp_strip_all_tags((string) $asker_metadata['description']));
+}
 $seo_keywords = 'TR: Çocuklar, ilkokul öğrencileri ve yaşlılar için ücretsiz online eğitici zeka oyunları, mantık oyunları ve hafıza oyunları oynayın. EN: Play free online educational brain games, logic games, and memory games for kids, primary school students, and older people. DE: Spielen Sie kostenlose online Lern-Denkspiele, Logikspiele und Gedächtnisspiele für Kinder, Grundschüler und ältere Menschen.';
 $seo_description = trim($page_title . ' oyna. ' . $seo_keywords);
 

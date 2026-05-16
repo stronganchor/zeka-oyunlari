@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.4.65.asker.arslan
+ * Version: 1.4.66.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -380,6 +380,46 @@ function zo_get_asker_multilingual_game_metadata($slug) {
 			'name' => 'TR: Bulmaca Sinyal Kasası | EN: Puzzle Signal Vault | DE: Puzzle-Signal-Tresor',
 			'description' => 'TR: Renk değiştiren sinyalleri çözerek kasa kapılarını sırayla aç. EN: Decode color-shift signals to open vault doors in sequence. DE: Entschlüssle farbwechselnde Signale, um Tresortüren der Reihe nach zu öffnen.',
 		),
+		'balloon-tower-climb' => array(
+			'name' => 'TR: Balon Kulesine Tırmanış | EN: Balloon Tower Climb | DE: Ballonturm-Aufstieg',
+			'description' => 'TR: Yükselme balonlarını toplayarak kulede yukarı çık. EN: Float up a tower collecting lift balloons. DE: Schwebe einen Turm hinauf und sammle Aufstiegsballons.',
+		),
+		'castle-siege-commander' => array(
+			'name' => 'TR: Kale Kuşatması Komutanı | EN: Castle Siege Commander | DE: Burgenbelagerungs-Kommandant',
+			'description' => 'TR: Kale kuşatması sırasında komuta bayraklarını topla. EN: Collect command flags during a castle siege. DE: Sammle Kommandoflaggen während einer Burgenbelagerung.',
+		),
+		'candy-factory-chaos' => array(
+			'name' => 'TR: Şeker Fabrikası Karmaşası | EN: Candy Factory Chaos | DE: Süßigkeitenfabrik-Chaos',
+			'description' => 'TR: Karışık bir fabrikada şeker partilerini topla. EN: Collect candy batches in a chaotic factory. DE: Sammle Süßigkeitenladungen in einer chaotischen Fabrik.',
+		),
+		'castle-trap-designer' => array(
+			'name' => 'TR: Kale Tuzak Tasarımcısı | EN: Castle Trap Designer | DE: Burgfallen-Designer',
+			'description' => 'TR: Akıllı kale tuzaklarını tamamlamak için dişlileri topla. EN: Collect gears to finish clever castle traps. DE: Sammle Zahnräder, um clevere Burgfallen fertigzustellen.',
+		),
+		'giant-bug-survival' => array(
+			'name' => 'TR: Dev Böcek Hayatta Kalma | EN: Giant Bug Survival | DE: Rieseninsekt-Überleben',
+			'description' => 'TR: Her şeyin devasa olduğu bir bahçede hayatta kal. EN: Survive in a backyard where everything is huge. DE: Überlebe in einem Garten, in dem alles riesig ist.',
+		),
+		'haunted-library-mystery' => array(
+			'name' => 'TR: Perili Kütüphane Gizemi | EN: Haunted Library Mystery | DE: Geheimnis der Spukbibliothek',
+			'description' => 'TR: Perili bir kütüphanede parlayan ipuçlarını bul. EN: Find glowing clues in a spooky library. DE: Finde leuchtende Hinweise in einer unheimlichen Bibliothek.',
+		),
+		'ice-mountain-snowboard' => array(
+			'name' => 'TR: Buz Dağı Snowboard | EN: Ice Mountain Snowboard | DE: Eisberg-Snowboard',
+			'description' => 'TR: Bayrakları toplayarak buzlu dağdan snowboard ile kay. EN: Snowboard down an icy mountain collecting flags. DE: Fahre mit dem Snowboard einen eisigen Berg hinab und sammle Flaggen.',
+		),
+		'invisible-platform-challenge' => array(
+			'name' => 'TR: Görünmez Platform Mücadelesi | EN: Invisible Platform Challenge | DE: Unsichtbare-Plattform-Herausforderung',
+			'description' => 'TR: Parıltı işaretlerini toplayarak gizli platformları bul. EN: Find hidden platforms by collecting shimmer marks. DE: Finde versteckte Plattformen, indem du Schimmerzeichen sammelst.',
+		),
+		'laser-mirror-puzzle' => array(
+			'name' => 'TR: Lazer Ayna Bulmacası | EN: Laser Mirror Puzzle | DE: Laser-Spiegel-Rätsel',
+			'description' => 'TR: Ayna parçalarını topla ve lazer ışınlarından kaç. EN: Collect mirror chips and avoid laser beams. DE: Sammle Spiegelteile und weiche Laserstrahlen aus.',
+		),
+		'arslan-country-quiz' => array(
+			'name' => 'TR: Ülke 100 Soru | EN: Country Quiz Coins | DE: Länderquiz-Münzen',
+			'description' => 'TR: Bir ülke adı yaz ve coin kazanmak ya da kaybetmek için 100 quiz sorusu cevapla. EN: Write a country name and answer 100 quiz questions to win or lose coins. DE: Schreibe einen Ländernamen und beantworte 100 Quizfragen, um Münzen zu gewinnen oder zu verlieren.',
+		),
 	);
 
 	return isset($items[$slug]) ? $items[$slug] : null;
@@ -408,6 +448,19 @@ function zo_get_fallback_multilingual_game_metadata($module) {
 	return $metadata;
 }
 
+function zo_get_asker_display_game_metadata($module) {
+	if (empty($module['slug'])) {
+		return null;
+	}
+
+	$metadata = zo_get_asker_multilingual_game_metadata(sanitize_title($module['slug']));
+	if (!is_array($metadata)) {
+		$metadata = zo_get_fallback_multilingual_game_metadata($module);
+	}
+
+	return is_array($metadata) ? $metadata : null;
+}
+
 function zo_apply_asker_multilingual_game_metadata($module) {
 	if (empty($module['slug']) || empty($module['author']) || !is_string($module['author'])) {
 		return $module;
@@ -417,11 +470,7 @@ function zo_apply_asker_multilingual_game_metadata($module) {
 		return $module;
 	}
 
-	$metadata = zo_get_asker_multilingual_game_metadata(sanitize_title($module['slug']));
-	if (!is_array($metadata)) {
-		$metadata = zo_get_fallback_multilingual_game_metadata($module);
-	}
-
+	$metadata = zo_get_asker_display_game_metadata($module);
 	if (!is_array($metadata)) {
 		return $module;
 	}
@@ -1770,15 +1819,16 @@ function zo_games_grid_shortcode($atts = array()) {
 			break;
 		}
 
-		$is_asker_game = !empty($module['author']) && is_string($module['author']) && strcasecmp(trim($module['author']), 'Asker') === 0;
+		$is_asker_game = $owner === 'asker' || (!empty($module['author']) && is_string($module['author']) && strcasecmp(trim($module['author']), 'Asker') === 0);
 		$title         = $post instanceof WP_Post ? get_the_title($post) : $module['name'];
 		$excerpt       = $post instanceof WP_Post ? get_the_excerpt($post) : '';
 		$url     = $post instanceof WP_Post ? zo_get_game_launch_url($post) : zo_get_game_module_fallback_url($slug);
 		$author  = zo_get_game_owner_label($owner);
 
 		if ($is_asker_game) {
-			$title   = $module['name'];
-			$excerpt = !empty($module['description']) && is_string($module['description']) ? $module['description'] : $excerpt;
+			$metadata = zo_get_asker_display_game_metadata($module);
+			$title    = !empty($metadata['name']) ? $metadata['name'] : $module['name'];
+			$excerpt  = !empty($metadata['description']) ? $metadata['description'] : $excerpt;
 		}
 
 		$has_results = true;
@@ -1821,7 +1871,7 @@ function zo_games_grid_shortcode($atts = array()) {
 		}
 
 		if ($url !== '') {
-			echo '<div class="zo-games-grid__actions"><a class="zo-games-grid__button" href="' . esc_url($url) . '">Oyunu Aç</a></div>';
+			echo '<div class="zo-games-grid__actions"><a class="zo-games-grid__button" href="' . esc_url($url) . '">Oyunu Aç / Open Game / Spiel Öffnen</a></div>';
 		}
 
 		echo '</div>';
