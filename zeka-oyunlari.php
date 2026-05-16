@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.4.64.asker.arslan
+ * Version: 1.4.65.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -372,9 +372,40 @@ function zo_get_asker_multilingual_game_metadata($slug) {
 			'name' => 'TR: Kelime Balonu Patlat | EN: Word Balloon Pop | DE: Wortballon-Platzen',
 			'description' => 'TR: Süre dolmadan doğru cevabı taşıyan balonu bul ve patlat. EN: Find and pop the balloon with the correct answer before time runs out. DE: Finde und platze den Ballon mit der richtigen Antwort, bevor die Zeit abläuft.',
 		),
+		'puzzle-crafter-drift' => array(
+			'name' => 'TR: Bulmaca Ustası Drift | EN: Puzzle Crafter Drift | DE: Puzzle-Bauer Drift',
+			'description' => 'TR: Değişen bulmaca parçaları oluştur ve puanını büyütmeye devam et. EN: Craft shifting puzzle tiles and keep your score growing. DE: Erstelle wechselnde Puzzle-Kacheln und lasse deine Punktzahl weiter wachsen.',
+		),
+		'puzzle-signal-vault' => array(
+			'name' => 'TR: Bulmaca Sinyal Kasası | EN: Puzzle Signal Vault | DE: Puzzle-Signal-Tresor',
+			'description' => 'TR: Renk değiştiren sinyalleri çözerek kasa kapılarını sırayla aç. EN: Decode color-shift signals to open vault doors in sequence. DE: Entschlüssle farbwechselnde Signale, um Tresortüren der Reihe nach zu öffnen.',
+		),
 	);
 
 	return isset($items[$slug]) ? $items[$slug] : null;
+}
+
+function zo_get_fallback_multilingual_game_metadata($module) {
+	$name = !empty($module['name']) && is_string($module['name']) ? trim($module['name']) : '';
+	$description = !empty($module['description']) && is_string($module['description']) ? trim(wp_strip_all_tags($module['description'])) : '';
+
+	if ($name === '') {
+		return null;
+	}
+
+	$metadata = array(
+		'name' => sprintf('TR: %1$s oyunu | EN: %1$s | DE: %1$s Spiel', $name),
+	);
+
+	if ($description !== '') {
+		$metadata['description'] = sprintf(
+			'TR: %1$s, Asker tarafından yapılan ve tarayıcıda oynanan bir oyundur. EN: %2$s DE: %1$s ist ein von Asker erstelltes Browserspiel.',
+			$name,
+			$description
+		);
+	}
+
+	return $metadata;
 }
 
 function zo_apply_asker_multilingual_game_metadata($module) {
@@ -387,6 +418,10 @@ function zo_apply_asker_multilingual_game_metadata($module) {
 	}
 
 	$metadata = zo_get_asker_multilingual_game_metadata(sanitize_title($module['slug']));
+	if (!is_array($metadata)) {
+		$metadata = zo_get_fallback_multilingual_game_metadata($module);
+	}
+
 	if (!is_array($metadata)) {
 		return $module;
 	}
