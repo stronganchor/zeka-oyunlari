@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.4.66.asker.arslan
+ * Version: 1.4.67.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -446,6 +446,109 @@ function zo_get_fallback_multilingual_game_metadata($module) {
 	}
 
 	return $metadata;
+}
+
+function zo_get_language_options() {
+	return array(
+		'tr' => 'TR',
+		'en' => 'EN',
+		'de' => 'DE',
+	);
+}
+
+function zo_get_current_language() {
+	$lang = '';
+
+	if (isset($_GET['zo_lang'])) {
+		$lang = sanitize_key(wp_unslash($_GET['zo_lang']));
+	}
+
+	return array_key_exists($lang, zo_get_language_options()) ? $lang : 'tr';
+}
+
+function zo_get_interface_text($key, $lang = '') {
+	$lang = array_key_exists($lang, zo_get_language_options()) ? $lang : zo_get_current_language();
+	$text = array(
+		'home' => array(
+			'tr' => 'Ana Sayfaya Dön',
+			'en' => 'Go to the home page',
+			'de' => 'Zur Startseite',
+		),
+		'intro' => array(
+			'tr' => 'Çocuklar, ilkokul öğrencileri ve yaşlılar için ücretsiz online eğitici zeka oyunları, mantık oyunları ve hafıza oyunları oynayın.',
+			'en' => 'Play free online educational brain games, logic games, and memory games for kids, primary school students, and older people.',
+			'de' => 'Spielen Sie kostenlose online Lern-Denkspiele, Logikspiele und Gedächtnisspiele für Kinder, Grundschüler und ältere Menschen.',
+		),
+		'open_game' => array(
+			'tr' => 'Oyunu Aç',
+			'en' => 'Open Game',
+			'de' => 'Spiel Öffnen',
+		),
+		'language_label' => array(
+			'tr' => 'Dil',
+			'en' => 'Language',
+			'de' => 'Sprache',
+		),
+		'play_suffix' => array(
+			'tr' => 'oyna',
+			'en' => 'play',
+			'de' => 'spielen',
+		),
+	);
+
+	return isset($text[$key][$lang]) ? $text[$key][$lang] : '';
+}
+
+function zo_get_localized_text($text, $lang = '') {
+	$text = is_string($text) ? trim($text) : '';
+	$lang = array_key_exists($lang, zo_get_language_options()) ? $lang : zo_get_current_language();
+
+	if ($text === '') {
+		return '';
+	}
+
+	$labels = array('tr' => 'TR:', 'en' => 'EN:', 'de' => 'DE:');
+	$matches = array();
+
+	foreach ($labels as $key => $label) {
+		$position = stripos($text, $label);
+
+		if ($position !== false) {
+			$matches[] = array(
+				'lang'     => $key,
+				'position' => $position,
+				'length'   => strlen($label),
+			);
+		}
+	}
+
+	if (empty($matches)) {
+		return $text;
+	}
+
+	usort(
+		$matches,
+		function ($a, $b) {
+			return $a['position'] <=> $b['position'];
+		}
+	);
+
+	$parts = array();
+	$count = count($matches);
+
+	for ($index = 0; $index < $count; $index++) {
+		$start = $matches[$index]['position'] + $matches[$index]['length'];
+		$end   = $index + 1 < $count ? $matches[$index + 1]['position'] : strlen($text);
+		$value = substr($text, $start, $end - $start);
+		$value = trim($value);
+		$value = trim($value, " \t\n\r\0\x0B|");
+
+		if ($value !== '') {
+			$parts[$matches[$index]['lang']] = $value;
+		}
+	}
+
+	return isset($parts[$lang]) ? $parts[$lang] : reset($parts);
 }
 
 function zo_get_asker_display_game_metadata($module) {
@@ -1592,8 +1695,44 @@ function zo_enqueue_grid_styles() {
 }
 .zo-games-grid__toolbar {
 	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
 	justify-content: flex-start;
+	align-items: center;
 	margin: 0 0 20px;
+}
+.zo-games-grid__language {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+}
+.zo-games-grid__language-label {
+	color: #374151;
+	font-weight: 700;
+}
+.zo-games-grid__language-option {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 36px;
+	min-width: 44px;
+	padding: 0 12px;
+	border-radius: 999px;
+	border: 1px solid #cbd5e1;
+	background: #ffffff;
+	color: #1f2937;
+	font-weight: 700;
+	text-decoration: none;
+}
+.zo-games-grid__language-option.is-active {
+	border-color: #1d4ed8;
+	background: #1d4ed8;
+	color: #ffffff;
+}
+.zo-games-grid__language-option:hover,
+.zo-games-grid__language-option:focus {
+	border-color: #1e40af;
+	text-decoration: none;
 }
 .zo-games-grid__intro {
 	margin: 0 0 20px;
@@ -1769,6 +1908,7 @@ function zo_games_grid_shortcode($atts = array()) {
 	$author_filter    = sanitize_title($atts['author']);
 	$limit            = (int) $atts['limit'];
 	$modules          = zo_get_game_modules();
+	$language         = zo_get_current_language();
 	$show_home_button = false;
 
 	if ($limit === 0) {
@@ -1794,11 +1934,24 @@ function zo_games_grid_shortcode($atts = array()) {
 
 	echo '<div class="zo-games-grid-wrap">';
 
+	echo '<div class="zo-games-grid__toolbar">';
+
 	if ($show_home_button) {
-		echo '<div class="zo-games-grid__toolbar"><a class="zo-games-grid__home" href="' . esc_url($home_url) . '">Ana Sayfaya Dön / Go to the home page / Zur Startseite</a></div>';
+		echo '<a class="zo-games-grid__home" href="' . esc_url(add_query_arg('zo_lang', $language, $home_url)) . '">' . esc_html(zo_get_interface_text('home', $language)) . '</a>';
 	}
 
-	echo '<p class="zo-games-grid__intro"><strong>TR:</strong> Çocuklar, ilkokul öğrencileri ve yaşlılar için ücretsiz online eğitici zeka oyunları, mantık oyunları ve hafıza oyunları oynayın. <strong>EN:</strong> Play free online educational brain games, logic games, and memory games for kids, primary school students, and older people. <strong>DE:</strong> Spielen Sie kostenlose online Lern-Denkspiele, Logikspiele und Gedächtnisspiele für Kinder, Grundschüler und ältere Menschen.</p>';
+	echo '<div class="zo-games-grid__language" aria-label="' . esc_attr(zo_get_interface_text('language_label', $language)) . '">';
+	echo '<span class="zo-games-grid__language-label">' . esc_html(zo_get_interface_text('language_label', $language)) . '</span>';
+
+	foreach (zo_get_language_options() as $code => $label) {
+		$class = 'zo-games-grid__language-option' . ($code === $language ? ' is-active' : '');
+		echo '<a class="' . esc_attr($class) . '" href="' . esc_url(add_query_arg('zo_lang', $code)) . '">' . esc_html($label) . '</a>';
+	}
+
+	echo '</div>';
+	echo '</div>';
+
+	echo '<p class="zo-games-grid__intro">' . esc_html(zo_get_interface_text('intro', $language)) . '</p>';
 
 	echo '<div class="zo-games-grid">';
 
@@ -1831,11 +1984,18 @@ function zo_games_grid_shortcode($atts = array()) {
 			$excerpt  = !empty($metadata['description']) ? $metadata['description'] : $excerpt;
 		}
 
+		$title   = zo_get_localized_text($title, $language);
+		$excerpt = zo_get_localized_text($excerpt, $language);
+
+		if ($url !== '') {
+			$url = add_query_arg('zo_lang', $language, $url);
+		}
+
 		$has_results = true;
 		$shown++;
 
 		if ($excerpt === '' && !empty($module['description']) && is_string($module['description'])) {
-			$excerpt = $module['description'];
+			$excerpt = zo_get_localized_text($module['description'], $language);
 		}
 
 		echo '<article class="zo-games-grid__card">';
@@ -1866,12 +2026,12 @@ function zo_games_grid_shortcode($atts = array()) {
 			echo '<p class="zo-games-grid__excerpt">' . esc_html($excerpt) . '</p>';
 		}
 
-		if ($title !== $module['name']) {
+		if (!$is_asker_game && $title !== $module['name']) {
 			echo '<div class="zo-games-grid__module">' . esc_html($module['name']) . '</div>';
 		}
 
 		if ($url !== '') {
-			echo '<div class="zo-games-grid__actions"><a class="zo-games-grid__button" href="' . esc_url($url) . '">Oyunu Aç / Open Game / Spiel Öffnen</a></div>';
+			echo '<div class="zo-games-grid__actions"><a class="zo-games-grid__button" href="' . esc_url($url) . '">' . esc_html(zo_get_interface_text('open_game', $language)) . '</a></div>';
 		}
 
 		echo '</div>';

@@ -15,6 +15,7 @@ if (!$module || !is_array($module)) {
 }
 
 $back_url   = function_exists('zo_get_game_back_url') ? zo_get_game_back_url($post_id) : home_url('/');
+$language   = function_exists('zo_get_current_language') ? zo_get_current_language() : 'tr';
 $page_title = $post_id ? get_the_title($post_id) : '';
 
 if (!is_string($page_title) || $page_title === '') {
@@ -35,7 +36,12 @@ if (is_array($asker_metadata) && !empty($asker_metadata['name'])) {
 	$page_title = (string) $module['name'];
 }
 
+if (function_exists('zo_get_localized_text')) {
+	$page_title = zo_get_localized_text($page_title, $language);
+}
+
 $site_name = get_bloginfo('name');
+$back_url = add_query_arg('zo_lang', $language, $back_url);
 $style_url = function_exists('zo_get_game_style_url') ? zo_get_game_style_url($module) : '';
 $script_url = function_exists('zo_get_game_script_url') ? zo_get_game_script_url($module) : '';
 $inline_style = !empty($module['inline_style']) && is_string($module['inline_style']) ? $module['inline_style'] : '';
@@ -45,8 +51,14 @@ $module_description = !empty($module['description']) && is_string($module['descr
 if (is_array($asker_metadata) && !empty($asker_metadata['description'])) {
 	$module_description = trim(wp_strip_all_tags((string) $asker_metadata['description']));
 }
-$seo_keywords = 'TR: Çocuklar, ilkokul öğrencileri ve yaşlılar için ücretsiz online eğitici zeka oyunları, mantık oyunları ve hafıza oyunları oynayın. EN: Play free online educational brain games, logic games, and memory games for kids, primary school students, and older people. DE: Spielen Sie kostenlose online Lern-Denkspiele, Logikspiele und Gedächtnisspiele für Kinder, Grundschüler und ältere Menschen.';
-$seo_description = trim($page_title . ' oyna. ' . $seo_keywords);
+
+if (function_exists('zo_get_localized_text')) {
+	$module_description = zo_get_localized_text($module_description, $language);
+}
+
+$seo_keywords = function_exists('zo_get_interface_text') ? zo_get_interface_text('intro', $language) : '';
+$play_suffix = function_exists('zo_get_interface_text') ? zo_get_interface_text('play_suffix', $language) : 'oyna';
+$seo_description = trim($page_title . ' ' . $play_suffix . '. ' . $seo_keywords);
 
 if ($module_description !== '') {
 	$seo_description = trim($page_title . ' oyna. ' . $module_description . ' ' . $seo_keywords);
@@ -159,7 +171,7 @@ if ($module_description !== '') {
 <body>
 	<div class="zo-game-page">
 		<header class="zo-game-page__header">
-			<a class="zo-game-page__back" href="<?php echo esc_url($back_url); ?>">Geri Dön</a>
+			<a class="zo-game-page__back" href="<?php echo esc_url($back_url); ?>"><?php echo esc_html(function_exists('zo_get_interface_text') ? zo_get_interface_text('home', $language) : 'Geri Dön'); ?></a>
 		</header>
 		<main class="zo-game-page__main">
 			<div class="zo-game-page__stage">
