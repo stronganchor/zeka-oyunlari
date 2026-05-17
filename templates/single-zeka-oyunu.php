@@ -71,7 +71,7 @@ $play_suffix = function_exists('zo_get_interface_text') ? zo_get_interface_text(
 $seo_description = trim($page_title . ' ' . $play_suffix . '. ' . $seo_keywords);
 
 if ($module_description !== '') {
-	$seo_description = trim($page_title . ' oyna. ' . $module_description . ' ' . $seo_keywords);
+	$seo_description = trim($page_title . ' ' . $play_suffix . '. ' . $module_description . ' ' . $seo_keywords);
 }
 ?>
 <!doctype html>
@@ -130,7 +130,30 @@ if ($module_description !== '') {
 		.zo-game-page__main {
 			flex: 1 1 auto;
 			display: flex;
+			flex-direction: column;
 			padding: 0 20px 20px;
+		}
+
+		.zo-game-page__meta {
+			width: min(100%, 1400px);
+			margin: 0 auto 16px;
+		}
+
+		.zo-game-page__title {
+			margin: 0 0 8px;
+			color: #f8fafc;
+			font-family: Arial, sans-serif;
+			font-size: clamp(26px, 4vw, 42px);
+			line-height: 1.15;
+		}
+
+		.zo-game-page__description {
+			max-width: 900px;
+			margin: 0;
+			color: #cbd5e1;
+			font-family: Arial, sans-serif;
+			font-size: 1rem;
+			line-height: 1.55;
 		}
 
 		.zo-game-page__stage {
@@ -162,6 +185,10 @@ if ($module_description !== '') {
 				padding: 0 14px 14px;
 			}
 
+			.zo-game-page__meta {
+				margin-bottom: 12px;
+			}
+
 			.zo-game-page__stage .zo-game-shell,
 			.zo-game-page__stage .zo-game-root {
 				min-height: calc(100vh - 84px);
@@ -184,6 +211,12 @@ if ($module_description !== '') {
 			<a class="zo-game-page__back" href="<?php echo esc_url($back_url); ?>"><?php echo esc_html(function_exists('zo_get_interface_text') ? zo_get_interface_text('home', $language) : 'Geri Dön'); ?></a>
 		</header>
 		<main class="zo-game-page__main">
+			<div class="zo-game-page__meta">
+				<h1 class="zo-game-page__title"><?php echo esc_html($page_title); ?></h1>
+				<?php if ($module_description !== '') : ?>
+				<p class="zo-game-page__description"><?php echo esc_html($module_description); ?></p>
+				<?php endif; ?>
+			</div>
 			<div class="zo-game-page__stage">
 				<?php echo zo_render_game($slug, $post_id); ?>
 			</div>

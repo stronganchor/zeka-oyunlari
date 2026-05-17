@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.4.70.asker.arslan
+ * Version: 1.4.72.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-define('ZO_PLUGIN_VERSION', '1.4.68.asker.arslan');
+define('ZO_PLUGIN_VERSION', '1.4.71.asker.arslan');
 define('ZO_PLUGIN_FILE', __FILE__);
 define('ZO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('ZO_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -508,11 +508,13 @@ function zo_get_game_language_availability($slug) {
 	$restricted = array(
 		'adam-asmaca' => array('tr'),
 		'falling-letters-catch' => array('tr'),
+		'firavunun-hazinesi' => array('tr'),
 		'kelime-karistirma' => array('tr'),
 		'kutsal-bocek-labirenti' => array('tr'),
 		'ogretmenden-kac' => array('tr'),
 		'simit-run' => array('tr'),
 		'speed-sort' => array('tr'),
+		'tr-search-launcher' => array('tr'),
 		'turkish-word-builder' => array('tr'),
 		'ulke-100-soru' => array('tr'),
 	);
@@ -855,6 +857,7 @@ function zo_get_game_module_fallback_url($slug) {
 
 	$url = add_query_arg('zo_game_module', $slug, $base_url);
 	$url = add_query_arg('zo_nonce', zo_get_nonce('zo_game_module'), $url);
+	$url = add_query_arg('zo_lang', zo_get_current_language(), $url);
 
 	$back_url = zo_get_current_request_url();
 	if ($back_url !== '') {
@@ -875,6 +878,8 @@ function zo_get_game_launch_url($post) {
 	if ($back_url !== '') {
 		$url = add_query_arg('zo_back', $back_url, $url);
 	}
+
+	$url = add_query_arg('zo_lang', zo_get_current_language(), $url);
 
 	return $url;
 }
