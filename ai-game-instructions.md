@@ -95,6 +95,11 @@ DO NOT omit the required file(s).
 * Must not echo directly outside buffer
 * Must include an `author` field with the game creator name used by `[zeka_oyunlari_grid author="..."]`
 * Single-file games should put CSS in `inline_style` and JavaScript in `inline_script`
+* Must support the plugin language setting from `zo_get_current_language()`
+* Must provide all visible player text in Turkish, English, and German
+* Must pass the selected language to JavaScript with a `data-lang` attribute
+* Must not hardcode English-only or Turkish-only UI text inside HTML or JavaScript
+* If the gameplay depends on one language only, mention that clearly in the returned `description`
 
 Template:
 
@@ -118,7 +123,12 @@ document.addEventListener('DOMContentLoaded', function () {
 	const games = document.querySelectorAll('.zo-game-root--{game-slug}');
 
 	games.forEach(function (game) {
+		const lang = game.getAttribute('data-lang') || 'tr';
+		const labels = JSON.parse(game.getAttribute('data-labels') || '{}');
+		const text = labels[lang] || labels.tr || labels.en || {};
+
 		// game-specific logic here
+		// Use text.start, text.score, text.restart, etc. instead of hardcoded UI strings.
 	});
 });
 JS;
@@ -126,11 +136,49 @@ JS;
 if (!function_exists('zo_game_{UNIQUE_NAME}_render')) {
 	function zo_game_{UNIQUE_NAME}_render($post_id = 0, $module = array()) {
 		$instance_id = 'zo-{game-slug}-' . ($post_id ? absint($post_id) : wp_rand(1000, 999999));
+		$lang = function_exists('zo_get_current_language') ? zo_get_current_language() : 'tr';
+		$labels = array(
+			'tr' => array(
+				'title' => '{Turkish Game Name}',
+				'instructions' => '{Turkish instructions}',
+				'score' => 'Puan',
+				'start' => 'Başlat',
+				'restart' => 'Yeniden Başlat',
+				'statusReady' => 'Başlamak için Başlat düğmesine bas.',
+			),
+			'en' => array(
+				'title' => '{English Game Name}',
+				'instructions' => '{English instructions}',
+				'score' => 'Score',
+				'start' => 'Start',
+				'restart' => 'Restart',
+				'statusReady' => 'Press Start to begin.',
+			),
+			'de' => array(
+				'title' => '{German Game Name}',
+				'instructions' => '{German instructions}',
+				'score' => 'Punkte',
+				'start' => 'Starten',
+				'restart' => 'Neu starten',
+				'statusReady' => 'Drücke Starten, um zu beginnen.',
+			),
+		);
+		$text = isset($labels[$lang]) ? $labels[$lang] : $labels['tr'];
 
 		ob_start();
 		?>
-		<div class="zo-game-root zo-game-root--{game-slug}" id="<?php echo esc_attr($instance_id); ?>">
-			<!-- GAME HTML HERE -->
+		<div
+			class="zo-game-root zo-game-root--{game-slug}"
+			id="<?php echo esc_attr($instance_id); ?>"
+			data-lang="<?php echo esc_attr($lang); ?>"
+			data-labels="<?php echo esc_attr(wp_json_encode($labels)); ?>"
+		>
+			<h2><?php echo esc_html($text['title']); ?></h2>
+			<p><?php echo esc_html($text['instructions']); ?></p>
+			<div><?php echo esc_html($text['score']); ?>: <span class="zo-{game-slug}-score">0</span></div>
+			<button type="button" class="zo-{game-slug}-start"><?php echo esc_html($text['start']); ?></button>
+			<button type="button" class="zo-{game-slug}-restart"><?php echo esc_html($text['restart']); ?></button>
+			<div class="zo-{game-slug}-status" aria-live="polite"><?php echo esc_html($text['statusReady']); ?></div>
 		</div>
 		<?php
 		return ob_get_clean();
@@ -139,9 +187,9 @@ if (!function_exists('zo_game_{UNIQUE_NAME}_render')) {
 
 return array(
 	'slug'            => '{game-slug}',
-	'name'            => '{Game Name}',
+	'name'            => 'TR: {Turkish Game Name} | EN: {English Game Name} | DE: {German Game Name}',
 	'author'          => '{Author Name}',
-	'description'     => '{Short description}',
+	'description'     => 'TR: {Turkish description} | EN: {English description} | DE: {German description}',
 	'render_callback' => 'zo_game_{UNIQUE_NAME}_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,
@@ -179,6 +227,10 @@ Example:
 * Loop through each instance
 * Do NOT use global variables
 * Do NOT assume only one game exists
+* Read selected language from `game.getAttribute('data-lang')`
+* Read translated strings from `data-labels`
+* Do not write hardcoded player-facing strings like `Score`, `Start`, `Game Over`, or `Correct`
+* Store dynamic messages in the labels object, for example `text.gameOver`, `text.correct`, `text.wrong`, `text.nextRound`
 
 Pattern:
 
@@ -187,6 +239,10 @@ document.addEventListener('DOMContentLoaded', function () {
 	const games = document.querySelectorAll('.zo-game-root');
 
 	games.forEach(function (game) {
+		const lang = game.getAttribute('data-lang') || 'tr';
+		const labels = JSON.parse(game.getAttribute('data-labels') || '{}');
+		const text = labels[lang] || labels.tr || labels.en || {};
+
 		// game-specific logic here
 	});
 });
@@ -213,6 +269,21 @@ document.addEventListener('DOMContentLoaded', function () {
 * Restart button or replay ability
 * Clean readable UI
 * Keep the HTML structure simple
+
+---
+
+## LANGUAGE RULES
+
+* Every game must work with `?zo_lang=tr`, `?zo_lang=en`, and `?zo_lang=de`
+* Turkish is the default fallback language
+* All labels, buttons, instructions, status messages, win/lose text, alerts, canvas text, and aria labels must have TR, EN, and DE versions
+* For game names and descriptions, return the multilingual format:
+  `TR: ... | EN: ... | DE: ...`
+* If the game uses words, quiz questions, riddles, spelling, countries, or culture-specific content, provide separate content lists for TR, EN, and DE
+* Do not use Turkish word lists in English or German mode
+* Do not use English word lists in Turkish or German mode
+* If a game cannot reasonably support all three languages, make the reason obvious in the description so the plugin owner can block it for unsupported languages
+* Prefer text keys such as `score`, `start`, `restart`, `correct`, `wrong`, `gameOver`, `youWin`, `timeUp`, `nextRound`, and `instructions`
 
 ---
 

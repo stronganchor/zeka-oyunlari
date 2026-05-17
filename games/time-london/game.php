@@ -117,11 +117,13 @@ document.addEventListener('DOMContentLoaded', function () {
 		let use24Hour = true;
 		let timerId = null;
 		const timeZone = 'Europe/London';
+		const locale = game.getAttribute('data-locale') || 'en-GB';
+		const zoneLabel = game.getAttribute('data-zone-label') || 'London Time';
 
 		function updateClock() {
 			const now = new Date();
 
-			timeEl.textContent = new Intl.DateTimeFormat('en-GB', {
+			timeEl.textContent = new Intl.DateTimeFormat(locale, {
 				timeZone: timeZone,
 				hour: '2-digit',
 				minute: '2-digit',
@@ -129,14 +131,14 @@ document.addEventListener('DOMContentLoaded', function () {
 				hour12: !use24Hour
 			}).format(now);
 
-			dateEl.textContent = new Intl.DateTimeFormat('en-US', {
+			dateEl.textContent = new Intl.DateTimeFormat(locale, {
 				timeZone: timeZone,
 				year: 'numeric',
 				month: 'numeric',
 				day: 'numeric'
 			}).format(now);
 
-			zoneEl.textContent = 'London Time';
+			zoneEl.textContent = zoneLabel;
 		}
 
 		function startClock() {
@@ -164,22 +166,29 @@ JS;
 if (!function_exists('zo_game_london_clock_render')) {
 	function zo_game_london_clock_render($post_id = 0, $module = array()) {
 		$instance_id = 'zo-london-clock-' . ($post_id ? absint($post_id) : wp_rand(1000, 999999));
+		$lang = function_exists('zo_get_current_language') ? zo_get_current_language() : 'tr';
+		$labels = array(
+			'tr' => array('title' => 'Londra Saati', 'zone' => 'Londra Saati', 'format' => '12/24 Saat', 'refresh' => 'Yenile', 'locale' => 'tr-TR'),
+			'en' => array('title' => 'London Clock', 'zone' => 'London Time', 'format' => '12/24 Format', 'refresh' => 'Refresh', 'locale' => 'en-GB'),
+			'de' => array('title' => 'London-Uhr', 'zone' => 'Londoner Zeit', 'format' => '12/24 Format', 'refresh' => 'Aktualisieren', 'locale' => 'de-DE'),
+		);
+		$label = isset($labels[$lang]) ? $labels[$lang] : $labels['tr'];
 
 		ob_start();
 		?>
-		<div class="zo-game-root zo-game-root--london-clock" id="<?php echo esc_attr($instance_id); ?>">
-			<h2 class="zo-lc-title">London Clock</h2>
+		<div class="zo-game-root zo-game-root--london-clock" id="<?php echo esc_attr($instance_id); ?>" data-locale="<?php echo esc_attr($label['locale']); ?>" data-zone-label="<?php echo esc_attr($label['zone']); ?>">
+			<h2 class="zo-lc-title"><?php echo esc_html($label['title']); ?></h2>
 
 			<div class="zo-lc-clock-wrap" aria-live="polite">
 				<div class="zo-lc-time">00:00:00</div>
 				<div class="zo-lc-date">1/1/2000</div>
 			</div>
 
-			<div class="zo-lc-zone">London Time</div>
+			<div class="zo-lc-zone"><?php echo esc_html($label['zone']); ?></div>
 
 			<div class="zo-lc-actions">
-				<button type="button" class="zo-lc-button zo-lc-button--format">12/24 Format</button>
-				<button type="button" class="zo-lc-button zo-lc-button--refresh">Refresh</button>
+				<button type="button" class="zo-lc-button zo-lc-button--format"><?php echo esc_html($label['format']); ?></button>
+				<button type="button" class="zo-lc-button zo-lc-button--refresh"><?php echo esc_html($label['refresh']); ?></button>
 			</div>
 		</div>
 		<?php

@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.4.72.asker.arslan
+ * Version: 1.4.73.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-define('ZO_PLUGIN_VERSION', '1.4.71.asker.arslan');
+define('ZO_PLUGIN_VERSION', '1.4.73.asker.arslan');
 define('ZO_PLUGIN_FILE', __FILE__);
 define('ZO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('ZO_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -507,6 +507,7 @@ function zo_get_interface_text($key, $lang = '') {
 function zo_get_game_language_availability($slug) {
 	$restricted = array(
 		'adam-asmaca' => array('tr'),
+		'ai-companion-trainer' => array('en'),
 		'falling-letters-catch' => array('tr'),
 		'firavunun-hazinesi' => array('tr'),
 		'kelime-karistirma' => array('tr'),
@@ -528,6 +529,374 @@ function zo_is_game_available_for_language($slug, $lang = '') {
 	$lang = array_key_exists($lang, zo_get_language_options()) ? $lang : zo_get_current_language();
 
 	return in_array($lang, zo_get_game_language_availability($slug), true);
+}
+
+function zo_get_runtime_translation_exact_map($lang) {
+	$lang = array_key_exists($lang, zo_get_language_options()) ? $lang : zo_get_current_language();
+
+	$translations = array(
+		'tr' => array(
+			'Start' => 'Başlat',
+			'Play' => 'Oyna',
+			'Play Again' => 'Tekrar Oyna',
+			'Restart' => 'Yeniden Başlat',
+			'Restart Game' => 'Oyunu Yeniden Başlat',
+			'Restart Round' => 'Turu Yeniden Başlat',
+			'Next' => 'Sonraki',
+			'Next Round' => 'Sonraki Tur',
+			'Next Question' => 'Sonraki Soru',
+			'Next Level' => 'Sonraki Seviye',
+			'Next Stage' => 'Sonraki Aşama',
+			'Pause' => 'Duraklat',
+			'Paused' => 'Duraklatıldı',
+			'Resume' => 'Devam Et',
+			'Refresh' => 'Yenile',
+			'Submit' => 'Gönder',
+			'Hint' => 'İpucu',
+			'Show Hint' => 'İpucu Göster',
+			'Score' => 'Puan',
+			'Final Score' => 'Son Puan',
+			'Best' => 'En İyi',
+			'Level' => 'Seviye',
+			'Round' => 'Tur',
+			'Stage' => 'Aşama',
+			'Time' => 'Süre',
+			'Lives' => 'Can',
+			'Health' => 'Sağlık',
+			'Coins' => 'Coin',
+			'Gold' => 'Altın',
+			'Goal' => 'Hedef',
+			'Question' => 'Soru',
+			'Correct' => 'Doğru',
+			'Wrong' => 'Yanlış',
+			'Game Over' => 'Oyun Bitti',
+			'GAME OVER' => 'OYUN BİTTİ',
+			'You Win' => 'Kazandın',
+			'You Win!' => 'Kazandın!',
+			'You lost' => 'Kaybettin',
+			'You Lost' => 'Kaybettin',
+			'How to Play' => 'Nasıl Oynanır',
+			'Rules' => 'Kurallar',
+			'Move List' => 'Hamle Listesi',
+			'Round History' => 'Tur Geçmişi',
+			'Make a Move' => 'Hamle Yap',
+			'Press Start.' => 'Başlat düğmesine bas.',
+			'Press Start to begin.' => 'Başlamak için Başlat düğmesine bas.',
+			'Press action to begin the challenge.' => 'Mücadeleye başlamak için hamle yap.',
+			'Correct.' => 'Doğru.',
+			'Wrong.' => 'Yanlış.',
+			'Correct!' => 'Doğru!',
+			'Wrong!' => 'Yanlış!',
+			'Try again.' => 'Tekrar dene.',
+			'Time is up.' => 'Süre doldu.',
+			'Time finished.' => 'Süre bitti.',
+			'ready' => 'hazır',
+			'done' => 'bitti',
+			'left' => 'kaldı',
+		),
+		'en' => array(
+			'Başlat' => 'Start',
+			'Oyna' => 'Play',
+			'Tekrar Oyna' => 'Play Again',
+			'Yeniden Başlat' => 'Restart',
+			'Oyunu Yeniden Başlat' => 'Restart Game',
+			'Turu Yeniden Başlat' => 'Restart Round',
+			'Sonraki' => 'Next',
+			'Sonraki Tur' => 'Next Round',
+			'Sonraki Soru' => 'Next Question',
+			'Sonraki Seviye' => 'Next Level',
+			'Sonraki Aşama' => 'Next Stage',
+			'Duraklat' => 'Pause',
+			'Devam Et' => 'Resume',
+			'Yenile' => 'Refresh',
+			'Gönder' => 'Submit',
+			'İpucu' => 'Hint',
+			'İpucu Göster' => 'Show Hint',
+			'Puan' => 'Score',
+			'Son Puan' => 'Final Score',
+			'En İyi' => 'Best',
+			'Seviye' => 'Level',
+			'Tur' => 'Round',
+			'Aşama' => 'Stage',
+			'Süre' => 'Time',
+			'Can' => 'Lives',
+			'Sağlık' => 'Health',
+			'Altın' => 'Gold',
+			'Hedef' => 'Goal',
+			'Soru' => 'Question',
+			'Doğru' => 'Correct',
+			'Yanlış' => 'Wrong',
+			'Oyun Bitti' => 'Game Over',
+			'OYUN BİTTİ' => 'GAME OVER',
+			'Kazandın' => 'You Win',
+			'Kazandın!' => 'You Win!',
+			'Kaybettin' => 'You Lost',
+			'Nasıl Oynanır' => 'How to Play',
+			'Kurallar' => 'Rules',
+			'Hamle Listesi' => 'Move List',
+			'Tur Geçmişi' => 'Round History',
+			'Hamle Yap' => 'Make a Move',
+			'Başlat düğmesine bas.' => 'Press Start.',
+			'Başlamak için Başlat düğmesine bas.' => 'Press Start to begin.',
+			'Doğru.' => 'Correct.',
+			'Yanlış.' => 'Wrong.',
+			'Doğru!' => 'Correct!',
+			'Yanlış!' => 'Wrong!',
+			'Tekrar dene.' => 'Try again.',
+			'Süre doldu.' => 'Time is up.',
+			'Süre bitti.' => 'Time finished.',
+		),
+		'de' => array(
+			'Start' => 'Starten',
+			'Play' => 'Spielen',
+			'Play Again' => 'Noch einmal spielen',
+			'Restart' => 'Neu starten',
+			'Restart Game' => 'Spiel neu starten',
+			'Restart Round' => 'Runde neu starten',
+			'Next' => 'Weiter',
+			'Next Round' => 'Nächste Runde',
+			'Next Question' => 'Nächste Frage',
+			'Next Level' => 'Nächstes Level',
+			'Next Stage' => 'Nächste Stufe',
+			'Pause' => 'Pause',
+			'Paused' => 'Pausiert',
+			'Resume' => 'Fortsetzen',
+			'Refresh' => 'Aktualisieren',
+			'Submit' => 'Senden',
+			'Hint' => 'Hinweis',
+			'Show Hint' => 'Hinweis zeigen',
+			'Score' => 'Punkte',
+			'Final Score' => 'Endpunkte',
+			'Best' => 'Bestwert',
+			'Level' => 'Level',
+			'Round' => 'Runde',
+			'Stage' => 'Stufe',
+			'Time' => 'Zeit',
+			'Lives' => 'Leben',
+			'Health' => 'Gesundheit',
+			'Coins' => 'Münzen',
+			'Gold' => 'Gold',
+			'Goal' => 'Ziel',
+			'Question' => 'Frage',
+			'Correct' => 'Richtig',
+			'Wrong' => 'Falsch',
+			'Game Over' => 'Spiel vorbei',
+			'GAME OVER' => 'SPIEL VORBEI',
+			'You Win' => 'Du gewinnst',
+			'You Win!' => 'Du gewinnst!',
+			'You lost' => 'Du hast verloren',
+			'You Lost' => 'Du hast verloren',
+			'How to Play' => 'Spielanleitung',
+			'Rules' => 'Regeln',
+			'Move List' => 'Zugliste',
+			'Round History' => 'Rundenverlauf',
+			'Make a Move' => 'Zug machen',
+			'Press Start.' => 'Drücke Starten.',
+			'Press Start to begin.' => 'Drücke Starten, um zu beginnen.',
+			'Press action to begin the challenge.' => 'Drücke die Aktion, um die Herausforderung zu starten.',
+			'Correct.' => 'Richtig.',
+			'Wrong.' => 'Falsch.',
+			'Correct!' => 'Richtig!',
+			'Wrong!' => 'Falsch!',
+			'Try again.' => 'Versuche es noch einmal.',
+			'Time is up.' => 'Die Zeit ist abgelaufen.',
+			'Time finished.' => 'Die Zeit ist vorbei.',
+			'Başlat' => 'Starten',
+			'Oyna' => 'Spielen',
+			'Tekrar Oyna' => 'Noch einmal spielen',
+			'Yeniden Başlat' => 'Neu starten',
+			'Oyunu Yeniden Başlat' => 'Spiel neu starten',
+			'Sonraki' => 'Weiter',
+			'Duraklat' => 'Pause',
+			'Devam Et' => 'Fortsetzen',
+			'Yenile' => 'Aktualisieren',
+			'Gönder' => 'Senden',
+			'İpucu' => 'Hinweis',
+			'Puan' => 'Punkte',
+			'Seviye' => 'Level',
+			'Tur' => 'Runde',
+			'Süre' => 'Zeit',
+			'Can' => 'Leben',
+			'Sağlık' => 'Gesundheit',
+			'Hedef' => 'Ziel',
+			'Soru' => 'Frage',
+			'Doğru' => 'Richtig',
+			'Yanlış' => 'Falsch',
+			'Oyun Bitti' => 'Spiel vorbei',
+			'Kazandın' => 'Du gewinnst',
+			'Kaybettin' => 'Du hast verloren',
+			'Nasıl Oynanır' => 'Spielanleitung',
+			'Kurallar' => 'Regeln',
+			'Hamle Yap' => 'Zug machen',
+			'Başlat düğmesine bas.' => 'Drücke Starten.',
+			'Başlamak için Başlat düğmesine bas.' => 'Drücke Starten, um zu beginnen.',
+		),
+	);
+
+	return isset($translations[$lang]) ? $translations[$lang] : array();
+}
+
+function zo_get_runtime_translation_replacements($lang) {
+	$lang = array_key_exists($lang, zo_get_language_options()) ? $lang : zo_get_current_language();
+
+	$phrases = array(
+		'tr' => array(
+			array('Score', 'Puan'),
+			array('Final Score', 'Son Puan'),
+			array('Level', 'Seviye'),
+			array('Round', 'Tur'),
+			array('Time', 'Süre'),
+			array('Lives', 'Can'),
+			array('Health', 'Sağlık'),
+			array('Coins', 'Coin'),
+			array('Question', 'Soru'),
+			array('Correct', 'Doğru'),
+			array('Wrong', 'Yanlış'),
+			array('Game Over', 'Oyun Bitti'),
+			array('Press Start', 'Başlat düğmesine bas'),
+			array('Press Restart', 'Yeniden Başlat düğmesine bas'),
+			array('Press R', 'R tuşuna bas'),
+			array('Press Space', 'Boşluk tuşuna bas'),
+			array('Press SPACE', 'BOŞLUK tuşuna bas'),
+			array('Start Quiz', 'Teste Başla'),
+			array('Next Question', 'Sonraki Soru'),
+			array('Play Again', 'Tekrar Oyna'),
+			array('Try again', 'Tekrar dene'),
+			array('You found', 'Buldun'),
+			array('You win', 'Kazandın'),
+			array('You Win', 'Kazandın'),
+			array('You lost', 'Kaybettin'),
+			array('Collect', 'Topla'),
+			array('Avoid', 'Kaçın'),
+			array('Move', 'Hareket'),
+			array('Restart', 'Yeniden Başlat'),
+			array('Start', 'Başlat'),
+			array('Pause', 'Duraklat'),
+			array('Resume', 'Devam Et'),
+		),
+		'en' => array(
+			array('Puan', 'Score'),
+			array('Son Puan', 'Final Score'),
+			array('Seviye', 'Level'),
+			array('Tur', 'Round'),
+			array('Süre', 'Time'),
+			array('Can', 'Lives'),
+			array('Sağlık', 'Health'),
+			array('Soru', 'Question'),
+			array('Doğru', 'Correct'),
+			array('Yanlış', 'Wrong'),
+			array('Oyun Bitti', 'Game Over'),
+			array('Başlat düğmesine bas', 'Press Start'),
+			array('Yeniden Başlat düğmesine bas', 'Press Restart'),
+			array('Tekrar dene', 'Try again'),
+			array('Kazandın', 'You Win'),
+			array('Kaybettin', 'You Lost'),
+			array('Topla', 'Collect'),
+			array('Kaçın', 'Avoid'),
+			array('Hareket', 'Move'),
+			array('Yeniden Başlat', 'Restart'),
+			array('Başlat', 'Start'),
+			array('Duraklat', 'Pause'),
+			array('Devam Et', 'Resume'),
+		),
+		'de' => array(
+			array('Final Score', 'Endpunkte'),
+			array('Score', 'Punkte'),
+			array('Level', 'Level'),
+			array('Round', 'Runde'),
+			array('Time', 'Zeit'),
+			array('Lives', 'Leben'),
+			array('Health', 'Gesundheit'),
+			array('Coins', 'Münzen'),
+			array('Question', 'Frage'),
+			array('Correct', 'Richtig'),
+			array('Wrong', 'Falsch'),
+			array('Game Over', 'Spiel vorbei'),
+			array('Press Start', 'Drücke Starten'),
+			array('Press Restart', 'Drücke Neu starten'),
+			array('Press R', 'Drücke R'),
+			array('Press Space', 'Drücke die Leertaste'),
+			array('Press SPACE', 'DRÜCKE DIE LEERTASTE'),
+			array('Start Quiz', 'Quiz starten'),
+			array('Next Question', 'Nächste Frage'),
+			array('Play Again', 'Noch einmal spielen'),
+			array('Try again', 'Versuche es noch einmal'),
+			array('You found', 'Du hast gefunden'),
+			array('You win', 'Du gewinnst'),
+			array('You Win', 'Du gewinnst'),
+			array('You lost', 'Du hast verloren'),
+			array('Collect', 'Sammle'),
+			array('Avoid', 'Weiche aus'),
+			array('Move', 'Bewege dich'),
+			array('Restart', 'Neu starten'),
+			array('Start', 'Starten'),
+			array('Pause', 'Pause'),
+			array('Resume', 'Fortsetzen'),
+			array('Puan', 'Punkte'),
+			array('Seviye', 'Level'),
+			array('Tur', 'Runde'),
+			array('Süre', 'Zeit'),
+			array('Can', 'Leben'),
+			array('Soru', 'Frage'),
+			array('Doğru', 'Richtig'),
+			array('Yanlış', 'Falsch'),
+			array('Oyun Bitti', 'Spiel vorbei'),
+			array('Başlat', 'Starten'),
+			array('Yeniden Başlat', 'Neu starten'),
+		),
+	);
+
+	return isset($phrases[$lang]) ? $phrases[$lang] : array();
+}
+
+function zo_wrap_game_runtime_translator($html, $module, $lang) {
+	$lang = array_key_exists($lang, zo_get_language_options()) ? $lang : zo_get_current_language();
+	$slug = !empty($module['slug']) ? sanitize_html_class($module['slug']) : 'game';
+	$id   = 'zo-game-shell-' . $slug . '-' . wp_rand(1000, 999999);
+
+	$exact = zo_get_runtime_translation_exact_map($lang);
+	$meta  = zo_get_game_display_metadata($module);
+	$title = isset($meta['name']) ? zo_get_localized_text($meta['name'], $lang) : '';
+
+	if ($title !== '') {
+		if (!empty($module['name'])) {
+			$exact[(string) $module['name']] = $title;
+		}
+
+		if (preg_match_all('/(?:^|\|)\s*(TR|EN|DE):\s*([^|]+)/u', isset($meta['name']) ? $meta['name'] : '', $matches)) {
+			foreach ($matches[2] as $name_part) {
+				$name_part = trim($name_part);
+				if ($name_part !== '') {
+					$exact[$name_part] = $title;
+				}
+			}
+		}
+	}
+
+	$payload = array(
+		'lang' => $lang,
+		'exact' => $exact,
+		'replacements' => zo_get_runtime_translation_replacements($lang),
+	);
+
+	$script = '<script>(function(){'
+		. 'const root=document.getElementById(' . wp_json_encode($id) . ');'
+		. 'if(!root){return;}'
+		. 'const payload=' . wp_json_encode($payload) . ';'
+		. 'const exact=payload.exact||{};'
+		. 'const reps=payload.replacements||[];'
+		. 'const skip={SCRIPT:1,STYLE:1,NOSCRIPT:1,TEXTAREA:1,CODE:1,PRE:1};'
+		. 'function applyCase(from,to){return from===from.toUpperCase()?to.toUpperCase():to;}'
+		. 'function tx(value){if(typeof value!=="string"){return value;}const m=value.match(/^(\\s*)([\\s\\S]*?)(\\s*)$/);const lead=m?m[1]:"";let text=m?m[2]:value;const trail=m?m[3]:"";if(!text.trim()){return value;}const trimmed=text.trim();if(Object.prototype.hasOwnProperty.call(exact,trimmed)){return lead+exact[trimmed]+trail;}reps.forEach(function(pair){const from=pair[0];const to=pair[1];if(!from||!to){return;}text=text.split(from).join(applyCase(from,to));});return lead+text+trail;}'
+		. 'function nodeText(node){if(!node||!node.nodeValue){return;}const next=tx(node.nodeValue);if(next!==node.nodeValue){node.nodeValue=next;}}'
+		. 'function attrs(el){["aria-label","title","placeholder"].forEach(function(name){if(!el.hasAttribute||!el.hasAttribute(name)){return;}const next=tx(el.getAttribute(name));if(next!==el.getAttribute(name)){el.setAttribute(name,next);}});if(el.matches&&el.matches("input[type=button],input[type=submit],input[type=reset]")&&el.hasAttribute("value")){const next=tx(el.getAttribute("value"));if(next!==el.getAttribute("value")){el.setAttribute("value",next);}}}'
+		. 'function walk(start){if(!start){return;}if(start.nodeType===3){nodeText(start);return;}if(start.nodeType!==1||skip[start.nodeName]){return;}attrs(start);const walker=document.createTreeWalker(start,NodeFilter.SHOW_TEXT,{acceptNode:function(n){return n.parentElement&&skip[n.parentElement.nodeName]?NodeFilter.FILTER_REJECT:NodeFilter.FILTER_ACCEPT;}});let n;while((n=walker.nextNode())){nodeText(n);}start.querySelectorAll&&start.querySelectorAll("[aria-label],[title],[placeholder],button,input").forEach(attrs);}'
+		. 'walk(root);'
+		. 'let busy=false;const observer=new MutationObserver(function(items){if(busy){return;}busy=true;items.forEach(function(item){if(item.type==="characterData"){nodeText(item.target);}else{item.addedNodes.forEach(walk);if(item.type==="attributes"){attrs(item.target);}}});busy=false;});'
+		. 'observer.observe(root,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:["aria-label","title","placeholder","value"]});'
+		. '})();</script>';
+
+	return '<div id="' . esc_attr($id) . '" class="zo-game-shell zo-game-shell--' . esc_attr($slug) . '" data-zo-game-lang="' . esc_attr($lang) . '">' . $html . '</div>' . $script;
 }
 
 function zo_get_localized_text($text, $lang = '') {
@@ -1701,7 +2070,7 @@ function zo_render_game($slug, $post_id = 0) {
 		$html = '<p>Bu oyun henüz görüntülenemiyor.</p>';
 	}
 
-	return '<div class="zo-game-shell zo-game-shell--' . esc_attr($module['slug']) . '">' . $html . '</div>';
+	return zo_wrap_game_runtime_translator($html, $module, $language);
 }
 
 function zo_get_game_posts_by_slug() {
