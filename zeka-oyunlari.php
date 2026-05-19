@@ -276,6 +276,38 @@ function zo_get_asker_multilingual_game_metadata($slug) {
 			'name' => 'TR: Yörünge Eşleştirme | EN: Orbit Match | DE: Orbit-Match',
 			'description' => 'TR: Her yörünge sembolünü hedef desene uyacak şekilde döndür. EN: Rotate each orbit symbol to align with the target pattern. DE: Drehe jedes Orbit-Symbol, bis es zum Zielmuster passt.',
 		),
+		'nova-crafter-challenge' => array(
+			'name' => 'TR: Nova Üretici Mücadelesi | EN: Nova Crafter Challenge | DE: Nova-Bauer-Herausforderung',
+			'description' => 'TR: Değişen parçaları üret ve mücadelede puanını yükselt. EN: Craft shifting parts and build your score through the challenge. DE: Baue wechselnde Teile und erhöhe deine Punktzahl in der Herausforderung.',
+		),
+		'nova-pilot-drift' => array(
+			'name' => 'TR: Nova Pilot Drift | EN: Nova Pilot Drift | DE: Nova-Pilot-Drift',
+			'description' => 'TR: Kontrollerin yavaşça kayarken sürüklenen asteroitlerin arasından pilotluk yap. EN: Pilot through drifting asteroids while your controls subtly desync. DE: Steuere durch driftende Asteroiden, während deine Steuerung leicht aus dem Takt gerät.',
+		),
+		'nova-signal-shift' => array(
+			'name' => 'TR: Nova Sinyal Kaydırma | EN: Nova Signal Shift | DE: Nova-Signalwechsel',
+			'description' => 'TR: Değişen Nova sinyallerini doğru sıraya getir. EN: Shift changing Nova signals into the right order. DE: Bringe wechselnde Nova-Signale in die richtige Reihenfolge.',
+		),
+		'orbit-architect-recall' => array(
+			'name' => 'TR: Yörünge Mimarı Hafıza | EN: Orbit Architect Recall | DE: Orbit-Architekt-Erinnerung',
+			'description' => 'TR: Yörünge planlarını hatırla ve mimari deseni yeniden kur. EN: Recall orbit plans and rebuild the architecture pattern. DE: Merke dir Orbit-Pläne und baue das Architekturmuster wieder auf.',
+		),
+		'orbit-builder-recall' => array(
+			'name' => 'TR: Yörünge Kurucu Hafıza | EN: Orbit Builder Recall | DE: Orbit-Bauer-Erinnerung',
+			'description' => 'TR: Yörünge parçalarının sırasını hatırla ve sistemi yeniden kur. EN: Recall the order of orbit parts and rebuild the system. DE: Merke dir die Reihenfolge der Orbit-Teile und baue das System wieder auf.',
+		),
+		'orbit-decoder-memory' => array(
+			'name' => 'TR: Yörünge Kod Çözücü Hafıza | EN: Orbit Decoder Memory | DE: Orbit-Decoder-Memory',
+			'description' => 'TR: Yörünge kodlarını hafızanda tut ve doğru diziyi çöz. EN: Memorize orbit codes and decode the correct sequence. DE: Merke dir Orbit-Codes und entschlüssele die richtige Folge.',
+		),
+		'orbit-runner-sprint' => array(
+			'name' => 'TR: Yörünge Koşucusu Sprint | EN: Orbit Runner Sprint | DE: Orbit-Läufer-Sprint',
+			'description' => 'TR: Yörünge engellerinin arasından hızlıca koş ve hedefe ulaş. EN: Sprint through orbit obstacles and reach the target. DE: Sprinte durch Orbit-Hindernisse und erreiche das Ziel.',
+		),
+		'orbit-signal-rescue' => array(
+			'name' => 'TR: Yörünge Sinyal Kurtarma | EN: Orbit Signal Rescue | DE: Orbit-Signalrettung',
+			'description' => 'TR: Yörünge sinyallerini yeniden yönlendir ve işaret pilotlarını kurtar. EN: Reroute orbit signals and rescue beacon pilots mid-flight. DE: Leite Orbit-Signale um und rette Leuchtfeuer-Piloten im Flug.',
+		),
 		'paris-clock' => array(
 			'name' => 'TR: Paris Saati | EN: Paris Clock | DE: Paris-Uhr',
 			'description' => 'TR: Paris saatini saniyelerle gösteren basit bir tarayıcı saati. EN: A simple browser clock showing Paris time with seconds. DE: Eine einfache Browser-Uhr, die die Pariser Zeit mit Sekunden zeigt.',
@@ -551,10 +583,14 @@ function zo_get_runtime_translation_exact_map($lang) {
 			'Paused' => 'Duraklatıldı',
 			'Resume' => 'Devam Et',
 			'Refresh' => 'Yenile',
+			'12/24 Format' => '12/24 Saat',
+			'Paris Time' => 'Paris Saati',
+			'Paris Clock' => 'Paris Saati',
 			'Submit' => 'Gönder',
 			'Hint' => 'İpucu',
 			'Show Hint' => 'İpucu Göster',
 			'Score' => 'Puan',
+			'Points' => 'Puan',
 			'Final Score' => 'Son Puan',
 			'Best' => 'En İyi',
 			'Level' => 'Seviye',
@@ -609,6 +645,8 @@ function zo_get_runtime_translation_exact_map($lang) {
 			'Duraklat' => 'Pause',
 			'Devam Et' => 'Resume',
 			'Yenile' => 'Refresh',
+			'12/24 Saat' => '12/24 Format',
+			'Paris Saati' => 'Paris Time',
 			'Gönder' => 'Submit',
 			'İpucu' => 'Hint',
 			'İpucu Göster' => 'Show Hint',
@@ -662,10 +700,14 @@ function zo_get_runtime_translation_exact_map($lang) {
 			'Paused' => 'Pausiert',
 			'Resume' => 'Fortsetzen',
 			'Refresh' => 'Aktualisieren',
+			'12/24 Format' => '12/24 Format',
+			'Paris Time' => 'Pariser Zeit',
+			'Paris Clock' => 'Paris-Uhr',
 			'Submit' => 'Senden',
 			'Hint' => 'Hinweis',
 			'Show Hint' => 'Hinweis zeigen',
 			'Score' => 'Punkte',
+			'Points' => 'Punkte',
 			'Final Score' => 'Endpunkte',
 			'Best' => 'Bestwert',
 			'Level' => 'Level',
@@ -948,7 +990,13 @@ function zo_get_localized_text($text, $lang = '') {
 		}
 	}
 
-	return isset($parts[$lang]) ? $parts[$lang] : reset($parts);
+	$result = isset($parts[$lang]) ? $parts[$lang] : reset($parts);
+
+	if (is_string($result) && $result !== $text && preg_match('/(?:^|\|)\s*(TR|EN|DE):/i', $result)) {
+		return zo_get_localized_text($result, $lang);
+	}
+
+	return $result;
 }
 
 function zo_get_asker_display_game_metadata($module) {
@@ -1102,6 +1150,293 @@ function zo_get_game_script_url($module) {
 	$script_file = trailingslashit($module['dir']) . 'script.js';
 
 	return file_exists($script_file) ? trailingslashit($module['url']) . 'script.js' : '';
+}
+
+function zo_game_module_has_generated_image_marker($module) {
+	return is_array($module)
+		&& !empty($module['dir'])
+		&& file_exists(trailingslashit($module['dir']) . '.featured-image.generated');
+}
+
+function zo_get_game_module_featured_image_path($module, $include_generated = false) {
+	if (!is_array($module) || empty($module['dir']) || empty($module['url'])) {
+		return '';
+	}
+
+	foreach (array('featured_image', 'thumbnail', 'image') as $key) {
+		if (empty($module[$key]) || !is_string($module[$key])) {
+			continue;
+		}
+
+		$value = trim($module[$key]);
+		if ($value === '') {
+			continue;
+		}
+
+		if (preg_match('#^https?://#i', $value)) {
+			continue;
+		}
+
+		$value = ltrim($value, '/\\');
+		if (file_exists(trailingslashit($module['dir']) . $value)) {
+			return trailingslashit($module['dir']) . $value;
+		}
+	}
+
+	if (!$include_generated && zo_game_module_has_generated_image_marker($module)) {
+		return '';
+	}
+
+	foreach (array('featured-image.webp', 'featured-image.png', 'featured-image.jpg', 'featured-image.jpeg', 'featured-image.svg') as $filename) {
+		if (file_exists(trailingslashit($module['dir']) . $filename)) {
+			return trailingslashit($module['dir']) . $filename;
+		}
+	}
+
+	return '';
+}
+
+function zo_get_game_module_featured_image_url($module) {
+	if (!is_array($module) || empty($module['dir']) || empty($module['url'])) {
+		return '';
+	}
+
+	foreach (array('featured_image', 'thumbnail', 'image') as $key) {
+		if (empty($module[$key]) || !is_string($module[$key])) {
+			continue;
+		}
+
+		$value = trim($module[$key]);
+		if ($value !== '' && preg_match('#^https?://#i', $value)) {
+			return esc_url_raw($value);
+		}
+	}
+
+	$image_path = zo_get_game_module_featured_image_path($module);
+	if ($image_path === '') {
+		return '';
+	}
+
+	$dir = trailingslashit(str_replace('\\', '/', $module['dir']));
+	$url = trailingslashit($module['url']);
+	$path = str_replace('\\', '/', $image_path);
+
+	if (strpos($path, $dir) !== 0) {
+		return '';
+	}
+
+	return $url . ltrim(substr($path, strlen($dir)), '/');
+}
+
+function zo_set_game_post_thumbnail_from_module($post_id, $module) {
+	$post_id = (int) $post_id;
+
+	if ($post_id <= 0 || !is_array($module) || has_post_thumbnail($post_id)) {
+		return;
+	}
+
+	$image_path = zo_get_game_module_featured_image_path($module);
+	if ($image_path === '') {
+		return;
+	}
+
+	$extension = strtolower((string) pathinfo($image_path, PATHINFO_EXTENSION));
+	if (!in_array($extension, array('jpg', 'jpeg', 'png', 'webp'), true)) {
+		return;
+	}
+
+	$mtime = filemtime($image_path);
+	if ($mtime === false) {
+		return;
+	}
+
+	$source_key = md5($image_path . '|' . $mtime);
+	if ((string) get_post_meta($post_id, '_zo_game_featured_image_source', true) === $source_key) {
+		return;
+	}
+
+	$contents = @file_get_contents($image_path);
+	if (!is_string($contents) || $contents === '') {
+		return;
+	}
+
+	$slug     = !empty($module['slug']) ? sanitize_title($module['slug']) : 'game';
+	$filename = sanitize_file_name($slug . '-featured-image.' . $extension);
+	$upload   = wp_upload_bits($filename, null, $contents);
+
+	if (!empty($upload['error']) || empty($upload['file'])) {
+		return;
+	}
+
+	$filetype = wp_check_filetype($upload['file'], null);
+	if (empty($filetype['type'])) {
+		return;
+	}
+
+	$title = !empty($module['name']) && is_string($module['name']) ? $module['name'] : $slug;
+	$attachment_id = wp_insert_attachment(
+		array(
+			'post_mime_type' => $filetype['type'],
+			'post_title'     => sanitize_text_field($title . ' featured image'),
+			'post_content'   => '',
+			'post_status'    => 'inherit',
+		),
+		$upload['file'],
+		$post_id
+	);
+
+	if (is_wp_error($attachment_id) || $attachment_id <= 0) {
+		return;
+	}
+
+	require_once ABSPATH . 'wp-admin/includes/image.php';
+
+	$metadata = wp_generate_attachment_metadata($attachment_id, $upload['file']);
+	if (is_array($metadata)) {
+		wp_update_attachment_metadata($attachment_id, $metadata);
+	}
+
+	if (set_post_thumbnail($post_id, $attachment_id)) {
+		update_post_meta($post_id, '_zo_game_featured_image_source', $source_key);
+	}
+}
+
+function zo_remove_generated_folder_image_when_post_has_thumbnail($post_id, $module) {
+	$post_id = (int) $post_id;
+
+	if ($post_id <= 0 || !is_array($module) || !has_post_thumbnail($post_id)) {
+		return;
+	}
+
+	if ((string) get_post_meta($post_id, '_zo_game_featured_image_source', true) !== '') {
+		return;
+	}
+
+	$image_path = zo_get_game_module_featured_image_path($module, true);
+	if ($image_path === '' || basename($image_path) !== 'featured-image.png') {
+		return;
+	}
+
+	$marker_path = trailingslashit($module['dir']) . '.featured-image.generated';
+	if (!file_exists($marker_path)) {
+		return;
+	}
+
+	@unlink($image_path);
+	@unlink($marker_path);
+}
+
+function zo_remove_generated_placeholder_post_thumbnail($post_id, $module) {
+	$post_id = (int) $post_id;
+
+	if ($post_id <= 0 || !is_array($module) || !has_post_thumbnail($post_id)) {
+		return;
+	}
+
+	if (!zo_game_module_has_generated_image_marker($module)) {
+		return;
+	}
+
+	if ((string) get_post_meta($post_id, '_zo_game_featured_image_source', true) === '') {
+		return;
+	}
+
+	delete_post_thumbnail($post_id);
+	delete_post_meta($post_id, '_zo_game_featured_image_source');
+}
+
+function zo_get_game_thumbnail_initials($title, $slug) {
+	$title = trim(wp_strip_all_tags((string) $title));
+	$parts = preg_split('/\s+/', $title);
+	$text  = '';
+
+	if (is_array($parts)) {
+		foreach ($parts as $part) {
+			$part = trim($part);
+			if ($part === '') {
+				continue;
+			}
+
+			$text .= function_exists('mb_substr') ? mb_substr($part, 0, 1) : substr($part, 0, 1);
+			if (strlen($text) >= 2) {
+				break;
+			}
+		}
+	}
+
+	if ($text === '') {
+		$text = strtoupper(substr(sanitize_title($slug), 0, 2));
+	}
+
+	return strtoupper($text);
+}
+
+function zo_get_game_thumbnail_theme($slug, $title) {
+	$text   = strtolower((string) $slug . ' ' . (string) $title);
+	$themes = array(
+		array('from' => '#0f766e', 'to' => '#22c55e', 'accent' => '#ccfbf1', 'label' => 'Puzzle'),
+		array('from' => '#1d4ed8', 'to' => '#38bdf8', 'accent' => '#dbeafe', 'label' => 'Arcade'),
+		array('from' => '#7c3aed', 'to' => '#f472b6', 'accent' => '#f5d0fe', 'label' => 'Quest'),
+		array('from' => '#b45309', 'to' => '#facc15', 'accent' => '#fef3c7', 'label' => 'Challenge'),
+		array('from' => '#be123c', 'to' => '#fb7185', 'accent' => '#ffe4e6', 'label' => 'Action'),
+		array('from' => '#334155', 'to' => '#14b8a6', 'accent' => '#e2e8f0', 'label' => 'Logic'),
+	);
+
+	if (preg_match('/chess|dama|sudoku|puzzle|maze|memory|word|number|binary|logic|rule/', $text)) {
+		return $themes[5];
+	}
+
+	if (preg_match('/race|runner|car|soccer|shoot|battle|defense|army|fight|ninja/', $text)) {
+		return $themes[4];
+	}
+
+	if (preg_match('/treasure|temple|pirate|dragon|magic|mystery|quest|hazine|misir|anubis/', $text)) {
+		return $themes[2];
+	}
+
+	if (preg_match('/clock|time|calculator|builder|sort|designer|paint/', $text)) {
+		return $themes[0];
+	}
+
+	$index = abs((int) crc32((string) $slug)) % count($themes);
+
+	return $themes[$index];
+}
+
+function zo_render_game_thumbnail($post, $module, $url, $title) {
+	if ($url === '') {
+		return;
+	}
+
+	echo '<a class="zo-games-grid__thumb" href="' . esc_url($url) . '">';
+
+	if ($post instanceof WP_Post && has_post_thumbnail($post)) {
+		echo get_the_post_thumbnail($post, 'large');
+		echo '</a>';
+		return;
+	}
+
+	$image_url = zo_get_game_module_featured_image_url($module);
+	if ($image_url !== '') {
+		echo '<img src="' . esc_url($image_url) . '" alt="' . esc_attr($title) . '" loading="lazy">';
+		echo '</a>';
+		return;
+	}
+
+	$slug     = !empty($module['slug']) ? $module['slug'] : sanitize_title($title);
+	$theme    = zo_get_game_thumbnail_theme($slug, $title);
+	$initials = zo_get_game_thumbnail_initials($title, $slug);
+
+	printf(
+		'<span class="zo-games-grid__thumb-fallback" style="--zo-thumb-from:%1$s;--zo-thumb-to:%2$s;--zo-thumb-accent:%3$s;"><span class="zo-games-grid__thumb-pattern" aria-hidden="true"></span><span class="zo-games-grid__thumb-label">%4$s</span><span class="zo-games-grid__thumb-initials">%5$s</span></span>',
+		esc_attr($theme['from']),
+		esc_attr($theme['to']),
+		esc_attr($theme['accent']),
+		esc_html($theme['label']),
+		esc_html($initials)
+	);
+
+	echo '</a>';
 }
 
 function zo_get_game_slug_for_post($post_id) {
@@ -1380,6 +1715,10 @@ function zo_sync_game_module_posts() {
 				}
 			}
 
+			zo_remove_generated_placeholder_post_thumbnail($existing_post->ID, $module);
+			zo_remove_generated_folder_image_when_post_has_thumbnail($existing_post->ID, $module);
+			zo_set_game_post_thumbnail_from_module($existing_post->ID, $module);
+
 			continue;
 		}
 
@@ -1408,6 +1747,8 @@ function zo_sync_game_module_posts() {
 		if ($owner !== '') {
 			update_post_meta($post_id, '_zo_game_owner', $owner);
 		}
+
+		zo_set_game_post_thumbnail_from_module($post_id, $module);
 	}
 }
 
@@ -2216,14 +2557,70 @@ function zo_enqueue_grid_styles() {
 }
 .zo-games-grid__thumb {
 	display: block;
+	position: relative;
 	aspect-ratio: 16 / 10;
 	background: #f3f4f6;
+	color: #ffffff;
+	text-decoration: none;
+	overflow: hidden;
 }
 .zo-games-grid__thumb img {
 	display: block;
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
+}
+.zo-games-grid__thumb-fallback {
+	position: relative;
+	display: grid;
+	width: 100%;
+	height: 100%;
+	min-height: 100%;
+	place-items: center;
+	isolation: isolate;
+	background:
+		radial-gradient(circle at 18% 20%, rgba(255, 255, 255, 0.32), transparent 24%),
+		linear-gradient(135deg, var(--zo-thumb-from), var(--zo-thumb-to));
+}
+.zo-games-grid__thumb-pattern {
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	opacity: 0.28;
+	background-image:
+		linear-gradient(45deg, rgba(255, 255, 255, 0.36) 25%, transparent 25%),
+		linear-gradient(-45deg, rgba(255, 255, 255, 0.24) 25%, transparent 25%);
+	background-position: 0 0, 20px 20px;
+	background-size: 40px 40px;
+}
+.zo-games-grid__thumb-label {
+	position: absolute;
+	top: 14px;
+	left: 14px;
+	padding: 6px 10px;
+	border: 1px solid rgba(255, 255, 255, 0.28);
+	border-radius: 999px;
+	background: rgba(15, 23, 42, 0.22);
+	color: var(--zo-thumb-accent);
+	font-size: 0.78rem;
+	font-weight: 800;
+	line-height: 1;
+	text-transform: uppercase;
+}
+.zo-games-grid__thumb-initials {
+	display: inline-grid;
+	width: 86px;
+	height: 86px;
+	place-items: center;
+	border: 2px solid rgba(255, 255, 255, 0.34);
+	border-radius: 22px;
+	background: rgba(255, 255, 255, 0.18);
+	box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+	color: #ffffff;
+	font-size: 2.15rem;
+	font-weight: 900;
+	line-height: 1;
+	text-shadow: 0 2px 18px rgba(15, 23, 42, 0.28);
 }
 .zo-games-grid__body {
 	display: flex;
@@ -2428,11 +2825,7 @@ function zo_games_grid_shortcode($atts = array()) {
 
 		echo '<article class="zo-games-grid__card">';
 
-		if ($post instanceof WP_Post && has_post_thumbnail($post)) {
-			echo '<a class="zo-games-grid__thumb" href="' . esc_url($url) . '">';
-			echo get_the_post_thumbnail($post, 'large');
-			echo '</a>';
-		}
+		zo_render_game_thumbnail($post, $module, $url, $title);
 
 		echo '<div class="zo-games-grid__body">';
 
