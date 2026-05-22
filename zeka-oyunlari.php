@@ -1408,9 +1408,8 @@ function zo_render_game_thumbnail($post, $module, $url, $title) {
 		return;
 	}
 
-	echo '<a class="zo-games-grid__thumb" href="' . esc_url($url) . '">';
-
 	if ($post instanceof WP_Post && has_post_thumbnail($post)) {
+		echo '<a class="zo-games-grid__thumb" href="' . esc_url($url) . '">';
 		echo get_the_post_thumbnail($post, 'large');
 		echo '</a>';
 		return;
@@ -1418,25 +1417,11 @@ function zo_render_game_thumbnail($post, $module, $url, $title) {
 
 	$image_url = zo_get_game_module_featured_image_url($module);
 	if ($image_url !== '') {
+		echo '<a class="zo-games-grid__thumb" href="' . esc_url($url) . '">';
 		echo '<img src="' . esc_url($image_url) . '" alt="' . esc_attr($title) . '" loading="lazy">';
 		echo '</a>';
 		return;
 	}
-
-	$slug     = !empty($module['slug']) ? $module['slug'] : sanitize_title($title);
-	$theme    = zo_get_game_thumbnail_theme($slug, $title);
-	$initials = zo_get_game_thumbnail_initials($title, $slug);
-
-	printf(
-		'<span class="zo-games-grid__thumb-fallback" style="--zo-thumb-from:%1$s;--zo-thumb-to:%2$s;--zo-thumb-accent:%3$s;"><span class="zo-games-grid__thumb-pattern" aria-hidden="true"></span><span class="zo-games-grid__thumb-label">%4$s</span><span class="zo-games-grid__thumb-initials">%5$s</span></span>',
-		esc_attr($theme['from']),
-		esc_attr($theme['to']),
-		esc_attr($theme['accent']),
-		esc_html($theme['label']),
-		esc_html($initials)
-	);
-
-	echo '</a>';
 }
 
 function zo_get_game_slug_for_post($post_id) {
