@@ -480,6 +480,176 @@ function zo_get_fallback_multilingual_game_metadata($module) {
 	return $metadata;
 }
 
+function zo_get_smart_fallback_game_metadata($module) {
+	$name = !empty($module['name']) && is_string($module['name']) ? trim($module['name']) : '';
+	$slug = !empty($module['slug']) ? sanitize_title($module['slug']) : sanitize_title($name);
+	$description = !empty($module['description']) && is_string($module['description']) ? trim(wp_strip_all_tags($module['description'])) : '';
+
+	if ($name === '') {
+		return null;
+	}
+
+	$has_localized_name = preg_match('/(?:^|\|)\s*(TR|EN|DE):/i', $name) === 1;
+	$clean_name = $has_localized_name ? zo_cleanup_generated_game_title(zo_get_localized_text($name, 'en')) : zo_cleanup_generated_game_title($name);
+	$category = zo_get_game_category($slug, $clean_name, $description);
+	$templates = zo_get_fallback_description_templates($category);
+
+	return array(
+		'name' => $has_localized_name ? $name : sprintf('TR: %1$s | EN: %1$s | DE: %1$s', $clean_name),
+		'description' => sprintf(
+			'TR: %1$s EN: %2$s DE: %3$s',
+			sprintf($templates['tr'], $clean_name),
+			sprintf($templates['en'], $clean_name),
+			sprintf($templates['de'], $clean_name)
+		),
+	);
+}
+
+function zo_cleanup_generated_game_title($title) {
+	$title = trim(wp_strip_all_tags((string) $title));
+	$title = preg_replace('/\s+/', ' ', $title);
+
+	if (!is_string($title) || $title === '') {
+		return '';
+	}
+
+	$title = preg_replace('/^\s*(TR|EN|DE):\s*/i', '', $title);
+	$title = preg_replace('/\s+(oyunu|game|spiel)\s*$/iu', '', $title);
+	$title = str_replace(array('_', '-'), ' ', $title);
+	$title = preg_replace('/\s+/', ' ', $title);
+
+	if (function_exists('mb_convert_case')) {
+		return mb_convert_case(trim($title), MB_CASE_TITLE, 'UTF-8');
+	}
+
+	return ucwords(strtolower(trim($title)));
+}
+
+function zo_get_game_category_options() {
+	return array(
+		'all' => array(
+			'tr' => 'Tum oyunlar',
+			'en' => 'All games',
+			'de' => 'Alle Spiele',
+		),
+		'puzzle' => array(
+			'tr' => 'Bulmaca',
+			'en' => 'Puzzle',
+			'de' => 'Puzzle',
+		),
+		'memory' => array(
+			'tr' => 'Hafiza',
+			'en' => 'Memory',
+			'de' => 'Memory',
+		),
+		'math' => array(
+			'tr' => 'Matematik',
+			'en' => 'Math',
+			'de' => 'Mathe',
+		),
+		'action' => array(
+			'tr' => 'Aksiyon',
+			'en' => 'Action',
+			'de' => 'Action',
+		),
+		'sports' => array(
+			'tr' => 'Spor',
+			'en' => 'Sports',
+			'de' => 'Sport',
+		),
+		'creative' => array(
+			'tr' => 'Yaratici',
+			'en' => 'Creative',
+			'de' => 'Kreativ',
+		),
+		'tool' => array(
+			'tr' => 'Araclar',
+			'en' => 'Tools',
+			'de' => 'Werkzeuge',
+		),
+	);
+}
+
+function zo_get_game_category_label($category, $lang = '') {
+	$lang = array_key_exists($lang, zo_get_language_options()) ? $lang : zo_get_current_language();
+	$options = zo_get_game_category_options();
+	$category = isset($options[$category]) ? $category : 'all';
+
+	return $options[$category][$lang] ?? $options[$category]['en'];
+}
+
+function zo_get_game_category($slug, $title = '', $description = '') {
+	$text = strtolower((string) $slug . ' ' . (string) $title . ' ' . (string) $description);
+
+	if (preg_match('/clock|time|calculator|search|launcher|paint|designer|builder|studio|draw|drawing|boyama|arama|saat|hesap/', $text)) {
+		return 'tool';
+	}
+
+	if (preg_match('/math|number|binary|calculator|angle|quiz|soru|country|ulke|line/', $text)) {
+		return 'math';
+	}
+
+	if (preg_match('/memory|recall|simon|sequence|hafiza|remember|match/', $text)) {
+		return 'memory';
+	}
+
+	if (preg_match('/soccer|football|penalty|race|racing|sled|snowboard|golf|sports|futbol|kosu/', $text)) {
+		return 'sports';
+	}
+
+	if (preg_match('/runner|battle|shoot|shooter|defense|army|fight|survival|escape|rescue|dodg|ninja|dragon|heist|lava|arena|rocket/', $text)) {
+		return 'action';
+	}
+
+	if (preg_match('/paint|design|designer|builder|factory|garden|shop|city|farm|creative|robot/', $text)) {
+		return 'creative';
+	}
+
+	return 'puzzle';
+}
+
+function zo_get_fallback_description_templates($category) {
+	$templates = array(
+		'puzzle' => array(
+			'tr' => '%s, dikkatli dusunerek adim adim cozdugun bir zeka bulmacasidir.',
+			'en' => '%s is a thinking puzzle where you solve the challenge step by step.',
+			'de' => '%s ist ein Denkspiel, bei dem du die Aufgabe Schritt fuer Schritt loest.',
+		),
+		'memory' => array(
+			'tr' => '%s, sirayi hatirlayip dogru hamleleri yapmani isteyen bir hafiza oyunudur.',
+			'en' => '%s is a memory game where you remember the pattern and make the right moves.',
+			'de' => '%s ist ein Memory-Spiel, bei dem du Muster merkst und richtig reagierst.',
+		),
+		'math' => array(
+			'tr' => '%s, sayilar ve mantikla pratik yapmani saglayan egitici bir oyundur.',
+			'en' => '%s is an educational game for practicing numbers and logic.',
+			'de' => '%s ist ein Lernspiel zum Ueben von Zahlen und Logik.',
+		),
+		'action' => array(
+			'tr' => '%s, hizli tepki verip hedefe ulasmaya calistigin hareketli bir oyundur.',
+			'en' => '%s is an action game where quick reactions help you reach the goal.',
+			'de' => '%s ist ein Actionspiel, bei dem schnelle Reaktionen zum Ziel fuehren.',
+		),
+		'sports' => array(
+			'tr' => '%s, zamanlama ve stratejiyle oynanan spor temali bir oyundur.',
+			'en' => '%s is a sports game built around timing and strategy.',
+			'de' => '%s ist ein Sportspiel mit Timing und Strategie.',
+		),
+		'creative' => array(
+			'tr' => '%s, bir seyler kurup deneyerek ilerledigin yaratici bir oyundur.',
+			'en' => '%s is a creative game where you build, test, and improve your idea.',
+			'de' => '%s ist ein kreatives Spiel, in dem du baust, testest und verbesserst.',
+		),
+		'tool' => array(
+			'tr' => '%s, tarayicida kullanabilecegin basit ve egitici bir aractir.',
+			'en' => '%s is a simple educational tool you can use in the browser.',
+			'de' => '%s ist ein einfaches Lernwerkzeug fuer den Browser.',
+		),
+	);
+
+	return isset($templates[$category]) ? $templates[$category] : $templates['puzzle'];
+}
+
 function zo_get_language_options() {
 	return array(
 		'tr' => 'TR',
@@ -520,6 +690,56 @@ function zo_get_interface_text($key, $lang = '') {
 			'tr' => 'Dil',
 			'en' => 'Language',
 			'de' => 'Sprache',
+		),
+		'search_label' => array(
+			'tr' => 'Oyun ara',
+			'en' => 'Search games',
+			'de' => 'Spiele suchen',
+		),
+		'search_placeholder' => array(
+			'tr' => 'Oyun adi yaz',
+			'en' => 'Type a game name',
+			'de' => 'Spielname eingeben',
+		),
+		'category_label' => array(
+			'tr' => 'Kategori',
+			'en' => 'Category',
+			'de' => 'Kategorie',
+		),
+		'sort_label' => array(
+			'tr' => 'Sirala',
+			'en' => 'Sort',
+			'de' => 'Sortieren',
+		),
+		'sort_title' => array(
+			'tr' => 'Ada gore',
+			'en' => 'By name',
+			'de' => 'Nach Name',
+		),
+		'sort_newest' => array(
+			'tr' => 'En yeni',
+			'en' => 'Newest',
+			'de' => 'Neueste',
+		),
+		'sort_category' => array(
+			'tr' => 'Kategoriye gore',
+			'en' => 'By category',
+			'de' => 'Nach Kategorie',
+		),
+		'filter_submit' => array(
+			'tr' => 'Filtrele',
+			'en' => 'Filter',
+			'de' => 'Filtern',
+		),
+		'filter_reset' => array(
+			'tr' => 'Temizle',
+			'en' => 'Clear',
+			'de' => 'Loeschen',
+		),
+		'results_count' => array(
+			'tr' => '%d oyun gosteriliyor',
+			'en' => 'Showing %d games',
+			'de' => '%d Spiele werden angezeigt',
 		),
 		'play_suffix' => array(
 			'tr' => 'oyna',
@@ -1006,7 +1226,7 @@ function zo_get_asker_display_game_metadata($module) {
 
 	$metadata = zo_get_asker_multilingual_game_metadata(sanitize_title($module['slug']));
 	if (!is_array($metadata)) {
-		$metadata = zo_get_fallback_multilingual_game_metadata($module);
+		$metadata = zo_get_smart_fallback_game_metadata($module);
 	}
 
 	return is_array($metadata) ? $metadata : null;
@@ -1014,12 +1234,12 @@ function zo_get_asker_display_game_metadata($module) {
 
 function zo_get_game_display_metadata($module) {
 	if (empty($module['slug'])) {
-		return zo_get_fallback_multilingual_game_metadata($module);
+		return zo_get_smart_fallback_game_metadata($module);
 	}
 
 	$metadata = zo_get_asker_multilingual_game_metadata(sanitize_title($module['slug']));
 	if (!is_array($metadata)) {
-		$metadata = zo_get_fallback_multilingual_game_metadata($module);
+		$metadata = zo_get_smart_fallback_game_metadata($module);
 	}
 
 	return is_array($metadata) ? $metadata : null;
@@ -1603,6 +1823,12 @@ function zo_get_game_back_url($post_id = 0) {
 }
 
 function zo_get_default_game_post_excerpt($module) {
+	$metadata = zo_get_game_display_metadata($module);
+
+	if (!empty($metadata['description']) && is_string($metadata['description'])) {
+		return trim($metadata['description']);
+	}
+
 	if (!empty($module['description']) && is_string($module['description'])) {
 		return trim($module['description']);
 	}
@@ -1664,6 +1890,8 @@ function zo_sync_game_module_posts() {
 	}
 
 	foreach ($modules as $slug => $module) {
+		$display_metadata = zo_get_game_display_metadata($module);
+		$post_title    = !empty($display_metadata['name']) && is_string($display_metadata['name']) ? $display_metadata['name'] : $module['name'];
 		$excerpt       = zo_get_default_game_post_excerpt($module);
 		$existing_post = $posts_by_slug[$slug] ?? null;
 
@@ -1671,8 +1899,8 @@ function zo_sync_game_module_posts() {
 			if ((string) get_post_meta($existing_post->ID, '_zo_game_autogenerated', true) === '1') {
 				$update = array('ID' => $existing_post->ID);
 
-				if ($existing_post->post_title !== $module['name']) {
-					$update['post_title'] = $module['name'];
+				if ($existing_post->post_title !== $post_title) {
+					$update['post_title'] = $post_title;
 				}
 
 				if ($existing_post->post_excerpt !== $excerpt) {
@@ -1712,7 +1940,7 @@ function zo_sync_game_module_posts() {
 				array(
 					'post_type'    => 'zeka_oyunu',
 					'post_status'  => 'publish',
-					'post_title'   => $module['name'],
+					'post_title'   => $post_title,
 					'post_name'    => $slug,
 					'post_excerpt' => $excerpt,
 					'post_content' => '',
@@ -1925,7 +2153,7 @@ function zo_get_input_blocker_css() {
 	-webkit-tap-highlight-color: transparent;
 	-webkit-touch-callout: none;
 	overscroll-behavior: contain;
-	touch-action: none;
+	touch-action: pan-y pinch-zoom;
 	user-select: none;
 	-webkit-user-drag: none;
 	user-drag: none;
@@ -2170,18 +2398,6 @@ function zo_get_input_blocker_js() {
 		event.preventDefault();
 	}
 
-	function handleTouchMove(event) {
-		if (getGameRoot(event.target)) {
-			event.preventDefault();
-		}
-	}
-
-	function handleWheel(event) {
-		if (!event.ctrlKey && getGameRoot(event.target) && !isSafeTarget(event.target)) {
-			event.preventDefault();
-		}
-	}
-
 	function handleGameOnlyDefault(event) {
 		if (getGameRoot(event.target) && !isSafeTarget(event.target)) {
 			event.preventDefault();
@@ -2193,8 +2409,6 @@ function zo_get_input_blocker_js() {
 	document.addEventListener('keydown', handleKeyBlock, true);
 	document.addEventListener('keyup', handleKeyBlock, true);
 	document.addEventListener('keypress', handleKeyBlock, true);
-	document.addEventListener('touchmove', handleTouchMove, { passive: false, capture: true });
-	document.addEventListener('wheel', handleWheel, { passive: false, capture: true });
 	document.addEventListener('dragstart', handleGameOnlyDefault, true);
 	document.addEventListener('selectstart', handleGameOnlyDefault, true);
 	document.addEventListener('contextmenu', handleGameOnlyDefault, true);
@@ -2457,6 +2671,73 @@ function zo_enqueue_grid_styles() {
 	align-items: center;
 	margin: 0 0 20px;
 }
+.zo-games-grid__filters {
+	display: grid;
+	width: 100%;
+	grid-template-columns: minmax(180px, 1fr) minmax(150px, 210px) minmax(150px, 210px) auto auto;
+	gap: 10px;
+	align-items: end;
+	margin: 0 0 18px;
+}
+.zo-games-grid__field {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	min-width: 0;
+}
+.zo-games-grid__field label {
+	color: #374151;
+	font-size: 0.86rem;
+	font-weight: 700;
+}
+.zo-games-grid__field input,
+.zo-games-grid__field select {
+	width: 100%;
+	min-height: 42px;
+	border: 1px solid #cbd5e1;
+	border-radius: 10px;
+	background: #fff;
+	color: #111827;
+	font: inherit;
+	padding: 0 12px;
+}
+.zo-games-grid__filter-button,
+.zo-games-grid__reset {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 42px;
+	padding: 0 16px;
+	border-radius: 10px;
+	border: 1px solid #0f766e;
+	background: #0f766e;
+	color: #fff;
+	font-weight: 700;
+	text-decoration: none;
+	cursor: pointer;
+}
+.zo-games-grid__reset {
+	border-color: #cbd5e1;
+	background: #fff;
+	color: #374151;
+}
+.zo-games-grid__filter-button:hover,
+.zo-games-grid__filter-button:focus {
+	background: #115e59;
+	color: #fff;
+	text-decoration: none;
+}
+.zo-games-grid__reset:hover,
+.zo-games-grid__reset:focus {
+	border-color: #94a3b8;
+	color: #111827;
+	text-decoration: none;
+}
+.zo-games-grid__count {
+	margin: -4px 0 16px;
+	color: #4b5563;
+	font-weight: 700;
+}
 .zo-games-grid__language {
 	display: inline-flex;
 	align-items: center;
@@ -2675,6 +2956,11 @@ function zo_enqueue_grid_styles() {
 .zo-games-grid:empty {
 	display: none;
 }
+@media (max-width: 820px) {
+	.zo-games-grid__filters {
+		grid-template-columns: 1fr;
+	}
+}
 ';
 
 	if (!wp_style_is($handle, 'registered')) {
@@ -2722,9 +3008,22 @@ function zo_games_grid_shortcode($atts = array()) {
 	$modules          = zo_get_game_modules();
 	$language         = zo_get_current_language();
 	$show_home_button = false;
+	$search_query     = isset($_GET['zo_game_search']) && is_string($_GET['zo_game_search']) ? sanitize_text_field(wp_unslash($_GET['zo_game_search'])) : '';
+	$category_filter  = isset($_GET['zo_game_category']) && is_string($_GET['zo_game_category']) ? sanitize_key(wp_unslash($_GET['zo_game_category'])) : 'all';
+	$sort             = isset($_GET['zo_game_sort']) && is_string($_GET['zo_game_sort']) ? sanitize_key(wp_unslash($_GET['zo_game_sort'])) : 'title';
+	$category_options = zo_get_game_category_options();
+	$sort_options     = array('title', 'newest', 'category');
 
 	if ($limit === 0) {
 		return '';
+	}
+
+	if (!isset($category_options[$category_filter])) {
+		$category_filter = 'all';
+	}
+
+	if (!in_array($sort, $sort_options, true)) {
+		$sort = 'title';
 	}
 
 	if (empty($modules)) {
@@ -2763,9 +3062,36 @@ function zo_games_grid_shortcode($atts = array()) {
 	echo '</div>';
 	echo '</div>';
 
+	$filter_action = remove_query_arg(array('zo_game_search', 'zo_game_category', 'zo_game_sort', 'zo_lang', 'paged'));
+	echo '<form class="zo-games-grid__filters" method="get" action="' . esc_url($filter_action) . '">';
+	echo '<input type="hidden" name="zo_lang" value="' . esc_attr($language) . '">';
+	echo '<div class="zo-games-grid__field">';
+	echo '<label for="zo-game-search">' . esc_html(zo_get_interface_text('search_label', $language)) . '</label>';
+	echo '<input id="zo-game-search" type="search" name="zo_game_search" value="' . esc_attr($search_query) . '" placeholder="' . esc_attr(zo_get_interface_text('search_placeholder', $language)) . '">';
+	echo '</div>';
+	echo '<div class="zo-games-grid__field">';
+	echo '<label for="zo-game-category">' . esc_html(zo_get_interface_text('category_label', $language)) . '</label>';
+	echo '<select id="zo-game-category" name="zo_game_category">';
+	foreach ($category_options as $category_key => $labels) {
+		echo '<option value="' . esc_attr($category_key) . '"' . selected($category_filter, $category_key, false) . '>' . esc_html(zo_get_game_category_label($category_key, $language)) . '</option>';
+	}
+	echo '</select>';
+	echo '</div>';
+	echo '<div class="zo-games-grid__field">';
+	echo '<label for="zo-game-sort">' . esc_html(zo_get_interface_text('sort_label', $language)) . '</label>';
+	echo '<select id="zo-game-sort" name="zo_game_sort">';
+	echo '<option value="title"' . selected($sort, 'title', false) . '>' . esc_html(zo_get_interface_text('sort_title', $language)) . '</option>';
+	echo '<option value="newest"' . selected($sort, 'newest', false) . '>' . esc_html(zo_get_interface_text('sort_newest', $language)) . '</option>';
+	echo '<option value="category"' . selected($sort, 'category', false) . '>' . esc_html(zo_get_interface_text('sort_category', $language)) . '</option>';
+	echo '</select>';
+	echo '</div>';
+	echo '<button class="zo-games-grid__filter-button" type="submit">' . esc_html(zo_get_interface_text('filter_submit', $language)) . '</button>';
+	echo '<a class="zo-games-grid__reset" href="' . esc_url(add_query_arg('zo_lang', $language, remove_query_arg(array('zo_game_search', 'zo_game_category', 'zo_game_sort', 'zo_lang', 'paged')))) . '">' . esc_html(zo_get_interface_text('filter_reset', $language)) . '</a>';
+	echo '</form>';
+
 	echo '<p class="zo-games-grid__intro">' . esc_html(zo_get_interface_text('intro', $language)) . '</p>';
 
-	echo '<div class="zo-games-grid">';
+	$game_items = array();
 
 	foreach ($modules as $slug => $module) {
 		if (!zo_is_game_available_for_language($slug, $language)) {
@@ -2784,10 +3110,6 @@ function zo_games_grid_shortcode($atts = array()) {
 			continue;
 		}
 
-		if ($limit > 0 && $shown >= $limit) {
-			break;
-		}
-
 		$metadata = zo_get_game_display_metadata($module);
 		$title    = !empty($metadata['name']) ? $metadata['name'] : ($post instanceof WP_Post ? get_the_title($post) : $module['name']);
 		$excerpt  = !empty($metadata['description']) ? $metadata['description'] : ($post instanceof WP_Post ? get_the_excerpt($post) : '');
@@ -2796,17 +3118,86 @@ function zo_games_grid_shortcode($atts = array()) {
 
 		$title   = zo_get_localized_text($title, $language);
 		$excerpt = zo_get_localized_text($excerpt, $language);
+		$category = zo_get_game_category($slug, $title, $excerpt);
 
 		if ($url !== '') {
 			$url = add_query_arg('zo_lang', $language, $url);
 		}
 
-		$has_results = true;
-		$shown++;
-
 		if ($excerpt === '' && !empty($module['description']) && is_string($module['description'])) {
 			$excerpt = zo_get_localized_text($module['description'], $language);
 		}
+
+		if ($category_filter !== 'all' && $category !== $category_filter) {
+			continue;
+		}
+
+		if ($search_query !== '') {
+			$haystack = strtolower($title . ' ' . $excerpt . ' ' . $slug . ' ' . $author . ' ' . zo_get_game_category_label($category, $language));
+			$needle = strtolower($search_query);
+
+			if (strpos($haystack, $needle) === false) {
+				continue;
+			}
+		}
+
+		$game_items[] = array(
+			'slug' => $slug,
+			'module' => $module,
+			'post' => $post,
+			'owner' => $owner,
+			'author' => $author,
+			'title' => $title,
+			'excerpt' => $excerpt,
+			'url' => $url,
+			'category' => $category,
+			'timestamp' => $post instanceof WP_Post ? strtotime((string) $post->post_date_gmt) : 0,
+		);
+	}
+
+	usort(
+		$game_items,
+		function ($a, $b) use ($sort, $language) {
+			if ($sort === 'newest') {
+				$time_compare = (int) $b['timestamp'] <=> (int) $a['timestamp'];
+				if ($time_compare !== 0) {
+					return $time_compare;
+				}
+			}
+
+			if ($sort === 'category') {
+				$category_compare = strcmp(
+					zo_get_game_category_label($a['category'], $language),
+					zo_get_game_category_label($b['category'], $language)
+				);
+
+				if ($category_compare !== 0) {
+					return $category_compare;
+				}
+			}
+
+			return strcasecmp($a['title'], $b['title']);
+		}
+	);
+
+	if ($limit > 0) {
+		$game_items = array_slice($game_items, 0, $limit);
+	}
+
+	$shown = count($game_items);
+	$has_results = $shown > 0;
+
+	echo '<p class="zo-games-grid__count">' . esc_html(sprintf(zo_get_interface_text('results_count', $language), $shown)) . '</p>';
+	echo '<div class="zo-games-grid">';
+
+	foreach ($game_items as $item) {
+		$slug = $item['slug'];
+		$module = $item['module'];
+		$post = $item['post'];
+		$author = $item['author'];
+		$title = $item['title'];
+		$excerpt = $item['excerpt'];
+		$url = $item['url'];
 
 		echo '<article class="zo-games-grid__card">';
 
