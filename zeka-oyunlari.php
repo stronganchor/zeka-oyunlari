@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.4.78.asker.arslan
+ * Version: 1.4.79.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -791,6 +791,12 @@ function zo_get_interface_text($key, $lang = '') {
 		'en' => 'About Asker’s Games',
 		'fr' => 'À propos des jeux d’Asker',
 		'de' => 'Über Askers Spiele',
+	);
+	$text['asker_games_link'] = array(
+		'tr' => 'Askerin oyunlarına git',
+		'en' => 'Go to Asker’s Games',
+		'fr' => 'Aller aux jeux d’Asker',
+		'de' => 'Zu Askers Spielen gehen',
 	);
 
 	return isset($text[$key][$lang]) ? $text[$key][$lang] : '';
@@ -3195,6 +3201,42 @@ function zo_enqueue_asker_about_styles() {
 	width: min(100%, 920px);
 	margin: 0 auto;
 }
+.zo-asker-about__language {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+	width: min(100%, 920px);
+	margin: 0 auto 24px;
+}
+.zo-asker-about__language-label {
+	color: #374151;
+	font-weight: 700;
+}
+.zo-asker-about__language-option {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 36px;
+	min-width: 44px;
+	padding: 0 12px;
+	border: 1px solid #cbd5e1;
+	border-radius: 999px;
+	background: #fff;
+	color: #1f2937;
+	font-weight: 700;
+	text-decoration: none;
+}
+.zo-asker-about__language-option.is-active {
+	border-color: #1d4ed8;
+	background: #1d4ed8;
+	color: #fff;
+}
+.zo-asker-about__language-option:hover,
+.zo-asker-about__language-option:focus {
+	border-color: #1e40af;
+	text-decoration: none;
+}
 .zo-asker-about-list .zo-asker-about {
 	padding-bottom: 30px;
 	border-bottom: 1px solid #e5e7eb;
@@ -3322,12 +3364,24 @@ function zo_asker_about_shortcode($atts = array()) {
 
 	$lang = sanitize_key((string) $atts['lang']);
 	$show_all = $lang === '' || $lang === 'all';
+	$current_lang = $show_all ? zo_get_current_language() : $lang;
 	$languages = $show_all ? array_keys(zo_get_language_options()) : array($lang);
 	$all_content = zo_get_asker_about_content('all');
 
 	zo_enqueue_asker_about_styles();
 
 	ob_start();
+
+	echo '<nav class="zo-asker-about__language" aria-label="' . esc_attr(zo_get_interface_text('language_label', $current_lang)) . '">';
+	echo '<span class="zo-asker-about__language-label">' . esc_html(zo_get_interface_text('language_label', $current_lang)) . '</span>';
+
+	foreach (zo_get_language_options() as $code => $label) {
+		$class = 'zo-asker-about__language-option';
+		$url = '#zo-asker-about-' . $code;
+		echo '<a class="' . esc_attr($class) . '" href="' . esc_url($url) . '">' . esc_html($label) . '</a>';
+	}
+
+	echo '</nav>';
 
 	echo '<div class="zo-asker-about-list">';
 	foreach ($languages as $code) {
@@ -3338,14 +3392,14 @@ function zo_asker_about_shortcode($atts = array()) {
 		$content = $all_content[$code];
 		$games_url = zo_get_owner_games_url('asker', $code);
 
-		echo '<section class="zo-asker-about" lang="' . esc_attr($code) . '">';
+		echo '<section class="zo-asker-about" id="zo-asker-about-' . esc_attr($code) . '" lang="' . esc_attr($code) . '">';
 		echo '<p class="zo-asker-about__lang">' . esc_html(zo_get_language_options()[$code]) . '</p>';
 		echo '<h2>' . esc_html($content['title']) . '</h2>';
 		echo '<p class="zo-asker-about__intro">' . esc_html($content['intro']) . '</p>';
 		echo '<p>' . esc_html($content['body']) . '</p>';
 		echo '<p>' . esc_html($content['note']) . '</p>';
 		if ($games_url !== '') {
-			echo '<p><a class="zo-asker-about__button" href="' . esc_url($games_url) . '">' . esc_html(zo_get_interface_text('open_game', $code)) . '</a></p>';
+			echo '<p><a class="zo-asker-about__button" href="' . esc_url($games_url) . '">' . esc_html(zo_get_interface_text('asker_games_link', $code)) . '</a></p>';
 		}
 		echo '</section>';
 	}
