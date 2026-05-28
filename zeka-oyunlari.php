@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.4.81.asker.arslan
+ * Version: 1.4.82.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -797,6 +797,18 @@ function zo_get_interface_text($key, $lang = '') {
 		'en' => 'Go to Asker’s Games',
 		'fr' => 'Aller aux jeux d’Asker',
 		'de' => 'Zu Askers Spielen gehen',
+	);
+	$text['asker_games_title'] = array(
+		'tr' => 'Askerin Oyunları',
+		'en' => 'Asker’s Games',
+		'fr' => 'Jeux d’Asker',
+		'de' => 'Askers Spiele',
+	);
+	$text['arslan_games_title'] = array(
+		'tr' => 'Arslanın Oyunları',
+		'en' => 'Arslan’s Games',
+		'fr' => 'Jeux d’Arslan',
+		'de' => 'Arslans Spiele',
 	);
 
 	return isset($text[$key][$lang]) ? $text[$key][$lang] : '';
@@ -3312,6 +3324,7 @@ function zo_enqueue_asker_about_styles() {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 10px;
+	justify-content: center;
 	margin-top: 8px;
 }
 ';
@@ -3520,8 +3533,8 @@ function zo_site_about_shortcode($atts = array()) {
 		echo '<p>' . esc_html($content['body']) . '</p>';
 		echo '<p>' . esc_html($content['note']) . '</p>';
 		echo '<div class="zo-site-about__actions">';
-		echo '<a class="zo-site-about__button" href="' . esc_url($asker_url) . '">' . esc_html(zo_get_game_owner_label('asker')) . '</a>';
-		echo '<a class="zo-site-about__button" href="' . esc_url($arslan_url) . '">' . esc_html(zo_get_game_owner_label('arslan')) . '</a>';
+		echo '<a class="zo-site-about__button" href="' . esc_url($asker_url) . '">' . esc_html(zo_get_interface_text('asker_games_title', $code)) . '</a>';
+		echo '<a class="zo-site-about__button" href="' . esc_url($arslan_url) . '">' . esc_html(zo_get_interface_text('arslan_games_title', $code)) . '</a>';
 		echo '</div>';
 		echo '</section>';
 	}
