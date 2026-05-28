@@ -3187,7 +3187,9 @@ function zo_enqueue_asker_about_styles() {
 
 	$handle = 'zo-shared-styles';
 	$css = '
-.zo-asker-about {
+.zo-asker-about,
+.zo-site-about {
+	scroll-margin-top: 96px;
 	width: min(100%, 880px);
 	margin: 0 auto;
 	color: #1f2937;
@@ -3195,13 +3197,15 @@ function zo_enqueue_asker_about_styles() {
 	font-size: 1.08rem;
 	line-height: 1.7;
 }
-.zo-asker-about-list {
+.zo-asker-about-list,
+.zo-site-about-list {
 	display: grid;
 	gap: 34px;
 	width: min(100%, 920px);
 	margin: 0 auto;
 }
-.zo-asker-about__language {
+.zo-asker-about__language,
+.zo-site-about__language {
 	position: sticky;
 	top: 0;
 	z-index: 10;
@@ -3214,11 +3218,13 @@ function zo_enqueue_asker_about_styles() {
 	padding: 10px 0;
 	background: #fff;
 }
-.zo-asker-about__language-label {
+.zo-asker-about__language-label,
+.zo-site-about__language-label {
 	color: #374151;
 	font-weight: 700;
 }
-.zo-asker-about__language-option {
+.zo-asker-about__language-option,
+.zo-site-about__language-option {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -3232,25 +3238,31 @@ function zo_enqueue_asker_about_styles() {
 	font-weight: 700;
 	text-decoration: none;
 }
-.zo-asker-about__language-option.is-active {
+.zo-asker-about__language-option.is-active,
+.zo-site-about__language-option.is-active {
 	border-color: #1d4ed8;
 	background: #1d4ed8;
 	color: #fff;
 }
 .zo-asker-about__language-option:hover,
-.zo-asker-about__language-option:focus {
+.zo-asker-about__language-option:focus,
+.zo-site-about__language-option:hover,
+.zo-site-about__language-option:focus {
 	border-color: #1e40af;
 	text-decoration: none;
 }
-.zo-asker-about-list .zo-asker-about {
+.zo-asker-about-list .zo-asker-about,
+.zo-site-about-list .zo-site-about {
 	padding-bottom: 30px;
 	border-bottom: 1px solid #e5e7eb;
 }
-.zo-asker-about-list .zo-asker-about:last-child {
+.zo-asker-about-list .zo-asker-about:last-child,
+.zo-site-about-list .zo-site-about:last-child {
 	border-bottom: 0;
 	padding-bottom: 0;
 }
-.zo-asker-about__lang {
+.zo-asker-about__lang,
+.zo-site-about__lang {
 	margin: 0 0 8px;
 	color: #0f766e;
 	font-size: 0.88rem;
@@ -3258,21 +3270,25 @@ function zo_enqueue_asker_about_styles() {
 	letter-spacing: 0.08em;
 	text-transform: uppercase;
 }
-.zo-asker-about h2 {
+.zo-asker-about h2,
+.zo-site-about h2 {
 	margin: 0 0 14px;
 	color: #111827;
 	font-size: clamp(30px, 5vw, 48px);
 	line-height: 1.1;
 }
-.zo-asker-about p {
+.zo-asker-about p,
+.zo-site-about p {
 	margin: 0 0 16px;
 }
-.zo-asker-about__intro {
+.zo-asker-about__intro,
+.zo-site-about__intro {
 	color: #374151;
 	font-size: 1.18rem;
 	font-weight: 700;
 }
-.zo-asker-about__button {
+.zo-asker-about__button,
+.zo-site-about__button {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -3285,10 +3301,18 @@ function zo_enqueue_asker_about_styles() {
 	text-decoration: none;
 }
 .zo-asker-about__button:hover,
-.zo-asker-about__button:focus {
+.zo-asker-about__button:focus,
+.zo-site-about__button:hover,
+.zo-site-about__button:focus {
 	background: #115e59;
 	color: #fff;
 	text-decoration: none;
+}
+.zo-site-about__actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin-top: 8px;
 }
 ';
 
@@ -3413,6 +3437,101 @@ function zo_asker_about_shortcode($atts = array()) {
 	return ob_get_clean();
 }
 add_shortcode('asker_oyunlari_hakkinda', 'zo_asker_about_shortcode');
+
+function zo_get_site_about_content($lang = '') {
+	$content = array(
+		'tr' => array(
+			'title' => 'zekâ.com Hakkında',
+			'intro' => 'zekâ.com; çocuklar, öğrenciler ve her yaştan meraklı insan için ücretsiz tarayıcı oyunları bulunan bir zeka oyunları sitesidir.',
+			'body' => 'Sitede mantık, hafıza, dikkat, refleks, matematik, bulmaca, spor ve yaratıcı oyunlar bulunur. Oyunlar kısa sürede açılır, tarayıcıda oynanır ve farklı yaşlardaki kullanıcıların eğlenirken düşünmesine yardımcı olmayı amaçlar.',
+			'note' => 'Oyunlar Asker ve Arslan gibi genç üreticilerin fikirleriyle büyür. Bazı oyunlar yapay zeka yardımıyla hazırlanır, sonra sitede paylaşılır.',
+		),
+		'en' => array(
+			'title' => 'About zekâ.com',
+			'intro' => 'zekâ.com is a free browser-game site for kids, students, and curious players of all ages.',
+			'body' => 'The site includes logic, memory, attention, reflex, math, puzzle, sports, and creative games. The games open quickly, run in the browser, and are meant to help people think while they play.',
+			'note' => 'The site grows with ideas from young makers like Asker and Arslan. Some games are made with help from AI and then shared on the site.',
+		),
+		'de' => array(
+			'title' => 'Über zekâ.com',
+			'intro' => 'zekâ.com ist eine kostenlose Browserspiel-Seite für Kinder, Schüler und neugierige Spieler jeden Alters.',
+			'body' => 'Die Seite enthält Logik-, Gedächtnis-, Aufmerksamkeits-, Reaktions-, Mathe-, Rätsel-, Sport- und Kreativspiele. Die Spiele starten schnell, laufen im Browser und sollen beim Spielen zum Denken anregen.',
+			'note' => 'Die Seite wächst durch Ideen von jungen Machern wie Asker und Arslan. Einige Spiele werden mit Hilfe von KI erstellt und dann auf der Seite geteilt.',
+		),
+		'fr' => array(
+			'title' => 'À propos de zekâ.com',
+			'intro' => 'zekâ.com est un site gratuit de jeux de navigateur pour les enfants, les élèves et les joueurs curieux de tout âge.',
+			'body' => 'Le site propose des jeux de logique, de mémoire, d’attention, de réflexes, de maths, de puzzle, de sport et de créativité. Les jeux se lancent vite, fonctionnent dans le navigateur et aident à réfléchir en jouant.',
+			'note' => 'Le site grandit grâce aux idées de jeunes créateurs comme Asker et Arslan. Certains jeux sont créés avec l’aide de l’IA puis partagés sur le site.',
+		),
+	);
+
+	if ($lang === 'all') {
+		return $content;
+	}
+
+	$lang = array_key_exists($lang, zo_get_language_options()) ? $lang : zo_get_current_language();
+
+	return $content[$lang] ?? $content['tr'];
+}
+
+function zo_site_about_shortcode($atts = array()) {
+	$atts = shortcode_atts(
+		array(
+			'lang' => '',
+		),
+		$atts,
+		'zeka_hakkinda'
+	);
+
+	$lang = sanitize_key((string) $atts['lang']);
+	$show_all = $lang === '' || $lang === 'all';
+	$current_lang = $show_all ? zo_get_current_language() : $lang;
+	$languages = $show_all ? array_keys(zo_get_language_options()) : array($lang);
+	$all_content = zo_get_site_about_content('all');
+
+	zo_enqueue_asker_about_styles();
+
+	ob_start();
+
+	echo '<nav class="zo-site-about__language" aria-label="' . esc_attr(zo_get_interface_text('language_label', $current_lang)) . '">';
+	echo '<span class="zo-site-about__language-label">' . esc_html(zo_get_interface_text('language_label', $current_lang)) . '</span>';
+
+	foreach (zo_get_language_options() as $code => $label) {
+		echo '<a class="zo-site-about__language-option" href="' . esc_url('#zo-site-about-' . $code) . '">' . esc_html($label) . '</a>';
+	}
+
+	echo '</nav>';
+	echo '<div class="zo-site-about-list">';
+
+	foreach ($languages as $code) {
+		if (!array_key_exists($code, zo_get_language_options()) || empty($all_content[$code])) {
+			continue;
+		}
+
+		$content = $all_content[$code];
+		$asker_url = zo_get_owner_games_url('asker', $code);
+		$arslan_url = zo_get_owner_games_url('arslan', $code);
+
+		echo '<section class="zo-site-about" id="zo-site-about-' . esc_attr($code) . '" lang="' . esc_attr($code) . '">';
+		echo '<p class="zo-site-about__lang">' . esc_html(zo_get_language_options()[$code]) . '</p>';
+		echo '<h2>' . esc_html($content['title']) . '</h2>';
+		echo '<p class="zo-site-about__intro">' . esc_html($content['intro']) . '</p>';
+		echo '<p>' . esc_html($content['body']) . '</p>';
+		echo '<p>' . esc_html($content['note']) . '</p>';
+		echo '<div class="zo-site-about__actions">';
+		echo '<a class="zo-site-about__button" href="' . esc_url($asker_url) . '">' . esc_html(zo_get_game_owner_label('asker')) . '</a>';
+		echo '<a class="zo-site-about__button" href="' . esc_url($arslan_url) . '">' . esc_html(zo_get_game_owner_label('arslan')) . '</a>';
+		echo '</div>';
+		echo '</section>';
+	}
+
+	echo '</div>';
+
+	return ob_get_clean();
+}
+add_shortcode('zeka_hakkinda', 'zo_site_about_shortcode');
+add_shortcode('zeka_com_hakkinda', 'zo_site_about_shortcode');
 
 function zo_games_grid_shortcode($atts = array()) {
 	$atts = shortcode_atts(
