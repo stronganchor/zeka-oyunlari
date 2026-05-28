@@ -489,18 +489,19 @@ function zo_get_smart_fallback_game_metadata($module) {
 		return null;
 	}
 
-	$has_localized_name = preg_match('/(?:^|\|)\s*(TR|EN|DE):/i', $name) === 1;
+	$has_localized_name = preg_match('/(?:^|\|)\s*(TR|EN|DE|FR):/i', $name) === 1;
 	$clean_name = $has_localized_name ? zo_cleanup_generated_game_title(zo_get_localized_text($name, 'en')) : zo_cleanup_generated_game_title($name);
 	$category = zo_get_game_category($slug, $clean_name, $description);
 	$templates = zo_get_fallback_description_templates($category);
 
 	return array(
-		'name' => $has_localized_name ? $name : sprintf('TR: %1$s | EN: %1$s | DE: %1$s', $clean_name),
+		'name' => $has_localized_name ? $name : sprintf('TR: %1$s | EN: %1$s | DE: %1$s | FR: %1$s', $clean_name),
 		'description' => sprintf(
-			'TR: %1$s EN: %2$s DE: %3$s',
+			'TR: %1$s EN: %2$s DE: %3$s FR: %4$s',
 			sprintf($templates['tr'], $clean_name),
 			sprintf($templates['en'], $clean_name),
-			sprintf($templates['de'], $clean_name)
+			sprintf($templates['de'], $clean_name),
+			sprintf($templates['fr'], $clean_name)
 		),
 	);
 }
@@ -513,7 +514,7 @@ function zo_cleanup_generated_game_title($title) {
 		return '';
 	}
 
-	$title = preg_replace('/^\s*(TR|EN|DE):\s*/i', '', $title);
+	$title = preg_replace('/^\s*(TR|EN|DE|FR):\s*/i', '', $title);
 	$title = preg_replace('/\s+(oyunu|game|spiel)\s*$/iu', '', $title);
 	$title = str_replace(array('_', '-'), ' ', $title);
 	$title = preg_replace('/\s+/', ' ', $title);
@@ -528,44 +529,52 @@ function zo_cleanup_generated_game_title($title) {
 function zo_get_game_category_options() {
 	return array(
 		'all' => array(
-			'tr' => 'Tum oyunlar',
+			'tr' => 'Tüm oyunlar',
 			'en' => 'All games',
 			'de' => 'Alle Spiele',
+			'fr' => 'Tous les jeux',
 		),
 		'puzzle' => array(
 			'tr' => 'Bulmaca',
 			'en' => 'Puzzle',
-			'de' => 'Puzzle',
+			'de' => 'Rätsel',
+			'fr' => 'Puzzle',
 		),
 		'memory' => array(
-			'tr' => 'Hafiza',
+			'tr' => 'Hafıza',
 			'en' => 'Memory',
-			'de' => 'Memory',
+			'de' => 'Gedächtnis',
+			'fr' => 'Mémoire',
 		),
 		'math' => array(
 			'tr' => 'Matematik',
 			'en' => 'Math',
 			'de' => 'Mathe',
+			'fr' => 'Maths',
 		),
 		'action' => array(
 			'tr' => 'Aksiyon',
 			'en' => 'Action',
 			'de' => 'Action',
+			'fr' => 'Action',
 		),
 		'sports' => array(
 			'tr' => 'Spor',
 			'en' => 'Sports',
 			'de' => 'Sport',
+			'fr' => 'Sport',
 		),
 		'creative' => array(
-			'tr' => 'Yaratici',
+			'tr' => 'Yaratıcı',
 			'en' => 'Creative',
 			'de' => 'Kreativ',
+			'fr' => 'Créatif',
 		),
 		'tool' => array(
-			'tr' => 'Araclar',
+			'tr' => 'Araçlar',
 			'en' => 'Tools',
 			'de' => 'Werkzeuge',
+			'fr' => 'Outils',
 		),
 	);
 }
@@ -611,39 +620,46 @@ function zo_get_game_category($slug, $title = '', $description = '') {
 function zo_get_fallback_description_templates($category) {
 	$templates = array(
 		'puzzle' => array(
-			'tr' => '%s, dikkatli dusunerek adim adim cozdugun bir zeka bulmacasidir.',
+			'tr' => '%s, dikkatli düşünerek adım adım çözdüğün bir zeka bulmacasıdır.',
 			'en' => '%s is a thinking puzzle where you solve the challenge step by step.',
-			'de' => '%s ist ein Denkspiel, bei dem du die Aufgabe Schritt fuer Schritt loest.',
+			'de' => '%s ist ein Denkspiel, bei dem du die Aufgabe Schritt für Schritt löst.',
+			'fr' => '%s est un jeu de réflexion où tu résous le défi étape par étape.',
 		),
 		'memory' => array(
-			'tr' => '%s, sirayi hatirlayip dogru hamleleri yapmani isteyen bir hafiza oyunudur.',
+			'tr' => '%s, sırayı hatırlayıp doğru hamleleri yapmanı isteyen bir hafıza oyunudur.',
 			'en' => '%s is a memory game where you remember the pattern and make the right moves.',
 			'de' => '%s ist ein Memory-Spiel, bei dem du Muster merkst und richtig reagierst.',
+			'fr' => '%s est un jeu de mémoire où tu retiens le motif et fais les bons choix.',
 		),
 		'math' => array(
-			'tr' => '%s, sayilar ve mantikla pratik yapmani saglayan egitici bir oyundur.',
+			'tr' => '%s, sayılar ve mantıkla pratik yapmanı sağlayan eğitici bir oyundur.',
 			'en' => '%s is an educational game for practicing numbers and logic.',
-			'de' => '%s ist ein Lernspiel zum Ueben von Zahlen und Logik.',
+			'de' => '%s ist ein Lernspiel zum Üben von Zahlen und Logik.',
+			'fr' => '%s est un jeu éducatif pour s’entraîner avec les nombres et la logique.',
 		),
 		'action' => array(
-			'tr' => '%s, hizli tepki verip hedefe ulasmaya calistigin hareketli bir oyundur.',
+			'tr' => '%s, hızlı tepki verip hedefe ulaşmaya çalıştığın hareketli bir oyundur.',
 			'en' => '%s is an action game where quick reactions help you reach the goal.',
-			'de' => '%s ist ein Actionspiel, bei dem schnelle Reaktionen zum Ziel fuehren.',
+			'de' => '%s ist ein Actionspiel, bei dem schnelle Reaktionen zum Ziel führen.',
+			'fr' => '%s est un jeu d’action où tes réflexes t’aident à atteindre l’objectif.',
 		),
 		'sports' => array(
-			'tr' => '%s, zamanlama ve stratejiyle oynanan spor temali bir oyundur.',
+			'tr' => '%s, zamanlama ve stratejiyle oynanan spor temalı bir oyundur.',
 			'en' => '%s is a sports game built around timing and strategy.',
 			'de' => '%s ist ein Sportspiel mit Timing und Strategie.',
+			'fr' => '%s est un jeu de sport basé sur le timing et la stratégie.',
 		),
 		'creative' => array(
-			'tr' => '%s, bir seyler kurup deneyerek ilerledigin yaratici bir oyundur.',
+			'tr' => '%s, bir şeyler kurup deneyerek ilerlediğin yaratıcı bir oyundur.',
 			'en' => '%s is a creative game where you build, test, and improve your idea.',
 			'de' => '%s ist ein kreatives Spiel, in dem du baust, testest und verbesserst.',
+			'fr' => '%s est un jeu créatif où tu construis, testes et améliores ton idée.',
 		),
 		'tool' => array(
-			'tr' => '%s, tarayicida kullanabilecegin basit ve egitici bir aractir.',
+			'tr' => '%s, tarayıcıda kullanabileceğin basit ve eğitici bir araçtır.',
 			'en' => '%s is a simple educational tool you can use in the browser.',
-			'de' => '%s ist ein einfaches Lernwerkzeug fuer den Browser.',
+			'de' => '%s ist ein einfaches Lernwerkzeug für den Browser.',
+			'fr' => '%s est un outil éducatif simple à utiliser dans le navigateur.',
 		),
 	);
 
@@ -655,6 +671,7 @@ function zo_get_language_options() {
 		'tr' => 'TR',
 		'en' => 'EN',
 		'de' => 'DE',
+		'fr' => 'FR',
 	);
 }
 
@@ -674,83 +691,106 @@ function zo_get_interface_text($key, $lang = '') {
 		'home' => array(
 			'tr' => 'Ana Sayfaya Dön',
 			'en' => 'Go to the home page',
+			'fr' => 'Retour à l’accueil',
 			'de' => 'Zur Startseite',
 		),
 		'intro' => array(
 			'tr' => 'Çocuklar, ilkokul öğrencileri ve yaşlılar için ücretsiz online eğitici zeka oyunları, mantık oyunları ve hafıza oyunları oynayın.',
 			'en' => 'Play free online educational brain games, logic games, and memory games for kids, primary school students, and older people.',
+			'fr' => 'Jouez gratuitement en ligne à des jeux éducatifs de réflexion, de logique et de mémoire pour les enfants, les élèves du primaire et les personnes âgées.',
 			'de' => 'Spielen Sie kostenlose online Lern-Denkspiele, Logikspiele und Gedächtnisspiele für Kinder, Grundschüler und ältere Menschen.',
 		),
 		'open_game' => array(
 			'tr' => 'Oyunu Aç',
 			'en' => 'Open Game',
+			'fr' => 'Ouvrir le jeu',
 			'de' => 'Spiel Öffnen',
 		),
 		'language_label' => array(
 			'tr' => 'Dil',
 			'en' => 'Language',
+			'fr' => 'Langue',
 			'de' => 'Sprache',
 		),
 		'search_label' => array(
 			'tr' => 'Oyun ara',
 			'en' => 'Search games',
+			'fr' => 'Rechercher un jeu',
 			'de' => 'Spiele suchen',
 		),
 		'search_placeholder' => array(
-			'tr' => 'Oyun adi yaz',
+			'tr' => 'Oyun adı yaz',
 			'en' => 'Type a game name',
+			'fr' => 'Écris le nom d’un jeu',
 			'de' => 'Spielname eingeben',
 		),
 		'category_label' => array(
 			'tr' => 'Kategori',
 			'en' => 'Category',
+			'fr' => 'Catégorie',
 			'de' => 'Kategorie',
 		),
 		'sort_label' => array(
-			'tr' => 'Sirala',
+			'tr' => 'Sırala',
 			'en' => 'Sort',
+			'fr' => 'Trier',
 			'de' => 'Sortieren',
 		),
 		'sort_title' => array(
-			'tr' => 'Ada gore',
+			'tr' => 'Ada göre',
 			'en' => 'By name',
+			'fr' => 'Par nom',
 			'de' => 'Nach Name',
 		),
 		'sort_newest' => array(
 			'tr' => 'En yeni',
 			'en' => 'Newest',
-			'de' => 'Neueste',
+			'fr' => 'Les plus récents',
+			'de' => 'Neueste zuerst',
 		),
 		'sort_category' => array(
-			'tr' => 'Kategoriye gore',
+			'tr' => 'Kategoriye göre',
 			'en' => 'By category',
+			'fr' => 'Par catégorie',
 			'de' => 'Nach Kategorie',
 		),
 		'filter_submit' => array(
 			'tr' => 'Filtrele',
 			'en' => 'Filter',
+			'fr' => 'Filtrer',
 			'de' => 'Filtern',
 		),
 		'filter_reset' => array(
 			'tr' => 'Temizle',
 			'en' => 'Clear',
-			'de' => 'Loeschen',
+			'fr' => 'Réinitialiser',
+			'de' => 'Zurücksetzen',
 		),
 		'results_count' => array(
-			'tr' => '%d oyun gosteriliyor',
+			'tr' => '%d oyun gösteriliyor',
 			'en' => 'Showing %d games',
+			'fr' => '%d jeux affichés',
 			'de' => '%d Spiele werden angezeigt',
 		),
 		'play_suffix' => array(
 			'tr' => 'oyna',
 			'en' => 'play',
+			'fr' => 'jouer',
 			'de' => 'spielen',
 		),
 		'language_unavailable' => array(
 			'tr' => 'Bu oyun seçili dilde kullanılamıyor.',
 			'en' => 'This game is not available in the selected language.',
+			'fr' => 'Ce jeu n’est pas disponible dans la langue sélectionnée.',
 			'de' => 'Dieses Spiel ist in der ausgewählten Sprache nicht verfügbar.',
 		),
+	);
+
+	$text['asker_about'] = array(
+		'tr' => 'Askerin Oyunları Hakkında',
+		'en' => 'About Asker’s Games',
+		'fr' => 'À propos des jeux d’Asker',
+		'de' => 'Über Askers Spiele',
 	);
 
 	return isset($text[$key][$lang]) ? $text[$key][$lang] : '';
@@ -993,6 +1033,78 @@ function zo_get_runtime_translation_exact_map($lang) {
 			'Başlat düğmesine bas.' => 'Drücke Starten.',
 			'Başlamak için Başlat düğmesine bas.' => 'Drücke Starten, um zu beginnen.',
 		),
+		'fr' => array(
+			'Start' => 'Démarrer',
+			'Play' => 'Jouer',
+			'Play Again' => 'Rejouer',
+			'Restart' => 'Redémarrer',
+			'Restart Game' => 'Redémarrer le jeu',
+			'Next' => 'Suivant',
+			'Next Round' => 'Manche suivante',
+			'Next Question' => 'Question suivante',
+			'Next Level' => 'Niveau suivant',
+			'Pause' => 'Pause',
+			'Resume' => 'Reprendre',
+			'Refresh' => 'Actualiser',
+			'Submit' => 'Envoyer',
+			'Hint' => 'Indice',
+			'Show Hint' => 'Afficher l’indice',
+			'Score' => 'Score',
+			'Points' => 'Points',
+			'Final Score' => 'Score final',
+			'Best' => 'Meilleur',
+			'Level' => 'Niveau',
+			'Round' => 'Manche',
+			'Stage' => 'Étape',
+			'Time' => 'Temps',
+			'Lives' => 'Vies',
+			'Health' => 'Santé',
+			'Coins' => 'Pièces',
+			'Gold' => 'Or',
+			'Goal' => 'Objectif',
+			'Question' => 'Question',
+			'Correct' => 'Correct',
+			'Wrong' => 'Incorrect',
+			'Game Over' => 'Partie terminée',
+			'GAME OVER' => 'PARTIE TERMINÉE',
+			'You Win' => 'Tu as gagné',
+			'You Win!' => 'Tu as gagné !',
+			'You lost' => 'Tu as perdu',
+			'You Lost' => 'Tu as perdu',
+			'How to Play' => 'Comment jouer',
+			'Rules' => 'Règles',
+			'Move List' => 'Liste des coups',
+			'Round History' => 'Historique des manches',
+			'Make a Move' => 'Jouer un coup',
+			'Press Start.' => 'Appuie sur Démarrer.',
+			'Press Start to begin.' => 'Appuie sur Démarrer pour commencer.',
+			'Press action to begin the challenge.' => 'Appuie sur action pour commencer le défi.',
+			'Correct.' => 'Correct.',
+			'Wrong.' => 'Incorrect.',
+			'Correct!' => 'Correct !',
+			'Wrong!' => 'Incorrect !',
+			'Try again.' => 'Réessaie.',
+			'Time is up.' => 'Le temps est écoulé.',
+			'Time finished.' => 'Le temps est terminé.',
+			'BaÅŸlat' => 'Démarrer',
+			'Oyna' => 'Jouer',
+			'Tekrar Oyna' => 'Rejouer',
+			'Yeniden BaÅŸlat' => 'Redémarrer',
+			'Sonraki' => 'Suivant',
+			'Duraklat' => 'Pause',
+			'Devam Et' => 'Reprendre',
+			'Yenile' => 'Actualiser',
+			'Puan' => 'Score',
+			'Seviye' => 'Niveau',
+			'Tur' => 'Manche',
+			'SÃ¼re' => 'Temps',
+			'Can' => 'Vies',
+			'Hedef' => 'Objectif',
+			'Soru' => 'Question',
+			'DoÄŸru' => 'Correct',
+			'YanlÄ±ÅŸ' => 'Incorrect',
+			'Oyun Bitti' => 'Partie terminée',
+		),
 	);
 
 	return isset($translations[$lang]) ? $translations[$lang] : array();
@@ -1106,6 +1218,46 @@ function zo_get_runtime_translation_replacements($lang) {
 			array('Başlat', 'Starten'),
 			array('Yeniden Başlat', 'Neu starten'),
 		),
+		'fr' => array(
+			array('Final Score', 'Score final'),
+			array('Score', 'Score'),
+			array('Level', 'Niveau'),
+			array('Round', 'Manche'),
+			array('Time', 'Temps'),
+			array('Lives', 'Vies'),
+			array('Health', 'Santé'),
+			array('Coins', 'Pièces'),
+			array('Question', 'Question'),
+			array('Correct', 'Correct'),
+			array('Wrong', 'Incorrect'),
+			array('Game Over', 'Partie terminée'),
+			array('Press Start', 'Appuie sur Démarrer'),
+			array('Press Restart', 'Appuie sur Redémarrer'),
+			array('Press R', 'Appuie sur R'),
+			array('Press Space', 'Appuie sur Espace'),
+			array('Start Quiz', 'Commencer le quiz'),
+			array('Next Question', 'Question suivante'),
+			array('Play Again', 'Rejouer'),
+			array('Try again', 'Réessaie'),
+			array('You found', 'Tu as trouvé'),
+			array('You win', 'Tu as gagné'),
+			array('You Win', 'Tu as gagné'),
+			array('You lost', 'Tu as perdu'),
+			array('Collect', 'Ramasse'),
+			array('Avoid', 'Évite'),
+			array('Move', 'Déplacement'),
+			array('Restart', 'Redémarrer'),
+			array('Start', 'Démarrer'),
+			array('Pause', 'Pause'),
+			array('Resume', 'Reprendre'),
+			array('Puan', 'Score'),
+			array('Seviye', 'Niveau'),
+			array('Tur', 'Manche'),
+			array('Can', 'Vies'),
+			array('Hedef', 'Objectif'),
+			array('Soru', 'Question'),
+			array('Oyun Bitti', 'Partie terminée'),
+		),
 	);
 
 	return isset($phrases[$lang]) ? $phrases[$lang] : array();
@@ -1125,7 +1277,7 @@ function zo_wrap_game_runtime_translator($html, $module, $lang) {
 			$exact[(string) $module['name']] = $title;
 		}
 
-		if (preg_match_all('/(?:^|\|)\s*(TR|EN|DE):\s*([^|]+)/u', isset($meta['name']) ? $meta['name'] : '', $matches)) {
+		if (preg_match_all('/(?:^|\|)\s*(TR|EN|DE|FR):\s*([^|]+)/u', isset($meta['name']) ? $meta['name'] : '', $matches)) {
 			foreach ($matches[2] as $name_part) {
 				$name_part = trim($name_part);
 				if ($name_part !== '') {
@@ -1169,7 +1321,7 @@ function zo_get_localized_text($text, $lang = '') {
 		return '';
 	}
 
-	$labels = array('tr' => 'TR:', 'en' => 'EN:', 'de' => 'DE:');
+	$labels = array('tr' => 'TR:', 'en' => 'EN:', 'de' => 'DE:', 'fr' => 'FR:');
 	$matches = array();
 
 	foreach ($labels as $key => $label) {
@@ -1210,9 +1362,9 @@ function zo_get_localized_text($text, $lang = '') {
 		}
 	}
 
-	$result = isset($parts[$lang]) ? $parts[$lang] : reset($parts);
+	$result = isset($parts[$lang]) ? $parts[$lang] : ($lang === 'fr' && isset($parts['en']) ? $parts['en'] : reset($parts));
 
-	if (is_string($result) && $result !== $text && preg_match('/(?:^|\|)\s*(TR|EN|DE):/i', $result)) {
+	if (is_string($result) && $result !== $text && preg_match('/(?:^|\|)\s*(TR|EN|DE|FR):/i', $result)) {
 		return zo_get_localized_text($result, $lang);
 	}
 
@@ -1686,6 +1838,26 @@ function zo_get_owner_games_url($owner, $lang = '') {
 	$path  = $owner === 'asker' ? '/askerin-oyunlari/' : '/arslanin-oyunlari/';
 
 	return add_query_arg('zo_lang', $lang, home_url($path));
+}
+
+function zo_get_owner_about_url($owner, $lang = '') {
+	$owner = zo_normalize_game_owner($owner);
+	$lang  = array_key_exists($lang, zo_get_language_options()) ? $lang : zo_get_current_language();
+
+	if ($owner !== 'asker') {
+		return '';
+	}
+
+	foreach (array('about-askerin-oyunlari', 'askerin-oyunlari-hakkinda', 'asker-hakkinda') as $path) {
+		$page = get_page_by_path($path);
+
+		if ($page instanceof WP_Post) {
+			$url = get_permalink($page);
+			return is_string($url) && $url !== '' ? add_query_arg('zo_lang', $lang, $url) : '';
+		}
+	}
+
+	return add_query_arg('zo_lang', $lang, home_url('/about-askerin-oyunlari/'));
 }
 
 function zo_resolve_game_slug_for_post($post_id) {
@@ -2953,6 +3125,32 @@ function zo_enqueue_grid_styles() {
 	background: #f9fafb;
 	color: #374151;
 }
+.zo-games-grid__footer {
+	display: flex;
+	justify-content: center;
+	margin: 28px 0 0;
+}
+.zo-games-grid__about {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 46px;
+	max-width: 100%;
+	padding: 0 18px;
+	border-radius: 999px;
+	background: #1d4ed8;
+	color: #fff;
+	font-weight: 700;
+	line-height: 1.25;
+	text-align: center;
+	text-decoration: none;
+}
+.zo-games-grid__about:hover,
+.zo-games-grid__about:focus {
+	background: #1e40af;
+	color: #fff;
+	text-decoration: none;
+}
 .zo-games-grid:empty {
 	display: none;
 }
@@ -2969,6 +3167,89 @@ function zo_enqueue_grid_styles() {
 
 	wp_enqueue_style($handle);
 	wp_enqueue_script('jquery');
+	wp_add_inline_style($handle, $css);
+
+	$done = true;
+}
+
+function zo_enqueue_asker_about_styles() {
+	static $done = false;
+
+	if ($done) {
+		return;
+	}
+
+	$handle = 'zo-shared-styles';
+	$css = '
+.zo-asker-about {
+	width: min(100%, 880px);
+	margin: 0 auto;
+	color: #1f2937;
+	font-family: Arial, sans-serif;
+	font-size: 1.08rem;
+	line-height: 1.7;
+}
+.zo-asker-about-list {
+	display: grid;
+	gap: 34px;
+	width: min(100%, 920px);
+	margin: 0 auto;
+}
+.zo-asker-about-list .zo-asker-about {
+	padding-bottom: 30px;
+	border-bottom: 1px solid #e5e7eb;
+}
+.zo-asker-about-list .zo-asker-about:last-child {
+	border-bottom: 0;
+	padding-bottom: 0;
+}
+.zo-asker-about__lang {
+	margin: 0 0 8px;
+	color: #0f766e;
+	font-size: 0.88rem;
+	font-weight: 800;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+}
+.zo-asker-about h2 {
+	margin: 0 0 14px;
+	color: #111827;
+	font-size: clamp(30px, 5vw, 48px);
+	line-height: 1.1;
+}
+.zo-asker-about p {
+	margin: 0 0 16px;
+}
+.zo-asker-about__intro {
+	color: #374151;
+	font-size: 1.18rem;
+	font-weight: 700;
+}
+.zo-asker-about__button {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 44px;
+	padding: 0 18px;
+	border-radius: 999px;
+	background: #0f766e;
+	color: #fff;
+	font-weight: 700;
+	text-decoration: none;
+}
+.zo-asker-about__button:hover,
+.zo-asker-about__button:focus {
+	background: #115e59;
+	color: #fff;
+	text-decoration: none;
+}
+';
+
+	if (!wp_style_is($handle, 'registered')) {
+		wp_register_style($handle, false, array(), ZO_PLUGIN_VERSION);
+	}
+
+	wp_enqueue_style($handle);
 	wp_add_inline_style($handle, $css);
 
 	$done = true;
@@ -2992,6 +3273,87 @@ function zo_game_shortcode($atts = array()) {
 	return zo_render_game($slug);
 }
 add_shortcode('zeka_oyunu', 'zo_game_shortcode');
+
+function zo_get_asker_about_content($lang = '') {
+	$content = array(
+		'tr' => array(
+			'title' => 'Askerin Oyunları Hakkında',
+			'intro' => 'Askerin Oyunları, Asker tarafından yapay zeka yardımıyla yapılmış tarayıcı oyunlarından oluşur.',
+			'body' => 'Asker fikirlerini oyuna dönüştürmek için yapay zekadan yardım alır; oyunlar da zeka, hafıza, dikkat, refleks ve problem çözme becerilerini çalıştırır. Bazı oyunlar bulmaca gibidir, bazıları hızlı tepki ister, bazıları da hatırlama ve sıralama becerilerini geliştirir.',
+			'note' => 'Oyunlar ücretsizdir ve bilgisayar, tablet veya telefon tarayıcısında oynanabilir. Yeni oyunlar eklendikçe liste büyümeye devam eder.',
+		),
+		'en' => array(
+			'title' => 'About Asker’s Games',
+			'intro' => 'Asker’s Games were made by Asker with help from AI.',
+			'body' => 'Asker uses AI to turn his ideas into browser games that practice thinking, memory, attention, reflexes, and problem solving. Some games feel like puzzles, some need quick reactions, and others train memory and sequencing.',
+			'note' => 'The games are free and can be played in a browser on a computer, tablet, or phone. The list will keep growing as new games are added.',
+		),
+		'de' => array(
+			'title' => 'Über Askers Spiele',
+			'intro' => 'Askers Spiele wurden von Asker mit Hilfe von KI gemacht.',
+			'body' => 'Asker nutzt KI, um seine Ideen in Browserspiele zu verwandeln, die Denken, Gedächtnis, Aufmerksamkeit, Reflexe und Problemlösung üben. Manche Spiele sind Rätsel, manche brauchen schnelle Reaktionen, andere trainieren Gedächtnis und Reihenfolgen.',
+			'note' => 'Die Spiele sind kostenlos und können im Browser auf Computer, Tablet oder Handy gespielt werden. Die Liste wächst weiter, wenn neue Spiele dazukommen.',
+		),
+		'fr' => array(
+			'title' => 'À propos des jeux d’Asker',
+			'intro' => 'Les jeux d’Asker ont été créés par Asker avec l’aide de l’IA.',
+			'body' => 'Asker utilise l’IA pour transformer ses idées en jeux de navigateur qui entraînent la réflexion, la mémoire, l’attention, les réflexes et la résolution de problèmes. Certains jeux ressemblent à des puzzles, certains demandent des réflexes rapides, et d’autres entraînent la mémoire et les suites logiques.',
+			'note' => 'Les jeux sont gratuits et peuvent être joués dans un navigateur sur ordinateur, tablette ou téléphone. La liste continuera de grandir quand de nouveaux jeux seront ajoutés.',
+		),
+	);
+
+	if ($lang === 'all') {
+		return $content;
+	}
+
+	$lang = array_key_exists($lang, zo_get_language_options()) ? $lang : zo_get_current_language();
+
+	return $content[$lang] ?? $content['tr'];
+}
+
+function zo_asker_about_shortcode($atts = array()) {
+	$atts = shortcode_atts(
+		array(
+			'lang' => '',
+		),
+		$atts,
+		'asker_oyunlari_hakkinda'
+	);
+
+	$lang = sanitize_key((string) $atts['lang']);
+	$show_all = $lang === '' || $lang === 'all';
+	$languages = $show_all ? array_keys(zo_get_language_options()) : array($lang);
+	$all_content = zo_get_asker_about_content('all');
+
+	zo_enqueue_asker_about_styles();
+
+	ob_start();
+
+	echo '<div class="zo-asker-about-list">';
+	foreach ($languages as $code) {
+		if (!array_key_exists($code, zo_get_language_options()) || empty($all_content[$code])) {
+			continue;
+		}
+
+		$content = $all_content[$code];
+		$games_url = zo_get_owner_games_url('asker', $code);
+
+		echo '<section class="zo-asker-about" lang="' . esc_attr($code) . '">';
+		echo '<p class="zo-asker-about__lang">' . esc_html(zo_get_language_options()[$code]) . '</p>';
+		echo '<h2>' . esc_html($content['title']) . '</h2>';
+		echo '<p class="zo-asker-about__intro">' . esc_html($content['intro']) . '</p>';
+		echo '<p>' . esc_html($content['body']) . '</p>';
+		echo '<p>' . esc_html($content['note']) . '</p>';
+		if ($games_url !== '') {
+			echo '<p><a class="zo-asker-about__button" href="' . esc_url($games_url) . '">' . esc_html(zo_get_interface_text('open_game', $code)) . '</a></p>';
+		}
+		echo '</section>';
+	}
+	echo '</div>';
+
+	return ob_get_clean();
+}
+add_shortcode('asker_oyunlari_hakkinda', 'zo_asker_about_shortcode');
 
 function zo_games_grid_shortcode($atts = array()) {
 	$atts = shortcode_atts(
@@ -3235,6 +3597,16 @@ function zo_games_grid_shortcode($atts = array()) {
 
 	if (!$has_results) {
 		echo '<p class="zo-games-grid__empty">Filtreye uyan oyun bulunamadı.</p>';
+	}
+
+	if ($author_filter === 'asker') {
+		$about_url = zo_get_owner_about_url('asker', $language);
+
+		if ($about_url !== '') {
+			echo '<div class="zo-games-grid__footer">';
+			echo '<a class="zo-games-grid__about" href="' . esc_url($about_url) . '">' . esc_html(zo_get_interface_text('asker_about', $language)) . '</a>';
+			echo '</div>';
+		}
 	}
 
 	echo '</div>';
