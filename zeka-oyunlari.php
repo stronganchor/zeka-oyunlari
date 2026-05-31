@@ -49,19 +49,19 @@ function zo_get_shortcode_logo_css() {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: clamp(44px, 5vw, 72px);
+	width: clamp(62px, 7vw, 96px);
 	aspect-ratio: 1;
-	border-radius: 14px;
-	background: rgba(255, 255, 255, 0.88);
-	box-shadow: 0 8px 22px rgba(15, 23, 42, 0.14);
+	border-radius: 18px;
+	background: rgba(255, 255, 255, 0.72);
+	box-shadow: 0 8px 20px rgba(15, 23, 42, 0.1);
 	line-height: 0;
 	text-decoration: none;
 }
 
 .zo-shortcode-logo img {
 	display: block;
-	width: 78%;
-	height: 78%;
+	width: 94%;
+	height: 94%;
 	object-fit: contain;
 }
 
@@ -83,8 +83,8 @@ function zo_get_shortcode_logo_css() {
 	.zo-shortcode-logo {
 		top: 8px;
 		right: 8px;
-		width: 46px;
-		border-radius: 12px;
+		width: 58px;
+		border-radius: 14px;
 	}
 
 	.zo-games-grid__toolbar,
@@ -4863,6 +4863,100 @@ function zo_get_runtime_translation_exact_map($lang) {
 		}
 	}
 
+	$sitewide_runtime_exact_followup = array(
+		'tr' => array(
+			'Notes: On' => 'Notlar: Acik',
+			'Notes: Off' => 'Notlar: Kapali',
+			'Corner' => 'Korner',
+			'Decision' => 'Karar',
+			'Live' => 'Canli',
+			'Smart' => 'Akilli',
+			'Corners' => 'Kornerler',
+			'Medicine Question' => 'Saglik sorusu',
+			'Ask a Clarifying Question' => 'Aciklayici soru sor',
+			'Ask One Question' => 'Bir soru sor',
+			'Choose the correct country name.' => 'Dogru ulke adini sec.',
+			'Doğru ülke adını seç.' => 'Dogru ulke adini sec.',
+			'Find numbers that are perfect squares.' => 'Tam kare olan sayilari bul.',
+			'Prime numbers are greater than 1 and divisible only by 1 and themselves. For example, 7 is prime because no number other than 1 and 7 divides it evenly.' => 'Asal sayilar 1den buyuktur ve yalnizca 1e ve kendisine bolunur. Ornegin 7 asaldir, cunku 1 ve 7 disinda hicbir sayi onu tam bolmez.',
+			'Target Shooting' => 'Hedef vurma',
+			'Tower Defense Paths' => 'Kule savunma yollari',
+			'Zombie Garden Defense' => 'Zombi bahce savunmasi',
+			'Dragon Egg Defense' => 'Ejderha yumurtasi savunmasi',
+		),
+		'de' => array(
+			'Notes: On' => 'Notizen: An',
+			'Notes: Off' => 'Notizen: Aus',
+			'Corner' => 'Ecke',
+			'Decision' => 'Entscheidung',
+			'Live' => 'Live',
+			'Smart' => 'Klug',
+			'Corners' => 'Ecken',
+			'Medicine Question' => 'Medizinfrage',
+			'Ask a Clarifying Question' => 'Klarende Frage stellen',
+			'Ask One Question' => 'Eine Frage stellen',
+			'Choose the correct country name.' => 'Wahle den richtigen Landernamen.',
+			'Doğru ülke adını seç.' => 'Wahle den richtigen Landernamen.',
+			'Find numbers that are perfect squares.' => 'Finde Zahlen, die Quadratzahlen sind.',
+			'Prime numbers are greater than 1 and divisible only by 1 and themselves. For example, 7 is prime because no number other than 1 and 7 divides it evenly.' => 'Primzahlen sind grosser als 1 und nur durch 1 und sich selbst teilbar. Zum Beispiel ist 7 prim, weil keine Zahl ausser 1 und 7 sie glatt teilt.',
+			'Target Shooting' => 'Zielschiessen',
+			'Tower Defense Paths' => 'Tower-Defense-Wege',
+			'Zombie Garden Defense' => 'Zombie-Gartenverteidigung',
+			'Dragon Egg Defense' => 'Drachenei-Verteidigung',
+		),
+		'fr' => array(
+			'Notes: On' => 'Notes : activees',
+			'Notes: Off' => 'Notes : desactivees',
+			'Corner' => 'Corner',
+			'Decision' => 'Decision',
+			'Live' => 'En direct',
+			'Smart' => 'Intelligent',
+			'Corners' => 'Corners',
+			'Medicine Question' => 'Question de sante',
+			'Ask a Clarifying Question' => 'Poser une question de clarification',
+			'Ask One Question' => 'Poser une question',
+			'Choose the correct country name.' => 'Choisis le bon nom de pays.',
+			'Doğru ülke adını seç.' => 'Choisis le bon nom de pays.',
+			'Find numbers that are perfect squares.' => 'Trouve les nombres qui sont des carres parfaits.',
+			'Prime numbers are greater than 1 and divisible only by 1 and themselves. For example, 7 is prime because no number other than 1 and 7 divides it evenly.' => 'Les nombres premiers sont superieurs a 1 et divisibles seulement par 1 et par eux-memes. Par exemple, 7 est premier car aucun nombre sauf 1 et 7 ne le divise exactement.',
+			'Target Shooting' => 'Tir sur cible',
+			'Tower Defense Paths' => 'Chemins de defense de tours',
+			'Zombie Garden Defense' => 'Defense du jardin zombie',
+			'Dragon Egg Defense' => 'Defense de l oeuf de dragon',
+		),
+		'es-mx' => array(
+			'Notes: On' => 'Notas: activadas',
+			'Notes: Off' => 'Notas: desactivadas',
+			'Corner' => 'Tiro de esquina',
+			'Decision' => 'Decision',
+			'Live' => 'En vivo',
+			'Smart' => 'Inteligente',
+			'Corners' => 'Tiros de esquina',
+			'Medicine Question' => 'Pregunta de medicina',
+			'Ask a Clarifying Question' => 'Haz una pregunta aclaratoria',
+			'Ask One Question' => 'Haz una pregunta',
+			'Choose the correct country name.' => 'Elige el nombre correcto del pais.',
+			'Doğru ülke adını seç.' => 'Elige el nombre correcto del pais.',
+			'Find numbers that are perfect squares.' => 'Encuentra numeros que sean cuadrados perfectos.',
+			'Prime numbers are greater than 1 and divisible only by 1 and themselves. For example, 7 is prime because no number other than 1 and 7 divides it evenly.' => 'Los numeros primos son mayores que 1 y solo se dividen entre 1 y ellos mismos. Por ejemplo, 7 es primo porque ningun numero excepto 1 y 7 lo divide exactamente.',
+			'Target Shooting' => 'Tiro al blanco',
+			'Tower Defense Paths' => 'Caminos de defensa de torres',
+			'Zombie Garden Defense' => 'Defensa del jardin zombie',
+			'Dragon Egg Defense' => 'Defensa del huevo de dragon',
+		),
+	);
+	$sitewide_runtime_exact_followup['es-es'] = array_merge($sitewide_runtime_exact_followup['es-mx'], array(
+		'Corner' => 'Saque de esquina',
+		'Corners' => 'Saques de esquina',
+		'Medicine Question' => 'Pregunta de medicina',
+	));
+
+	foreach ($sitewide_runtime_exact_followup as $followup_lang => $followup_items) {
+		if (isset($translations[$followup_lang])) {
+			$translations[$followup_lang] = array_merge($translations[$followup_lang], $followup_items);
+		}
+	}
+
 	foreach ($agent_runtime_exact as $agent_lang => $agent_items) {
 		if (isset($translations[$agent_lang])) {
 			$translations[$agent_lang] = array_merge($translations[$agent_lang], $agent_items);
@@ -5495,6 +5589,87 @@ function zo_get_runtime_translation_replacements($lang) {
 	$agent_replacements_more['es-es'] = array_merge($agent_replacements_more['es-mx'], array(
 		array('Computer', 'Ordenador'),
 	));
+
+	$agent_replacements_followup = array(
+		'tr' => array(
+			array('Digit sum = ', 'Rakam toplami = '),
+			array('is a perfect square.', 'tam karedir.'),
+			array('is not a perfect square.', 'tam kare degildir.'),
+			array('is prime.', 'asaldir.'),
+			array('is not prime.', 'asal degildir.'),
+			array('Incorrect. Digit sum = ', 'Yanlis. Rakam toplami = '),
+			array('Incorrect. ', 'Yanlis. '),
+			array('Which country has the capital ', 'Hangi ulkenin baskenti '),
+			array('What is the capital of ', 'Baskenti hangi sehir: '),
+			array(' is in which continent?', ' hangi kitadadir?'),
+			array('What is the currency of ', 'Para birimi nedir: '),
+			array('Which country uses ', 'Hangi ulke sunu kullanir: '),
+			array('What language is mainly spoken in ', 'Hangi dil yaygin konusulur: '),
+			array('Which country is linked with the ', 'Hangi ulke su dille iliskilidir: '),
+			array(' language?', ' dili?'),
+		),
+		'de' => array(
+			array('Digit sum = ', 'Quersumme = '),
+			array('is a perfect square.', 'ist eine Quadratzahl.'),
+			array('is not a perfect square.', 'ist keine Quadratzahl.'),
+			array('is prime.', 'ist eine Primzahl.'),
+			array('is not prime.', 'ist keine Primzahl.'),
+			array('Incorrect. Digit sum = ', 'Falsch. Quersumme = '),
+			array('Incorrect. ', 'Falsch. '),
+			array('Which country has the capital ', 'Welches Land hat die Hauptstadt '),
+			array('What is the capital of ', 'Was ist die Hauptstadt von '),
+			array(' is in which continent?', ' liegt auf welchem Kontinent?'),
+			array('What is the currency of ', 'Was ist die Wahrung von '),
+			array('Which country uses ', 'Welches Land verwendet '),
+			array('What language is mainly spoken in ', 'Welche Sprache wird hauptsachlich gesprochen in '),
+			array('Which country is linked with the ', 'Welches Land ist mit der Sprache '),
+			array(' language?', ' verbunden?'),
+		),
+		'fr' => array(
+			array('Digit sum = ', 'Somme des chiffres = '),
+			array('is a perfect square.', 'est un carre parfait.'),
+			array('is not a perfect square.', 'n est pas un carre parfait.'),
+			array('is prime.', 'est premier.'),
+			array('is not prime.', 'n est pas premier.'),
+			array('Incorrect. Digit sum = ', 'Incorrect. Somme des chiffres = '),
+			array('Incorrect. ', 'Incorrect. '),
+			array('Which country has the capital ', 'Quel pays a pour capitale '),
+			array('What is the capital of ', 'Quelle est la capitale de '),
+			array(' is in which continent?', ' est sur quel continent ?'),
+			array('What is the currency of ', 'Quelle est la monnaie de '),
+			array('Which country uses ', 'Quel pays utilise '),
+			array('What language is mainly spoken in ', 'Quelle langue est principalement parlee en '),
+			array('Which country is linked with the ', 'Quel pays est lie a la langue '),
+			array(' language?', ' ?'),
+		),
+		'es-mx' => array(
+			array('Digit sum = ', 'Suma de digitos = '),
+			array('is a perfect square.', 'es un cuadrado perfecto.'),
+			array('is not a perfect square.', 'no es un cuadrado perfecto.'),
+			array('is prime.', 'es primo.'),
+			array('is not prime.', 'no es primo.'),
+			array('Incorrect. Digit sum = ', 'Incorrecto. Suma de digitos = '),
+			array('Incorrect. ', 'Incorrecto. '),
+			array('Which country has the capital ', 'Que pais tiene la capital '),
+			array('What is the capital of ', 'Cual es la capital de '),
+			array(' is in which continent?', ' esta en que continente?'),
+			array('What is the currency of ', 'Cual es la moneda de '),
+			array('Which country uses ', 'Que pais usa '),
+			array('What language is mainly spoken in ', 'Que idioma se habla principalmente en '),
+			array('Which country is linked with the ', 'Que pais esta relacionado con el idioma '),
+			array(' language?', '?'),
+		),
+	);
+	$agent_replacements_followup['es-es'] = array_merge($agent_replacements_followup['es-mx'], array(
+		array('Which country has the capital ', 'Que pais tiene como capital '),
+		array('Which country uses ', 'Que pais utiliza '),
+	));
+
+	foreach ($agent_replacements_followup as $followup_rep_lang => $followup_rep_items) {
+		if (isset($common_replacements[$followup_rep_lang])) {
+			$common_replacements[$followup_rep_lang] = array_merge($followup_rep_items, $common_replacements[$followup_rep_lang]);
+		}
+	}
 
 	foreach ($agent_replacements_more as $agent_rep_lang => $agent_rep_items) {
 		if (isset($common_replacements[$agent_rep_lang])) {
