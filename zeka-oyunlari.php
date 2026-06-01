@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.4.85.asker.arslan
+ * Version: 1.4.86.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -51,9 +51,9 @@ function zo_get_shortcode_logo_css() {
 	justify-content: center;
 	width: clamp(62px, 7vw, 96px);
 	aspect-ratio: 1;
-	border-radius: 18px;
-	background: rgba(255, 255, 255, 0.72);
-	box-shadow: 0 8px 20px rgba(15, 23, 42, 0.1);
+	border-radius: 0;
+	background: transparent;
+	box-shadow: none;
 	line-height: 0;
 	text-decoration: none;
 }
@@ -67,10 +67,9 @@ function zo_get_shortcode_logo_css() {
 
 .zo-shortcode-logo:hover,
 .zo-shortcode-logo:focus {
-	background: #fff;
-	box-shadow: 0 10px 28px rgba(15, 23, 42, 0.18);
-	outline: 2px solid rgba(15, 118, 110, 0.28);
-	outline-offset: 3px;
+	background: transparent;
+	box-shadow: none;
+	outline: none;
 }
 
 .zo-games-grid__toolbar,
@@ -84,7 +83,7 @@ function zo_get_shortcode_logo_css() {
 		top: 8px;
 		right: 8px;
 		width: 58px;
-		border-radius: 14px;
+		border-radius: 0;
 	}
 
 	.zo-games-grid__toolbar,
@@ -6995,7 +6994,7 @@ function zo_get_input_blocker_css() {
 .zo-game-root {
 	-webkit-tap-highlight-color: transparent;
 	-webkit-touch-callout: none;
-	overscroll-behavior: contain;
+	overscroll-behavior: auto;
 	touch-action: pan-y pinch-zoom;
 	user-select: none;
 	-webkit-user-drag: none;
@@ -7022,6 +7021,49 @@ function zo_get_input_blocker_css() {
 .zo-game-root [contenteditable="true"] {
 	touch-action: manipulation;
 	user-select: text;
+}
+
+@media (max-width: 768px) {
+	html,
+	body {
+		overscroll-behavior-y: auto;
+		-webkit-overflow-scrolling: touch;
+	}
+
+	.zo-shortcode-frame,
+	.zo-game-shell,
+	.zo-game-root {
+		max-width: 100%;
+		overflow-x: auto !important;
+		overflow-y: visible !important;
+		-webkit-overflow-scrolling: touch;
+		overscroll-behavior-y: auto !important;
+		touch-action: pan-y pinch-zoom !important;
+	}
+
+	.zo-game-shell button,
+	.zo-game-shell a,
+	.zo-game-shell input,
+	.zo-game-shell textarea,
+	.zo-game-shell select,
+	.zo-game-root button,
+	.zo-game-root a,
+	.zo-game-root input,
+	.zo-game-root textarea,
+	.zo-game-root select {
+		touch-action: manipulation;
+	}
+
+	.zo-game-shell canvas,
+	.zo-game-root canvas,
+	.zo-game-shell svg,
+	.zo-game-root svg,
+	.zo-game-shell [role="application"],
+	.zo-game-root [role="application"],
+	.zo-game-shell [data-zo-game-board],
+	.zo-game-root [data-zo-game-board] {
+		touch-action: pan-y pinch-zoom !important;
+	}
 }
 ';
 }
@@ -7984,6 +8026,7 @@ function zo_enqueue_asker_about_styles() {
 	color: #fff;
 	text-decoration: none;
 }
+.zo-asker-about__actions,
 .zo-site-about__actions {
 	display: flex;
 	flex-wrap: wrap;
@@ -8164,6 +8207,7 @@ function zo_asker_about_shortcode($atts = array()) {
 
 		$content = $all_content[$code];
 		$games_url = zo_get_owner_games_url('asker', $code);
+		$home_url = add_query_arg('zo_lang', $code, home_url('/'));
 
 		echo '<section class="zo-asker-about" id="zo-asker-about-' . esc_attr($code) . '" lang="' . esc_attr($code) . '">';
 		echo '<p class="zo-asker-about__lang">' . esc_html(zo_get_language_options()[$code]) . '</p>';
@@ -8171,9 +8215,12 @@ function zo_asker_about_shortcode($atts = array()) {
 		echo '<p class="zo-asker-about__intro">' . esc_html($content['intro']) . '</p>';
 		echo '<p>' . esc_html($content['body']) . '</p>';
 		echo '<p>' . esc_html($content['note']) . '</p>';
+		echo '<div class="zo-asker-about__actions">';
 		if ($games_url !== '') {
-			echo '<p><a class="zo-asker-about__button" href="' . esc_url($games_url) . '">' . esc_html(zo_get_interface_text('asker_games_link', $code)) . '</a></p>';
+			echo '<a class="zo-asker-about__button" href="' . esc_url($games_url) . '">' . esc_html(zo_get_interface_text('asker_games_link', $code)) . '</a>';
 		}
+		echo '<a class="zo-asker-about__button" href="' . esc_url($home_url) . '">' . esc_html(zo_get_interface_text('home', $code)) . '</a>';
+		echo '</div>';
 		echo '</section>';
 	}
 	echo '</div>';
@@ -8272,6 +8319,7 @@ function zo_site_about_shortcode($atts = array()) {
 		$content = $all_content[$code];
 		$asker_url = zo_get_owner_games_url('asker', $code);
 		$arslan_url = zo_get_owner_games_url('arslan', $code);
+		$home_url = add_query_arg('zo_lang', $code, home_url('/'));
 
 		echo '<section class="zo-site-about" id="zo-site-about-' . esc_attr($code) . '" lang="' . esc_attr($code) . '">';
 		echo '<p class="zo-site-about__lang">' . esc_html(zo_get_language_options()[$code]) . '</p>';
@@ -8282,6 +8330,7 @@ function zo_site_about_shortcode($atts = array()) {
 		echo '<div class="zo-site-about__actions">';
 		echo '<a class="zo-site-about__button" href="' . esc_url($asker_url) . '">' . esc_html(zo_get_interface_text('asker_games_title', $code)) . '</a>';
 		echo '<a class="zo-site-about__button" href="' . esc_url($arslan_url) . '">' . esc_html(zo_get_interface_text('arslan_games_title', $code)) . '</a>';
+		echo '<a class="zo-site-about__button" href="' . esc_url($home_url) . '">' . esc_html(zo_get_interface_text('home', $code)) . '</a>';
 		echo '</div>';
 		echo '</section>';
 	}
