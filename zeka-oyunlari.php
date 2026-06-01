@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.4.87.asker.arslan
+ * Version: 1.4.89.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -7567,6 +7567,33 @@ function zo_enqueue_grid_styles() {
 	align-items: center;
 	margin: 0 0 20px;
 }
+.zo-games-grid__search-toggle {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 64px;
+	height: 64px;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	cursor: pointer;
+}
+.zo-games-grid__search-toggle img {
+	display: block;
+	width: 56px;
+	height: 56px;
+	object-fit: contain;
+	pointer-events: none;
+}
+.zo-games-grid__search-toggle:hover,
+.zo-games-grid__search-toggle:focus {
+	background: transparent;
+}
+.zo-games-grid__search-toggle:focus-visible {
+	outline: 3px solid #1d4ed8;
+	outline-offset: 4px;
+	border-radius: 12px;
+}
 .zo-games-grid__filters {
 	display: grid;
 	width: 100%;
@@ -7574,6 +7601,9 @@ function zo_enqueue_grid_styles() {
 	gap: 10px;
 	align-items: end;
 	margin: 0 0 18px;
+}
+.zo-games-grid__filters[hidden] {
+	display: none !important;
 }
 .zo-games-grid__field {
 	display: flex;
@@ -8363,6 +8393,7 @@ function zo_games_grid_shortcode($atts = array()) {
 	$sort             = isset($_GET['zo_game_sort']) && is_string($_GET['zo_game_sort']) ? sanitize_key(wp_unslash($_GET['zo_game_sort'])) : 'title';
 	$category_options = zo_get_game_category_options();
 	$sort_options     = array('title', 'newest', 'category');
+	$filters_open     = false;
 
 	if ($limit === 0) {
 		return '';
@@ -8376,6 +8407,8 @@ function zo_games_grid_shortcode($atts = array()) {
 		$sort = 'title';
 	}
 
+	$filters_open = $search_query !== '' || $category_filter !== 'all' || $sort !== 'title';
+
 	if (empty($modules)) {
 		return '<p class="zo-games-grid__empty">Henüz oyun bulunamadı.</p>';
 	}
@@ -8384,6 +8417,7 @@ function zo_games_grid_shortcode($atts = array()) {
 
 	$posts_by_slug = zo_get_game_posts_by_slug();
 	$home_url      = home_url('/');
+	$filters_id    = 'zo-games-grid-filters-' . wp_rand(1000, 999999);
 
 	if (!is_front_page() && !is_home() && is_string($home_url) && $home_url !== '') {
 		$show_home_button = true;
@@ -8397,6 +8431,9 @@ function zo_games_grid_shortcode($atts = array()) {
 	echo zo_get_shortcode_logo_html('games-grid');
 
 	echo '<div class="zo-games-grid__toolbar">';
+	echo '<button class="zo-games-grid__search-toggle" type="button" aria-label="' . esc_attr(zo_get_interface_text('search_label', $language)) . '" aria-controls="' . esc_attr($filters_id) . '" aria-expanded="' . ($filters_open ? 'true' : 'false') . '" data-zo-games-search-toggle>';
+	echo '<img src="' . esc_url(ZO_PLUGIN_URL . 'zeka.com%20search.png') . '" alt="" loading="lazy" decoding="async">';
+	echo '</button>';
 
 	if ($show_home_button) {
 		echo '<a class="zo-games-grid__home" href="' . esc_url(add_query_arg('zo_lang', $language, $home_url)) . '">' . esc_html(zo_get_interface_text('home', $language)) . '</a>';
@@ -8414,7 +8451,7 @@ function zo_games_grid_shortcode($atts = array()) {
 	echo '</div>';
 
 	$filter_action = remove_query_arg(array('zo_game_search', 'zo_game_category', 'zo_game_sort', 'zo_lang', 'paged'));
-	echo '<form class="zo-games-grid__filters" method="get" action="' . esc_url($filter_action) . '">';
+	echo '<form id="' . esc_attr($filters_id) . '" class="zo-games-grid__filters" method="get" action="' . esc_url($filter_action) . '"' . ($filters_open ? '' : ' hidden') . ' data-zo-games-search-panel>';
 	echo '<input type="hidden" name="zo_lang" value="' . esc_attr($language) . '">';
 	echo '<div class="zo-games-grid__field">';
 	echo '<label for="zo-game-search">' . esc_html(zo_get_interface_text('search_label', $language)) . '</label>';
@@ -8439,6 +8476,7 @@ function zo_games_grid_shortcode($atts = array()) {
 	echo '<button class="zo-games-grid__filter-button" type="submit">' . esc_html(zo_get_interface_text('filter_submit', $language)) . '</button>';
 	echo '<a class="zo-games-grid__reset" href="' . esc_url(add_query_arg('zo_lang', $language, remove_query_arg(array('zo_game_search', 'zo_game_category', 'zo_game_sort', 'zo_lang', 'paged')))) . '">' . esc_html(zo_get_interface_text('filter_reset', $language)) . '</a>';
 	echo '</form>';
+	echo '<script>(function(){var script=document.currentScript;var wrap=script&&script.closest(".zo-games-grid-wrap");if(!wrap){return;}var button=wrap.querySelector("[data-zo-games-search-toggle]");var panel=wrap.querySelector("[data-zo-games-search-panel]");var input=wrap.querySelector("#zo-game-search");if(!button||!panel){return;}button.addEventListener("click",function(){var willOpen=panel.hasAttribute("hidden");if(willOpen){panel.removeAttribute("hidden");button.setAttribute("aria-expanded","true");if(input){window.setTimeout(function(){input.focus();},0);}}else{panel.setAttribute("hidden","");button.setAttribute("aria-expanded","false");}});})();</script>';
 
 	echo '<p class="zo-games-grid__intro">' . esc_html(zo_get_interface_text('intro', $language)) . '</p>';
 
