@@ -69,9 +69,46 @@ if (function_exists('zo_get_localized_text')) {
 $seo_keywords = function_exists('zo_get_interface_text') ? zo_get_interface_text('intro', $language) : '';
 $play_suffix = function_exists('zo_get_interface_text') ? zo_get_interface_text('play_suffix', $language) : 'oyna';
 $seo_description = trim($page_title . ' ' . $play_suffix . '. ' . $seo_keywords);
+$game_category = 'puzzle';
+$game_category_label = '';
+$difficulty_key = 'medium';
+$difficulty_label = '';
+$related_games = array();
+$feedback_url = '';
+$search_url = add_query_arg('zo_lang', $language, home_url('/'));
+$asset_base_url = defined('ZO_PLUGIN_URL') ? ZO_PLUGIN_URL : plugins_url('', dirname(__FILE__)) . '/';
 
 if ($module_description !== '') {
 	$seo_description = trim($page_title . ' ' . $play_suffix . '. ' . $module_description . ' ' . $seo_keywords);
+}
+
+if (function_exists('zo_get_localized_game_display_metadata')) {
+	$localized_metadata = zo_get_localized_game_display_metadata($module, $language);
+
+	if (is_array($localized_metadata)) {
+		$game_category = !empty($localized_metadata['category_key']) ? (string) $localized_metadata['category_key'] : $game_category;
+		$game_category_label = !empty($localized_metadata['category_label']) ? (string) $localized_metadata['category_label'] : '';
+	}
+}
+
+if ($game_category_label === '' && function_exists('zo_get_game_category_label')) {
+	$game_category_label = zo_get_game_category_label($game_category, $language);
+}
+
+if (function_exists('zo_get_game_difficulty_key')) {
+	$difficulty_key = zo_get_game_difficulty_key($module, $game_category);
+}
+
+if (function_exists('zo_get_game_difficulty_label')) {
+	$difficulty_label = zo_get_game_difficulty_label($module, $game_category, $language);
+}
+
+if (function_exists('zo_get_related_game_items')) {
+	$related_games = zo_get_related_game_items($slug, $language, 4);
+}
+
+if (in_array($language, array('tr', 'en'), true) && function_exists('zo_get_game_feedback_url')) {
+	$feedback_url = zo_get_game_feedback_url($slug, $page_title, $language);
 }
 ?>
 <!doctype html>
@@ -102,9 +139,58 @@ if ($module_description !== '') {
 		}
 
 		.zo-game-page__header {
+			position: sticky;
+			top: 0;
+			z-index: 20;
 			display: flex;
 			align-items: center;
+			justify-content: space-between;
+			gap: 14px;
 			padding: 18px 20px;
+			background: rgba(15, 23, 42, 0.94);
+			backdrop-filter: blur(12px);
+		}
+
+		.zo-game-page__brand {
+			display: inline-flex;
+			align-items: center;
+			width: 58px;
+			height: 58px;
+			text-decoration: none;
+		}
+
+		.zo-game-page__brand img {
+			display: block;
+			width: 100%;
+			height: 100%;
+			object-fit: contain;
+		}
+
+		.zo-game-page__nav {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 10px;
+			align-items: center;
+			justify-content: flex-end;
+		}
+
+		.zo-game-page__search {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 46px;
+			height: 46px;
+			border-radius: 999px;
+			background: #fff;
+			text-decoration: none;
+			box-shadow: 0 10px 30px rgba(15, 23, 42, 0.22);
+		}
+
+		.zo-game-page__search img {
+			display: block;
+			width: 32px;
+			height: 32px;
+			object-fit: contain;
 		}
 
 		.zo-game-page__back {
@@ -125,6 +211,35 @@ if ($module_description !== '') {
 			background: #115e59;
 			color: #fff;
 			text-decoration: none;
+		}
+
+		.zo-game-page__language {
+			display: inline-flex;
+			gap: 6px;
+			align-items: center;
+		}
+
+		.zo-game-page__language-option {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			min-width: 38px;
+			min-height: 36px;
+			padding: 0 10px;
+			border: 1px solid rgba(203, 213, 225, 0.52);
+			border-radius: 999px;
+			background: rgba(255, 255, 255, 0.1);
+			color: #f8fafc;
+			font-family: Arial, sans-serif;
+			font-size: 0.82rem;
+			font-weight: 800;
+			text-decoration: none;
+		}
+
+		.zo-game-page__language-option.is-active {
+			background: #1d4ed8;
+			border-color: #1d4ed8;
+			color: #fff;
 		}
 
 		.zo-game-page__main {
@@ -156,6 +271,44 @@ if ($module_description !== '') {
 			line-height: 1.55;
 		}
 
+		.zo-game-page__tags {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 8px;
+			margin: 12px 0 0;
+			font-family: Arial, sans-serif;
+		}
+
+		.zo-game-page__tag {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			min-height: 32px;
+			padding: 0 11px;
+			border-radius: 999px;
+			background: rgba(255, 255, 255, 0.1);
+			color: #f8fafc;
+			font-size: 0.86rem;
+			font-weight: 800;
+		}
+
+		.zo-game-page__tag--difficulty {
+			background: #0f766e;
+			color: #fff;
+		}
+
+		.zo-game-page__feedback {
+			display: inline-flex;
+			width: fit-content;
+			max-width: 100%;
+			margin-top: 12px;
+			color: #bfdbfe;
+			font-family: Arial, sans-serif;
+			font-weight: 800;
+			text-decoration: underline;
+			text-underline-offset: 3px;
+		}
+
 		.zo-game-page__stage {
 			flex: 1 1 auto;
 			width: min(100%, 1400px);
@@ -176,9 +329,101 @@ if ($module_description !== '') {
 			min-height: calc(100vh - 110px);
 		}
 
+		.zo-game-page__related {
+			width: min(100%, 1400px);
+			margin: 24px auto 0;
+			font-family: Arial, sans-serif;
+		}
+
+		.zo-game-page__related-title {
+			margin: 0 0 14px;
+			color: #f8fafc;
+			font-size: 1.35rem;
+			line-height: 1.2;
+		}
+
+		.zo-game-page__related-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+			gap: 14px;
+		}
+
+		.zo-game-page__related-card {
+			display: flex;
+			flex-direction: column;
+			gap: 8px;
+			min-height: 100%;
+			padding: 14px;
+			border: 1px solid rgba(203, 213, 225, 0.22);
+			border-radius: 14px;
+			background: rgba(255, 255, 255, 0.08);
+			color: #e2e8f0;
+			text-decoration: none;
+		}
+
+		.zo-game-page__related-card:hover,
+		.zo-game-page__related-card:focus {
+			border-color: rgba(191, 219, 254, 0.7);
+			background: rgba(255, 255, 255, 0.12);
+			color: #fff;
+			text-decoration: none;
+		}
+
+		.zo-game-page__related-category {
+			color: #bfdbfe;
+			font-size: 0.78rem;
+			font-weight: 800;
+			text-transform: uppercase;
+		}
+
+		.zo-game-page__related-name {
+			color: inherit;
+			font-size: 1rem;
+			font-weight: 900;
+			line-height: 1.25;
+		}
+
+		.zo-game-page__related-description {
+			color: #cbd5e1;
+			font-size: 0.9rem;
+			line-height: 1.45;
+		}
+
 		@media (max-width: 640px) {
 			.zo-game-page__header {
 				padding: 14px 14px 8px;
+				align-items: center;
+			}
+
+			.zo-game-page__brand {
+				width: 46px;
+				height: 46px;
+			}
+
+			.zo-game-page__nav {
+				gap: 7px;
+			}
+
+			.zo-game-page__back {
+				min-height: 38px;
+				padding: 0 12px;
+				font-size: 0.9rem;
+			}
+
+			.zo-game-page__search {
+				width: 40px;
+				height: 40px;
+			}
+
+			.zo-game-page__search img {
+				width: 28px;
+				height: 28px;
+			}
+
+			.zo-game-page__language-option {
+				min-width: 34px;
+				min-height: 32px;
+				padding: 0 8px;
 			}
 
 			.zo-game-page__main {
@@ -208,7 +453,20 @@ if ($module_description !== '') {
 <body>
 	<div class="zo-game-page">
 		<header class="zo-game-page__header">
+			<a class="zo-game-page__brand" href="<?php echo esc_url($back_url); ?>" aria-label="<?php echo esc_attr($site_name ? $site_name : 'zeka.com'); ?>">
+				<img src="<?php echo esc_url($asset_base_url . 'zeka-logo.png'); ?>" alt="">
+			</a>
+			<nav class="zo-game-page__nav" aria-label="<?php echo esc_attr(function_exists('zo_get_interface_text') ? zo_get_interface_text('language_label', $language) : 'Language'); ?>">
+				<a class="zo-game-page__search" href="<?php echo esc_url($search_url); ?>" aria-label="<?php echo esc_attr(function_exists('zo_get_interface_text') ? zo_get_interface_text('search_label', $language) : 'Search games'); ?>">
+					<img src="<?php echo esc_url($asset_base_url . 'zeka.com%20search.png'); ?>" alt="">
+				</a>
 			<a class="zo-game-page__back" href="<?php echo esc_url($back_url); ?>"><?php echo esc_html(function_exists('zo_get_interface_text') ? zo_get_interface_text('home', $language) : 'Geri Dön'); ?></a>
+				<div class="zo-game-page__language">
+					<?php foreach ((function_exists('zo_get_language_options') ? zo_get_language_options() : array('tr' => 'TR', 'en' => 'EN')) as $code => $label) : ?>
+						<a class="zo-game-page__language-option<?php echo $code === $language ? ' is-active' : ''; ?>" href="<?php echo esc_url(add_query_arg('zo_lang', $code)); ?>"><?php echo esc_html($label); ?></a>
+					<?php endforeach; ?>
+				</div>
+			</nav>
 		</header>
 		<main class="zo-game-page__main">
 			<div class="zo-game-page__meta">
@@ -216,10 +474,37 @@ if ($module_description !== '') {
 				<?php if ($module_description !== '') : ?>
 				<p class="zo-game-page__description"><?php echo esc_html($module_description); ?></p>
 				<?php endif; ?>
+				<div class="zo-game-page__tags">
+					<?php if ($game_category_label !== '') : ?>
+					<span class="zo-game-page__tag"><?php echo esc_html($game_category_label); ?></span>
+					<?php endif; ?>
+					<?php if ($difficulty_label !== '') : ?>
+					<span class="zo-game-page__tag zo-game-page__tag--difficulty"><?php echo esc_html((function_exists('zo_get_interface_text') ? zo_get_interface_text('difficulty_label', $language) : 'Difficulty') . ': ' . $difficulty_label); ?></span>
+					<?php endif; ?>
+				</div>
+				<?php if ($feedback_url !== '') : ?>
+				<a class="zo-game-page__feedback" href="<?php echo esc_url($feedback_url); ?>" target="_blank" rel="noopener"><?php echo esc_html(function_exists('zo_get_interface_text') ? zo_get_interface_text('game_feedback', $language) : 'Report a problem or suggest an improvement'); ?></a>
+				<?php endif; ?>
 			</div>
 			<div class="zo-game-page__stage">
 				<?php echo zo_render_game($slug, $post_id); ?>
 			</div>
+			<?php if (!empty($related_games)) : ?>
+			<section class="zo-game-page__related" aria-label="<?php echo esc_attr(function_exists('zo_get_interface_text') ? zo_get_interface_text('related_games', $language) : 'Related games'); ?>">
+				<h2 class="zo-game-page__related-title"><?php echo esc_html(function_exists('zo_get_interface_text') ? zo_get_interface_text('related_games', $language) : 'Related games'); ?></h2>
+				<div class="zo-game-page__related-grid">
+					<?php foreach ($related_games as $related) : ?>
+						<a class="zo-game-page__related-card" href="<?php echo esc_url($related['url']); ?>">
+							<span class="zo-game-page__related-category"><?php echo esc_html($related['category_label']); ?></span>
+							<span class="zo-game-page__related-name"><?php echo esc_html($related['title']); ?></span>
+							<?php if (!empty($related['description'])) : ?>
+							<span class="zo-game-page__related-description"><?php echo esc_html(wp_trim_words(wp_strip_all_tags($related['description']), 18)); ?></span>
+							<?php endif; ?>
+						</a>
+					<?php endforeach; ?>
+				</div>
+			</section>
+			<?php endif; ?>
 		</main>
 	</div>
 	<?php if ($script_url !== '') : ?>

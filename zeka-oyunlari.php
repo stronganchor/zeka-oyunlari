@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.4.91.asker.arslan
+ * Version: 1.4.92.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -1628,7 +1628,7 @@ function zo_get_interface_text($key, $lang = '') {
 			'de' => 'Neu',
 		),
 		'badge_popular' => array(
-			'tr' => 'Populer',
+			'tr' => 'Popüler',
 			'en' => 'Popular',
 			'es-mx' => 'Popular',
 			'es-es' => 'Popular',
@@ -1674,6 +1674,50 @@ function zo_get_interface_text($key, $lang = '') {
 		'en' => 'About Asker’s Games',
 		'fr' => 'À propos des jeux d’Asker',
 		'de' => 'Über Askers Spiele',
+	);
+	$text['difficulty_label'] = array(
+		'tr' => 'Zorluk',
+		'en' => 'Difficulty',
+		'es-mx' => 'Dificultad',
+		'es-es' => 'Dificultad',
+		'fr' => 'Difficulte',
+		'de' => 'Schwierigkeit',
+	);
+	$text['difficulty_easy'] = array(
+		'tr' => 'Kolay',
+		'en' => 'Easy',
+		'es-mx' => 'Facil',
+		'es-es' => 'Facil',
+		'fr' => 'Facile',
+		'de' => 'Einfach',
+	);
+	$text['difficulty_medium'] = array(
+		'tr' => 'Orta',
+		'en' => 'Medium',
+		'es-mx' => 'Medio',
+		'es-es' => 'Medio',
+		'fr' => 'Moyen',
+		'de' => 'Mittel',
+	);
+	$text['difficulty_hard'] = array(
+		'tr' => 'Zor',
+		'en' => 'Hard',
+		'es-mx' => 'Dificil',
+		'es-es' => 'Dificil',
+		'fr' => 'Difficile',
+		'de' => 'Schwer',
+	);
+	$text['related_games'] = array(
+		'tr' => 'Benzer oyunlar',
+		'en' => 'Related games',
+		'es-mx' => 'Juegos relacionados',
+		'es-es' => 'Juegos relacionados',
+		'fr' => 'Jeux similaires',
+		'de' => 'Aehnliche Spiele',
+	);
+	$text['game_feedback'] = array(
+		'tr' => 'Sorun bildir veya oneride bulun',
+		'en' => 'Report a problem or suggest an improvement',
 	);
 	$text['asker_games_link'] = array(
 		'tr' => 'Askerin oyunlarına git',
@@ -6112,6 +6156,113 @@ function zo_get_localized_game_display_metadata($module, $lang = '') {
 		'category_key' => $category_key,
 		'category_label' => $category_label,
 	);
+}
+
+function zo_get_game_difficulty_key($module, $category = '') {
+	$value = is_array($module) && isset($module['difficulty']) ? $module['difficulty'] : '';
+
+	if (is_numeric($value)) {
+		$value = (int) $value;
+
+		if ($value <= 1) {
+			return 'easy';
+		}
+
+		if ($value >= 3) {
+			return 'hard';
+		}
+
+		return 'medium';
+	}
+
+	if (is_string($value)) {
+		$value = strtolower(trim($value));
+
+		if (in_array($value, array('easy', 'medium', 'hard'), true)) {
+			return $value;
+		}
+	}
+
+	if (in_array($category, array('action', 'sports'), true)) {
+		return 'medium';
+	}
+
+	if (in_array($category, array('tool', 'creative'), true)) {
+		return 'easy';
+	}
+
+	return 'medium';
+}
+
+function zo_get_game_difficulty_label($module, $category = '', $lang = '') {
+	$lang = array_key_exists($lang, zo_get_language_options()) ? $lang : zo_get_current_language();
+	$key = zo_get_game_difficulty_key($module, $category);
+
+	return zo_get_interface_text('difficulty_' . $key, $lang);
+}
+
+function zo_get_game_feedback_url($slug, $title, $lang = '') {
+	$lang = array_key_exists($lang, zo_get_language_options()) ? $lang : zo_get_current_language();
+	$title_prefix = $lang === 'tr' ? 'Oyun geri bildirimi' : 'Game feedback';
+	$body_label = $lang === 'tr' ? "Oyun: %s\nSlug: %s\n\nSorun veya oneri:\n" : "Game: %s\nSlug: %s\n\nProblem or suggestion:\n";
+
+	return add_query_arg(
+		array(
+			'title' => $title_prefix . ': ' . $title,
+			'body'  => sprintf($body_label, $title, $slug),
+		),
+		'https://github.com/stronganchor/zeka-oyunlari/issues/new'
+	);
+}
+
+function zo_get_related_game_items($current_slug, $lang = '', $limit = 4) {
+	$lang = array_key_exists($lang, zo_get_language_options()) ? $lang : zo_get_current_language();
+	$current_slug = sanitize_title($current_slug);
+	$limit = max(1, (int) $limit);
+	$modules = zo_get_game_modules();
+	$posts_by_slug = zo_get_game_posts_by_slug();
+
+	if (empty($modules[$current_slug])) {
+		return array();
+	}
+
+	$current_meta = zo_get_localized_game_display_metadata($modules[$current_slug], $lang);
+	$current_category = $current_meta['category_key'] ?? 'puzzle';
+	$items = array();
+
+	foreach ($modules as $slug => $module) {
+		if ($slug === $current_slug || !zo_is_game_available_for_language($slug, $lang)) {
+			continue;
+		}
+
+		$meta = zo_get_localized_game_display_metadata($module, $lang);
+		$category = $meta['category_key'] ?? 'puzzle';
+		$post = $posts_by_slug[$slug] ?? null;
+		$url = $post instanceof WP_Post ? zo_get_game_launch_url($post) : zo_get_game_module_fallback_url($slug);
+
+		if ($url !== '') {
+			$url = add_query_arg('zo_lang', $lang, $url);
+		}
+
+		$items[] = array(
+			'slug' => $slug,
+			'title' => $meta['name'] ?? ($module['name'] ?? $slug),
+			'description' => $meta['description'] ?? ($module['description'] ?? ''),
+			'category' => $category,
+			'category_label' => zo_get_game_category_label($category, $lang),
+			'url' => $url,
+			'score' => $category === $current_category ? 0 : 1,
+		);
+	}
+
+	usort(
+		$items,
+		function ($a, $b) {
+			return ((int) $a['score'] <=> (int) $b['score']) ?: strcasecmp((string) $a['title'], (string) $b['title']);
+		}
+	);
+
+	return array_slice($items, 0, $limit);
 }
 
 function zo_apply_asker_multilingual_game_metadata($module) {
