@@ -1715,10 +1715,6 @@ function zo_get_interface_text($key, $lang = '') {
 		'fr' => 'Jeux similaires',
 		'de' => 'Aehnliche Spiele',
 	);
-	$text['game_feedback'] = array(
-		'tr' => 'Sorun bildir veya oneride bulun',
-		'en' => 'Report a problem or suggest an improvement',
-	);
 	$text['asker_games_link'] = array(
 		'tr' => 'Askerin oyunlarına git',
 		'en' => 'Go to Asker’s Games',
@@ -6199,20 +6195,6 @@ function zo_get_game_difficulty_label($module, $category = '', $lang = '') {
 	$key = zo_get_game_difficulty_key($module, $category);
 
 	return zo_get_interface_text('difficulty_' . $key, $lang);
-}
-
-function zo_get_game_feedback_url($slug, $title, $lang = '') {
-	$lang = array_key_exists($lang, zo_get_language_options()) ? $lang : zo_get_current_language();
-	$title_prefix = $lang === 'tr' ? 'Oyun geri bildirimi' : 'Game feedback';
-	$body_label = $lang === 'tr' ? "Oyun: %s\nSlug: %s\n\nSorun veya oneri:\n" : "Game: %s\nSlug: %s\n\nProblem or suggestion:\n";
-
-	return add_query_arg(
-		array(
-			'title' => $title_prefix . ': ' . $title,
-			'body'  => sprintf($body_label, $title, $slug),
-		),
-		'https://github.com/stronganchor/zeka-oyunlari/issues/new'
-	);
 }
 
 function zo_get_related_game_items($current_slug, $lang = '', $limit = 4) {

@@ -74,7 +74,6 @@ $game_category_label = '';
 $difficulty_key = 'medium';
 $difficulty_label = '';
 $related_games = array();
-$feedback_url = '';
 $search_url = add_query_arg('zo_lang', $language, home_url('/'));
 $asset_base_url = defined('ZO_PLUGIN_URL') ? ZO_PLUGIN_URL : plugins_url('', dirname(__FILE__)) . '/';
 
@@ -107,9 +106,6 @@ if (function_exists('zo_get_related_game_items')) {
 	$related_games = zo_get_related_game_items($slug, $language, 4);
 }
 
-if (in_array($language, array('tr', 'en'), true) && function_exists('zo_get_game_feedback_url')) {
-	$feedback_url = zo_get_game_feedback_url($slug, $page_title, $language);
-}
 ?>
 <!doctype html>
 <html <?php language_attributes(); ?>>
@@ -217,18 +213,6 @@ if (in_array($language, array('tr', 'en'), true) && function_exists('zo_get_game
 		.zo-game-page__tag--difficulty {
 			background: #0f766e;
 			color: #fff;
-		}
-
-		.zo-game-page__feedback {
-			display: inline-flex;
-			width: fit-content;
-			max-width: 100%;
-			margin-top: 12px;
-			color: #bfdbfe;
-			font-family: Arial, sans-serif;
-			font-weight: 800;
-			text-decoration: underline;
-			text-underline-offset: 3px;
 		}
 
 		.zo-game-page__stage {
@@ -365,9 +349,6 @@ if (in_array($language, array('tr', 'en'), true) && function_exists('zo_get_game
 					<span class="zo-game-page__tag zo-game-page__tag--difficulty"><?php echo esc_html((function_exists('zo_get_interface_text') ? zo_get_interface_text('difficulty_label', $language) : 'Difficulty') . ': ' . $difficulty_label); ?></span>
 					<?php endif; ?>
 				</div>
-				<?php if ($feedback_url !== '') : ?>
-				<a class="zo-game-page__feedback" href="<?php echo esc_url($feedback_url); ?>" target="_blank" rel="noopener"><?php echo esc_html(function_exists('zo_get_interface_text') ? zo_get_interface_text('game_feedback', $language) : 'Report a problem or suggest an improvement'); ?></a>
-				<?php endif; ?>
 			</div>
 			<div class="zo-game-page__stage">
 				<?php echo zo_render_game($slug, $post_id); ?>
