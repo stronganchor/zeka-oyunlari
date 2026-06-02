@@ -139,58 +139,9 @@ if (in_array($language, array('tr', 'en'), true) && function_exists('zo_get_game
 		}
 
 		.zo-game-page__header {
-			position: sticky;
-			top: 0;
-			z-index: 20;
 			display: flex;
 			align-items: center;
-			justify-content: space-between;
-			gap: 14px;
 			padding: 18px 20px;
-			background: rgba(15, 23, 42, 0.94);
-			backdrop-filter: blur(12px);
-		}
-
-		.zo-game-page__brand {
-			display: inline-flex;
-			align-items: center;
-			width: 58px;
-			height: 58px;
-			text-decoration: none;
-		}
-
-		.zo-game-page__brand img {
-			display: block;
-			width: 100%;
-			height: 100%;
-			object-fit: contain;
-		}
-
-		.zo-game-page__nav {
-			display: flex;
-			flex-wrap: wrap;
-			gap: 10px;
-			align-items: center;
-			justify-content: flex-end;
-		}
-
-		.zo-game-page__search {
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			width: 46px;
-			height: 46px;
-			border-radius: 999px;
-			background: #fff;
-			text-decoration: none;
-			box-shadow: 0 10px 30px rgba(15, 23, 42, 0.22);
-		}
-
-		.zo-game-page__search img {
-			display: block;
-			width: 32px;
-			height: 32px;
-			object-fit: contain;
 		}
 
 		.zo-game-page__back {
@@ -211,35 +162,6 @@ if (in_array($language, array('tr', 'en'), true) && function_exists('zo_get_game
 			background: #115e59;
 			color: #fff;
 			text-decoration: none;
-		}
-
-		.zo-game-page__language {
-			display: inline-flex;
-			gap: 6px;
-			align-items: center;
-		}
-
-		.zo-game-page__language-option {
-			display: inline-flex;
-			align-items: center;
-			justify-content: center;
-			min-width: 38px;
-			min-height: 36px;
-			padding: 0 10px;
-			border: 1px solid rgba(203, 213, 225, 0.52);
-			border-radius: 999px;
-			background: rgba(255, 255, 255, 0.1);
-			color: #f8fafc;
-			font-family: Arial, sans-serif;
-			font-size: 0.82rem;
-			font-weight: 800;
-			text-decoration: none;
-		}
-
-		.zo-game-page__language-option.is-active {
-			background: #1d4ed8;
-			border-color: #1d4ed8;
-			color: #fff;
 		}
 
 		.zo-game-page__main {
@@ -392,38 +314,12 @@ if (in_array($language, array('tr', 'en'), true) && function_exists('zo_get_game
 		@media (max-width: 640px) {
 			.zo-game-page__header {
 				padding: 14px 14px 8px;
-				align-items: center;
-			}
-
-			.zo-game-page__brand {
-				width: 46px;
-				height: 46px;
-			}
-
-			.zo-game-page__nav {
-				gap: 7px;
 			}
 
 			.zo-game-page__back {
 				min-height: 38px;
 				padding: 0 12px;
 				font-size: 0.9rem;
-			}
-
-			.zo-game-page__search {
-				width: 40px;
-				height: 40px;
-			}
-
-			.zo-game-page__search img {
-				width: 28px;
-				height: 28px;
-			}
-
-			.zo-game-page__language-option {
-				min-width: 34px;
-				min-height: 32px;
-				padding: 0 8px;
 			}
 
 			.zo-game-page__main {
@@ -453,20 +349,7 @@ if (in_array($language, array('tr', 'en'), true) && function_exists('zo_get_game
 <body>
 	<div class="zo-game-page">
 		<header class="zo-game-page__header">
-			<a class="zo-game-page__brand" href="<?php echo esc_url($back_url); ?>" aria-label="<?php echo esc_attr($site_name ? $site_name : 'zeka.com'); ?>">
-				<img src="<?php echo esc_url($asset_base_url . 'zeka-logo.png'); ?>" alt="">
-			</a>
-			<nav class="zo-game-page__nav" aria-label="<?php echo esc_attr(function_exists('zo_get_interface_text') ? zo_get_interface_text('language_label', $language) : 'Language'); ?>">
-				<a class="zo-game-page__search" href="<?php echo esc_url($search_url); ?>" aria-label="<?php echo esc_attr(function_exists('zo_get_interface_text') ? zo_get_interface_text('search_label', $language) : 'Search games'); ?>">
-					<img src="<?php echo esc_url($asset_base_url . 'zeka.com%20search.png'); ?>" alt="">
-				</a>
 			<a class="zo-game-page__back" href="<?php echo esc_url($back_url); ?>"><?php echo esc_html(function_exists('zo_get_interface_text') ? zo_get_interface_text('home', $language) : 'Geri Dön'); ?></a>
-				<div class="zo-game-page__language">
-					<?php foreach ((function_exists('zo_get_language_options') ? zo_get_language_options() : array('tr' => 'TR', 'en' => 'EN')) as $code => $label) : ?>
-						<a class="zo-game-page__language-option<?php echo $code === $language ? ' is-active' : ''; ?>" href="<?php echo esc_url(add_query_arg('zo_lang', $code)); ?>"><?php echo esc_html($label); ?></a>
-					<?php endforeach; ?>
-				</div>
-			</nav>
 		</header>
 		<main class="zo-game-page__main">
 			<div class="zo-game-page__meta">
