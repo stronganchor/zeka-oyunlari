@@ -8084,23 +8084,25 @@ function zo_enqueue_grid_styles() {
 	background: #1d4ed8;
 }
 .zo-games-grid__favorite {
-	position: absolute;
-	top: 12px;
-	left: 12px;
-	z-index: 3;
 	display: inline-grid;
 	width: 38px;
 	height: 38px;
+	margin: 12px 0 8px 12px;
 	place-items: center;
-	border: 1px solid rgba(255, 255, 255, 0.72);
+	border: 1px solid #d1d5db;
 	border-radius: 999px;
-	background: rgba(15, 23, 42, 0.48);
-	color: #fff;
+	background: #fff;
+	color: #475569;
 	font-size: 1.3rem;
 	font-weight: 900;
 	line-height: 1;
 	cursor: pointer;
-	box-shadow: 0 8px 20px rgba(15, 23, 42, 0.2);
+	box-shadow: 0 6px 16px rgba(15, 23, 42, 0.1);
+}
+.zo-games-grid__favorite:hover,
+.zo-games-grid__favorite:focus {
+	border-color: #f59e0b;
+	color: #111827;
 }
 .zo-games-grid__favorite.is-active {
 	background: #f59e0b;

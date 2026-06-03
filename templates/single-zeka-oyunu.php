@@ -307,7 +307,13 @@ if (function_exists('zo_get_related_game_items')) {
 		.zo-game-page__bottom-actions {
 			width: min(100%, 1400px);
 			margin: 24px auto 0;
+			padding: 0 0 36px;
 			font-family: Arial, sans-serif;
+			text-align: center;
+		}
+
+		.zo-game-page__bottom-actions .zo-game-page__back {
+			margin: 0 auto;
 		}
 
 		@media (max-width: 640px) {
@@ -322,7 +328,7 @@ if (function_exists('zo_get_related_game_items')) {
 			}
 
 			.zo-game-page__main {
-				padding: 0 14px 14px;
+				padding: 0 14px 22px;
 			}
 
 			.zo-game-page__meta {
@@ -332,6 +338,10 @@ if (function_exists('zo_get_related_game_items')) {
 			.zo-game-page__stage .zo-game-shell,
 			.zo-game-page__stage .zo-game-root {
 				min-height: calc(100vh - 84px);
+			}
+
+			.zo-game-page__bottom-actions {
+				padding-bottom: 42px;
 			}
 		}
 	</style>
