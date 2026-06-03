@@ -74,8 +74,7 @@ $game_category_label = '';
 $difficulty_key = 'medium';
 $difficulty_label = '';
 $related_games = array();
-$search_url = add_query_arg('zo_lang', $language, home_url('/'));
-$asset_base_url = defined('ZO_PLUGIN_URL') ? ZO_PLUGIN_URL : plugins_url('', dirname(__FILE__)) . '/';
+$game_thumbnail_url = function_exists('zo_get_game_thumbnail_url') ? zo_get_game_thumbnail_url($post_id ? get_post($post_id) : null, $module) : '';
 
 if ($module_description !== '') {
 	$seo_description = trim($page_title . ' ' . $play_suffix . '. ' . $module_description . ' ' . $seo_keywords);
@@ -275,6 +274,16 @@ if (function_exists('zo_get_related_game_items')) {
 			text-decoration: none;
 		}
 
+		.zo-game-page__related-thumb {
+			display: block;
+			width: 100%;
+			aspect-ratio: 16 / 9;
+			border-radius: 10px;
+			background: rgba(226, 232, 240, 0.14);
+			object-fit: cover;
+			overflow: hidden;
+		}
+
 		.zo-game-page__related-category {
 			color: #bfdbfe;
 			font-size: 0.78rem;
@@ -293,6 +302,12 @@ if (function_exists('zo_get_related_game_items')) {
 			color: #cbd5e1;
 			font-size: 0.9rem;
 			line-height: 1.45;
+		}
+
+		.zo-game-page__bottom-actions {
+			width: min(100%, 1400px);
+			margin: 24px auto 0;
+			font-family: Arial, sans-serif;
 		}
 
 		@media (max-width: 640px) {
@@ -359,6 +374,11 @@ if (function_exists('zo_get_related_game_items')) {
 				<div class="zo-game-page__related-grid">
 					<?php foreach ($related_games as $related) : ?>
 						<a class="zo-game-page__related-card" href="<?php echo esc_url($related['url']); ?>">
+							<?php if (!empty($related['thumbnail_url'])) : ?>
+							<img class="zo-game-page__related-thumb" src="<?php echo esc_url($related['thumbnail_url']); ?>" alt="" loading="lazy">
+							<?php else : ?>
+							<span class="zo-game-page__related-thumb" aria-hidden="true"></span>
+							<?php endif; ?>
 							<span class="zo-game-page__related-category"><?php echo esc_html($related['category_label']); ?></span>
 							<span class="zo-game-page__related-name"><?php echo esc_html($related['title']); ?></span>
 							<?php if (!empty($related['description'])) : ?>
@@ -369,8 +389,36 @@ if (function_exists('zo_get_related_game_items')) {
 				</div>
 			</section>
 			<?php endif; ?>
+			<div class="zo-game-page__bottom-actions">
+				<a class="zo-game-page__back" href="<?php echo esc_url($back_url); ?>"><?php echo esc_html(function_exists('zo_get_interface_text') ? zo_get_interface_text('back_to_games', $language) : 'Back to games'); ?></a>
+			</div>
 		</main>
 	</div>
+	<script>
+	(function(){
+		try {
+			var game = {
+				slug: <?php echo wp_json_encode($slug); ?>,
+				title: <?php echo wp_json_encode($page_title); ?>,
+				url: <?php echo wp_json_encode(get_permalink($post_id) ? add_query_arg('zo_lang', $language, get_permalink($post_id)) : home_url('/')); ?>,
+				thumb: <?php echo wp_json_encode($game_thumbnail_url); ?>
+			};
+			if (!game.slug) {
+				return;
+			}
+			var key = 'zoRecentlyPlayedGames';
+			var items = JSON.parse(localStorage.getItem(key) || '[]');
+			if (!Array.isArray(items)) {
+				items = [];
+			}
+			items = items.filter(function(item) {
+				return item && item.slug !== game.slug;
+			});
+			items.unshift(game);
+			localStorage.setItem(key, JSON.stringify(items.slice(0, 20)));
+		} catch (error) {}
+	})();
+	</script>
 	<?php if ($script_url !== '') : ?>
 	<script src="<?php echo esc_url($script_url); ?>"></script>
 	<?php endif; ?>
