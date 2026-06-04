@@ -75,6 +75,7 @@ $difficulty_key = 'medium';
 $difficulty_label = '';
 $related_games = array();
 $game_thumbnail_url = function_exists('zo_get_game_thumbnail_url') ? zo_get_game_thumbnail_url($post_id ? get_post($post_id) : null, $module) : '';
+$game_owner = function_exists('zo_get_game_owner_for_module') ? zo_get_game_owner_for_module($module) : '';
 
 if ($module_description !== '') {
 	$seo_description = trim($page_title . ' ' . $play_suffix . '. ' . $module_description . ' ' . $seo_keywords);
@@ -429,6 +430,61 @@ if (function_exists('zo_get_related_game_items')) {
 		} catch (error) {}
 	})();
 	</script>
+	<?php if ($game_owner === 'asker') : ?>
+	<script>
+	(function(){
+		var key = 'zoAskerPlayStreak';
+		var today = new Date();
+		var dayKey = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+		var lastTick = Date.now();
+
+		function read() {
+			try {
+				var data = JSON.parse(localStorage.getItem(key) || '{}');
+				if (!data || typeof data !== 'object') {
+					data = {};
+				}
+				if (!data.days || typeof data.days !== 'object') {
+					data.days = {};
+				}
+				return data;
+			} catch (error) {
+				return { days: {} };
+			}
+		}
+
+		function write(data) {
+			try {
+				localStorage.setItem(key, JSON.stringify(data));
+			} catch (error) {}
+		}
+
+		function addSeconds(seconds) {
+			if (!seconds || seconds < 1) {
+				return;
+			}
+			var data = read();
+			data.days[dayKey] = Math.min(86400, Number(data.days[dayKey] || 0) + seconds);
+			write(data);
+		}
+
+		function tick() {
+			var now = Date.now();
+			var seconds = Math.floor((now - lastTick) / 1000);
+			lastTick = now;
+			if (document.visibilityState === 'visible') {
+				addSeconds(Math.min(seconds, 15));
+			}
+		}
+
+		window.setInterval(tick, 10000);
+		window.addEventListener('pagehide', tick);
+		document.addEventListener('visibilitychange', function() {
+			lastTick = Date.now();
+		});
+	})();
+	</script>
+	<?php endif; ?>
 	<?php if ($script_url !== '') : ?>
 	<script src="<?php echo esc_url($script_url); ?>"></script>
 	<?php endif; ?>

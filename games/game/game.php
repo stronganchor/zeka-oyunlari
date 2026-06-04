@@ -314,15 +314,6 @@ document.addEventListener('DOMContentLoaded', function () {
 				url: '/oyun/ses-efektli-surum/',
 				requireStars: 4,
 				difficulty: 'Orta'
-			},
-			{
-				id: 'meyve-topla',
-				name: 'Meyve Topla',
-				icon: '🍎',
-				desc: 'Meyveleri topla. Çamurlardan kaç.',
-				url: '/oyun/meyve-topla/',
-				requireStars: 5,
-				difficulty: 'Zor'
 			}
 		];
 

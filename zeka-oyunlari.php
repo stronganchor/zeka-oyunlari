@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.4.97.asker.arslan
+ * Version: 1.4.98.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -262,10 +262,6 @@ function zo_get_asker_multilingual_game_metadata($slug) {
 			'name' => 'TR: Böcek Sıralama İstasyonu | EN: Bug Sort Station | DE: Käfer-Sortierstation',
 			'description' => 'TR: Kaçmadan önce gelen böcekleri doğru istasyona yönlendirerek sınıflandır. EN: Classify arriving bugs by using the correct station before they escape. DE: Sortiere ankommende Käfer an der richtigen Station, bevor sie entkommen.',
 		),
-		'car-lane-switch' => array(
-			'name' => 'TR: Araba Şerit Değiştirme | EN: Car Lane Switch | DE: Auto-Spurwechsel',
-			'description' => 'TR: 5 şeritli, yüksek kamera açılı, ok tuşları, duraklatma ve gerçek turbo düğmesi olan yavaş tempolu sürüş oyunu. EN: A slower lane-switching driving game with 5 lanes, a higher camera view, arrow keys, pause controls, and a real turbo-use button. DE: Ein ruhigeres Spurwechsel-Fahrspiel mit 5 Spuren, höherer Kamera, Pfeiltasten, Pause und echtem Turbo-Knopf.',
-		),
 		'chess-ai' => array(
 			'name' => 'TR: Yapay Zekaya Karşı Satranç | EN: Chess vs AI | DE: Schach gegen KI',
 			'description' => 'TR: Çok kolaydan çok zora kadar bilgisayar rakiplere karşı satranç oyna. EN: Play chess against computer opponents from very easy to very hard. DE: Spiele Schach gegen Computergegner von sehr leicht bis sehr schwer.',
@@ -474,10 +470,6 @@ function zo_get_asker_multilingual_game_metadata($slug) {
 			'name' => 'TR: Wisconsin Saati | EN: Wisconsin Clock | DE: Wisconsin-Uhr',
 			'description' => 'TR: Wisconsin saatini saniyelerle gösteren basit bir tarayıcı saati. EN: A simple browser clock showing Wisconsin time with seconds. DE: Eine einfache Browser-Uhr, die die Wisconsin-Zeit mit Sekunden zeigt.',
 		),
-		'word-balloon-pop' => array(
-			'name' => 'TR: Kelime Balonu Patlat | EN: Word Balloon Pop | DE: Wortballon-Platzen',
-			'description' => 'TR: Süre dolmadan doğru cevabı taşıyan balonu bul ve patlat. EN: Find and pop the balloon with the correct answer before time runs out. DE: Finde und platze den Ballon mit der richtigen Antwort, bevor die Zeit abläuft.',
-		),
 		'puzzle-crafter-drift' => array(
 			'name' => 'TR: Bulmaca Ustası Drift | EN: Puzzle Crafter Drift | DE: Puzzle-Bauer Drift',
 			'description' => 'TR: Değişen bulmaca parçaları oluştur ve puanını büyütmeye devam et. EN: Craft shifting puzzle tiles and keep your score growing. DE: Erstelle wechselnde Puzzle-Kacheln und lasse deine Punktzahl weiter wachsen.',
@@ -641,11 +633,6 @@ function zo_get_fallback_game_title_for_language($title, $lang) {
 			'fr' => 'Station de tri des insectes',
 			'es-mx' => 'Estación para ordenar insectos',
 			'es-es' => 'Estación de clasificación de insectos',
-		),
-		'Car Lane Switch' => array(
-			'fr' => 'Changement de voie en voiture',
-			'es-mx' => 'Cambio de carril',
-			'es-es' => 'Cambio de carril',
 		),
 		'Chess vs AI' => array(
 			'fr' => 'Échecs contre IA',
@@ -886,11 +873,6 @@ function zo_get_fallback_game_title_for_language($title, $lang) {
 			'fr' => 'Lanceur de recherche turque',
 			'es-mx' => 'Lanzador de búsqueda turca',
 			'es-es' => 'Lanzador de búsqueda turca',
-		),
-		'Word Balloon Pop' => array(
-			'fr' => 'Éclate les ballons de mots',
-			'es-mx' => 'Revienta globos de palabras',
-			'es-es' => 'Revienta globos de palabras',
 		),
 		'Puzzle Crafter Drift' => array(
 			'fr' => 'Dérive du créateur de puzzles',
@@ -1651,6 +1633,38 @@ function zo_get_interface_text($key, $lang = '') {
 			'fr' => 'Favoris',
 			'de' => 'Favoriten',
 		),
+		'play_streak_badge' => array(
+			'tr' => '5 Günlük Asker Rozeti',
+			'en' => '5-Day Asker Badge',
+			'es-mx' => 'Insignia Asker de 5 días',
+			'es-es' => 'Insignia Asker de 5 días',
+			'fr' => 'Badge Asker de 5 jours',
+			'de' => '5-Tage-Asker-Abzeichen',
+		),
+		'play_streak_badge_text' => array(
+			'tr' => 'Askerin Oyunları içinde 5 gün boyunca her gün 10+ dakika oynadın.',
+			'en' => 'You played Asker’s Games for 10+ minutes every day for 5 days.',
+			'es-mx' => 'Jugaste Asker’s Games más de 10 minutos cada día durante 5 días.',
+			'es-es' => 'Has jugado a Asker’s Games más de 10 minutos cada día durante 5 días.',
+			'fr' => 'Tu as joué aux jeux d’Asker plus de 10 minutes par jour pendant 5 jours.',
+			'de' => 'Du hast Askers Spiele 5 Tage lang jeden Tag mehr als 10 Minuten gespielt.',
+		),
+		'daily_champion_badge' => array(
+			'tr' => 'Günlük Şampiyon',
+			'en' => 'Daily Champion',
+			'es-mx' => 'Campeón diario',
+			'es-es' => 'Campeón diario',
+			'fr' => 'Champion du jour',
+			'de' => 'Tageschampion',
+		),
+		'daily_champion_badge_text' => array(
+			'tr' => 'Askerin Oyunları içinde 5 gün boyunca her gün 30+ dakika oynadın.',
+			'en' => 'You played Asker’s Games for 30+ minutes every day for 5 days.',
+			'es-mx' => 'Jugaste Asker’s Games más de 30 minutos cada día durante 5 días.',
+			'es-es' => 'Has jugado a Asker’s Games más de 30 minutos cada día durante 5 días.',
+			'fr' => 'Tu as joué aux jeux d’Asker plus de 30 minutes par jour pendant 5 jours.',
+			'de' => 'Du hast Askers Spiele 5 Tage lang jeden Tag mehr als 30 Minuten gespielt.',
+		),
 		'favorite_game' => array(
 			'tr' => 'Favori yap',
 			'en' => 'Add to favorites',
@@ -1801,12 +1815,10 @@ function zo_get_game_language_availability($slug) {
 	$restricted = array(
 		'adam-asmaca' => array('tr'),
 		'ai-companion-trainer' => array('en'),
-		'falling-letters-catch' => array('tr'),
 		'firavunun-hazinesi' => array('tr'),
 		'kelime-karistirma' => array('tr'),
 		'kutsal-bocek-labirenti' => array('tr'),
 		'ogretmenden-kac' => array('tr'),
-		'simit-run' => array('tr'),
 		'speed-sort' => array('tr'),
 		'tr-search-launcher' => array('tr'),
 		'turkish-word-builder' => array('tr'),
@@ -3360,7 +3372,6 @@ function zo_get_runtime_translation_exact_map($lang) {
 			'SINIF' => 'CLASS',
 			'TAHTA' => 'BOARD',
 			'Kaçma Oyunu' => 'Escape Game',
-			'Meyve Topla' => 'Fruit Collector',
 			'Tekrar başlat ve yeniden savaş.' => 'Restart and battle again.',
 			'Başlat ve bir savaşçı gönder.' => 'Start and send a fighter.',
 			'Başlat düğmesine bas' => 'Press the Start button',
@@ -3438,7 +3449,6 @@ function zo_get_runtime_translation_exact_map($lang) {
 			'SINIF' => 'KLASSE',
 			'TAHTA' => 'TAFEL',
 			'Kaçma Oyunu' => 'Fluchtspiel',
-			'Meyve Topla' => 'Obst sammeln',
 			'Tekrar başlat ve yeniden savaş.' => 'Starte neu und kämpfe wieder.',
 			'Başlat ve bir savaşçı gönder.' => 'Starte und sende einen Kämpfer.',
 			'Başlat düğmesine bas' => 'Drücke die Starttaste',
@@ -3516,7 +3526,6 @@ function zo_get_runtime_translation_exact_map($lang) {
 			'SINIF' => 'CLASSE',
 			'TAHTA' => 'TABLEAU',
 			'Kaçma Oyunu' => 'Jeu d’évasion',
-			'Meyve Topla' => 'Ramasse les fruits',
 			'Tekrar başlat ve yeniden savaş.' => 'Redémarre et combats à nouveau.',
 			'Başlat ve bir savaşçı gönder.' => 'Démarre et envoie un combattant.',
 			'Başlat düğmesine bas' => 'Appuie sur le bouton Démarrer',
@@ -3594,7 +3603,6 @@ function zo_get_runtime_translation_exact_map($lang) {
 			'SINIF' => 'SALÓN',
 			'TAHTA' => 'PIZARRÓN',
 			'Kaçma Oyunu' => 'Juego de escape',
-			'Meyve Topla' => 'Recoge frutas',
 			'Tekrar başlat ve yeniden savaş.' => 'Reinicia y lucha otra vez.',
 			'Başlat ve bir savaşçı gönder.' => 'Empieza y envía un luchador.',
 			'Başlat düğmesine bas' => 'Presiona el botón Empezar',
@@ -3672,7 +3680,6 @@ function zo_get_runtime_translation_exact_map($lang) {
 			'SINIF' => 'CLASE',
 			'TAHTA' => 'PIZARRA',
 			'Kaçma Oyunu' => 'Juego de escape',
-			'Meyve Topla' => 'Recoge frutas',
 			'Tekrar başlat ve yeniden savaş.' => 'Reinicia y lucha otra vez.',
 			'Başlat ve bir savaşçı gönder.' => 'Empieza y envía un luchador.',
 			'Başlat düğmesine bas' => 'Pulsa el botón Empezar',
@@ -8034,6 +8041,24 @@ function zo_enqueue_grid_styles() {
 	font-weight: 900;
 	line-height: 1.25;
 }
+.zo-games-grid__streak-badge {
+	display: block;
+	width: min(100%, 420px);
+	margin: 0 auto;
+	text-align: center;
+}
+.zo-games-grid__streak-badge[hidden] {
+	display: none !important;
+}
+.zo-games-grid__streak-badge + .zo-games-grid__streak-badge {
+	margin-top: 14px;
+}
+.zo-games-grid__streak-image {
+	display: block;
+	width: 100%;
+	height: auto;
+	border-radius: 18px;
+}
 .zo-games-grid {
 	display: grid;
 	width: min(100%, 1120px);
@@ -8085,18 +8110,28 @@ function zo_enqueue_grid_styles() {
 }
 .zo-games-grid__favorite {
 	display: inline-grid;
-	width: 38px;
-	height: 38px;
+	box-sizing: border-box;
+	flex: 0 0 42px;
+	width: 42px;
+	min-width: 42px;
+	max-width: 42px;
+	height: 42px;
+	min-height: 42px;
+	max-height: 42px;
+	aspect-ratio: 1;
 	margin: 12px 0 8px 12px;
 	place-items: center;
 	border: 1px solid #d1d5db;
 	border-radius: 999px;
 	background: #fff;
 	color: #475569;
-	font-size: 1.3rem;
+	padding: 0;
+	text-align: center;
+	font-size: 1.45rem;
 	font-weight: 900;
-	line-height: 1;
+	line-height: 0;
 	cursor: pointer;
+	appearance: none;
 	box-shadow: 0 6px 16px rgba(15, 23, 42, 0.1);
 }
 .zo-games-grid__favorite:hover,
@@ -9017,6 +9052,23 @@ function zo_games_grid_shortcode($atts = array()) {
 		echo '</section>';
 	}
 
+	if ($author_filter === 'asker') {
+		$streak_image_code = in_array($language, array('tr', 'en', 'de', 'fr'), true) ? $language : 'es';
+		$streak_image_url  = ZO_PLUGIN_URL . 'assets/play-streak/play-streak-' . $streak_image_code . '.png';
+		$streak_alt        = zo_get_interface_text('play_streak_badge', $language) . '. ' . zo_get_interface_text('play_streak_badge_text', $language);
+		$champion_image_url = ZO_PLUGIN_URL . 'assets/play-streak/play-streak-30-' . $streak_image_code . '.png';
+		$champion_alt       = zo_get_interface_text('daily_champion_badge', $language) . '. ' . zo_get_interface_text('daily_champion_badge_text', $language);
+
+		echo '<section class="zo-games-grid__feature-section" aria-label="' . esc_attr(zo_get_interface_text('play_streak_badge', $language)) . '">';
+		echo '<div class="zo-games-grid__streak-badge" data-zo-asker-streak-badge data-threshold="600" hidden>';
+		echo '<img class="zo-games-grid__streak-image" src="' . esc_url($streak_image_url) . '" alt="' . esc_attr($streak_alt) . '" loading="lazy" decoding="async">';
+		echo '</div>';
+		echo '<div class="zo-games-grid__streak-badge" data-zo-asker-streak-badge data-threshold="1800" hidden>';
+		echo '<img class="zo-games-grid__streak-image" src="' . esc_url($champion_image_url) . '" alt="' . esc_attr($champion_alt) . '" loading="lazy" decoding="async">';
+		echo '</div>';
+		echo '</section>';
+	}
+
 	echo '<section class="zo-games-grid__feature-section" data-zo-recent-section hidden aria-label="' . esc_attr(zo_get_interface_text('recently_played', $language)) . '">';
 	echo '<h2 class="zo-games-grid__feature-title">' . esc_html(zo_get_interface_text('recently_played', $language)) . '</h2>';
 	echo '<div class="zo-games-grid__mini-row" data-zo-recent-list></div>';
@@ -9094,6 +9146,7 @@ function zo_games_grid_shortcode($atts = array()) {
 	echo '</div>';
 	echo '<script>(function(){var script=document.currentScript;var wrap=script&&script.closest(".zo-games-grid-wrap");if(!wrap){return;}var input=wrap.querySelector("#zo-game-search");var category=wrap.querySelector("#zo-game-category");var sort=wrap.querySelector("#zo-game-sort");var grid=wrap.querySelector("[data-zo-games-grid]");var count=wrap.querySelector("[data-zo-games-count]");var empty=wrap.querySelector("[data-zo-games-live-empty]");var panel=wrap.querySelector("[data-zo-games-search-panel]");var button=wrap.querySelector("[data-zo-games-search-toggle]");function normalize(value){return String(value||"").toLowerCase();}function updateCount(total){if(count){count.textContent=String(count.getAttribute("data-count-template")||"%d").replace("%d",total);}}function openPanel(){if(panel){panel.removeAttribute("hidden");}if(button){button.setAttribute("aria-expanded","true");}}function applyFilters(){if(!grid){return;}var q=normalize(input&&input.value).trim();var cat=category?category.value:"all";var sortValue=sort?sort.value:"title";var cards=Array.prototype.slice.call(grid.querySelectorAll("[data-zo-game-card]"));var visible=[];cards.forEach(function(card){var matchesText=!q||normalize(card.getAttribute("data-search")).indexOf(q)!==-1;var matchesCategory=cat==="all"||card.getAttribute("data-category")===cat;var show=matchesText&&matchesCategory;card.hidden=!show;if(show){visible.push(card);}});visible.sort(function(a,b){if(sortValue==="newest"){return Number(b.getAttribute("data-timestamp")||0)-Number(a.getAttribute("data-timestamp")||0)||normalize(a.getAttribute("data-title")).localeCompare(normalize(b.getAttribute("data-title")));}if(sortValue==="category"){return normalize(a.getAttribute("data-category-label")).localeCompare(normalize(b.getAttribute("data-category-label")))||normalize(a.getAttribute("data-title")).localeCompare(normalize(b.getAttribute("data-title")));}return normalize(a.getAttribute("data-title")).localeCompare(normalize(b.getAttribute("data-title")));});visible.forEach(function(card){grid.appendChild(card);});updateCount(visible.length);if(empty){empty.hidden=visible.length!==0;}}if(input){input.addEventListener("input",applyFilters);}if(category){category.addEventListener("change",applyFilters);}if(sort){sort.addEventListener("change",applyFilters);}Array.prototype.forEach.call(wrap.querySelectorAll("[data-zo-games-reset]"),function(reset){reset.addEventListener("click",function(event){event.preventDefault();if(input){input.value="";}if(category){category.value="all";}if(sort){sort.value="title";}openPanel();applyFilters();if(input){input.focus();}});});applyFilters();})();</script>';
 	echo '<script>(function(){var script=document.currentScript;var wrap=script&&script.closest(".zo-games-grid-wrap");if(!wrap){return;}var grid=wrap.querySelector("[data-zo-games-grid]");if(!grid){return;}var recentKey="zoRecentlyPlayedGames";var favoriteKey="zoFavoriteGames";var cards=Array.prototype.slice.call(grid.querySelectorAll("[data-zo-game-card]"));var gameMap={};function read(key){try{var value=JSON.parse(localStorage.getItem(key)||"[]");return Array.isArray(value)?value:[];}catch(error){return [];}}function write(key,value){try{localStorage.setItem(key,JSON.stringify(value));}catch(error){}}function itemFromCard(card){return {slug:card.getAttribute("data-slug")||"",title:card.getAttribute("data-title")||"",url:card.getAttribute("data-url")||"",thumb:card.getAttribute("data-thumb")||""};}function miniCard(item){var a=document.createElement("a");a.className="zo-games-grid__mini-card";a.href=item.url||"#";var media;if(item.thumb){media=document.createElement("img");media.className="zo-games-grid__mini-thumb";media.src=item.thumb;media.alt="";media.loading="lazy";}else{media=document.createElement("span");media.className="zo-games-grid__mini-thumb";media.setAttribute("aria-hidden","true");}var title=document.createElement("span");title.className="zo-games-grid__mini-title";title.textContent=item.title||item.slug;a.appendChild(media);a.appendChild(title);return a;}function render(sectionSelector,listSelector,items){var section=wrap.querySelector(sectionSelector);var list=wrap.querySelector(listSelector);if(!section||!list){return;}list.innerHTML="";items.filter(function(item){return item&&item.slug&&gameMap[item.slug];}).slice(0,4).forEach(function(item){list.appendChild(miniCard(Object.assign({},gameMap[item.slug],item)));});section.hidden=!list.children.length;}function updateFavoriteButton(button,active){button.classList.toggle("is-active",active);button.setAttribute("aria-pressed",active?"true":"false");button.setAttribute("aria-label",button.getAttribute(active?"data-label-remove":"data-label-add")||"");button.innerHTML=active?"&#9733;":"&#9734;";}function renderAll(){var favorites=read(favoriteKey);var recent=read(recentKey);render("[data-zo-favorites-section]","[data-zo-favorites-list]",favorites);render("[data-zo-recent-section]","[data-zo-recent-list]",recent);}cards.forEach(function(card){var item=itemFromCard(card);if(!item.slug){return;}gameMap[item.slug]=item;var favButton=card.querySelector("[data-zo-favorite-toggle]");if(favButton){updateFavoriteButton(favButton,read(favoriteKey).some(function(favorite){return favorite.slug===item.slug;}));favButton.addEventListener("click",function(event){event.preventDefault();event.stopPropagation();var favorites=read(favoriteKey).filter(function(favorite){return favorite.slug!==item.slug;});var active=!favButton.classList.contains("is-active");if(active){favorites.unshift(item);}favorites=favorites.slice(0,40);write(favoriteKey,favorites);updateFavoriteButton(favButton,active);renderAll();});}card.addEventListener("click",function(event){if(event.target.closest("[data-zo-favorite-toggle]")){return;}if(!event.target.closest("a")){return;}var recent=read(recentKey).filter(function(recentItem){return recentItem.slug!==item.slug;});recent.unshift(item);write(recentKey,recent.slice(0,20));});});renderAll();})();</script>';
+	echo '<script>(function(){var script=document.currentScript;var wrap=script&&script.closest(".zo-games-grid-wrap");if(!wrap){return;}var badges=Array.prototype.slice.call(wrap.querySelectorAll("[data-zo-asker-streak-badge]"));if(!badges.length){return;}try{var data=JSON.parse(localStorage.getItem("zoAskerPlayStreak")||"{}");var days=data&&data.days&&typeof data.days==="object"?data.days:{};badges.forEach(function(badge){var threshold=Number(badge.getAttribute("data-threshold")||600);var qualified=Object.keys(days).filter(function(day){return Number(days[day]||0)>=threshold;}).length;if(qualified>=5){badge.hidden=false;}});}catch(error){}})();</script>';
 
 	if (!$has_results) {
 		echo '<p class="zo-games-grid__empty">' . esc_html(zo_get_interface_text('no_live_results', $language)) . '</p>';

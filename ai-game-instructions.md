@@ -16,13 +16,15 @@ Your output must strictly follow this structure so the game works automatically.
 
 - Each game MUST include:
   - `game.php` (required)
+  - `featured-image.png` (required)
 
 - Optional split files:
   - `style.css`
   - `script.js`
 
 - Preferred format:
-  - a single `game.php` that contains the HTML renderer plus `inline_style` and `inline_script`
+  - `game.php` containing the HTML renderer plus `inline_style` and `inline_script`
+  - one matching `featured-image.png` in the same game folder
 
 - The plugin will automatically:
   - load `game.php`
@@ -73,15 +75,17 @@ Examples:
 
 ## OUTPUT FORMAT (STRICT)
 
-Default: output EXACTLY 1 FILE:
+Default: output EXACTLY 2 FILES:
 
 1. `game.php`
+2. `featured-image.png`
 
-Only if the user explicitly asks for split files, output EXACTLY 3 FILES:
+Only if the user explicitly asks for split files, output EXACTLY 4 FILES:
 
 1. `game.php`
 2. `style.css`
 3. `script.js`
+4. `featured-image.png`
 
 Preferred format for copy-paste is the single-file version below.
 
@@ -94,8 +98,25 @@ Use this exact format for the default single-file version:
 ```
 
 DO NOT add explanations.
-DO NOT add extra files.
+DO NOT add extra files beyond the required game code file(s) and `featured-image.png`.
 DO NOT omit the required file(s).
+
+---
+
+## featured-image.png REQUIREMENTS
+
+* Every new game must include a custom `featured-image.png`
+* Save it inside the same folder as the game:
+  `/games/{game-slug}/featured-image.png`
+* The image must match the specific game theme, title, colors, and main gameplay idea
+* Do not reuse the site logo as the game image
+* Do not use a generic placeholder image
+* Do not leave the image blank, mostly white, or unrelated to the game
+* Prefer a clean square image that works well as a small game-card thumbnail
+* Recommended size: 1024 by 1024 pixels
+* Keep important shapes large and centered so the thumbnail still reads on phones
+* The image should not contain tiny text that becomes unreadable
+* If generating files directly in the repository, create the actual PNG file, not just instructions for one
 
 ---
 
@@ -464,8 +485,8 @@ Create a memory matching card game for kids.
 
 Return ONLY:
 
-* `game.php` by default
-* or `game.php`, `style.css`, `script.js` only if the user explicitly asks for split files
+* `game.php` and `featured-image.png` by default
+* or `game.php`, `style.css`, `script.js`, and `featured-image.png` only if the user explicitly asks for split files
 
 Nothing else.
 No explanation.
