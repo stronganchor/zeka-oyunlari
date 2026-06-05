@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="Loading">
+  <defs>
+    <linearGradient id="reloadBlue" x1="46" y1="58" x2="207" y2="203" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#21e6ff"/>
+      <stop offset="0.48" stop-color="#0097ff"/>
+      <stop offset="1" stop-color="#075cf2"/>
+    </linearGradient>
+    <filter id="reloadGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="7" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.00 0 0 0 0 0.63 0 0 0 0 1.00 0 0 0 .85 0" result="glow"/>
+      <feMerge>
+        <feMergeNode in="glow"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <path fill="none" stroke="url(#reloadBlue)" stroke-width="28" stroke-linecap="round" filter="url(#reloadGlow)"
+    d="M190 152a76 76 0 1 1-11-80"/>
+  <path fill="url(#reloadBlue)" stroke="#e8fbff" stroke-width="5" stroke-linejoin="round" filter="url(#reloadGlow)"
+    d="M168 50l54 19-44 38-10-57z"/>
+  <path fill="none" stroke="#e8fbff" stroke-width="5" stroke-linecap="round"
+    d="M190 152a76 76 0 1 1-11-80"/>
+</svg>

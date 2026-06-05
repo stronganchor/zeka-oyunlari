@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.4.98.asker.arslan
+ * Version: 1.4.99.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -94,6 +94,125 @@ function zo_get_shortcode_logo_css() {
 }
 ';
 }
+
+function zo_get_page_loader_style_handle() {
+	return 'zo-page-loader';
+}
+
+function zo_get_page_loader_script_handle() {
+	return 'zo-page-loader';
+}
+
+function zo_get_page_loader_css() {
+	return '
+.zo-page-loader {
+	position: fixed;
+	inset: 0;
+	z-index: 999999;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(255, 255, 255, 0.96);
+	opacity: 1;
+	visibility: visible;
+	transition: opacity 220ms ease, visibility 220ms ease;
+}
+.zo-page-loader.is-done {
+	opacity: 0;
+	visibility: hidden;
+	pointer-events: none;
+}
+.zo-page-loader__symbol {
+	display: block;
+	width: clamp(86px, 16vw, 156px);
+	height: auto;
+	animation: zoPageLoaderSpin 850ms linear infinite;
+}
+@keyframes zoPageLoaderSpin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	.zo-page-loader__symbol {
+		animation-duration: 1600ms;
+	}
+}
+';
+}
+
+function zo_get_page_loader_js() {
+	return <<<JS
+(function () {
+	function finishLoader() {
+		var loader = document.querySelector('[data-zo-page-loader]');
+		if (!loader) {
+			return;
+		}
+		window.setTimeout(function () {
+			loader.classList.add('is-done');
+			window.setTimeout(function () {
+				if (loader && loader.parentNode) {
+					loader.parentNode.removeChild(loader);
+				}
+			}, 260);
+		}, 180);
+	}
+
+	if (document.readyState === 'complete') {
+		finishLoader();
+	} else {
+		window.addEventListener('load', finishLoader, { once: true });
+	}
+})();
+JS;
+}
+
+function zo_register_page_loader_assets() {
+	wp_register_style(
+		zo_get_page_loader_style_handle(),
+		false,
+		array(),
+		ZO_PLUGIN_VERSION
+	);
+	wp_add_inline_style(zo_get_page_loader_style_handle(), zo_get_page_loader_css());
+
+	wp_register_script(
+		zo_get_page_loader_script_handle(),
+		false,
+		array(),
+		ZO_PLUGIN_VERSION,
+		true
+	);
+	wp_add_inline_script(zo_get_page_loader_script_handle(), zo_get_page_loader_js());
+}
+add_action('wp_enqueue_scripts', 'zo_register_page_loader_assets', 3);
+
+function zo_enqueue_page_loader_assets() {
+	if (is_admin()) {
+		return;
+	}
+
+	if (wp_style_is(zo_get_page_loader_style_handle(), 'registered')) {
+		wp_enqueue_style(zo_get_page_loader_style_handle());
+	}
+
+	if (wp_script_is(zo_get_page_loader_script_handle(), 'registered')) {
+		wp_enqueue_script(zo_get_page_loader_script_handle());
+	}
+}
+add_action('wp_enqueue_scripts', 'zo_enqueue_page_loader_assets', 30);
+
+function zo_render_page_loader() {
+	if (is_admin()) {
+		return;
+	}
+
+	echo '<div class="zo-page-loader" data-zo-page-loader role="status" aria-label="' . esc_attr__('Loading', 'zeka-oyunlari') . '">';
+	echo '<img class="zo-page-loader__symbol" src="' . esc_url(ZO_PLUGIN_URL . 'assets/loading-reload.svg') . '" alt="" decoding="async">';
+	echo '</div>';
+}
+add_action('wp_body_open', 'zo_render_page_loader', 1);
 
 function zo_get_update_branch() {
 	$branch = 'main';

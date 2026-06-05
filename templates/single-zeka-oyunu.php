@@ -76,6 +76,7 @@ $difficulty_label = '';
 $related_games = array();
 $game_thumbnail_url = function_exists('zo_get_game_thumbnail_url') ? zo_get_game_thumbnail_url($post_id ? get_post($post_id) : null, $module) : '';
 $game_owner = function_exists('zo_get_game_owner_for_module') ? zo_get_game_owner_for_module($module) : '';
+$games_url  = $game_owner !== '' && function_exists('zo_get_owner_games_url') ? zo_get_owner_games_url($game_owner, $language) : $back_url;
 
 if ($module_description !== '') {
 	$seo_description = trim($page_title . ' ' . $play_suffix . '. ' . $module_description . ' ' . $seo_keywords);
@@ -307,7 +308,7 @@ if (function_exists('zo_get_related_game_items')) {
 
 		.zo-game-page__bottom-actions {
 			width: min(100%, 1400px);
-			margin: 24px auto 0;
+			margin: 42px auto 0;
 			padding: 0 0 36px;
 			font-family: Arial, sans-serif;
 			text-align: center;
@@ -401,7 +402,7 @@ if (function_exists('zo_get_related_game_items')) {
 			</section>
 			<?php endif; ?>
 			<div class="zo-game-page__bottom-actions">
-				<a class="zo-game-page__back" href="<?php echo esc_url($back_url); ?>"><?php echo esc_html(function_exists('zo_get_interface_text') ? zo_get_interface_text('back_to_games', $language) : 'Back to games'); ?></a>
+				<a class="zo-game-page__back" href="<?php echo esc_url($games_url); ?>"><?php echo esc_html(function_exists('zo_get_interface_text') ? zo_get_interface_text('back_to_games', $language) : 'Back to games'); ?></a>
 			</div>
 		</main>
 	</div>
