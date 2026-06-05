@@ -216,6 +216,90 @@ if (function_exists('zo_get_related_game_items')) {
 			color: #fff;
 		}
 
+		.zo-game-page__progress {
+			display: grid;
+			gap: 9px;
+			max-width: 680px;
+			margin: 14px 0 0;
+			font-family: Arial, sans-serif;
+		}
+
+		.zo-game-page__progress-track {
+			height: 9px;
+			border-radius: 999px;
+			background: rgba(226, 232, 240, 0.16);
+			overflow: hidden;
+		}
+
+		.zo-game-page__progress-fill {
+			display: block;
+			width: 0;
+			height: 100%;
+			border-radius: inherit;
+			background: linear-gradient(90deg, #14b8a6, #38bdf8);
+			transition: width 220ms ease;
+		}
+
+		.zo-game-page__progress-steps {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 8px;
+		}
+
+		.zo-game-page__progress-step {
+			display: inline-flex;
+			align-items: center;
+			min-height: 30px;
+			padding: 0 10px;
+			border-radius: 999px;
+			background: rgba(255, 255, 255, 0.08);
+			color: #cbd5e1;
+			font-size: 0.82rem;
+			font-weight: 800;
+		}
+
+		.zo-game-page__progress-step.is-active {
+			background: #0f766e;
+			color: #fff;
+		}
+
+		.zo-game-page__stats {
+			display: grid;
+			grid-template-columns: repeat(3, minmax(0, 1fr));
+			gap: 10px;
+			max-width: 680px;
+			margin: 12px 0 0;
+			font-family: Arial, sans-serif;
+		}
+
+		.zo-game-page__stat {
+			min-width: 0;
+			padding: 10px 12px;
+			border: 1px solid rgba(203, 213, 225, 0.18);
+			border-radius: 12px;
+			background: rgba(255, 255, 255, 0.08);
+		}
+
+		.zo-game-page__stat-label {
+			display: block;
+			margin-bottom: 4px;
+			color: #bfdbfe;
+			font-family: Arial, sans-serif;
+			font-size: 0.74rem;
+			font-weight: 900;
+			line-height: 1.15;
+			text-transform: uppercase;
+		}
+
+		.zo-game-page__stat-value {
+			display: block;
+			color: #f8fafc;
+			font-size: 0.98rem;
+			font-weight: 900;
+			line-height: 1.25;
+			overflow-wrap: anywhere;
+		}
+
 		.zo-game-page__stage {
 			flex: 1 1 auto;
 			width: min(100%, 1400px);
@@ -320,7 +404,12 @@ if (function_exists('zo_get_related_game_items')) {
 
 		@media (max-width: 640px) {
 			.zo-game-page__header {
-				padding: 14px 14px 8px;
+				position: sticky;
+				top: 0;
+				z-index: 40;
+				padding: 8px 10px 6px;
+				background: rgba(15, 23, 42, 0.94);
+				backdrop-filter: blur(10px);
 			}
 
 			.zo-game-page__back {
@@ -330,16 +419,94 @@ if (function_exists('zo_get_related_game_items')) {
 			}
 
 			.zo-game-page__main {
-				padding: 0 14px 22px;
+				padding: 0 10px 22px;
 			}
 
 			.zo-game-page__meta {
-				margin-bottom: 12px;
+				margin-bottom: 8px;
+			}
+
+			.zo-game-page__title {
+				margin-bottom: 5px;
+				font-size: clamp(22px, 8vw, 30px);
+			}
+
+			.zo-game-page__description {
+				display: -webkit-box;
+				-webkit-box-orient: vertical;
+				-webkit-line-clamp: 2;
+				overflow: hidden;
+				font-size: 0.92rem;
+				line-height: 1.42;
+			}
+
+			.zo-game-page__tags,
+			.zo-game-page__progress-steps {
+				flex-wrap: nowrap;
+				overflow-x: auto;
+				padding-bottom: 4px;
+				scrollbar-width: none;
+			}
+
+			.zo-game-page__tags::-webkit-scrollbar,
+			.zo-game-page__progress-steps::-webkit-scrollbar {
+				display: none;
+			}
+
+			.zo-game-page__progress {
+				margin-top: 8px;
+				gap: 7px;
+			}
+
+			.zo-game-page__progress-track {
+				height: 7px;
+			}
+
+			.zo-game-page__stats {
+				grid-template-columns: repeat(3, minmax(92px, 1fr));
+				gap: 8px;
+				overflow-x: auto;
+				padding-bottom: 4px;
+				scrollbar-width: none;
+			}
+
+			.zo-game-page__stats::-webkit-scrollbar {
+				display: none;
+			}
+
+			.zo-game-page__stat {
+				padding: 8px 10px;
 			}
 
 			.zo-game-page__stage .zo-game-shell,
 			.zo-game-page__stage .zo-game-root {
 				min-height: calc(100vh - 84px);
+			}
+
+			.zo-game-page__related {
+				margin-top: 18px;
+			}
+
+			.zo-game-page__related-title {
+				font-size: 1.12rem;
+			}
+
+			.zo-game-page__related-grid {
+				display: flex;
+				gap: 12px;
+				overflow-x: auto;
+				padding: 0 4px 10px;
+				scroll-snap-type: x mandatory;
+				scrollbar-width: none;
+			}
+
+			.zo-game-page__related-grid::-webkit-scrollbar {
+				display: none;
+			}
+
+			.zo-game-page__related-card {
+				flex: 0 0 min(82vw, 310px);
+				scroll-snap-align: start;
 			}
 
 			.zo-game-page__bottom-actions {
@@ -375,6 +542,32 @@ if (function_exists('zo_get_related_game_items')) {
 					<?php if ($difficulty_label !== '') : ?>
 					<span class="zo-game-page__tag zo-game-page__tag--difficulty"><?php echo esc_html((function_exists('zo_get_interface_text') ? zo_get_interface_text('difficulty_label', $language) : 'Difficulty') . ': ' . $difficulty_label); ?></span>
 					<?php endif; ?>
+				</div>
+				<div class="zo-game-page__progress" data-zo-game-progress aria-label="<?php echo esc_attr(function_exists('zo_get_interface_text') ? zo_get_interface_text('game_progress', $language) : 'Game progress'); ?>">
+					<div class="zo-game-page__progress-track" aria-hidden="true">
+						<span class="zo-game-page__progress-fill" data-zo-progress-fill></span>
+					</div>
+					<div class="zo-game-page__progress-steps">
+						<span class="zo-game-page__progress-step" data-zo-progress-step="opened"><?php echo esc_html(function_exists('zo_get_interface_text') ? zo_get_interface_text('progress_opened', $language) : 'Opened'); ?></span>
+						<span class="zo-game-page__progress-step" data-zo-progress-step="favorite"><?php echo esc_html(function_exists('zo_get_interface_text') ? zo_get_interface_text('progress_favorite', $language) : 'Favorite'); ?></span>
+						<?php if ($game_owner === 'asker') : ?>
+						<span class="zo-game-page__progress-step" data-zo-progress-step="streak"><?php echo esc_html(function_exists('zo_get_interface_text') ? zo_get_interface_text('progress_streak', $language) : 'Streak counting'); ?></span>
+						<?php endif; ?>
+					</div>
+				</div>
+				<div class="zo-game-page__stats" data-zo-game-stats aria-label="<?php echo esc_attr(function_exists('zo_get_interface_text') ? zo_get_interface_text('game_stats', $language) : 'Game stats'); ?>">
+					<div class="zo-game-page__stat">
+						<span class="zo-game-page__stat-label"><?php echo esc_html(function_exists('zo_get_interface_text') ? zo_get_interface_text('stat_plays', $language) : 'Plays'); ?></span>
+						<span class="zo-game-page__stat-value" data-zo-stat-plays>1</span>
+					</div>
+					<div class="zo-game-page__stat">
+						<span class="zo-game-page__stat-label"><?php echo esc_html(function_exists('zo_get_interface_text') ? zo_get_interface_text('stat_last_played', $language) : 'Last played'); ?></span>
+						<span class="zo-game-page__stat-value" data-zo-stat-last><?php echo esc_html(date_i18n(get_option('date_format'))); ?></span>
+					</div>
+					<div class="zo-game-page__stat">
+						<span class="zo-game-page__stat-label"><?php echo esc_html(function_exists('zo_get_interface_text') ? zo_get_interface_text('stat_favorite', $language) : 'Favorite'); ?></span>
+						<span class="zo-game-page__stat-value" data-zo-stat-favorite><?php echo esc_html(function_exists('zo_get_interface_text') ? zo_get_interface_text('stat_no', $language) : 'No'); ?></span>
+					</div>
 				</div>
 			</div>
 			<div class="zo-game-page__stage">
@@ -423,12 +616,81 @@ if (function_exists('zo_get_related_game_items')) {
 			if (!Array.isArray(items)) {
 				items = [];
 			}
+			var previous = null;
 			items = items.filter(function(item) {
-				return item && item.slug !== game.slug;
+				if (item && item.slug === game.slug) {
+					previous = item;
+					return false;
+				}
+				return item;
 			});
+			game.plays = Number(previous && previous.plays || 0) + 1;
+			game.lastPlayed = new Date().toISOString();
 			items.unshift(game);
 			localStorage.setItem(key, JSON.stringify(items.slice(0, 20)));
+
+			var stats = document.querySelector('[data-zo-game-stats]');
+			if (stats) {
+				var plays = stats.querySelector('[data-zo-stat-plays]');
+				var last = stats.querySelector('[data-zo-stat-last]');
+				var favorite = stats.querySelector('[data-zo-stat-favorite]');
+				var favorites = JSON.parse(localStorage.getItem('zoFavoriteGames') || '[]');
+				if (plays) {
+					plays.textContent = String(game.plays);
+				}
+				if (last) {
+					last.textContent = new Date(game.lastPlayed).toLocaleDateString();
+				}
+				if (favorite && Array.isArray(favorites)) {
+					favorite.textContent = favorites.some(function(item) { return item && item.slug === game.slug; }) ? <?php echo wp_json_encode(function_exists('zo_get_interface_text') ? zo_get_interface_text('stat_yes', $language) : 'Yes'); ?> : <?php echo wp_json_encode(function_exists('zo_get_interface_text') ? zo_get_interface_text('stat_no', $language) : 'No'); ?>;
+				}
+			}
 		} catch (error) {}
+	})();
+	</script>
+	<script>
+	(function(){
+		var root = document.querySelector('[data-zo-game-progress]');
+		if (!root) {
+			return;
+		}
+		var slug = <?php echo wp_json_encode($slug); ?>;
+		var owner = <?php echo wp_json_encode($game_owner); ?>;
+		var active = { opened: true, favorite: false, streak: false };
+
+		function read(key, fallback) {
+			try {
+				var value = JSON.parse(localStorage.getItem(key) || fallback);
+				return value;
+			} catch (error) {
+				return JSON.parse(fallback);
+			}
+		}
+
+		var favorites = read('zoFavoriteGames', '[]');
+		if (Array.isArray(favorites)) {
+			active.favorite = favorites.some(function(item) {
+				return item && item.slug === slug;
+			});
+		}
+
+		active.streak = owner === 'asker';
+
+		var steps = Array.prototype.slice.call(root.querySelectorAll('[data-zo-progress-step]'));
+		var activeCount = 0;
+		steps.forEach(function(step) {
+			var key = step.getAttribute('data-zo-progress-step');
+			var isActive = !!active[key];
+			step.classList.toggle('is-active', isActive);
+			if (isActive) {
+				activeCount++;
+			}
+		});
+
+		var fill = root.querySelector('[data-zo-progress-fill]');
+		if (fill && steps.length) {
+			fill.style.width = Math.round((activeCount / steps.length) * 100) + '%';
+		}
 	})();
 	</script>
 	<?php if ($game_owner === 'asker') : ?>
