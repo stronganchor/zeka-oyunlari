@@ -75,7 +75,10 @@ $difficulty_key = 'medium';
 $difficulty_label = '';
 $related_games = array();
 $game_thumbnail_url = function_exists('zo_get_game_thumbnail_url') ? zo_get_game_thumbnail_url($post_id ? get_post($post_id) : null, $module) : '';
-$game_owner = function_exists('zo_get_game_owner_for_module') ? zo_get_game_owner_for_module($module) : '';
+$game_owner = $post_id && function_exists('zo_get_game_owner_for_post') ? zo_get_game_owner_for_post($post_id) : '';
+if ($game_owner === '' && function_exists('zo_get_game_owner_for_module')) {
+	$game_owner = zo_get_game_owner_for_module($module);
+}
 $games_url  = $game_owner !== '' && function_exists('zo_get_owner_games_url') ? zo_get_owner_games_url($game_owner, $language) : $back_url;
 
 if ($module_description !== '') {
@@ -550,7 +553,7 @@ if (function_exists('zo_get_related_game_items')) {
 					<div class="zo-game-page__progress-steps">
 						<span class="zo-game-page__progress-step" data-zo-progress-step="opened"><?php echo esc_html(function_exists('zo_get_interface_text') ? zo_get_interface_text('progress_opened', $language) : 'Opened'); ?></span>
 						<span class="zo-game-page__progress-step" data-zo-progress-step="favorite"><?php echo esc_html(function_exists('zo_get_interface_text') ? zo_get_interface_text('progress_favorite', $language) : 'Favorite'); ?></span>
-						<?php if ($game_owner === 'asker') : ?>
+						<?php if (in_array($game_owner, array('asker', 'arslan'), true)) : ?>
 						<span class="zo-game-page__progress-step" data-zo-progress-step="streak"><?php echo esc_html(function_exists('zo_get_interface_text') ? zo_get_interface_text('progress_streak', $language) : 'Streak counting'); ?></span>
 						<?php endif; ?>
 					</div>
@@ -674,7 +677,7 @@ if (function_exists('zo_get_related_game_items')) {
 			});
 		}
 
-		active.streak = owner === 'asker';
+		active.streak = owner === 'asker' || owner === 'arslan';
 
 		var steps = Array.prototype.slice.call(root.querySelectorAll('[data-zo-progress-step]'));
 		var activeCount = 0;
@@ -693,10 +696,10 @@ if (function_exists('zo_get_related_game_items')) {
 		}
 	})();
 	</script>
-	<?php if ($game_owner === 'asker') : ?>
+	<?php if (in_array($game_owner, array('asker', 'arslan'), true)) : ?>
 	<script>
 	(function(){
-		var key = 'zoAskerPlayStreak';
+		var key = <?php echo wp_json_encode($game_owner === 'arslan' ? 'zoArslanPlayStreak' : 'zoAskerPlayStreak'); ?>;
 		var today = new Date();
 		var dayKey = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
 		var lastTick = Date.now();
