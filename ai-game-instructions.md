@@ -120,6 +120,22 @@ DO NOT omit the required file(s).
 
 ---
 
+## SECURITY AND DEPLOYMENT RULES
+
+* Do not create `.bak`, `.old`, `.orig`, `.save`, `.tmp`, `.log`, `.sql`, `.zip`, `.tar`, `.gz`, `.7z`, or `.rar` files
+* Do not create `.git`, `.vscode`, editor settings, workspace settings, cache folders, or hidden tool folders inside a game folder
+* Do not create helper/build files such as `.py`, `.ps1`, `.sh`, `.bat`, `.cmd`, `.md`, or `.txt` unless the user explicitly asks for them
+* Do not create debug logs, crash logs, temporary screenshots, generated markers, or backup copies in the live plugin folder
+* Do not put API keys, access tokens, secrets, passwords, private URLs, or credentials in any game file
+* Do not reference files outside the game folder with `../` paths
+* `featured-image.png`, optional `style.css`, and optional `script.js` must live in the same `/games/{game-slug}/` folder as `game.php`
+* Do not load remote scripts, remote stylesheets, remote fonts, trackers, analytics, iframes, pixels, ads, or third-party embeds
+* Do not use WordPress AJAX, REST API, `fetch`, cookies, or server writes unless the user explicitly asks for server-side behavior
+* Every PHP file must begin with the `ABSPATH` guard shown in the template
+* If split files are used, JavaScript and CSS must be static browser assets only; they must not contain secrets or deployment-only data
+
+---
+
 ## game.php REQUIREMENTS
 
 * Must return an array
