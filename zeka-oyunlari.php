@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.02.asker.arslan.2
+ * Version: 1.5.03.asker.arslan.2
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -282,13 +282,14 @@ function zo_plugin_deactivate() {
 }
 
 function zo_register_admin_health_page() {
-	add_submenu_page(
-		'tools.php',
-		'Zeka Oyunlari Health',
-		'Zeka Oyunlari Health',
+	add_menu_page(
+		'Zekâ content look up',
+		'Zekâ content look up',
 		'manage_options',
-		'zeka-oyunlari-health',
-		'zo_render_admin_health_page'
+		'zeka-content-look-up',
+		'zo_render_admin_health_page',
+		'dashicons-search',
+		58
 	);
 }
 add_action('admin_menu', 'zo_register_admin_health_page');
@@ -303,8 +304,64 @@ function zo_admin_status_badge($status, $label) {
 	);
 }
 
+function zo_admin_priority_badge($priority) {
+	$priority = in_array($priority, array('critical', 'warning', 'info'), true) ? $priority : 'warning';
+	$labels   = array(
+		'critical' => 'Critical',
+		'warning'  => 'Warning',
+		'info'     => 'Info',
+	);
+
+	return sprintf(
+		'<span class="zo-admin-priority zo-admin-priority--%1$s">%2$s</span>',
+		esc_attr($priority),
+		esc_html($labels[$priority])
+	);
+}
+
+function zo_admin_priority_for_status($status) {
+	if ($status === 'bad') {
+		return 'critical';
+	}
+
+	if ($status === 'warn') {
+		return 'warning';
+	}
+
+	return 'info';
+}
+
+function zo_admin_recheck_key() {
+	$key = isset($_GET['zo_recheck']) ? sanitize_key(wp_unslash($_GET['zo_recheck'])) : '';
+
+	return $key;
+}
+
+function zo_admin_recheck_button($key, $label = 'Recheck') {
+	$key = sanitize_key($key);
+	$url = add_query_arg(
+		array(
+			'page' => 'zeka-content-look-up',
+			'zo_recheck' => $key,
+		),
+		admin_url('admin.php')
+	);
+
+	return sprintf(
+		'<a class="button button-small zo-admin-recheck-button" href="%1$s#%2$s">%3$s</a>',
+		esc_url($url),
+		esc_attr($key),
+		esc_html($label)
+	);
+}
+
 function zo_admin_collect_files($extensions, $skip_directories = array()) {
-	$extensions = array_map('strtolower', array_map('ltrim', (array) $extensions, array_fill(0, count((array) $extensions), '.')));
+	$extensions = array_map(
+		function ($extension) {
+			return strtolower(ltrim((string) $extension, '.'));
+		},
+		(array) $extensions
+	);
 	$files      = array();
 	$root       = realpath(ZO_PLUGIN_DIR);
 
@@ -386,36 +443,268 @@ function zo_admin_get_security_checks() {
 
 	return array(
 		array(
+			'key' => 'security-blocked-files',
 			'label' => 'No backup, log, dump, or archive files',
 			'status' => empty($blocked_files) ? 'good' : 'bad',
+			'priority' => empty($blocked_files) ? 'info' : 'critical',
 			'message' => empty($blocked_files) ? 'No risky generated files found.' : count($blocked_files) . ' risky file(s) found.',
 			'items' => $blocked_files,
 		),
 		array(
+			'key' => 'security-apache-blocks',
 			'label' => 'Apache blocks private plugin files',
 			'status' => file_exists(ZO_PLUGIN_DIR . '.htaccess') && zo_admin_file_contains('.htaccess', array('.git', '.vscode', 'FilesMatch')) ? 'good' : 'warn',
+			'priority' => file_exists(ZO_PLUGIN_DIR . '.htaccess') && zo_admin_file_contains('.htaccess', array('.git', '.vscode', 'FilesMatch')) ? 'info' : 'warning',
 			'message' => file_exists(ZO_PLUGIN_DIR . '.htaccess') ? '.htaccess is present.' : '.htaccess is missing.',
 			'items' => array(),
 		),
 		array(
+			'key' => 'security-iis-blocks',
 			'label' => 'IIS blocks private plugin files',
 			'status' => file_exists(ZO_PLUGIN_DIR . 'web.config') && zo_admin_file_contains('web.config', array('.git', '.vscode', 'fileExtensions')) ? 'good' : 'warn',
+			'priority' => file_exists(ZO_PLUGIN_DIR . 'web.config') && zo_admin_file_contains('web.config', array('.git', '.vscode', 'fileExtensions')) ? 'info' : 'warning',
 			'message' => file_exists(ZO_PLUGIN_DIR . 'web.config') ? 'web.config is present.' : 'web.config is missing.',
 			'items' => array(),
 		),
 		array(
+			'key' => 'security-local-folders',
 			'label' => 'Local development folders are not public assets',
 			'status' => (is_dir(ZO_PLUGIN_DIR . '.git') || is_dir(ZO_PLUGIN_DIR . '.vscode')) ? 'warn' : 'good',
+			'priority' => (is_dir(ZO_PLUGIN_DIR . '.git') || is_dir(ZO_PLUGIN_DIR . '.vscode')) ? 'warning' : 'info',
 			'message' => (is_dir(ZO_PLUGIN_DIR . '.git') || is_dir(ZO_PLUGIN_DIR . '.vscode')) ? 'Local folders exist here. Keep them blocked or out of deployments.' : 'No local development folders found.',
 			'items' => array(),
 		),
 		array(
+			'key' => 'security-helper-scripts',
 			'label' => 'Helper scripts are not public assets',
 			'status' => empty($helper_files) ? 'good' : 'warn',
+			'priority' => empty($helper_files) ? 'info' : 'warning',
 			'message' => empty($helper_files) ? 'No helper scripts found.' : count($helper_files) . ' helper script(s) found. Keep blocked or out of deployments.',
 			'items' => $helper_files,
 		),
 	);
+}
+
+function zo_admin_get_site_kit_info() {
+	global $wpdb;
+
+	$plugins = (array) get_option('active_plugins', array());
+	$site_kit_file = 'google-site-kit/google-site-kit.php';
+	$site_kit_path = defined('WP_PLUGIN_DIR') ? trailingslashit(WP_PLUGIN_DIR) . $site_kit_file : '';
+	$is_installed = $site_kit_path !== '' && file_exists($site_kit_path);
+	$is_active = in_array($site_kit_file, $plugins, true);
+
+	if (!$is_active && is_multisite()) {
+		$network_plugins = (array) get_site_option('active_sitewide_plugins', array());
+		$is_active = isset($network_plugins[$site_kit_file]);
+	}
+
+	$option_names = array();
+	if ($wpdb instanceof wpdb) {
+		$option_names = $wpdb->get_col(
+			"SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE 'googlesitekit_%' ORDER BY option_name LIMIT 20"
+		);
+		if (!is_array($option_names)) {
+			$option_names = array();
+		}
+	}
+	$has_settings = !empty($option_names);
+	$connected = in_array('googlesitekit_core_site', $option_names, true)
+		|| in_array('googlesitekit_core_user', $option_names, true)
+		|| in_array('googlesitekit_search-console_settings', $option_names, true);
+	$option_items = array_map(
+		function ($option_name) {
+			return array(
+				'path' => $option_name,
+			);
+		},
+		$option_names
+	);
+
+	return array(
+		array(
+			'key' => 'site-kit-installed',
+			'label' => 'Site Kit installed',
+			'status' => $is_installed ? 'good' : 'warn',
+			'priority' => $is_installed ? 'info' : 'warning',
+			'message' => $is_installed ? 'Google Site Kit files are installed.' : 'Google Site Kit files were not found.',
+			'items' => array(),
+		),
+		array(
+			'key' => 'site-kit-plugin',
+			'label' => 'Site Kit plugin',
+			'status' => $is_active ? 'good' : 'warn',
+			'priority' => $is_active ? 'info' : 'warning',
+			'message' => $is_active ? 'Google Site Kit is active.' : 'Google Site Kit is not active on this site.',
+			'items' => array(),
+		),
+		array(
+			'key' => 'site-kit-settings',
+			'label' => 'Site Kit saved bilgi',
+			'status' => $has_settings ? 'good' : 'warn',
+			'priority' => $has_settings ? 'info' : 'warning',
+			'message' => $has_settings ? count($option_names) . ' Site Kit option(s) were found in WordPress.' : 'No Site Kit options were found yet.',
+			'items' => $option_items,
+		),
+		array(
+			'key' => 'site-kit-connection',
+			'label' => 'Site Kit connection',
+			'status' => $connected ? 'good' : 'warn',
+			'priority' => $connected ? 'info' : 'warning',
+			'message' => $connected ? 'Site Kit looks connected from saved options.' : 'Connection details were not found in saved options.',
+			'items' => array(),
+		),
+	);
+}
+
+function zo_admin_get_localized_parts($text) {
+	$text = is_string($text) ? $text : '';
+	$labels = array('tr' => 'TR:', 'en' => 'EN:', 'de' => 'DE:', 'fr' => 'FR:', 'es-mx' => 'ES-MX:', 'es-es' => 'ES-ES:');
+	$matches = array();
+
+	foreach ($labels as $lang => $label) {
+		$position = stripos($text, $label);
+		if ($position !== false) {
+			$matches[] = array(
+				'lang' => $lang,
+				'position' => $position,
+				'length' => strlen($label),
+			);
+		}
+	}
+
+	if (empty($matches)) {
+		return array();
+	}
+
+	usort(
+		$matches,
+		function ($a, $b) {
+			return $a['position'] <=> $b['position'];
+		}
+	);
+
+	$parts = array();
+	$count = count($matches);
+	for ($index = 0; $index < $count; $index++) {
+		$start = $matches[$index]['position'] + $matches[$index]['length'];
+		$end = $index + 1 < $count ? $matches[$index + 1]['position'] : strlen($text);
+		$value = trim(substr($text, $start, $end - $start));
+		$value = trim($value, " \t\n\r\0\x0B|");
+		if ($value !== '') {
+			$parts[$matches[$index]['lang']] = $value;
+		}
+	}
+
+	return $parts;
+}
+
+function zo_admin_get_missing_translation_checks() {
+	$items = array();
+	$languages = array_keys(zo_get_language_options());
+
+	foreach (zo_get_game_modules() as $module) {
+		if (!is_array($module) || empty($module['slug'])) {
+			continue;
+		}
+
+		$metadata = zo_get_game_display_metadata($module);
+		$name = !empty($metadata['name']) && is_string($metadata['name']) ? $metadata['name'] : (!empty($module['name']) ? (string) $module['name'] : '');
+		$description = !empty($metadata['description']) && is_string($metadata['description']) ? $metadata['description'] : (!empty($module['description']) ? (string) $module['description'] : '');
+		$name_parts = zo_admin_get_localized_parts($name);
+		$description_parts = zo_admin_get_localized_parts($description);
+		$missing = array();
+
+		foreach ($languages as $lang) {
+			if (empty($name_parts[$lang])) {
+				$missing[] = strtoupper($lang) . ' name';
+			}
+
+			if (empty($description_parts[$lang])) {
+				$missing[] = strtoupper($lang) . ' description';
+			}
+		}
+
+		if (!empty($missing)) {
+			$items[] = array(
+				'slug' => sanitize_title($module['slug']),
+				'name' => $name !== '' ? zo_get_localized_text($name, 'en') : sanitize_title($module['slug']),
+				'priority' => count($missing) >= count($languages) ? 'critical' : 'warning',
+				'missing' => $missing,
+			);
+		}
+	}
+
+	return $items;
+}
+
+function zo_admin_get_empty_broken_game_checks() {
+	$items = array();
+	$loaded_by_folder = array();
+	$modules = zo_get_game_modules();
+
+	foreach ($modules as $module) {
+		if (!is_array($module) || empty($module['folder'])) {
+			continue;
+		}
+
+		$loaded_by_folder[(string) $module['folder']] = $module;
+	}
+
+	$game_root = ZO_PLUGIN_DIR . 'games';
+	$directories = is_dir($game_root) ? glob(trailingslashit($game_root) . '*', GLOB_ONLYDIR) : array();
+	if (!is_array($directories)) {
+		$directories = array();
+	}
+
+	foreach ($directories as $directory) {
+		$folder = basename($directory);
+		if ($folder === '_shared') {
+			continue;
+		}
+
+		$game_file = trailingslashit($directory) . 'game.php';
+		$issues = array();
+
+		if (!file_exists($game_file)) {
+			$issues[] = 'Missing game.php.';
+		} elseif ((int) filesize($game_file) <= 0) {
+			$issues[] = 'game.php is empty.';
+		} elseif (empty($loaded_by_folder[$folder])) {
+			$issues[] = 'game.php did not load as a valid module.';
+		}
+
+		if (!empty($loaded_by_folder[$folder])) {
+			$module = $loaded_by_folder[$folder];
+			foreach (array('slug', 'name', 'author', 'description', 'render_callback') as $key) {
+				if (empty($module[$key])) {
+					$issues[] = 'Missing module field: ' . $key . '.';
+				}
+			}
+
+			if (!empty($module['render_callback']) && !is_callable($module['render_callback'])) {
+				$issues[] = 'Render callback is not callable.';
+			}
+		}
+
+		if (!empty($issues)) {
+			$items[] = array(
+				'folder' => $folder,
+				'path' => 'games/' . $folder . '/game.php',
+				'priority' => in_array('game.php is empty.', $issues, true) || in_array('Missing game.php.', $issues, true) ? 'critical' : 'warning',
+				'issues' => $issues,
+			);
+		}
+	}
+
+	usort(
+		$items,
+		function ($a, $b) {
+			return strcasecmp($a['folder'], $b['folder']);
+		}
+	);
+
+	return $items;
 }
 
 function zo_admin_get_image_checks() {
@@ -532,12 +821,17 @@ function zo_admin_get_duplicate_game_groups() {
 }
 
 function zo_render_admin_health_table($rows) {
-	echo '<table class="widefat striped zo-admin-health-table"><thead><tr><th>Check</th><th>Status</th><th>Details</th></tr></thead><tbody>';
+	$recheck_key = zo_admin_recheck_key();
+	echo '<table class="widefat striped zo-admin-health-table"><thead><tr><th>Check</th><th>Priority</th><th>Status</th><th>Details</th><th>Recheck</th></tr></thead><tbody>';
 	foreach ($rows as $row) {
 		$status = isset($row['status']) ? $row['status'] : 'warn';
 		$label = $status === 'good' ? 'Good' : ($status === 'bad' ? 'Fix' : 'Check');
-		echo '<tr>';
+		$priority = isset($row['priority']) ? $row['priority'] : zo_admin_priority_for_status($status);
+		$key = !empty($row['key']) ? sanitize_key($row['key']) : sanitize_key($row['label']);
+		$class = $key === $recheck_key ? ' class="zo-admin-rechecked"' : '';
+		echo '<tr id="' . esc_attr($key) . '"' . $class . '>';
 		echo '<td><strong>' . esc_html($row['label']) . '</strong></td>';
+		echo '<td>' . zo_admin_priority_badge($priority) . '</td>';
 		echo '<td>' . zo_admin_status_badge($status, $label) . '</td>';
 		echo '<td>' . esc_html($row['message']);
 		if (!empty($row['items']) && is_array($row['items'])) {
@@ -552,7 +846,9 @@ function zo_render_admin_health_table($rows) {
 			}
 			echo '</ul>';
 		}
-		echo '</td></tr>';
+		echo '</td>';
+		echo '<td>' . zo_admin_recheck_button($key) . '</td>';
+		echo '</tr>';
 	}
 	echo '</tbody></table>';
 }
@@ -563,13 +859,17 @@ function zo_render_admin_health_page() {
 	}
 
 	$security_checks = zo_admin_get_security_checks();
+	$site_kit_info = zo_admin_get_site_kit_info();
 	$image_issues = zo_admin_get_image_checks();
 	$duplicates = zo_admin_get_duplicate_game_groups();
+	$translation_issues = zo_admin_get_missing_translation_checks();
+	$broken_games = zo_admin_get_empty_broken_game_checks();
 	$total_modules = count(zo_get_game_modules());
+	$recheck_key = zo_admin_recheck_key();
 
 	echo '<div class="wrap zo-admin-health">';
-	echo '<h1>Zeka Oyunlari Health</h1>';
-	echo '<p>Admin-only scanner for security hygiene, game thumbnails, and likely duplicate games.</p>';
+	echo '<h1>Zekâ content look up</h1>';
+	echo '<p>Admin-only scanner for site bilgi, security hygiene, game thumbnails, translations, broken games, and likely duplicate games.</p>';
 
 	echo '<style>
 		.zo-admin-health-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:18px 0}
@@ -579,16 +879,32 @@ function zo_render_admin_health_page() {
 		.zo-admin-badge--good{background:#d1fae5;color:#065f46}
 		.zo-admin-badge--warn{background:#fef3c7;color:#92400e}
 		.zo-admin-badge--bad{background:#fee2e2;color:#991b1b}
+		.zo-admin-priority{display:inline-flex;min-width:70px;justify-content:center;border-radius:6px;padding:4px 9px;font-weight:700;font-size:12px}
+		.zo-admin-priority--critical{background:#991b1b;color:#fff}
+		.zo-admin-priority--warning{background:#f59e0b;color:#111827}
+		.zo-admin-priority--info{background:#e5e7eb;color:#374151}
 		.zo-admin-mini-list{margin:8px 0 0 0}
 		.zo-admin-mini-list li{margin:3px 0}
 		.zo-admin-section{margin-top:24px}
 		.zo-admin-issue-list{margin:0;padding-left:18px}
+		.zo-admin-rechecked{outline:3px solid #2271b1;outline-offset:-3px}
+		.zo-admin-recheck-button{white-space:nowrap}
 	</style>';
 
 	echo '<div class="zo-admin-health-summary">';
 	echo '<div class="zo-admin-health-card"><strong>' . esc_html((string) $total_modules) . '</strong><span>Loaded games</span></div>';
 	echo '<div class="zo-admin-health-card"><strong>' . esc_html((string) count($image_issues)) . '</strong><span>Image issues</span></div>';
+	echo '<div class="zo-admin-health-card"><strong>' . esc_html((string) count($translation_issues)) . '</strong><span>Translation issues</span></div>';
+	echo '<div class="zo-admin-health-card"><strong>' . esc_html((string) count($broken_games)) . '</strong><span>Broken games</span></div>';
 	echo '<div class="zo-admin-health-card"><strong>' . esc_html((string) count($duplicates)) . '</strong><span>Duplicate groups</span></div>';
+	echo '</div>';
+
+	if ($recheck_key !== '') {
+		echo '<div class="notice notice-success inline"><p>Rechecked: <code>' . esc_html($recheck_key) . '</code></p></div>';
+	}
+
+	echo '<div class="zo-admin-section"><h2>Bilgi from Site Kit</h2>';
+	zo_render_admin_health_table($site_kit_info);
 	echo '</div>';
 
 	echo '<div class="zo-admin-section"><h2>Security Health Page</h2>';
@@ -597,11 +913,12 @@ function zo_render_admin_health_page() {
 
 	echo '<div class="zo-admin-section"><h2>Game Image Checker</h2>';
 	if (empty($image_issues)) {
-		echo '<p>' . zo_admin_status_badge('good', 'Good') . ' No thumbnail problems found.</p>';
+		echo '<p id="image-checker-empty"' . ($recheck_key === 'image-checker-empty' ? ' class="zo-admin-rechecked"' : '') . '>' . zo_admin_status_badge('good', 'Good') . ' No thumbnail problems found. ' . zo_admin_recheck_button('image-checker-empty') . '</p>';
 	} else {
-		echo '<table class="widefat striped"><thead><tr><th>Game</th><th>Image</th><th>Details</th><th>Issues</th></tr></thead><tbody>';
+		echo '<table class="widefat striped"><thead><tr><th>Game</th><th>Image</th><th>Details</th><th>Issues</th><th>Recheck</th></tr></thead><tbody>';
 		foreach ($image_issues as $item) {
-			echo '<tr>';
+			$key = 'image-' . sanitize_key($item['slug']);
+			echo '<tr id="' . esc_attr($key) . '"' . ($recheck_key === $key ? ' class="zo-admin-rechecked"' : '') . '>';
 			echo '<td><strong>' . esc_html($item['name']) . '</strong><br><code>' . esc_html($item['slug']) . '</code></td>';
 			echo '<td>' . ($item['image'] !== '' ? '<code>' . esc_html($item['image']) . '</code>' : '<em>Missing</em>') . '</td>';
 			echo '<td>' . esc_html($item['details']) . '</td>';
@@ -610,6 +927,52 @@ function zo_render_admin_health_page() {
 				echo '<li>' . esc_html($issue) . '</li>';
 			}
 			echo '</ul></td>';
+			echo '<td>' . zo_admin_recheck_button($key) . '</td>';
+			echo '</tr>';
+		}
+		echo '</tbody></table>';
+	}
+	echo '</div>';
+
+	echo '<div class="zo-admin-section"><h2>Missing Translation Checker</h2>';
+	if (empty($translation_issues)) {
+		echo '<p id="translation-checker-empty"' . ($recheck_key === 'translation-checker-empty' ? ' class="zo-admin-rechecked"' : '') . '>' . zo_admin_status_badge('good', 'Good') . ' No missing metadata translations found. ' . zo_admin_recheck_button('translation-checker-empty') . '</p>';
+	} else {
+		echo '<table class="widefat striped"><thead><tr><th>Game</th><th>Priority</th><th>Missing</th><th>Recheck</th></tr></thead><tbody>';
+		foreach ($translation_issues as $item) {
+			$key = 'translation-' . sanitize_key($item['slug']);
+			echo '<tr id="' . esc_attr($key) . '"' . ($recheck_key === $key ? ' class="zo-admin-rechecked"' : '') . '>';
+			echo '<td><strong>' . esc_html($item['name']) . '</strong><br><code>' . esc_html($item['slug']) . '</code></td>';
+			echo '<td>' . zo_admin_priority_badge($item['priority']) . '</td>';
+			echo '<td><ul class="zo-admin-issue-list">';
+			foreach ($item['missing'] as $missing) {
+				echo '<li>' . esc_html($missing) . '</li>';
+			}
+			echo '</ul></td>';
+			echo '<td>' . zo_admin_recheck_button($key) . '</td>';
+			echo '</tr>';
+		}
+		echo '</tbody></table>';
+	}
+	echo '</div>';
+
+	echo '<div class="zo-admin-section"><h2>Empty/Broken Game Checker</h2>';
+	if (empty($broken_games)) {
+		echo '<p id="broken-checker-empty"' . ($recheck_key === 'broken-checker-empty' ? ' class="zo-admin-rechecked"' : '') . '>' . zo_admin_status_badge('good', 'Good') . ' No empty or broken game modules found. ' . zo_admin_recheck_button('broken-checker-empty') . '</p>';
+	} else {
+		echo '<table class="widefat striped"><thead><tr><th>Game folder</th><th>Priority</th><th>File</th><th>Issues</th><th>Recheck</th></tr></thead><tbody>';
+		foreach ($broken_games as $item) {
+			$key = 'broken-' . sanitize_key($item['folder']);
+			echo '<tr id="' . esc_attr($key) . '"' . ($recheck_key === $key ? ' class="zo-admin-rechecked"' : '') . '>';
+			echo '<td><strong>' . esc_html($item['folder']) . '</strong></td>';
+			echo '<td>' . zo_admin_priority_badge($item['priority']) . '</td>';
+			echo '<td><code>' . esc_html($item['path']) . '</code></td>';
+			echo '<td><ul class="zo-admin-issue-list">';
+			foreach ($item['issues'] as $issue) {
+				echo '<li>' . esc_html($issue) . '</li>';
+			}
+			echo '</ul></td>';
+			echo '<td>' . zo_admin_recheck_button($key) . '</td>';
 			echo '</tr>';
 		}
 		echo '</tbody></table>';
@@ -618,11 +981,12 @@ function zo_render_admin_health_page() {
 
 	echo '<div class="zo-admin-section"><h2>Duplicate Game Detector</h2>';
 	if (empty($duplicates)) {
-		echo '<p>' . zo_admin_status_badge('good', 'Good') . ' No likely duplicate groups found.</p>';
+		echo '<p id="duplicate-checker-empty"' . ($recheck_key === 'duplicate-checker-empty' ? ' class="zo-admin-rechecked"' : '') . '>' . zo_admin_status_badge('good', 'Good') . ' No likely duplicate groups found. ' . zo_admin_recheck_button('duplicate-checker-empty') . '</p>';
 	} else {
-		echo '<table class="widefat striped"><thead><tr><th>Similarity key</th><th>Games</th></tr></thead><tbody>';
+		echo '<table class="widefat striped"><thead><tr><th>Similarity key</th><th>Games</th><th>Recheck</th></tr></thead><tbody>';
 		foreach ($duplicates as $key => $items) {
-			echo '<tr><td><code>' . esc_html($key) . '</code></td><td><ul class="zo-admin-mini-list">';
+			$row_key = 'duplicate-' . sanitize_key($key);
+			echo '<tr id="' . esc_attr($row_key) . '"' . ($recheck_key === $row_key ? ' class="zo-admin-rechecked"' : '') . '><td><code>' . esc_html($key) . '</code></td><td><ul class="zo-admin-mini-list">';
 			foreach ($items as $item) {
 				echo '<li><strong>' . esc_html($item['title']) . '</strong> <code>' . esc_html($item['slug']) . '</code>';
 				if ($item['author'] !== '') {
@@ -633,7 +997,7 @@ function zo_render_admin_health_page() {
 				}
 				echo '</li>';
 			}
-			echo '</ul></td></tr>';
+			echo '</ul></td><td>' . zo_admin_recheck_button($row_key) . '</td></tr>';
 		}
 		echo '</tbody></table>';
 	}
