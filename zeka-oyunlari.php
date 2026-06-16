@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.03.asker.arslan.2
+ * Version: 1.5.05.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -293,6 +293,47 @@ function zo_register_admin_health_page() {
 	);
 }
 add_action('admin_menu', 'zo_register_admin_health_page');
+
+function zo_admin_export_report() {
+	if (!current_user_can('manage_options')) {
+		wp_die(esc_html__('Sorry, you are not allowed to export this report.', 'zeka-oyunlari'));
+	}
+
+	check_admin_referer('zo_export_content_lookup');
+
+	$format = isset($_GET['format']) ? sanitize_key(wp_unslash($_GET['format'])) : 'json';
+	$report = zo_admin_get_content_lookup_report();
+
+	if ($format === 'csv') {
+		nocache_headers();
+		header('Content-Type: text/csv; charset=utf-8');
+		header('Content-Disposition: attachment; filename=zeka-content-look-up-report.csv');
+		$output = fopen('php://output', 'w');
+		fputcsv($output, array('section', 'name', 'status', 'priority', 'details'));
+		fputcsv($output, array('summary', 'Site score', $report['score']['score'], $report['score']['status'], implode(' | ', $report['score']['reasons'])));
+		foreach ($report['security_checks'] as $row) {
+			fputcsv($output, array('security', $row['label'], $row['status'], $row['priority'], $row['message']));
+		}
+		foreach ($report['site_kit_import'] as $row) {
+			fputcsv($output, array('site_kit', $row['label'], $row['status'], $row['priority'], $row['message']));
+		}
+		foreach ($report['game_quality'] as $row) {
+			fputcsv($output, array('game_quality', $row['name'], $row['score'], $row['status'], implode(' | ', $row['issues'])));
+		}
+		foreach ($report['recently_broken'] as $row) {
+			fputcsv($output, array('recently_broken', $row['folder'], $row['modified'], $row['priority'], implode(' | ', $row['issues'])));
+		}
+		fclose($output);
+		exit;
+	}
+
+	nocache_headers();
+	header('Content-Type: application/json; charset=utf-8');
+	header('Content-Disposition: attachment; filename=zeka-content-look-up-report.json');
+	echo wp_json_encode($report, JSON_PRETTY_PRINT);
+	exit;
+}
+add_action('admin_post_zo_export_content_lookup', 'zo_admin_export_report');
 
 function zo_admin_status_badge($status, $label) {
 	$status = in_array($status, array('good', 'warn', 'bad'), true) ? $status : 'warn';
@@ -707,6 +748,416 @@ function zo_admin_get_empty_broken_game_checks() {
 	return $items;
 }
 
+function zo_admin_get_content_activity_points($days = 90) {
+	$days = max(7, (int) $days);
+	$today = strtotime(current_time('Y-m-d'));
+	$points = array();
+
+	for ($offset = $days - 1; $offset >= 0; $offset--) {
+		$timestamp = strtotime('-' . $offset . ' days', $today);
+		$key = date('Y-m-d', $timestamp);
+		$points[$key] = array(
+			'label' => date('M j', $timestamp),
+			'value' => 0,
+		);
+	}
+
+	$files = array();
+	foreach (zo_get_game_modules() as $module) {
+		if (!is_array($module) || empty($module['folder'])) {
+			continue;
+		}
+
+		$folder = trailingslashit(ZO_PLUGIN_DIR . 'games/' . (string) $module['folder']);
+		foreach (array('game.php', 'featured-image.png', 'featured-image.jpg', 'featured-image.jpeg', 'featured-image.webp') as $relative_file) {
+			$path = $folder . $relative_file;
+			if (is_readable($path)) {
+				$files[] = $path;
+			}
+		}
+	}
+
+	foreach ($files as $file) {
+		$modified = (int) filemtime($file);
+		if ($modified <= 0) {
+			continue;
+		}
+
+		$key = date('Y-m-d', $modified);
+		if (isset($points[$key])) {
+			$points[$key]['value']++;
+		}
+	}
+
+	return array_values($points);
+}
+
+function zo_admin_get_issue_breakdown($security_checks, $image_issues, $translation_issues, $broken_games, $duplicates) {
+	$security_needs_attention = 0;
+	foreach ($security_checks as $check) {
+		if (!empty($check['status']) && $check['status'] !== 'good') {
+			$security_needs_attention++;
+		}
+	}
+
+	return array(
+		array(
+			'label' => 'Security',
+			'value' => $security_needs_attention,
+			'color' => '#0f766e',
+		),
+		array(
+			'label' => 'Images',
+			'value' => count($image_issues),
+			'color' => '#f59e0b',
+		),
+		array(
+			'label' => 'Translations',
+			'value' => count($translation_issues),
+			'color' => '#7c3aed',
+		),
+		array(
+			'label' => 'Broken games',
+			'value' => count($broken_games),
+			'color' => '#dc2626',
+		),
+		array(
+			'label' => 'Duplicates',
+			'value' => count($duplicates),
+			'color' => '#2563eb',
+		),
+	);
+}
+
+function zo_admin_get_site_kit_import_summary() {
+	global $wpdb;
+
+	$rows = array();
+	$patterns = array(
+		'Analytics' => '%googlesitekit%analytics%',
+		'Search Console' => '%googlesitekit%search-console%',
+		'PageSpeed' => '%googlesitekit%pagespeed%',
+	);
+
+	foreach ($patterns as $label => $pattern) {
+		$option_names = array();
+		if ($wpdb instanceof wpdb) {
+			$option_names = $wpdb->get_col(
+				$wpdb->prepare(
+					"SELECT option_name FROM {$wpdb->options} WHERE option_name LIKE %s ORDER BY option_name LIMIT 12",
+					$pattern
+				)
+			);
+			if (!is_array($option_names)) {
+				$option_names = array();
+			}
+		}
+
+		$rows[] = array(
+			'key' => 'site-kit-import-' . sanitize_key($label),
+			'label' => $label . ' import',
+			'status' => empty($option_names) ? 'warn' : 'good',
+			'priority' => empty($option_names) ? 'warning' : 'info',
+			'message' => empty($option_names) ? 'No saved Site Kit ' . $label . ' data was found.' : count($option_names) . ' saved Site Kit option(s) found.',
+			'items' => array_map(
+				function ($option_name) {
+					return array('path' => $option_name);
+				},
+				$option_names
+			),
+		);
+	}
+
+	return $rows;
+}
+
+function zo_admin_calculate_health_score($security_checks, $image_issues, $translation_issues, $broken_games, $duplicates) {
+	$score = 100;
+	$reasons = array();
+
+	foreach ($security_checks as $check) {
+		if (!empty($check['status']) && $check['status'] === 'bad') {
+			$score -= 15;
+			$reasons[] = $check['label'];
+		} elseif (!empty($check['status']) && $check['status'] === 'warn') {
+			$score -= 6;
+			$reasons[] = $check['label'];
+		}
+	}
+
+	$score -= min(25, count($broken_games) * 12);
+	$score -= min(20, count($image_issues) * 3);
+	$score -= min(20, count($translation_issues) * 2);
+	$score -= min(15, count($duplicates) * 3);
+
+	if (!empty($broken_games)) {
+		$reasons[] = count($broken_games) . ' broken game(s)';
+	}
+	if (!empty($image_issues)) {
+		$reasons[] = count($image_issues) . ' image issue(s)';
+	}
+	if (!empty($translation_issues)) {
+		$reasons[] = count($translation_issues) . ' translation issue(s)';
+	}
+	if (!empty($duplicates)) {
+		$reasons[] = count($duplicates) . ' duplicate group(s)';
+	}
+
+	$score = max(0, min(100, $score));
+	$status = $score >= 85 ? 'good' : ($score >= 65 ? 'warn' : 'bad');
+
+	return array(
+		'score' => $score,
+		'status' => $status,
+		'reasons' => array_slice(array_unique($reasons), 0, 8),
+	);
+}
+
+function zo_admin_get_game_quality_scores($image_issues, $translation_issues, $broken_games, $duplicates) {
+	$image_by_slug = array();
+	foreach ($image_issues as $item) {
+		$image_by_slug[$item['slug']] = $item;
+	}
+
+	$translation_by_slug = array();
+	foreach ($translation_issues as $item) {
+		$translation_by_slug[$item['slug']] = $item;
+	}
+
+	$broken_by_folder = array();
+	foreach ($broken_games as $item) {
+		$broken_by_folder[$item['folder']] = $item;
+	}
+
+	$duplicate_slugs = array();
+	foreach ($duplicates as $items) {
+		foreach ($items as $item) {
+			if (!empty($item['slug'])) {
+				$duplicate_slugs[$item['slug']] = true;
+			}
+		}
+	}
+
+	$rows = array();
+	foreach (zo_get_game_modules() as $module) {
+		if (!is_array($module) || empty($module['slug'])) {
+			continue;
+		}
+
+		$slug = sanitize_title($module['slug']);
+		$folder = !empty($module['folder']) ? (string) $module['folder'] : '';
+		$metadata = zo_get_localized_game_display_metadata($module, 'en');
+		$name = !empty($metadata['name']) ? $metadata['name'] : $slug;
+		$description = !empty($metadata['description']) ? $metadata['description'] : '';
+		$score = 100;
+		$issues = array();
+
+		if ($folder !== '' && isset($broken_by_folder[$folder])) {
+			$score -= 35;
+			$issues[] = 'Broken module';
+		}
+		if (isset($image_by_slug[$slug])) {
+			$score -= 20;
+			$issues[] = 'Image needs work';
+		}
+		if (isset($translation_by_slug[$slug])) {
+			$score -= 18;
+			$issues[] = 'Missing translations';
+		}
+		if (isset($duplicate_slugs[$slug])) {
+			$score -= 15;
+			$issues[] = 'Likely duplicate';
+		}
+		if (strlen(wp_strip_all_tags($description)) < 45) {
+			$score -= 8;
+			$issues[] = 'Short description';
+		}
+
+		$score = max(0, min(100, $score));
+		$rows[] = array(
+			'slug' => $slug,
+			'folder' => $folder,
+			'name' => $name,
+			'score' => $score,
+			'status' => $score >= 85 ? 'good' : ($score >= 65 ? 'warn' : 'bad'),
+			'issues' => empty($issues) ? array('Looks good') : $issues,
+		);
+	}
+
+	usort(
+		$rows,
+		function ($a, $b) {
+			if ($a['score'] === $b['score']) {
+				return strcasecmp($a['name'], $b['name']);
+			}
+
+			return $a['score'] <=> $b['score'];
+		}
+	);
+
+	return $rows;
+}
+
+function zo_admin_get_recently_broken_games($broken_games) {
+	foreach ($broken_games as &$item) {
+		$path = ZO_PLUGIN_DIR . ltrim(str_replace('/', DIRECTORY_SEPARATOR, $item['path']), DIRECTORY_SEPARATOR);
+		$modified = is_readable($path) ? (int) filemtime($path) : 0;
+		$item['modified_timestamp'] = $modified;
+		$item['modified'] = $modified > 0 ? date_i18n('Y-m-d H:i', $modified) : 'Missing file';
+	}
+	unset($item);
+
+	usort(
+		$broken_games,
+		function ($a, $b) {
+			return $b['modified_timestamp'] <=> $a['modified_timestamp'];
+		}
+	);
+
+	return array_slice($broken_games, 0, 20);
+}
+
+function zo_admin_get_content_lookup_report() {
+	$security_checks = zo_admin_get_security_checks();
+	$site_kit_info = zo_admin_get_site_kit_info();
+	$site_kit_import = zo_admin_get_site_kit_import_summary();
+	$image_issues = zo_admin_get_image_checks();
+	$duplicates = zo_admin_get_duplicate_game_groups();
+	$translation_issues = zo_admin_get_missing_translation_checks();
+	$broken_games = zo_admin_get_empty_broken_game_checks();
+	$content_activity_points = zo_admin_get_content_activity_points(90);
+	$issue_breakdown = zo_admin_get_issue_breakdown($security_checks, $image_issues, $translation_issues, $broken_games, $duplicates);
+	$score = zo_admin_calculate_health_score($security_checks, $image_issues, $translation_issues, $broken_games, $duplicates);
+	$game_quality = zo_admin_get_game_quality_scores($image_issues, $translation_issues, $broken_games, $duplicates);
+	$recently_broken = zo_admin_get_recently_broken_games($broken_games);
+
+	return array(
+		'generated_at' => current_time('mysql'),
+		'total_modules' => count(zo_get_game_modules()),
+		'score' => $score,
+		'security_checks' => $security_checks,
+		'site_kit_info' => $site_kit_info,
+		'site_kit_import' => $site_kit_import,
+		'image_issues' => $image_issues,
+		'translation_issues' => $translation_issues,
+		'broken_games' => $broken_games,
+		'recently_broken' => $recently_broken,
+		'duplicates' => $duplicates,
+		'content_activity_points' => $content_activity_points,
+		'issue_breakdown' => $issue_breakdown,
+		'game_quality' => $game_quality,
+	);
+}
+
+function zo_admin_export_url($format) {
+	return wp_nonce_url(
+		add_query_arg(
+			array(
+				'action' => 'zo_export_content_lookup',
+				'format' => sanitize_key($format),
+			),
+			admin_url('admin-post.php')
+		),
+		'zo_export_content_lookup'
+	);
+}
+
+function zo_admin_render_line_graph($points) {
+	$width = 680;
+	$height = 230;
+	$padding_left = 34;
+	$padding_right = 14;
+	$padding_top = 18;
+	$padding_bottom = 30;
+	$count = count($points);
+	$max_value = 1;
+	$total = 0;
+
+	foreach ($points as $point) {
+		$value = isset($point['value']) ? (int) $point['value'] : 0;
+		$max_value = max($max_value, $value);
+		$total += $value;
+	}
+
+	$plot_width = $width - $padding_left - $padding_right;
+	$plot_height = $height - $padding_top - $padding_bottom;
+	$coordinates = array();
+
+	foreach ($points as $index => $point) {
+		$value = isset($point['value']) ? (int) $point['value'] : 0;
+		$x = $padding_left + ($count > 1 ? ($plot_width * $index / ($count - 1)) : 0);
+		$y = $padding_top + $plot_height - ($plot_height * $value / $max_value);
+		$coordinates[] = round($x, 2) . ',' . round($y, 2);
+	}
+
+	echo '<div class="zo-admin-graph-card zo-admin-line-card" id="content-activity-graph">';
+	echo '<div class="zo-admin-graph-head"><div><span>Content activity</span><strong>' . esc_html((string) $total) . '</strong><small>File updates in the last 90 days</small></div>' . zo_admin_recheck_button('content-activity-graph') . '</div>';
+	echo '<svg class="zo-admin-line-graph" viewBox="0 0 ' . esc_attr((string) $width) . ' ' . esc_attr((string) $height) . '" role="img" aria-label="Content activity graph">';
+	for ($line = 0; $line <= 4; $line++) {
+		$y = $padding_top + ($plot_height * $line / 4);
+		echo '<line x1="' . esc_attr((string) $padding_left) . '" y1="' . esc_attr((string) round($y, 2)) . '" x2="' . esc_attr((string) ($width - $padding_right)) . '" y2="' . esc_attr((string) round($y, 2)) . '" />';
+	}
+	echo '<polyline points="' . esc_attr(implode(' ', $coordinates)) . '" />';
+	foreach ($points as $index => $point) {
+		$value = isset($point['value']) ? (int) $point['value'] : 0;
+		if ($value <= 0) {
+			continue;
+		}
+
+		$x = $padding_left + ($count > 1 ? ($plot_width * $index / ($count - 1)) : 0);
+		$y = $padding_top + $plot_height - ($plot_height * $value / $max_value);
+		echo '<circle cx="' . esc_attr((string) round($x, 2)) . '" cy="' . esc_attr((string) round($y, 2)) . '" r="3.5"><title>' . esc_html($point['label'] . ': ' . $value) . '</title></circle>';
+	}
+
+	if (!empty($points)) {
+		$first = reset($points);
+		$last = end($points);
+		echo '<text x="' . esc_attr((string) $padding_left) . '" y="' . esc_attr((string) ($height - 8)) . '">' . esc_html($first['label']) . '</text>';
+		echo '<text x="' . esc_attr((string) ($width - 70)) . '" y="' . esc_attr((string) ($height - 8)) . '">' . esc_html($last['label']) . '</text>';
+	}
+	echo '</svg>';
+	echo '</div>';
+}
+
+function zo_admin_render_donut_graph($items) {
+	$total = 0;
+	foreach ($items as $item) {
+		$total += isset($item['value']) ? max(0, (int) $item['value']) : 0;
+	}
+
+	$segments = array();
+	$start = 0;
+	foreach ($items as $item) {
+		$value = isset($item['value']) ? max(0, (int) $item['value']) : 0;
+		if ($value <= 0 || $total <= 0) {
+			continue;
+		}
+
+		$degrees = 360 * $value / $total;
+		$end = $start + $degrees;
+		$color = isset($item['color']) ? $item['color'] : '#94a3b8';
+		$segments[] = $color . ' ' . round($start, 2) . 'deg ' . round($end, 2) . 'deg';
+		$start = $end;
+	}
+
+	$background = empty($segments) ? '#d1fae5 0deg 360deg' : implode(', ', $segments);
+
+	echo '<div class="zo-admin-graph-card zo-admin-donut-card" id="issue-breakdown-graph">';
+	echo '<div class="zo-admin-graph-head"><div><span>Issue breakdown</span><strong>' . esc_html((string) $total) . '</strong><small>By checker type</small></div>' . zo_admin_recheck_button('issue-breakdown-graph') . '</div>';
+	echo '<div class="zo-admin-donut-wrap">';
+	echo '<div class="zo-admin-donut" style="background: conic-gradient(' . esc_attr($background) . ');"><span>By<br>Issues</span></div>';
+	echo '<ul class="zo-admin-donut-legend">';
+	foreach ($items as $item) {
+		$value = isset($item['value']) ? max(0, (int) $item['value']) : 0;
+		$color = isset($item['color']) ? $item['color'] : '#94a3b8';
+		$percent = $total > 0 ? round($value * 100 / $total, 1) : 0;
+		echo '<li><span style="background:' . esc_attr($color) . '"></span>' . esc_html($item['label'] . ' ' . $value . ' (' . $percent . '%)') . '</li>';
+	}
+	echo '</ul>';
+	echo '</div>';
+	echo '</div>';
+}
+
 function zo_admin_get_image_checks() {
 	$items = array();
 	$modules = zo_get_game_modules();
@@ -858,13 +1309,20 @@ function zo_render_admin_health_page() {
 		wp_die(esc_html__('Sorry, you are not allowed to access this page.', 'zeka-oyunlari'));
 	}
 
-	$security_checks = zo_admin_get_security_checks();
-	$site_kit_info = zo_admin_get_site_kit_info();
-	$image_issues = zo_admin_get_image_checks();
-	$duplicates = zo_admin_get_duplicate_game_groups();
-	$translation_issues = zo_admin_get_missing_translation_checks();
-	$broken_games = zo_admin_get_empty_broken_game_checks();
-	$total_modules = count(zo_get_game_modules());
+	$report = zo_admin_get_content_lookup_report();
+	$security_checks = $report['security_checks'];
+	$site_kit_info = $report['site_kit_info'];
+	$site_kit_import = $report['site_kit_import'];
+	$image_issues = $report['image_issues'];
+	$duplicates = $report['duplicates'];
+	$translation_issues = $report['translation_issues'];
+	$broken_games = $report['broken_games'];
+	$content_activity_points = $report['content_activity_points'];
+	$issue_breakdown = $report['issue_breakdown'];
+	$score = $report['score'];
+	$game_quality = $report['game_quality'];
+	$recently_broken = $report['recently_broken'];
+	$total_modules = $report['total_modules'];
 	$recheck_key = zo_admin_recheck_key();
 
 	echo '<div class="wrap zo-admin-health">';
@@ -875,6 +1333,10 @@ function zo_render_admin_health_page() {
 		.zo-admin-health-summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;margin:18px 0}
 		.zo-admin-health-card{background:#fff;border:1px solid #dcdcde;border-radius:8px;padding:14px}
 		.zo-admin-health-card strong{display:block;font-size:24px;line-height:1.1}
+		.zo-admin-health-card--score{border-left:6px solid #2271b1}
+		.zo-admin-health-card--good{border-left-color:#059669}
+		.zo-admin-health-card--warn{border-left-color:#f59e0b}
+		.zo-admin-health-card--bad{border-left-color:#dc2626}
 		.zo-admin-badge{display:inline-flex;min-width:58px;justify-content:center;border-radius:999px;padding:4px 9px;font-weight:700;font-size:12px}
 		.zo-admin-badge--good{background:#d1fae5;color:#065f46}
 		.zo-admin-badge--warn{background:#fef3c7;color:#92400e}
@@ -889,9 +1351,42 @@ function zo_render_admin_health_page() {
 		.zo-admin-issue-list{margin:0;padding-left:18px}
 		.zo-admin-rechecked{outline:3px solid #2271b1;outline-offset:-3px}
 		.zo-admin-recheck-button{white-space:nowrap}
+		.zo-admin-graphs{display:grid;grid-template-columns:minmax(0,2fr) minmax(280px,1fr);gap:16px;margin-top:24px}
+		.zo-admin-graph-card{background:#fff;border:1px solid #dcdcde;border-radius:8px;padding:16px}
+		.zo-admin-graph-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:10px}
+		.zo-admin-graph-head span{display:block;color:#64748b;font-size:12px;text-transform:uppercase;font-weight:700}
+		.zo-admin-graph-head strong{display:block;font-size:36px;line-height:1.05;color:#111827}
+		.zo-admin-graph-head small{display:block;color:#64748b}
+		.zo-admin-line-graph{display:block;width:100%;height:auto;overflow:visible}
+		.zo-admin-line-graph line{stroke:#e5e7eb;stroke-width:1}
+		.zo-admin-line-graph polyline{fill:none;stroke:#166534;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
+		.zo-admin-line-graph circle{fill:#166534;stroke:#fff;stroke-width:2}
+		.zo-admin-line-graph text{fill:#64748b;font-size:11px}
+		.zo-admin-donut-wrap{display:flex;align-items:center;gap:18px}
+		.zo-admin-donut{width:190px;height:190px;border-radius:50%;display:grid;place-items:center;position:relative;flex:0 0 auto}
+		.zo-admin-donut:before{content:"";position:absolute;inset:44px;background:#fff;border-radius:50%}
+		.zo-admin-donut span{position:relative;z-index:1;text-align:center;color:#64748b;font-size:12px;line-height:1.25}
+		.zo-admin-donut-legend{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+		.zo-admin-donut-legend li{display:flex;align-items:center;gap:8px;margin:0;color:#334155}
+		.zo-admin-donut-legend span{width:10px;height:10px;border-radius:999px;display:inline-block}
+		.zo-admin-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:18px 0}
+		.zo-admin-search{min-width:260px;max-width:420px;width:100%}
+		.zo-admin-export-actions{display:flex;gap:8px;flex-wrap:wrap}
+		.zo-admin-score-list{margin:8px 0 0 18px}
+		.zo-admin-muted{color:#64748b}
+		@media (max-width: 960px){.zo-admin-graphs{grid-template-columns:1fr}.zo-admin-donut-wrap{flex-direction:column;align-items:flex-start}}
 	</style>';
 
+	echo '<div class="zo-admin-toolbar">';
+	echo '<input type="search" class="regular-text zo-admin-search" id="zo-admin-report-search" placeholder="Search report, games, issues..." aria-label="Search report">';
+	echo '<div class="zo-admin-export-actions">';
+	echo '<a class="button button-primary" href="' . esc_url(zo_admin_export_url('json')) . '">Export JSON</a>';
+	echo '<a class="button" href="' . esc_url(zo_admin_export_url('csv')) . '">Export CSV</a>';
+	echo '</div>';
+	echo '</div>';
+
 	echo '<div class="zo-admin-health-summary">';
+	echo '<div class="zo-admin-health-card zo-admin-health-card--score zo-admin-health-card--' . esc_attr($score['status']) . '"><strong>' . esc_html((string) $score['score']) . '/100</strong><span>Site score</span></div>';
 	echo '<div class="zo-admin-health-card"><strong>' . esc_html((string) $total_modules) . '</strong><span>Loaded games</span></div>';
 	echo '<div class="zo-admin-health-card"><strong>' . esc_html((string) count($image_issues)) . '</strong><span>Image issues</span></div>';
 	echo '<div class="zo-admin-health-card"><strong>' . esc_html((string) count($translation_issues)) . '</strong><span>Translation issues</span></div>';
@@ -899,12 +1394,35 @@ function zo_render_admin_health_page() {
 	echo '<div class="zo-admin-health-card"><strong>' . esc_html((string) count($duplicates)) . '</strong><span>Duplicate groups</span></div>';
 	echo '</div>';
 
+	echo '<div class="zo-admin-section"><h2>Score System</h2>';
+	echo '<p>' . zo_admin_status_badge($score['status'], $score['status'] === 'good' ? 'Good' : ($score['status'] === 'bad' ? 'Fix' : 'Check')) . ' Current content health score is <strong>' . esc_html((string) $score['score']) . '/100</strong>.</p>';
+	if (!empty($score['reasons'])) {
+		echo '<ul class="zo-admin-score-list">';
+		foreach ($score['reasons'] as $reason) {
+			echo '<li>' . esc_html($reason) . '</li>';
+		}
+		echo '</ul>';
+	}
+	echo '</div>';
+
 	if ($recheck_key !== '') {
 		echo '<div class="notice notice-success inline"><p>Rechecked: <code>' . esc_html($recheck_key) . '</code></p></div>';
 	}
 
+	echo '<div class="zo-admin-section"><h2>Graphs</h2>';
+	echo '<div class="zo-admin-graphs">';
+	zo_admin_render_line_graph($content_activity_points);
+	zo_admin_render_donut_graph($issue_breakdown);
+	echo '</div>';
+	echo '</div>';
+
 	echo '<div class="zo-admin-section"><h2>Bilgi from Site Kit</h2>';
 	zo_render_admin_health_table($site_kit_info);
+	echo '</div>';
+
+	echo '<div class="zo-admin-section"><h2>Real Site Kit Import</h2>';
+	zo_render_admin_health_table($site_kit_import);
+	echo '<p class="zo-admin-muted">This imports saved Site Kit signals from WordPress options when Site Kit has connected modules. Private tokens and values are not printed.</p>';
 	echo '</div>';
 
 	echo '<div class="zo-admin-section"><h2>Security Health Page</h2>';
@@ -979,6 +1497,51 @@ function zo_render_admin_health_page() {
 	}
 	echo '</div>';
 
+	echo '<div class="zo-admin-section"><h2>Game Quality Score</h2>';
+	if (empty($game_quality)) {
+		echo '<p>' . zo_admin_status_badge('warn', 'Check') . ' No games were available for scoring.</p>';
+	} else {
+		echo '<table class="widefat striped"><thead><tr><th>Game</th><th>Score</th><th>Status</th><th>Issues</th><th>Recheck</th></tr></thead><tbody>';
+		foreach ($game_quality as $item) {
+			$key = 'quality-' . sanitize_key($item['slug']);
+			echo '<tr id="' . esc_attr($key) . '"' . ($recheck_key === $key ? ' class="zo-admin-rechecked"' : '') . '>';
+			echo '<td><strong>' . esc_html($item['name']) . '</strong><br><code>' . esc_html($item['slug']) . '</code></td>';
+			echo '<td><strong>' . esc_html((string) $item['score']) . '/100</strong></td>';
+			echo '<td>' . zo_admin_status_badge($item['status'], $item['status'] === 'good' ? 'Good' : ($item['status'] === 'bad' ? 'Fix' : 'Check')) . '</td>';
+			echo '<td><ul class="zo-admin-issue-list">';
+			foreach ($item['issues'] as $issue) {
+				echo '<li>' . esc_html($issue) . '</li>';
+			}
+			echo '</ul></td>';
+			echo '<td>' . zo_admin_recheck_button($key) . '</td>';
+			echo '</tr>';
+		}
+		echo '</tbody></table>';
+	}
+	echo '</div>';
+
+	echo '<div class="zo-admin-section"><h2>Recently Broken</h2>';
+	if (empty($recently_broken)) {
+		echo '<p>' . zo_admin_status_badge('good', 'Good') . ' No recently broken games found. ' . zo_admin_recheck_button('recently-broken-empty') . '</p>';
+	} else {
+		echo '<table class="widefat striped"><thead><tr><th>Game folder</th><th>Last changed</th><th>Issues</th><th>Recheck</th></tr></thead><tbody>';
+		foreach ($recently_broken as $item) {
+			$key = 'recent-broken-' . sanitize_key($item['folder']);
+			echo '<tr id="' . esc_attr($key) . '"' . ($recheck_key === $key ? ' class="zo-admin-rechecked"' : '') . '>';
+			echo '<td><strong>' . esc_html($item['folder']) . '</strong><br><code>' . esc_html($item['path']) . '</code></td>';
+			echo '<td>' . esc_html($item['modified']) . '</td>';
+			echo '<td><ul class="zo-admin-issue-list">';
+			foreach ($item['issues'] as $issue) {
+				echo '<li>' . esc_html($issue) . '</li>';
+			}
+			echo '</ul></td>';
+			echo '<td>' . zo_admin_recheck_button($key) . '</td>';
+			echo '</tr>';
+		}
+		echo '</tbody></table>';
+	}
+	echo '</div>';
+
 	echo '<div class="zo-admin-section"><h2>Duplicate Game Detector</h2>';
 	if (empty($duplicates)) {
 		echo '<p id="duplicate-checker-empty"' . ($recheck_key === 'duplicate-checker-empty' ? ' class="zo-admin-rechecked"' : '') . '>' . zo_admin_status_badge('good', 'Good') . ' No likely duplicate groups found. ' . zo_admin_recheck_button('duplicate-checker-empty') . '</p>';
@@ -1002,6 +1565,19 @@ function zo_render_admin_health_page() {
 		echo '</tbody></table>';
 	}
 	echo '</div>';
+	echo '<script>
+	(function(){
+		const input=document.getElementById("zo-admin-report-search");
+		if(!input){return;}
+		const rows=Array.from(document.querySelectorAll(".zo-admin-health table tbody tr"));
+		input.addEventListener("input",function(){
+			const query=input.value.trim().toLowerCase();
+			rows.forEach(function(row){
+				row.style.display=!query||row.textContent.toLowerCase().indexOf(query)!==-1?"":"none";
+			});
+		});
+	})();
+	</script>';
 	echo '</div>';
 }
 
