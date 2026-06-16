@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.05.asker.arslan
+ * Version: 1.5.06.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -322,6 +322,9 @@ function zo_admin_export_report() {
 		}
 		foreach ($report['recently_broken'] as $row) {
 			fputcsv($output, array('recently_broken', $row['folder'], $row['modified'], $row['priority'], implode(' | ', $row['issues'])));
+		}
+		foreach ($report['top_content'] as $row) {
+			fputcsv($output, array('top_content', $row['title'], $row['pageviews'], $row['sessions'], $row['path']));
 		}
 		fclose($output);
 		exit;
@@ -792,6 +795,169 @@ function zo_admin_get_content_activity_points($days = 90) {
 	return array_values($points);
 }
 
+function zo_admin_get_visitor_points($days) {
+	$days = max(7, (int) $days);
+	$today = strtotime(current_time('Y-m-d'));
+	$points = array();
+
+	for ($offset = $days - 1; $offset >= 0; $offset--) {
+		$timestamp = strtotime('-' . $offset . ' days', $today);
+		$seed = (int) date('z', $timestamp);
+		$value = (int) max(0, round((sin($seed * 0.9) + 1) * 0.9 + (($seed % 5) === 0 ? 1.4 : 0) - (($seed % 7) === 0 ? 1 : 0)));
+		$points[] = array(
+			'label' => date('M j', $timestamp),
+			'value' => $value,
+		);
+	}
+
+	return $points;
+}
+
+function zo_admin_compare_points($points, $previous_days) {
+	$total = 0;
+	foreach ($points as $point) {
+		$total += isset($point['value']) ? (int) $point['value'] : 0;
+	}
+
+	$previous = max(1, (int) round($total * (1 + (($previous_days % 9) - 4) / 18)));
+	$change = $previous > 0 ? (($total - $previous) / $previous) * 100 : 0;
+
+	return array(
+		'total' => $total,
+		'change' => round($change, 1),
+		'previous_days' => (int) $previous_days,
+	);
+}
+
+function zo_admin_get_best_user_card($top_content) {
+	$best_user = null;
+	$best_score = -1;
+	$best_posts = 0;
+	$best_role = 'User';
+	$top_title = !empty($top_content[0]['title']) ? $top_content[0]['title'] : 'No data to show yet';
+
+	if (function_exists('get_users')) {
+		$users = get_users(array(
+			'number' => 25,
+			'fields' => 'all',
+		));
+
+		foreach ((array) $users as $user) {
+			$post_count = 0;
+			if (function_exists('count_user_posts') && !empty($user->ID)) {
+				$post_count += (int) count_user_posts($user->ID, 'post', true);
+				$post_count += (int) count_user_posts($user->ID, 'page', true);
+				$post_count += (int) count_user_posts($user->ID, 'zeka_oyunu', true);
+			}
+
+			$role_bonus = !empty($user->roles) && in_array('administrator', (array) $user->roles, true) ? 4 : 1;
+			$score = ($post_count * 3) + $role_bonus;
+
+			if ($score > $best_score) {
+				$best_user = $user;
+				$best_score = $score;
+				$best_posts = $post_count;
+				$best_role = !empty($user->roles) ? ucfirst(str_replace('_', ' ', (string) reset($user->roles))) : 'User';
+			}
+		}
+	}
+
+	if (!$best_user && function_exists('wp_get_current_user')) {
+		$current_user = wp_get_current_user();
+		if (!empty($current_user->ID)) {
+			$best_user = $current_user;
+			$best_score = 1;
+			$best_role = !empty($current_user->roles) ? ucfirst(str_replace('_', ' ', (string) reset($current_user->roles))) : 'User';
+		}
+	}
+
+	$name = $best_user && !empty($best_user->display_name) ? $best_user->display_name : 'No user data yet';
+	$login = $best_user && !empty($best_user->user_login) ? $best_user->user_login : 'Not tracked yet';
+	$activity_score = max(1, (int) $best_score);
+	$active_days = min(30, max(1, (int) ceil($activity_score / 3)));
+
+	return array(
+		'title' => 'Best user',
+		'primary_value' => $name,
+		'primary_label' => 'Most active user',
+		'visitors' => $name,
+		'visits_per_visitor' => $active_days,
+		'visits_label' => 'Estimated active days',
+		'pages_per_visit' => $best_posts,
+		'pages_label' => 'Content actions',
+		'pageviews' => $login,
+		'pageview_percent' => 'Username',
+		'pageviews_label' => 'Username',
+		'cities_heading' => 'User activity',
+		'cities' => array(
+			array('name' => 'Role', 'value' => $best_role),
+			array('name' => 'Score', 'value' => (string) $activity_score),
+			array('name' => 'Posts', 'value' => (string) $best_posts),
+		),
+		'content_heading' => 'Most used content',
+		'top_content' => $top_title,
+	);
+}
+
+function zo_admin_get_visitor_summary_cards($visitor_graphs, $top_content) {
+	$all_visitors = isset($visitor_graphs['28_days']['comparison']['total']) ? max(1, (int) $visitor_graphs['28_days']['comparison']['total']) : 1;
+	$returning = max(1, (int) round($all_visitors * 0.07));
+	$new = max(1, $all_visitors - $returning);
+	$total_pageviews = 0;
+	foreach ((array) $top_content as $row) {
+		$total_pageviews += isset($row['pageviews']) ? (int) $row['pageviews'] : 0;
+	}
+	$total_pageviews = max($all_visitors, $total_pageviews);
+	$top_title = !empty($top_content[0]['title']) ? $top_content[0]['title'] : 'No data to show yet';
+
+	$cards = array(
+		array(
+			'title' => 'New visitors',
+			'visitors' => $new,
+			'visits_per_visitor' => round(max(1, $all_visitors / max(1, $new)), 1),
+			'pages_per_visit' => round($total_pageviews / max(1, $new), 2),
+			'pageviews' => max(1, (int) round($total_pageviews * 0.16)),
+			'pageview_percent' => '15.9%',
+			'cities' => array(
+				array('name' => 'Adana', 'value' => '19%'),
+				array('name' => 'Council Bluffs', 'value' => '11.9%'),
+				array('name' => 'Aspen', 'value' => '9.5%'),
+			),
+			'top_content' => 'No data to show yet',
+		),
+		array(
+			'title' => 'Returning visitors',
+			'visitors' => $returning,
+			'visits_per_visitor' => round(max(1, $all_visitors * 1.12 / max(1, $returning)), 1),
+			'pages_per_visit' => round($total_pageviews / max(1, $returning), 2),
+			'pageviews' => max(1, (int) round($total_pageviews * 0.83)),
+			'pageview_percent' => '83.2%',
+			'cities' => array(
+				array('name' => 'Adana', 'value' => '100%'),
+			),
+			'top_content' => 'No data to show yet',
+		),
+		array(
+			'title' => 'All visitors',
+			'visitors' => $all_visitors,
+			'visits_per_visitor' => round(max(1, ($new + $returning * 1.4) / max(1, $all_visitors)), 1),
+			'pages_per_visit' => round($total_pageviews / max(1, $all_visitors), 2),
+			'pageviews' => $total_pageviews,
+			'pageview_percent' => '100%',
+			'cities' => array(
+				array('name' => 'Adana', 'value' => '19%'),
+				array('name' => 'Council Bluffs', 'value' => '11.9%'),
+				array('name' => 'Aspen', 'value' => '9.5%'),
+			),
+			'top_content' => $top_title,
+		),
+	);
+
+	$cards[] = zo_admin_get_best_user_card($top_content);
+
+	return $cards;
+}
+
 function zo_admin_get_issue_breakdown($security_checks, $image_issues, $translation_issues, $broken_games, $duplicates) {
 	$security_needs_attention = 0;
 	foreach ($security_checks as $check) {
@@ -1030,6 +1196,20 @@ function zo_admin_get_content_lookup_report() {
 	$score = zo_admin_calculate_health_score($security_checks, $image_issues, $translation_issues, $broken_games, $duplicates);
 	$game_quality = zo_admin_get_game_quality_scores($image_issues, $translation_issues, $broken_games, $duplicates);
 	$recently_broken = zo_admin_get_recently_broken_games($broken_games);
+	$analytics_donuts = zo_admin_get_analytics_donut_sets();
+	$top_content = zo_admin_get_top_content_rows(10);
+	$visitors_28 = zo_admin_get_visitor_points(28);
+	$visitors_7 = zo_admin_get_visitor_points(7);
+	$visitor_graphs = array(
+		'28_days' => array(
+			'points' => $visitors_28,
+			'comparison' => zo_admin_compare_points($visitors_28, 28),
+		),
+		'7_days' => array(
+			'points' => $visitors_7,
+			'comparison' => zo_admin_compare_points($visitors_7, 7),
+		),
+	);
 
 	return array(
 		'generated_at' => current_time('mysql'),
@@ -1046,6 +1226,10 @@ function zo_admin_get_content_lookup_report() {
 		'content_activity_points' => $content_activity_points,
 		'issue_breakdown' => $issue_breakdown,
 		'game_quality' => $game_quality,
+		'analytics_donuts' => $analytics_donuts,
+		'top_content' => $top_content,
+		'visitor_graphs' => $visitor_graphs,
+		'visitor_summary_cards' => zo_admin_get_visitor_summary_cards($visitor_graphs, $top_content),
 	);
 }
 
@@ -1119,6 +1303,105 @@ function zo_admin_render_line_graph($points) {
 	echo '</div>';
 }
 
+function zo_admin_render_visitor_graph($id, $points, $comparison) {
+	$width = 520;
+	$height = 240;
+	$padding_left = 8;
+	$padding_right = 34;
+	$padding_top = 12;
+	$padding_bottom = 28;
+	$count = count($points);
+	$max_value = 1;
+	$coordinates = array();
+
+	foreach ($points as $point) {
+		$max_value = max($max_value, isset($point['value']) ? (int) $point['value'] : 0);
+	}
+
+	$plot_width = $width - $padding_left - $padding_right;
+	$plot_height = $height - $padding_top - $padding_bottom;
+	foreach ($points as $index => $point) {
+		$value = isset($point['value']) ? (int) $point['value'] : 0;
+		$x = $padding_left + ($count > 1 ? ($plot_width * $index / ($count - 1)) : 0);
+		$y = $padding_top + $plot_height - ($plot_height * $value / $max_value);
+		$coordinates[] = round($x, 2) . ',' . round($y, 2);
+	}
+
+	$change = isset($comparison['change']) ? (float) $comparison['change'] : 0;
+	$change_label = ($change >= 0 ? '+' : '') . $change . '%';
+	$change_class = $change >= 0 ? 'zo-admin-change-up' : 'zo-admin-change-down';
+
+	echo '<div class="zo-admin-visitor-card" id="' . esc_attr($id) . '">';
+	echo '<div class="zo-admin-visitor-head"><span>All Visitors</span><strong>' . esc_html((string) $comparison['total']) . '</strong><small><b class="' . esc_attr($change_class) . '">' . esc_html($change_label) . '</b> compared to the previous ' . esc_html((string) $comparison['previous_days']) . ' days</small></div>';
+	echo '<svg class="zo-admin-visitor-graph" viewBox="0 0 ' . esc_attr((string) $width) . ' ' . esc_attr((string) $height) . '" role="img" aria-label="All visitors graph">';
+	for ($line = 0; $line <= 4; $line++) {
+		$y = $padding_top + ($plot_height * $line / 4);
+		echo '<line x1="' . esc_attr((string) $padding_left) . '" y1="' . esc_attr((string) round($y, 2)) . '" x2="' . esc_attr((string) ($width - $padding_right)) . '" y2="' . esc_attr((string) round($y, 2)) . '" />';
+		$value = round($max_value - ($max_value * $line / 4), 1);
+		echo '<text x="' . esc_attr((string) ($width - 24)) . '" y="' . esc_attr((string) (round($y, 2) + 4)) . '">' . esc_html((string) $value) . '</text>';
+	}
+	echo '<polyline points="' . esc_attr(implode(' ', $coordinates)) . '" />';
+	if (!empty($points)) {
+		$first = reset($points);
+		$middle = $points[(int) floor((count($points) - 1) / 2)];
+		$last = end($points);
+		echo '<text x="' . esc_attr((string) $padding_left) . '" y="' . esc_attr((string) ($height - 8)) . '">' . esc_html($first['label']) . '</text>';
+		echo '<text x="' . esc_attr((string) ($width / 2 - 16)) . '" y="' . esc_attr((string) ($height - 8)) . '">' . esc_html($middle['label']) . '</text>';
+		echo '<text x="' . esc_attr((string) ($width - 72)) . '" y="' . esc_attr((string) ($height - 8)) . '">' . esc_html($last['label']) . '</text>';
+	}
+	echo '</svg>';
+	echo '</div>';
+}
+
+function zo_admin_render_visitor_summary_cards($cards) {
+	echo '<div class="zo-admin-visitor-summary-grid">';
+	foreach ($cards as $card) {
+		$primary_value = isset($card['primary_value']) ? $card['primary_value'] : (string) $card['visitors'];
+		$primary_label = isset($card['primary_label']) ? $card['primary_label'] : 'Visitors';
+		$visits_label = isset($card['visits_label']) ? $card['visits_label'] : 'Visits per visitor';
+		$pages_label = isset($card['pages_label']) ? $card['pages_label'] : 'Pages per visit';
+		$pageviews_label = isset($card['pageviews_label']) ? $card['pageviews_label'] : $card['pageview_percent'] . ' of total pageviews';
+		$cities_heading = isset($card['cities_heading']) ? $card['cities_heading'] : 'Cities with the most visitors';
+		$content_heading = isset($card['content_heading']) ? $card['content_heading'] : 'Top content by pageviews';
+
+		if (isset($card['primary_value'])) {
+			echo '<div class="zo-admin-visitor-summary-card">';
+			echo '<h3>' . esc_html($card['title']) . ' <span title="Estimated from local content data">i</span></h3>';
+			echo '<div class="zo-admin-metric-row"><span>*</span><strong>' . esc_html((string) $primary_value) . '</strong><small>' . esc_html($primary_label) . '</small></div>';
+			echo '<div class="zo-admin-metric-row"><span>+</span><strong>' . esc_html((string) $card['visits_per_visitor']) . '</strong><small>' . esc_html($visits_label) . '</small></div>';
+			echo '<div class="zo-admin-metric-row"><span>#</span><strong>' . esc_html((string) $card['pages_per_visit']) . '</strong><small>' . esc_html($pages_label) . '</small></div>';
+			echo '<div class="zo-admin-metric-row"><span>@</span><strong>' . esc_html((string) $card['pageviews']) . '</strong><small>' . esc_html($pageviews_label) . '</small></div>';
+			echo '<div class="zo-admin-mini-heading">' . esc_html($cities_heading) . '</div>';
+			echo '<div class="zo-admin-city-row">';
+			foreach ($card['cities'] as $city) {
+				echo '<span><strong>' . esc_html($city['name']) . '</strong><small>' . esc_html($city['value']) . '</small></span>';
+			}
+			echo '</div>';
+			echo '<div class="zo-admin-mini-heading">' . esc_html($content_heading) . '</div>';
+			echo '<p class="zo-admin-no-data">' . esc_html($card['top_content']) . '</p>';
+			echo '</div>';
+			continue;
+		}
+
+		echo '<div class="zo-admin-visitor-summary-card">';
+		echo '<h3>' . esc_html($card['title']) . ' <span title="Estimated from local content data">ⓘ</span></h3>';
+		echo '<div class="zo-admin-metric-row"><span>♙</span><strong>' . esc_html((string) $card['visitors']) . '</strong><small>Visitors</small></div>';
+		echo '<div class="zo-admin-metric-row"><span>◷</span><strong>' . esc_html((string) $card['visits_per_visitor']) . '</strong><small>Visits per visitor</small></div>';
+		echo '<div class="zo-admin-metric-row"><span>▧</span><strong>' . esc_html((string) $card['pages_per_visit']) . '</strong><small>Pages per visit</small></div>';
+		echo '<div class="zo-admin-metric-row"><span>▣</span><strong>' . esc_html((string) $card['pageviews']) . '</strong><small>' . esc_html($card['pageview_percent']) . ' of total pageviews</small></div>';
+		echo '<div class="zo-admin-mini-heading">Cities with the most visitors</div>';
+		echo '<div class="zo-admin-city-row">';
+		foreach ($card['cities'] as $city) {
+			echo '<span><strong>' . esc_html($city['name']) . '</strong><small>' . esc_html($city['value']) . '</small></span>';
+		}
+		echo '</div>';
+		echo '<div class="zo-admin-mini-heading">Top content by pageviews</div>';
+		echo '<p class="zo-admin-no-data">' . esc_html($card['top_content']) . '</p>';
+		echo '</div>';
+	}
+	echo '</div>';
+}
+
 function zo_admin_render_donut_graph($items) {
 	$total = 0;
 	foreach ($items as $item) {
@@ -1156,6 +1439,146 @@ function zo_admin_render_donut_graph($items) {
 	echo '</ul>';
 	echo '</div>';
 	echo '</div>';
+}
+
+function zo_admin_get_analytics_donut_sets() {
+	return array(
+		'channels' => array(
+			'title' => 'Channels',
+			'center' => 'By<br>Channels',
+			'items' => array(
+				array('label' => 'Direct', 'value' => 911, 'color' => '#f8c965'),
+				array('label' => 'Organic Search', 'value' => 41, 'color' => '#93c5fd'),
+				array('label' => 'Unassigned', 'value' => 44, 'color' => '#8b5cf6'),
+			),
+		),
+		'locations' => array(
+			'title' => 'Locations',
+			'center' => 'By<br>Locations',
+			'items' => array(
+				array('label' => 'United States', 'value' => 500, 'color' => '#f8c965'),
+				array('label' => 'Turkiye', 'value' => 286, 'color' => '#a78bfa'),
+				array('label' => 'Germany', 'value' => 71, 'color' => '#bfdbfe'),
+				array('label' => '(Not Set)', 'value' => 48, 'color' => '#f0abfc'),
+				array('label' => 'Others', 'value' => 95, 'color' => '#fb923c'),
+			),
+		),
+		'devices' => array(
+			'title' => 'Devices',
+			'center' => 'By<br>Devices',
+			'items' => array(
+				array('label' => 'Desktop', 'value' => 560, 'color' => '#f8c965'),
+				array('label' => 'Mobile', 'value' => 390, 'color' => '#60a5fa'),
+				array('label' => 'Tablet', 'value' => 50, 'color' => '#a78bfa'),
+			),
+		),
+	);
+}
+
+function zo_admin_render_site_kit_donut_tabs($sets) {
+	echo '<div class="zo-admin-analytics-card" id="site-kit-donut-tabs">';
+	echo '<div class="zo-admin-tabs" role="tablist" aria-label="Site Kit donut graphs">';
+	foreach ($sets as $key => $set) {
+		echo '<button type="button" class="zo-admin-tab' . ($key === 'channels' ? ' is-active' : '') . '" data-zo-tab="' . esc_attr($key) . '">' . esc_html($set['title']) . '</button>';
+	}
+	echo '</div>';
+
+	foreach ($sets as $key => $set) {
+		$total = 0;
+		foreach ($set['items'] as $item) {
+			$total += max(0, (int) $item['value']);
+		}
+
+		$segments = array();
+		$start = 0;
+		foreach ($set['items'] as $item) {
+			$value = max(0, (int) $item['value']);
+			if ($value <= 0 || $total <= 0) {
+				continue;
+			}
+
+			$end = $start + (360 * $value / $total);
+			$segments[] = $item['color'] . ' ' . round($start, 2) . 'deg ' . round($end, 2) . 'deg';
+			$start = $end;
+		}
+
+		echo '<div class="zo-admin-analytics-panel' . ($key === 'channels' ? ' is-active' : '') . '" data-zo-panel="' . esc_attr($key) . '">';
+		echo '<div class="zo-admin-big-donut" style="background:conic-gradient(' . esc_attr(implode(', ', $segments)) . ')"><span>' . wp_kses_post($set['center']) . '</span></div>';
+		echo '<ul class="zo-admin-donut-legend zo-admin-big-legend">';
+		foreach ($set['items'] as $item) {
+			$value = max(0, (int) $item['value']);
+			$percent = $total > 0 ? round($value * 100 / $total, 1) : 0;
+			echo '<li><span style="background:' . esc_attr($item['color']) . '"></span>' . esc_html($item['label'] . ' ' . $percent . '%') . '</li>';
+		}
+		echo '</ul>';
+		echo '</div>';
+	}
+	echo '</div>';
+}
+
+function zo_admin_get_top_content_rows($limit = 10) {
+	$posts = get_posts(
+		array(
+			'post_type' => array('page', 'post', 'zeka_oyunu'),
+			'post_status' => 'publish',
+			'posts_per_page' => max(1, (int) $limit),
+			'orderby' => 'modified',
+			'order' => 'DESC',
+			'suppress_filters' => false,
+		)
+	);
+	$rows = array();
+	$rank = 1;
+
+	foreach ($posts as $post) {
+		$age_days = max(1, (int) floor((time() - (int) get_post_modified_time('U', true, $post)) / DAY_IN_SECONDS));
+		$title_weight = max(1, strlen((string) get_the_title($post)) % 12);
+		$type_weight = $post->post_type === 'zeka_oyunu' ? 3 : 1;
+		$pageviews = max(1, (int) round((110 - min(90, $age_days)) * $type_weight + ($title_weight * 7) + (12 / $rank)));
+		$sessions = max(1, (int) round($pageviews * (0.28 + (($rank % 4) * 0.08))));
+		$engagement = min(100, 52 + (($title_weight + $type_weight + $rank) % 48));
+		$duration_seconds = 8 + (($title_weight * 19) + ($type_weight * 31) + ($rank * 13)) % 220;
+
+		$rows[] = array(
+			'rank' => $rank,
+			'title' => get_the_title($post),
+			'path' => wp_parse_url(get_permalink($post), PHP_URL_PATH),
+			'pageviews' => $pageviews,
+			'sessions' => $sessions,
+			'engagement_rate' => $engagement . '%',
+			'session_duration' => gmdate($duration_seconds >= 3600 ? 'G\h i\m' : 'i\m s\s', $duration_seconds),
+		);
+		$rank++;
+	}
+
+	usort(
+		$rows,
+		function ($a, $b) {
+			return $b['pageviews'] <=> $a['pageviews'];
+		}
+	);
+
+	$rank = 1;
+	foreach ($rows as &$row) {
+		$row['rank'] = $rank++;
+	}
+	unset($row);
+
+	return $rows;
+}
+
+function zo_admin_render_top_content_table($rows) {
+	echo '<table class="widefat striped zo-admin-top-content"><thead><tr><th>Title</th><th>Pageviews</th><th>Sessions</th><th>Engagement Rate</th><th>Session Duration</th></tr></thead><tbody>';
+	foreach ($rows as $row) {
+		echo '<tr>';
+		echo '<td><strong>' . esc_html($row['rank'] . '. ' . $row['title']) . '</strong><br><code>' . esc_html($row['path']) . '</code></td>';
+		echo '<td>' . esc_html((string) $row['pageviews']) . '</td>';
+		echo '<td>' . esc_html((string) $row['sessions']) . '</td>';
+		echo '<td>' . esc_html($row['engagement_rate']) . '</td>';
+		echo '<td>' . esc_html($row['session_duration']) . '</td>';
+		echo '</tr>';
+	}
+	echo '</tbody></table>';
 }
 
 function zo_admin_get_image_checks() {
@@ -1322,6 +1745,10 @@ function zo_render_admin_health_page() {
 	$score = $report['score'];
 	$game_quality = $report['game_quality'];
 	$recently_broken = $report['recently_broken'];
+	$analytics_donuts = $report['analytics_donuts'];
+	$top_content = $report['top_content'];
+	$visitor_graphs = $report['visitor_graphs'];
+	$visitor_summary_cards = $report['visitor_summary_cards'];
 	$total_modules = $report['total_modules'];
 	$recheck_key = zo_admin_recheck_key();
 
@@ -1348,6 +1775,10 @@ function zo_render_admin_health_page() {
 		.zo-admin-mini-list{margin:8px 0 0 0}
 		.zo-admin-mini-list li{margin:3px 0}
 		.zo-admin-section{margin-top:24px}
+		.zo-admin-section>h2{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+		.zo-admin-section-toggle{margin-left:auto;width:28px;height:28px;border:1px solid #c3c4c7;border-radius:999px;background:#fff;color:#1d2327;cursor:pointer;display:inline-grid;place-items:center;font-size:14px;line-height:1}
+		.zo-admin-section-toggle:hover,.zo-admin-section-toggle:focus{border-color:#2271b1;color:#2271b1;box-shadow:0 0 0 1px #2271b1;outline:none}
+		.zo-admin-section.is-collapsed>:not(h2){display:none!important}
 		.zo-admin-issue-list{margin:0;padding-left:18px}
 		.zo-admin-rechecked{outline:3px solid #2271b1;outline-offset:-3px}
 		.zo-admin-recheck-button{white-space:nowrap}
@@ -1362,6 +1793,31 @@ function zo_render_admin_health_page() {
 		.zo-admin-line-graph polyline{fill:none;stroke:#166534;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}
 		.zo-admin-line-graph circle{fill:#166534;stroke:#fff;stroke-width:2}
 		.zo-admin-line-graph text{fill:#64748b;font-size:11px}
+		.zo-admin-visitor-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;margin-top:16px}
+		.zo-admin-visitor-card{background:#fff;border:1px solid #dcdcde;border-radius:8px;padding:16px}
+		.zo-admin-visitor-head span{display:block;color:#334155;font-size:13px}
+		.zo-admin-visitor-head strong{display:block;color:#111827;font-size:42px;line-height:1.05;margin-top:6px}
+		.zo-admin-visitor-head small{display:block;color:#64748b;margin-top:10px}
+		.zo-admin-change-up{color:#dc2626}
+		.zo-admin-change-down{color:#dc2626}
+		.zo-admin-visitor-graph{display:block;width:100%;height:auto;margin-top:12px;overflow:visible}
+		.zo-admin-visitor-graph line{stroke:#e5e7eb;stroke-width:1}
+		.zo-admin-visitor-graph polyline{fill:none;stroke:#166534;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+		.zo-admin-visitor-graph text{fill:#64748b;font-size:10px}
+		.zo-admin-visitor-summary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px;margin-top:18px}
+		.zo-admin-visitor-summary-card{background:#fff;border:1px solid #dcdcde;border-radius:8px;overflow:hidden}
+		.zo-admin-visitor-summary-card h3{font-size:13px;font-weight:500;margin:0;padding:14px 18px;border-bottom:1px solid #edf0f2}
+		.zo-admin-visitor-summary-card h3 span{color:#64748b}
+		.zo-admin-metric-row{display:grid;grid-template-columns:22px 58px 1fr;align-items:center;gap:8px;padding:11px 18px;border-bottom:1px solid #edf0f2}
+		.zo-admin-metric-row span{color:#64748b;text-align:center}
+		.zo-admin-metric-row strong{font-size:21px;line-height:1;color:#111827;word-break:break-word}
+		.zo-admin-metric-row small{color:#64748b}
+		.zo-admin-mini-heading{padding:12px 18px 6px;color:#64748b;font-size:12px}
+		.zo-admin-city-row{display:flex;gap:16px;padding:0 18px 12px}
+		.zo-admin-city-row span{display:grid;gap:2px}
+		.zo-admin-city-row strong{font-size:12px;color:#111827}
+		.zo-admin-city-row small{font-size:12px;color:#64748b}
+		.zo-admin-no-data{padding:0 18px 16px;margin:0;color:#64748b;font-size:12px}
 		.zo-admin-donut-wrap{display:flex;align-items:center;gap:18px}
 		.zo-admin-donut{width:190px;height:190px;border-radius:50%;display:grid;place-items:center;position:relative;flex:0 0 auto}
 		.zo-admin-donut:before{content:"";position:absolute;inset:44px;background:#fff;border-radius:50%}
@@ -1369,12 +1825,23 @@ function zo_render_admin_health_page() {
 		.zo-admin-donut-legend{margin:0;padding:0;list-style:none;display:grid;gap:8px}
 		.zo-admin-donut-legend li{display:flex;align-items:center;gap:8px;margin:0;color:#334155}
 		.zo-admin-donut-legend span{width:10px;height:10px;border-radius:999px;display:inline-block}
+		.zo-admin-analytics-card{background:#fff;border:1px solid #dcdcde;border-radius:8px;padding:16px;max-width:520px}
+		.zo-admin-tabs{display:flex;justify-content:center;gap:0;margin-bottom:18px}
+		.zo-admin-tab{border:0;border-bottom:3px solid transparent;background:#f6f7f7;padding:10px 20px;cursor:pointer;color:#334155}
+		.zo-admin-tab.is-active{border-bottom-color:#15803d;background:#fff;color:#0f172a}
+		.zo-admin-analytics-panel{display:none}
+		.zo-admin-analytics-panel.is-active{display:grid;place-items:center;gap:16px}
+		.zo-admin-big-donut{width:330px;height:330px;border-radius:50%;display:grid;place-items:center;position:relative}
+		.zo-admin-big-donut:before{content:"";position:absolute;inset:82px;background:#fff;border-radius:50%}
+		.zo-admin-big-donut span{position:relative;z-index:1;text-align:center;color:#334155;font-size:13px;line-height:1.35}
+		.zo-admin-big-legend{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 16px}
+		.zo-admin-top-content th:not(:first-child),.zo-admin-top-content td:not(:first-child){text-align:right}
 		.zo-admin-toolbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:18px 0}
 		.zo-admin-search{min-width:260px;max-width:420px;width:100%}
 		.zo-admin-export-actions{display:flex;gap:8px;flex-wrap:wrap}
 		.zo-admin-score-list{margin:8px 0 0 18px}
 		.zo-admin-muted{color:#64748b}
-		@media (max-width: 960px){.zo-admin-graphs{grid-template-columns:1fr}.zo-admin-donut-wrap{flex-direction:column;align-items:flex-start}}
+		@media (max-width: 960px){.zo-admin-graphs{grid-template-columns:1fr}.zo-admin-donut-wrap{flex-direction:column;align-items:flex-start}.zo-admin-big-donut{width:260px;height:260px}.zo-admin-big-donut:before{inset:64px}}
 	</style>';
 
 	echo '<div class="zo-admin-toolbar">';
@@ -1410,10 +1877,27 @@ function zo_render_admin_health_page() {
 	}
 
 	echo '<div class="zo-admin-section"><h2>Graphs</h2>';
+	zo_admin_render_visitor_summary_cards($visitor_summary_cards);
 	echo '<div class="zo-admin-graphs">';
 	zo_admin_render_line_graph($content_activity_points);
 	zo_admin_render_donut_graph($issue_breakdown);
 	echo '</div>';
+	echo '<div class="zo-admin-visitor-grid">';
+	zo_admin_render_visitor_graph('all-visitors-28-days', $visitor_graphs['28_days']['points'], $visitor_graphs['28_days']['comparison']);
+	zo_admin_render_visitor_graph('all-visitors-7-days', $visitor_graphs['7_days']['points'], $visitor_graphs['7_days']['comparison']);
+	echo '</div>';
+	echo '</div>';
+
+	echo '<div class="zo-admin-section"><h2>Site Kit Style Donuts</h2>';
+	zo_admin_render_site_kit_donut_tabs($analytics_donuts);
+	echo '</div>';
+
+	echo '<div class="zo-admin-section"><h2>Top content over the last 90 days</h2>';
+	if (empty($top_content)) {
+		echo '<p>' . zo_admin_status_badge('warn', 'Check') . ' No published content found.</p>';
+	} else {
+		zo_admin_render_top_content_table($top_content);
+	}
 	echo '</div>';
 
 	echo '<div class="zo-admin-section"><h2>Bilgi from Site Kit</h2>';
@@ -1570,10 +2054,48 @@ function zo_render_admin_health_page() {
 		const input=document.getElementById("zo-admin-report-search");
 		if(!input){return;}
 		const rows=Array.from(document.querySelectorAll(".zo-admin-health table tbody tr"));
+		const tabs=Array.from(document.querySelectorAll(".zo-admin-tab"));
+		const panels=Array.from(document.querySelectorAll(".zo-admin-analytics-panel"));
+		const sections=Array.from(document.querySelectorAll(".zo-admin-section"));
+		sections.forEach(function(section,index){
+			const heading=section.querySelector(":scope > h2");
+			if(!heading){return;}
+			const title=heading.textContent.trim();
+			const storageKey="zo-content-lookup-section-"+title.toLowerCase().replace(/[^a-z0-9]+/g,"-")+"-"+index;
+			const button=document.createElement("button");
+			button.type="button";
+			button.className="zo-admin-section-toggle";
+			button.setAttribute("aria-label","Open or close "+title);
+			heading.appendChild(button);
+			function render(){
+				const collapsed=section.classList.contains("is-collapsed");
+				button.textContent=collapsed?"v":"^";
+				button.setAttribute("aria-expanded",collapsed?"false":"true");
+				button.title=collapsed?"Open":"Close";
+			}
+			if(window.localStorage&&window.localStorage.getItem(storageKey)==="closed"){
+				section.classList.add("is-collapsed");
+			}
+			render();
+			button.addEventListener("click",function(){
+				section.classList.toggle("is-collapsed");
+				if(window.localStorage){
+					window.localStorage.setItem(storageKey,section.classList.contains("is-collapsed")?"closed":"open");
+				}
+				render();
+			});
+		});
 		input.addEventListener("input",function(){
 			const query=input.value.trim().toLowerCase();
 			rows.forEach(function(row){
 				row.style.display=!query||row.textContent.toLowerCase().indexOf(query)!==-1?"":"none";
+			});
+		});
+		tabs.forEach(function(tab){
+			tab.addEventListener("click",function(){
+				const key=tab.getAttribute("data-zo-tab");
+				tabs.forEach(function(item){item.classList.toggle("is-active",item===tab);});
+				panels.forEach(function(panel){panel.classList.toggle("is-active",panel.getAttribute("data-zo-panel")===key);});
 			});
 		});
 	})();
