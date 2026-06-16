@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.07.asker.arslan
+ * Version: 1.5.08.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -890,24 +890,24 @@ function zo_admin_get_best_user_card($top_content) {
 	$active_days = min(30, max(1, (int) ceil($activity_score / 3)));
 
 	return array(
-		'title' => 'Best user',
+		'title' => 'Most used Chrome user address',
 		'primary_value' => $name,
-		'primary_label' => 'Most active WordPress user',
+		'primary_label' => 'Most used browser profile',
 		'visitors' => $name,
 		'visits_per_visitor' => $active_days,
 		'visits_label' => 'Active days estimate',
 		'pages_per_visit' => $best_posts,
 		'pages_label' => 'Published content',
 		'pageviews' => $login,
-		'pageview_percent' => 'Username',
-		'pageviews_label' => 'Username',
-		'cities_heading' => 'User activity',
+		'pageview_percent' => 'User address',
+		'pageviews_label' => 'User address',
+		'cities_heading' => 'Profile activity',
 		'cities' => array(
 			array('name' => 'Role', 'value' => $best_role),
 			array('name' => 'Score', 'value' => (string) $activity_score),
 			array('name' => 'Posts', 'value' => (string) $best_posts),
 		),
-		'content_heading' => 'Most used content',
+		'content_heading' => 'Most opened content',
 		'top_content' => $top_title,
 	);
 }
@@ -1382,7 +1382,7 @@ function zo_admin_render_visitor_summary_cards($cards) {
 			echo '<h3>' . esc_html($card['title']) . ' <span title="Estimated from local content data">Info</span></h3>';
 			echo '<div class="zo-admin-best-user-main"><strong>' . esc_html((string) $primary_value) . '</strong><small>' . esc_html($primary_label) . '</small></div>';
 			echo '<dl class="zo-admin-best-user-stats">';
-			echo '<div><dt>Username</dt><dd>' . esc_html((string) $card['pageviews']) . '</dd></div>';
+			echo '<div><dt>' . esc_html($pageviews_label) . '</dt><dd>' . esc_html((string) $card['pageviews']) . '</dd></div>';
 			echo '<div><dt>' . esc_html($visits_label) . '</dt><dd>' . esc_html((string) $card['visits_per_visitor']) . '</dd></div>';
 			echo '<div><dt>' . esc_html($pages_label) . '</dt><dd>' . esc_html((string) $card['pages_per_visit']) . '</dd></div>';
 			echo '</dl>';
