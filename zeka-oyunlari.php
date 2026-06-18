@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.10.asker.arslan
+ * Version: 1.5.11.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -12453,6 +12453,13 @@ function zo_enqueue_404_suggestion_styles() {
 	color: #111827;
 	font-family: Arial, sans-serif;
 }
+.zo-404-suggestions__eyebrow {
+	margin: 0 0 6px;
+	color: #dc2626;
+	font-size: 0.86rem;
+	font-weight: 800;
+	text-transform: uppercase;
+}
 .zo-404-suggestions__title {
 	margin: 0 0 8px;
 	font-size: clamp(1.25rem, 2.5vw, 1.8rem);
@@ -12535,6 +12542,7 @@ function zo_render_404_suggestion_helper() {
 
 	$rendered = true;
 	echo '<section class="zo-404-suggestions" aria-label="' . esc_attr__('Page suggestions', 'zeka-oyunlari') . '">';
+	echo '<p class="zo-404-suggestions__eyebrow">' . esc_html__('404 Error', 'zeka-oyunlari') . '</p>';
 	echo '<h2 class="zo-404-suggestions__title">' . esc_html__('Maybe you meant these games/pages?', 'zeka-oyunlari') . '</h2>';
 	echo '<p class="zo-404-suggestions__intro">' . esc_html__('The page address looks a little different. Try one of these close matches.', 'zeka-oyunlari') . '</p>';
 	echo '<ul class="zo-404-suggestions__list">';
