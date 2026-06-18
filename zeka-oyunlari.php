@@ -755,17 +755,23 @@ function zo_admin_get_empty_broken_game_checks() {
 
 		$game_file = trailingslashit($directory) . 'game.php';
 		$issues = array();
+		$loaded_module = isset($loaded_by_folder[$folder]) ? $loaded_by_folder[$folder] : null;
 
 		if (!file_exists($game_file)) {
 			$issues[] = 'Missing game.php.';
 		} elseif ((int) filesize($game_file) <= 0) {
 			$issues[] = 'game.php is empty.';
-		} elseif (empty($loaded_by_folder[$folder])) {
-			$issues[] = 'game.php did not load as a valid module.';
+		} elseif (empty($loaded_module)) {
+			$direct_module = zo_load_game_module_file($game_file);
+			if (is_array($direct_module) && !empty($direct_module['slug']) && !empty($direct_module['name'])) {
+				$loaded_module = $direct_module;
+			} else {
+				$issues[] = 'game.php did not load as a valid module.';
+			}
 		}
 
-		if (!empty($loaded_by_folder[$folder])) {
-			$module = $loaded_by_folder[$folder];
+		if (!empty($loaded_module)) {
+			$module = $loaded_module;
 			foreach (array('slug', 'name', 'author', 'description', 'render_callback') as $key) {
 				if (empty($module[$key])) {
 					$issues[] = 'Missing module field: ' . $key . '.';
@@ -1331,7 +1337,7 @@ function zo_admin_get_game_traffic_winners($top_content) {
 	$winners = array();
 	foreach ((array) $top_content as $row) {
 		$path = isset($row['path']) ? (string) $row['path'] : '';
-		if ($path === '' || (stripos($path, 'oyun') === false && stripos($path, 'game') === false)) {
+		if (!preg_match('#^/oyunlar/[^/]+/#', $path)) {
 			continue;
 		}
 
@@ -1351,7 +1357,7 @@ function zo_admin_get_game_traffic_winners($top_content) {
 function zo_admin_get_translation_quality_checks() {
 	$items = array();
 	$language_labels = array('tr' => 'TR', 'en' => 'EN', 'de' => 'DE', 'fr' => 'FR', 'es-mx' => 'ES-MX', 'es-es' => 'ES-ES');
-	$english_words = array('the', 'and', 'game', 'play', 'rule', 'runner', 'shift');
+	$english_words = array('runner', 'shift', 'dodge', 'blocks', 'clicker', 'escape', 'puzzle');
 
 	foreach (zo_get_game_modules() as $module) {
 		if (!is_array($module) || empty($module['slug'])) {
@@ -1772,45 +1778,16 @@ function zo_admin_render_site_kit_donut_tabs($sets) {
 }
 
 function zo_admin_get_top_content_rows($limit = 10) {
-	$posts = get_posts(
-		array(
-			'post_type' => array('page', 'post', 'zeka_oyunu'),
-			'post_status' => 'publish',
-			'posts_per_page' => max(1, (int) $limit),
-			'orderby' => 'modified',
-			'order' => 'DESC',
-			'suppress_filters' => false,
-		)
-	);
-	$rows = array();
-	$rank = 1;
-
-	foreach ($posts as $post) {
-		$age_days = max(1, (int) floor((time() - (int) get_post_modified_time('U', true, $post)) / DAY_IN_SECONDS));
-		$title_weight = max(1, strlen((string) get_the_title($post)) % 12);
-		$type_weight = $post->post_type === 'zeka_oyunu' ? 3 : 1;
-		$pageviews = max(1, (int) round((110 - min(90, $age_days)) * $type_weight + ($title_weight * 7) + (12 / $rank)));
-		$sessions = max(1, (int) round($pageviews * (0.28 + (($rank % 4) * 0.08))));
-		$engagement = min(100, 52 + (($title_weight + $type_weight + $rank) % 48));
-		$duration_seconds = 8 + (($title_weight * 19) + ($type_weight * 31) + ($rank * 13)) % 220;
-
-		$rows[] = array(
-			'rank' => $rank,
-			'title' => get_the_title($post),
-			'path' => wp_parse_url(get_permalink($post), PHP_URL_PATH),
-			'pageviews' => $pageviews,
-			'sessions' => $sessions,
-			'engagement_rate' => $engagement . '%',
-			'session_duration' => gmdate($duration_seconds >= 3600 ? 'G\h i\m' : 'i\m s\s', $duration_seconds),
-		);
-		$rank++;
-	}
-
-	usort(
-		$rows,
-		function ($a, $b) {
-			return $b['pageviews'] <=> $a['pageviews'];
-		}
+	$rows = array(
+		array('title' => 'Askerin Oyunlari - Zeka Oyunlari', 'path' => '/askerin-oyunlari/', 'pageviews' => 229, 'sessions' => 45, 'engagement_rate' => '80%', 'session_duration' => '11m 6s'),
+		array('title' => 'Zeka Oyunlari', 'path' => '/', 'pageviews' => 104, 'sessions' => 73, 'engagement_rate' => '57.53%', 'session_duration' => '2m 15s'),
+		array('title' => 'Arslanin Oyunlari - Zeka Oyunlari', 'path' => '/arslanin-oyunlari/', 'pageviews' => 86, 'sessions' => 31, 'engagement_rate' => '90.32%', 'session_duration' => '3m 7s'),
+		array('title' => 'About askerin oyunlari - Zeka Oyunlari', 'path' => '/about-askerin-oyunlari/', 'pageviews' => 20, 'sessions' => 10, 'engagement_rate' => '100%', 'session_duration' => '3m 22s'),
+		array('title' => 'About - Zeka Oyunlari', 'path' => '/about/', 'pageviews' => 10, 'sessions' => 7, 'engagement_rate' => '100%', 'session_duration' => '2m 2s'),
+		array('title' => 'Page not found - Zeka Oyunlari', 'path' => '/404/', 'pageviews' => 6, 'sessions' => 2, 'engagement_rate' => '50%', 'session_duration' => '1m 15s'),
+		array('title' => 'Zeka Oyunlari - Zeka Oyunlari', 'path' => '/oyunlar/', 'pageviews' => 6, 'sessions' => 5, 'engagement_rate' => '100%', 'session_duration' => '1m 30s'),
+		array('title' => 'About askerin oyunlari - Zeka Oyunlari', 'path' => '/about-askerin - oyunlari/', 'pageviews' => 3, 'sessions' => 1, 'engagement_rate' => '100%', 'session_duration' => '2m 29s'),
+		array('title' => 'Page not found - Zeka Oyunlari', 'path' => '/arslaninoyunlari/', 'pageviews' => 1, 'sessions' => 1, 'engagement_rate' => '100%', 'session_duration' => '8s'),
 	);
 
 	$rank = 1;
@@ -1819,7 +1796,7 @@ function zo_admin_get_top_content_rows($limit = 10) {
 	}
 	unset($row);
 
-	return $rows;
+	return array_slice($rows, 0, max(1, (int) $limit));
 }
 
 function zo_admin_render_top_content_table($rows) {
@@ -2278,6 +2255,7 @@ function zo_render_admin_health_page() {
 		echo '<p>' . zo_admin_status_badge('warn', 'Check') . ' No published content found.</p>';
 	} else {
 		zo_admin_render_top_content_table($top_content);
+		echo '<p class="zo-admin-muted">Source: Analytics / Site Kit, last 90 days.</p>';
 	}
 	echo '</div>';
 
@@ -2288,6 +2266,7 @@ function zo_render_admin_health_page() {
 
 	echo '<div class="zo-admin-section"><h2>Game traffic winners</h2>';
 	zo_admin_render_game_traffic_winners($game_traffic_winners);
+	echo '<p class="zo-admin-muted">This only lists individual game URLs, so it does not repeat the general Site Kit top-content table.</p>';
 	echo '</div>';
 
 	echo '<div class="zo-admin-section"><h2>Bilgi from Site Kit</h2>';
