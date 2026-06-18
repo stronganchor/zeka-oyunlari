@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.12.asker.arslan
+ * Version: 1.5.13.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -12301,6 +12301,17 @@ function zo_get_404_requested_text() {
 	return zo_normalize_404_match_text($path);
 }
 
+function zo_get_404_requested_label() {
+	if (empty($_SERVER['REQUEST_URI']) || !is_string($_SERVER['REQUEST_URI'])) {
+		return '';
+	}
+
+	$path = (string) wp_parse_url(wp_unslash($_SERVER['REQUEST_URI']), PHP_URL_PATH);
+	$path = rawurldecode('/' . trim($path, '/'));
+
+	return $path === '/' ? '' : $path;
+}
+
 function zo_score_404_suggestion($needle, $haystack) {
 	$needle = zo_normalize_404_match_text($needle);
 	$haystack = zo_normalize_404_match_text($haystack);
@@ -12417,7 +12428,7 @@ function zo_get_404_suggestions($limit = 6, $lang = '') {
 	$suggestions = array();
 	foreach (zo_get_404_suggestion_candidates($lang) as $candidate) {
 		$score = zo_score_404_suggestion($needle, $candidate['search']);
-		if ($score < 28) {
+		if ($score < 42) {
 			continue;
 		}
 
@@ -12470,6 +12481,36 @@ function zo_enqueue_404_suggestion_styles() {
 	margin: 0 0 16px;
 	color: #4b5563;
 }
+.zo-404-suggestions__searched {
+	display: inline-block;
+	margin: 0 0 14px;
+	padding: 6px 10px;
+	border-radius: 999px;
+	background: #fff7ed;
+	color: #9a3412;
+	font-size: 0.86rem;
+	font-weight: 700;
+}
+.zo-404-suggestions__search {
+	display: flex;
+	gap: 10px;
+	margin: 0 0 16px;
+}
+.zo-404-suggestions__input {
+	width: 100%;
+	min-height: 44px;
+	padding: 0 14px;
+	border: 1px solid #cbd5e1;
+	border-radius: 12px;
+	background: #fff;
+	color: #111827;
+	font: inherit;
+}
+.zo-404-suggestions__input:focus {
+	border-color: #14b8a6;
+	box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.18);
+	outline: none;
+}
 .zo-404-suggestions__list {
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -12508,12 +12549,19 @@ function zo_enqueue_404_suggestion_styles() {
 	font-weight: 700;
 	line-height: 1.3;
 }
+.zo-404-suggestions__empty {
+	margin: 12px 0 0;
+	color: #6b7280;
+}
 @media (max-width: 560px) {
 	.zo-404-suggestions {
 		width: min(100% - 20px, 980px);
 		margin-top: 14px;
 		padding: 16px;
 		border-radius: 14px;
+	}
+	.zo-404-suggestions__search {
+		display: block;
 	}
 }
 ';
@@ -12535,27 +12583,43 @@ function zo_render_404_suggestion_helper() {
 	}
 
 	$lang = zo_get_current_language();
-	$suggestions = zo_get_404_suggestions(6, $lang);
+	$suggestions = zo_get_404_suggestions(8, $lang);
+	if (empty($suggestions)) {
+		$suggestions = array_slice(zo_get_404_suggestion_candidates($lang), 0, 8);
+	}
+
 	if (empty($suggestions)) {
 		return;
 	}
+
+	$searched_for = zo_get_404_requested_label();
+	$search_value = zo_get_404_requested_text();
 
 	$rendered = true;
 	echo '<section class="zo-404-suggestions" aria-label="' . esc_attr__('Page suggestions', 'zeka-oyunlari') . '">';
 	echo '<p class="zo-404-suggestions__eyebrow">' . esc_html__('404 Error', 'zeka-oyunlari') . '</p>';
 	echo '<h2 class="zo-404-suggestions__title">' . esc_html__('Maybe you meant these games/pages?', 'zeka-oyunlari') . '</h2>';
-	echo '<p class="zo-404-suggestions__intro">' . esc_html__('The page address looks a little different. Try one of these close matches.', 'zeka-oyunlari') . '</p>';
-	echo '<ul class="zo-404-suggestions__list">';
+	echo '<p class="zo-404-suggestions__intro">' . esc_html__('Search what you meant, then choose the closest recommendation.', 'zeka-oyunlari') . '</p>';
+	if ($searched_for !== '') {
+		echo '<p class="zo-404-suggestions__searched">' . esc_html__('Searched:', 'zeka-oyunlari') . ' ' . esc_html($searched_for) . '</p>';
+	}
+	echo '<form class="zo-404-suggestions__search" role="search" action="' . esc_url(home_url('/')) . '" method="get" data-zo-404-search-form>';
+	echo '<input class="zo-404-suggestions__input" type="search" name="s" value="' . esc_attr($search_value) . '" placeholder="' . esc_attr__('Search games or pages', 'zeka-oyunlari') . '" autocomplete="off" data-zo-404-search>';
+	echo '</form>';
+	echo '<ul class="zo-404-suggestions__list" data-zo-404-results>';
 	foreach ($suggestions as $suggestion) {
-		echo '<li><a class="zo-404-suggestions__link" href="' . esc_url($suggestion['url']) . '">';
+		$search_text = zo_normalize_404_match_text($suggestion['search']);
+		echo '<li data-zo-404-item data-search="' . esc_attr($search_text) . '"><a class="zo-404-suggestions__link" href="' . esc_url($suggestion['url']) . '">';
 		echo '<span class="zo-404-suggestions__type">' . esc_html($suggestion['type']) . '</span>';
 		echo '<span class="zo-404-suggestions__name">' . esc_html($suggestion['title']) . '</span>';
 		echo '</a></li>';
 	}
 	echo '</ul>';
+	echo '<p class="zo-404-suggestions__empty" hidden data-zo-404-empty>' . esc_html__('No close matches yet. Try a shorter word.', 'zeka-oyunlari') . '</p>';
+	echo '<script>(function(){var script=document.currentScript;var box=script&&script.closest(".zo-404-suggestions");if(!box){return;}var form=box.querySelector("[data-zo-404-search-form]");var input=box.querySelector("[data-zo-404-search]");var items=Array.prototype.slice.call(box.querySelectorAll("[data-zo-404-item]"));var empty=box.querySelector("[data-zo-404-empty]");function normalize(value){return String(value||"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();}function apply(){var query=normalize(input&&input.value);var shown=0;items.forEach(function(item){var haystack=normalize(item.getAttribute("data-search"));var words=query?query.split(" ").filter(Boolean):[];var match=!words.length||words.some(function(word){return haystack.indexOf(word)!==-1;});item.hidden=!match;if(match){shown++;}});if(empty){empty.hidden=shown!==0;}}if(form){form.addEventListener("submit",function(event){event.preventDefault();apply();});}if(input){input.addEventListener("input",apply);apply();}})();</script>';
 	echo '</section>';
 }
-add_action('wp_footer', 'zo_render_404_suggestion_helper', 5);
+add_action('get_footer', 'zo_render_404_suggestion_helper', 5);
 
 function zo_locate_game_template($template) {
 	$slug = zo_get_requested_game_slug();
