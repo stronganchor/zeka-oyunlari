@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.13.asker.arslan
+ * Version: 1.5.14.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -10048,6 +10048,10 @@ function zo_get_input_blocker_css() {
 	user-select: text;
 }
 
+.zo-mobile-controls {
+	display: none;
+}
+
 @media (max-width: 768px) {
 	html,
 	body {
@@ -10088,6 +10092,113 @@ function zo_get_input_blocker_css() {
 	.zo-game-shell [data-zo-game-board],
 	.zo-game-root [data-zo-game-board] {
 		touch-action: pan-y pinch-zoom !important;
+	}
+
+	.zo-mobile-controls {
+		position: fixed;
+		right: 10px;
+		bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+		left: 10px;
+		z-index: 9999;
+		display: none;
+		align-items: end;
+		justify-content: space-between;
+		gap: 14px;
+		pointer-events: none;
+	}
+
+	.zo-mobile-controls.is-visible {
+		display: flex;
+	}
+
+	.zo-mobile-controls__pad,
+	.zo-mobile-controls__actions {
+		display: grid;
+		gap: 7px;
+		pointer-events: auto;
+	}
+
+	.zo-mobile-controls__pad {
+		grid-template-columns: repeat(3, 48px);
+		grid-template-rows: repeat(3, 48px);
+	}
+
+	.zo-mobile-controls__actions {
+		grid-template-columns: repeat(2, 54px);
+		align-items: end;
+	}
+
+	.zo-mobile-controls__button {
+		width: 48px;
+		height: 48px;
+		border: 1px solid rgba(255, 255, 255, 0.38);
+		border-radius: 999px;
+		background: rgba(15, 23, 42, 0.82);
+		box-shadow: 0 10px 22px rgba(15, 23, 42, 0.28);
+		color: #fff;
+		font: 800 20px/1 Arial, sans-serif;
+		text-align: center;
+		touch-action: none;
+		user-select: none;
+		-webkit-user-select: none;
+	}
+
+	.zo-mobile-controls__button:active,
+	.zo-mobile-controls__button.is-pressed {
+		background: #0f766e;
+		transform: translateY(1px);
+	}
+
+	.zo-mobile-controls__button--up {
+		grid-column: 2;
+		grid-row: 1;
+	}
+
+	.zo-mobile-controls__button--left {
+		grid-column: 1;
+		grid-row: 2;
+	}
+
+	.zo-mobile-controls__button--right {
+		grid-column: 3;
+		grid-row: 2;
+	}
+
+	.zo-mobile-controls__button--down {
+		grid-column: 2;
+		grid-row: 3;
+	}
+
+	.zo-mobile-controls__button--action {
+		width: 54px;
+		height: 54px;
+		background: rgba(15, 118, 110, 0.9);
+		font-size: 16px;
+	}
+
+	.zo-mobile-controls__button--secondary {
+		background: rgba(30, 64, 175, 0.88);
+	}
+}
+
+@media (max-width: 360px) {
+	.zo-mobile-controls__pad {
+		grid-template-columns: repeat(3, 42px);
+		grid-template-rows: repeat(3, 42px);
+	}
+
+	.zo-mobile-controls__button {
+		width: 42px;
+		height: 42px;
+	}
+
+	.zo-mobile-controls__actions {
+		grid-template-columns: repeat(2, 48px);
+	}
+
+	.zo-mobile-controls__button--action {
+		width: 48px;
+		height: 48px;
 	}
 }
 ';
@@ -10261,6 +10372,147 @@ function zo_get_input_blocker_js() {
 		}
 	}
 
+	function shouldShowMobileControls() {
+		return !!(
+			window.matchMedia &&
+			window.matchMedia('(max-width: 768px), (pointer: coarse)').matches &&
+			document.querySelector('.zo-game-shell, .zo-game-root')
+		);
+	}
+
+	function getControlTarget() {
+		return lastActiveGame || getGameRoot(document.activeElement) || findSingleGameRoot() || document.querySelector('.zo-game-shell, .zo-game-root');
+	}
+
+	function keyInfo(code) {
+		var map = {
+			ArrowUp: { key: 'ArrowUp', keyCode: 38, which: 38 },
+			ArrowDown: { key: 'ArrowDown', keyCode: 40, which: 40 },
+			ArrowLeft: { key: 'ArrowLeft', keyCode: 37, which: 37 },
+			ArrowRight: { key: 'ArrowRight', keyCode: 39, which: 39 },
+			Space: { key: ' ', keyCode: 32, which: 32 },
+			Enter: { key: 'Enter', keyCode: 13, which: 13 }
+		};
+
+		return map[code] || { key: code, keyCode: 0, which: 0 };
+	}
+
+	function dispatchGameKey(code, type) {
+		var target = getControlTarget();
+		var info = keyInfo(code);
+		var eventInit = {
+			key: info.key,
+			code: code,
+			keyCode: info.keyCode,
+			which: info.which,
+			bubbles: true,
+			cancelable: true
+		};
+		var event;
+
+		if (target) {
+			lastActiveGame = target;
+			ensureFocusable(target);
+			if (target.focus) {
+				target.focus({ preventScroll: true });
+			}
+		}
+
+		try {
+			event = new KeyboardEvent(type, eventInit);
+		} catch (error) {
+			event = document.createEvent('KeyboardEvent');
+			event.initKeyboardEvent(type, true, true, window, info.key, 0, '', false, '');
+		}
+
+		try {
+			Object.defineProperty(event, 'keyCode', { get: function () { return info.keyCode; } });
+			Object.defineProperty(event, 'which', { get: function () { return info.which; } });
+		} catch (error) {}
+
+		if (target) {
+			target.dispatchEvent(event);
+		}
+
+		document.dispatchEvent(new KeyboardEvent(type, eventInit));
+		window.dispatchEvent(new KeyboardEvent(type, eventInit));
+	}
+
+	function createMobileControls() {
+		var wrap = document.createElement('div');
+		wrap.className = 'zo-mobile-controls';
+		wrap.setAttribute('aria-label', 'Mobile game controls');
+		wrap.innerHTML = '' +
+			'<div class="zo-mobile-controls__pad" aria-label="Move">' +
+				'<button class="zo-mobile-controls__button zo-mobile-controls__button--up" type="button" data-zo-control-key="ArrowUp" aria-label="Up">▲</button>' +
+				'<button class="zo-mobile-controls__button zo-mobile-controls__button--left" type="button" data-zo-control-key="ArrowLeft" aria-label="Left">◀</button>' +
+				'<button class="zo-mobile-controls__button zo-mobile-controls__button--right" type="button" data-zo-control-key="ArrowRight" aria-label="Right">▶</button>' +
+				'<button class="zo-mobile-controls__button zo-mobile-controls__button--down" type="button" data-zo-control-key="ArrowDown" aria-label="Down">▼</button>' +
+			'</div>' +
+			'<div class="zo-mobile-controls__actions" aria-label="Actions">' +
+				'<button class="zo-mobile-controls__button zo-mobile-controls__button--action" type="button" data-zo-control-key="Space" aria-label="Action">A</button>' +
+				'<button class="zo-mobile-controls__button zo-mobile-controls__button--action zo-mobile-controls__button--secondary" type="button" data-zo-control-key="Enter" aria-label="Start">B</button>' +
+			'</div>';
+		document.body.appendChild(wrap);
+		return wrap;
+	}
+
+	function setupMobileControls() {
+		var controls = document.querySelector('.zo-mobile-controls') || createMobileControls();
+		var pressed = {};
+
+		function updateVisibility() {
+			controls.classList.toggle('is-visible', shouldShowMobileControls());
+		}
+
+		function press(button) {
+			var code = button.getAttribute('data-zo-control-key');
+			if (!code || pressed[code]) {
+				return;
+			}
+
+			pressed[code] = true;
+			button.classList.add('is-pressed');
+			dispatchGameKey(code, 'keydown');
+		}
+
+		function release(button) {
+			var code = button.getAttribute('data-zo-control-key');
+			if (!code || !pressed[code]) {
+				return;
+			}
+
+			pressed[code] = false;
+			button.classList.remove('is-pressed');
+			dispatchGameKey(code, 'keyup');
+		}
+
+		controls.querySelectorAll('[data-zo-control-key]').forEach(function (button) {
+			button.addEventListener('pointerdown', function (event) {
+				event.preventDefault();
+				button.setPointerCapture && button.setPointerCapture(event.pointerId);
+				press(button);
+			});
+			button.addEventListener('pointerup', function (event) {
+				event.preventDefault();
+				release(button);
+			});
+			button.addEventListener('pointercancel', function () {
+				release(button);
+			});
+			button.addEventListener('pointerleave', function () {
+				release(button);
+			});
+			button.addEventListener('click', function (event) {
+				event.preventDefault();
+			});
+		});
+
+		updateVisibility();
+		window.addEventListener('resize', updateVisibility);
+		window.addEventListener('orientationchange', updateVisibility);
+	}
+
 	function rememberGameFromEvent(event) {
 		var game = getGameRoot(event.target);
 
@@ -10329,6 +10581,7 @@ function zo_get_input_blocker_js() {
 	document.addEventListener('gestureend', handleGameOnlyDefault, true);
 
 	document.querySelectorAll('.zo-game-shell, .zo-game-root').forEach(ensureFocusable);
+	setupMobileControls();
 })();
 JS;
 }
@@ -12279,347 +12532,6 @@ function zo_badge_showcase_shortcode($atts = array()) {
 }
 add_shortcode('zeka_rozetleri', 'zo_badge_showcase_shortcode');
 add_shortcode('zeka_badge_showcase', 'zo_badge_showcase_shortcode');
-
-function zo_normalize_404_match_text($value) {
-	$value = is_scalar($value) ? (string) $value : '';
-	$value = remove_accents(wp_strip_all_tags($value));
-	$value = strtolower($value);
-	$value = preg_replace('/[^a-z0-9]+/', ' ', $value);
-
-	return trim((string) $value);
-}
-
-function zo_get_404_requested_text() {
-	$path = '';
-
-	if (!empty($_SERVER['REQUEST_URI']) && is_string($_SERVER['REQUEST_URI'])) {
-		$path = (string) wp_parse_url(wp_unslash($_SERVER['REQUEST_URI']), PHP_URL_PATH);
-	}
-
-	$path = rawurldecode(trim($path, '/'));
-
-	return zo_normalize_404_match_text($path);
-}
-
-function zo_get_404_requested_label() {
-	if (empty($_SERVER['REQUEST_URI']) || !is_string($_SERVER['REQUEST_URI'])) {
-		return '';
-	}
-
-	$path = (string) wp_parse_url(wp_unslash($_SERVER['REQUEST_URI']), PHP_URL_PATH);
-	$path = rawurldecode('/' . trim($path, '/'));
-
-	return $path === '/' ? '' : $path;
-}
-
-function zo_score_404_suggestion($needle, $haystack) {
-	$needle = zo_normalize_404_match_text($needle);
-	$haystack = zo_normalize_404_match_text($haystack);
-
-	if ($needle === '' || $haystack === '') {
-		return 0;
-	}
-
-	if ($needle === $haystack) {
-		return 100;
-	}
-
-	$score = 0;
-	if (strpos($haystack, $needle) !== false || strpos($needle, $haystack) !== false) {
-		$score = 86;
-	}
-
-	similar_text($needle, $haystack, $percent);
-	$score = max($score, (int) round($percent));
-
-	$max_length = max(strlen($needle), strlen($haystack), 1);
-	$distance = levenshtein(substr($needle, 0, 255), substr($haystack, 0, 255));
-	$distance_score = max(0, 100 - (int) round(($distance / $max_length) * 100));
-
-	return max($score, $distance_score);
-}
-
-function zo_get_404_suggestion_candidates($lang = '') {
-	$lang = array_key_exists($lang, zo_get_language_options()) ? $lang : zo_get_current_language();
-	$candidates = array();
-	$add_candidate = function ($title, $url, $type, $extra = '') use (&$candidates) {
-		$url = is_string($url) ? $url : '';
-		if ($url === '') {
-			return;
-		}
-
-		$path = (string) wp_parse_url($url, PHP_URL_PATH);
-		$key = strtolower($path !== '' ? $path : $url);
-		if (isset($candidates[$key])) {
-			return;
-		}
-
-		$candidates[$key] = array(
-			'title' => is_scalar($title) && (string) $title !== '' ? (string) $title : $url,
-			'url' => $url,
-			'type' => $type,
-			'search' => trim((string) $title . ' ' . $path . ' ' . $extra),
-		);
-	};
-
-	$games_archive = get_post_type_archive_link('zeka_oyunu');
-	if (!is_string($games_archive) || $games_archive === '') {
-		$games_archive = home_url('/oyunlar/');
-	}
-
-	$add_candidate(zo_get_interface_text('home', $lang), add_query_arg('zo_lang', $lang, home_url('/')), 'Page', 'home zeka');
-	$add_candidate(zo_get_interface_text('all_games', $lang), add_query_arg('zo_lang', $lang, $games_archive), 'Page', 'oyunlar games');
-	$add_candidate('Askerin Oyunlari', zo_get_owner_games_url('asker', $lang), 'Page', 'askerin oyunlari asker games');
-	$add_candidate('Arslanin Oyunlari', zo_get_owner_games_url('arslan', $lang), 'Page', 'arslanin oyunlari arslan games');
-	$add_candidate('About', add_query_arg('zo_lang', $lang, home_url('/about/')), 'Page', 'about hakkinda');
-	$add_candidate('About Askerin Oyunlari', add_query_arg('zo_lang', $lang, home_url('/about-askerin-oyunlari/')), 'Page', 'about askerin oyunlari');
-
-	$pages = get_posts(
-		array(
-			'post_type' => array('page', 'post'),
-			'post_status' => 'publish',
-			'posts_per_page' => 40,
-			'orderby' => 'modified',
-			'order' => 'DESC',
-			'no_found_rows' => true,
-			'suppress_filters' => false,
-		)
-	);
-
-	foreach ($pages as $page) {
-		if (!$page instanceof WP_Post) {
-			continue;
-		}
-
-		$url = get_permalink($page);
-		if (is_string($url) && $url !== '') {
-			$add_candidate(get_the_title($page), add_query_arg('zo_lang', $lang, $url), 'Page', $page->post_name);
-		}
-	}
-
-	$posts_by_slug = zo_get_game_posts_by_slug();
-	foreach (zo_get_game_modules() as $slug => $module) {
-		if (!zo_is_game_available_for_language($slug, $lang)) {
-			continue;
-		}
-
-		$metadata = zo_get_game_display_metadata($module);
-		$title = !empty($metadata['name']) ? $metadata['name'] : (!empty($module['name']) ? $module['name'] : $slug);
-		$title = zo_get_localized_text($title, $lang);
-		$post = isset($posts_by_slug[$slug]) ? $posts_by_slug[$slug] : null;
-		$url = $post instanceof WP_Post ? zo_get_game_launch_url($post) : zo_get_game_module_fallback_url($slug);
-
-		if ($url !== '') {
-			$url = add_query_arg('zo_lang', $lang, $url);
-			$add_candidate($title, $url, 'Game', $slug);
-		}
-	}
-
-	return array_values($candidates);
-}
-
-function zo_get_404_suggestions($limit = 6, $lang = '') {
-	$limit = max(1, (int) $limit);
-	$needle = zo_get_404_requested_text();
-	if ($needle === '') {
-		return array_slice(zo_get_404_suggestion_candidates($lang), 0, $limit);
-	}
-
-	$suggestions = array();
-	foreach (zo_get_404_suggestion_candidates($lang) as $candidate) {
-		$score = zo_score_404_suggestion($needle, $candidate['search']);
-		if ($score < 42) {
-			continue;
-		}
-
-		$candidate['score'] = $score;
-		$suggestions[] = $candidate;
-	}
-
-	usort(
-		$suggestions,
-		function ($a, $b) {
-			return ((int) $b['score'] <=> (int) $a['score']) ?: strcasecmp((string) $a['title'], (string) $b['title']);
-		}
-	);
-
-	return array_slice($suggestions, 0, $limit);
-}
-
-function zo_enqueue_404_suggestion_styles() {
-	if (!is_404()) {
-		return;
-	}
-
-	$handle = 'zo-404-suggestions';
-	$css = '
-.zo-404-suggestions {
-	width: min(100% - 32px, 980px);
-	margin: 24px auto;
-	padding: 22px;
-	border: 1px solid #d7dee9;
-	border-radius: 18px;
-	background: #ffffff;
-	box-shadow: 0 18px 42px rgba(15, 23, 42, 0.12);
-	color: #111827;
-	font-family: Arial, sans-serif;
-}
-.zo-404-suggestions__eyebrow {
-	margin: 0 0 6px;
-	color: #dc2626;
-	font-size: 0.86rem;
-	font-weight: 800;
-	text-transform: uppercase;
-}
-.zo-404-suggestions__title {
-	margin: 0 0 8px;
-	font-size: clamp(1.25rem, 2.5vw, 1.8rem);
-	line-height: 1.2;
-	color: #0f172a;
-}
-.zo-404-suggestions__intro {
-	margin: 0 0 16px;
-	color: #4b5563;
-}
-.zo-404-suggestions__searched {
-	display: inline-block;
-	margin: 0 0 14px;
-	padding: 6px 10px;
-	border-radius: 999px;
-	background: #fff7ed;
-	color: #9a3412;
-	font-size: 0.86rem;
-	font-weight: 700;
-}
-.zo-404-suggestions__search {
-	display: flex;
-	gap: 10px;
-	margin: 0 0 16px;
-}
-.zo-404-suggestions__input {
-	width: 100%;
-	min-height: 44px;
-	padding: 0 14px;
-	border: 1px solid #cbd5e1;
-	border-radius: 12px;
-	background: #fff;
-	color: #111827;
-	font: inherit;
-}
-.zo-404-suggestions__input:focus {
-	border-color: #14b8a6;
-	box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.18);
-	outline: none;
-}
-.zo-404-suggestions__list {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-	gap: 10px;
-	margin: 0;
-	padding: 0;
-	list-style: none;
-}
-.zo-404-suggestions__link {
-	display: block;
-	min-height: 100%;
-	padding: 12px 14px;
-	border: 1px solid #e5e7eb;
-	border-radius: 12px;
-	background: #f8fafc;
-	color: #0f172a;
-	text-decoration: none;
-}
-.zo-404-suggestions__link:hover,
-.zo-404-suggestions__link:focus {
-	border-color: #14b8a6;
-	background: #ecfeff;
-	color: #0f172a;
-	text-decoration: none;
-}
-.zo-404-suggestions__type {
-	display: block;
-	margin-bottom: 4px;
-	color: #0f766e;
-	font-size: 0.78rem;
-	font-weight: 700;
-	text-transform: uppercase;
-}
-.zo-404-suggestions__name {
-	display: block;
-	font-weight: 700;
-	line-height: 1.3;
-}
-.zo-404-suggestions__empty {
-	margin: 12px 0 0;
-	color: #6b7280;
-}
-@media (max-width: 560px) {
-	.zo-404-suggestions {
-		width: min(100% - 20px, 980px);
-		margin-top: 14px;
-		padding: 16px;
-		border-radius: 14px;
-	}
-	.zo-404-suggestions__search {
-		display: block;
-	}
-}
-';
-
-	if (!wp_style_is($handle, 'registered')) {
-		wp_register_style($handle, false, array(), ZO_PLUGIN_VERSION);
-	}
-
-	wp_enqueue_style($handle);
-	wp_add_inline_style($handle, $css);
-}
-add_action('wp_enqueue_scripts', 'zo_enqueue_404_suggestion_styles', 25);
-
-function zo_render_404_suggestion_helper() {
-	static $rendered = false;
-
-	if ($rendered || !is_404()) {
-		return;
-	}
-
-	$lang = zo_get_current_language();
-	$suggestions = zo_get_404_suggestions(8, $lang);
-	if (empty($suggestions)) {
-		$suggestions = array_slice(zo_get_404_suggestion_candidates($lang), 0, 8);
-	}
-
-	if (empty($suggestions)) {
-		return;
-	}
-
-	$searched_for = zo_get_404_requested_label();
-	$search_value = zo_get_404_requested_text();
-
-	$rendered = true;
-	echo '<section class="zo-404-suggestions" aria-label="' . esc_attr__('Page suggestions', 'zeka-oyunlari') . '">';
-	echo '<p class="zo-404-suggestions__eyebrow">' . esc_html__('404 Error', 'zeka-oyunlari') . '</p>';
-	echo '<h2 class="zo-404-suggestions__title">' . esc_html__('Maybe you meant these games/pages?', 'zeka-oyunlari') . '</h2>';
-	echo '<p class="zo-404-suggestions__intro">' . esc_html__('Search what you meant, then choose the closest recommendation.', 'zeka-oyunlari') . '</p>';
-	if ($searched_for !== '') {
-		echo '<p class="zo-404-suggestions__searched">' . esc_html__('Searched:', 'zeka-oyunlari') . ' ' . esc_html($searched_for) . '</p>';
-	}
-	echo '<form class="zo-404-suggestions__search" role="search" action="' . esc_url(home_url('/')) . '" method="get" data-zo-404-search-form>';
-	echo '<input class="zo-404-suggestions__input" type="search" name="s" value="' . esc_attr($search_value) . '" placeholder="' . esc_attr__('Search games or pages', 'zeka-oyunlari') . '" autocomplete="off" data-zo-404-search>';
-	echo '</form>';
-	echo '<ul class="zo-404-suggestions__list" data-zo-404-results>';
-	foreach ($suggestions as $suggestion) {
-		$search_text = zo_normalize_404_match_text($suggestion['search']);
-		echo '<li data-zo-404-item data-search="' . esc_attr($search_text) . '"><a class="zo-404-suggestions__link" href="' . esc_url($suggestion['url']) . '">';
-		echo '<span class="zo-404-suggestions__type">' . esc_html($suggestion['type']) . '</span>';
-		echo '<span class="zo-404-suggestions__name">' . esc_html($suggestion['title']) . '</span>';
-		echo '</a></li>';
-	}
-	echo '</ul>';
-	echo '<p class="zo-404-suggestions__empty" hidden data-zo-404-empty>' . esc_html__('No close matches yet. Try a shorter word.', 'zeka-oyunlari') . '</p>';
-	echo '<script>(function(){var script=document.currentScript;var box=script&&script.closest(".zo-404-suggestions");if(!box){return;}var form=box.querySelector("[data-zo-404-search-form]");var input=box.querySelector("[data-zo-404-search]");var items=Array.prototype.slice.call(box.querySelectorAll("[data-zo-404-item]"));var empty=box.querySelector("[data-zo-404-empty]");function normalize(value){return String(value||"").toLowerCase().replace(/[^a-z0-9]+/g," ").trim();}function apply(){var query=normalize(input&&input.value);var shown=0;items.forEach(function(item){var haystack=normalize(item.getAttribute("data-search"));var words=query?query.split(" ").filter(Boolean):[];var match=!words.length||words.some(function(word){return haystack.indexOf(word)!==-1;});item.hidden=!match;if(match){shown++;}});if(empty){empty.hidden=shown!==0;}}if(form){form.addEventListener("submit",function(event){event.preventDefault();apply();});}if(input){input.addEventListener("input",apply);apply();}})();</script>';
-	echo '</section>';
-}
-add_action('get_footer', 'zo_render_404_suggestion_helper', 5);
 
 function zo_locate_game_template($template) {
 	$slug = zo_get_requested_game_slug();
