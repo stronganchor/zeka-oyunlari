@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.14.asker.arslan
+ * Version: 1.5.15.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -10095,16 +10095,15 @@ function zo_get_input_blocker_css() {
 	}
 
 	.zo-mobile-controls {
-		position: fixed;
-		right: 10px;
-		bottom: calc(10px + env(safe-area-inset-bottom, 0px));
-		left: 10px;
-		z-index: 9999;
+		box-sizing: border-box;
+		width: min(100%, 520px);
+		margin: 14px auto 0;
+		padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px));
 		display: none;
-		align-items: end;
+		align-items: center;
 		justify-content: space-between;
 		gap: 14px;
-		pointer-events: none;
+		pointer-events: auto;
 	}
 
 	.zo-mobile-controls.is-visible {
@@ -10136,7 +10135,7 @@ function zo_get_input_blocker_css() {
 		background: rgba(15, 23, 42, 0.82);
 		box-shadow: 0 10px 22px rgba(15, 23, 42, 0.28);
 		color: #fff;
-		font: 800 20px/1 Arial, sans-serif;
+		font: 800 15px/1 Arial, sans-serif;
 		text-align: center;
 		touch-action: none;
 		user-select: none;
@@ -10444,17 +10443,30 @@ function zo_get_input_blocker_js() {
 		wrap.setAttribute('aria-label', 'Mobile game controls');
 		wrap.innerHTML = '' +
 			'<div class="zo-mobile-controls__pad" aria-label="Move">' +
-				'<button class="zo-mobile-controls__button zo-mobile-controls__button--up" type="button" data-zo-control-key="ArrowUp" aria-label="Up">▲</button>' +
-				'<button class="zo-mobile-controls__button zo-mobile-controls__button--left" type="button" data-zo-control-key="ArrowLeft" aria-label="Left">◀</button>' +
-				'<button class="zo-mobile-controls__button zo-mobile-controls__button--right" type="button" data-zo-control-key="ArrowRight" aria-label="Right">▶</button>' +
-				'<button class="zo-mobile-controls__button zo-mobile-controls__button--down" type="button" data-zo-control-key="ArrowDown" aria-label="Down">▼</button>' +
+				'<button class="zo-mobile-controls__button zo-mobile-controls__button--up" type="button" data-zo-control-key="ArrowUp" aria-label="Up">UP</button>' +
+				'<button class="zo-mobile-controls__button zo-mobile-controls__button--left" type="button" data-zo-control-key="ArrowLeft" aria-label="Left">LT</button>' +
+				'<button class="zo-mobile-controls__button zo-mobile-controls__button--right" type="button" data-zo-control-key="ArrowRight" aria-label="Right">RT</button>' +
+				'<button class="zo-mobile-controls__button zo-mobile-controls__button--down" type="button" data-zo-control-key="ArrowDown" aria-label="Down">DN</button>' +
 			'</div>' +
 			'<div class="zo-mobile-controls__actions" aria-label="Actions">' +
 				'<button class="zo-mobile-controls__button zo-mobile-controls__button--action" type="button" data-zo-control-key="Space" aria-label="Action">A</button>' +
 				'<button class="zo-mobile-controls__button zo-mobile-controls__button--action zo-mobile-controls__button--secondary" type="button" data-zo-control-key="Enter" aria-label="Start">B</button>' +
 			'</div>';
-		document.body.appendChild(wrap);
 		return wrap;
+	}
+
+	function placeMobileControls(controls) {
+		var target = getControlTarget();
+		if (!target || !target.parentNode) {
+			if (!controls.parentNode) {
+				document.body.appendChild(controls);
+			}
+			return;
+		}
+
+		if (target.nextSibling !== controls) {
+			target.parentNode.insertBefore(controls, target.nextSibling);
+		}
 	}
 
 	function setupMobileControls() {
@@ -10462,6 +10474,7 @@ function zo_get_input_blocker_js() {
 		var pressed = {};
 
 		function updateVisibility() {
+			placeMobileControls(controls);
 			controls.classList.toggle('is-visible', shouldShowMobileControls());
 		}
 
