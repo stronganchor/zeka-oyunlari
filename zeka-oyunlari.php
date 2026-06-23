@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.15.asker.arslan
+ * Version: 1.5.16.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -9596,6 +9596,163 @@ function zo_get_current_request_url() {
 
 	return is_string($url) ? esc_url_raw($url) : '';
 }
+
+function zo_get_bad_url_redirect_map() {
+	return array(
+		'games' => '/oyunlar/',
+		'game' => '/oyunlar/',
+		'oyun' => '/oyunlar/',
+		'oyunlari' => '/oyunlar/',
+		'oyunları' => '/oyunlar/',
+		'all-games' => '/oyunlar/',
+		'game-list' => '/oyunlar/',
+		'games-list' => '/oyunlar/',
+		'allgames' => '/oyunlar/',
+		'play' => '/oyunlar/',
+		'oyna' => '/oyunlar/',
+		'oyun-listesi' => '/oyunlar/',
+		'oyunlar-listesi' => '/oyunlar/',
+		'oyun-oyna' => '/oyunlar/',
+		'zeka-oyunlari' => '/oyunlar/',
+		'brain-games' => '/oyunlar/',
+		'mind-games' => '/oyunlar/',
+		'free-games' => '/oyunlar/',
+		'fun-games' => '/oyunlar/',
+		'puzzle-games' => '/oyunlar/',
+		'logic-games' => '/oyunlar/',
+		'zeka-games' => '/oyunlar/',
+		'juegos' => '/oyunlar/',
+		'jeux' => '/oyunlar/',
+		'spiel' => '/oyunlar/',
+		'spiele' => '/oyunlar/',
+		'jugar' => '/oyunlar/',
+		'jouer' => '/oyunlar/',
+		'oynamak' => '/oyunlar/',
+		'play-games' => '/oyunlar/',
+		'oyunlar/mini-brawl' => '/oyunlar/mini-brawl-roster/',
+		'oyunlar/brawl-roster' => '/oyunlar/mini-brawl-roster/',
+		'games/mini-brawl-roster' => '/oyunlar/mini-brawl-roster/',
+		'oyunlari/mini-brawl-roster' => '/oyunlar/mini-brawl-roster/',
+		'oyunlar/adamasmaca' => '/oyunlar/adam-asmaca/',
+		'game/adam-asmaca' => '/oyunlar/adam-asmaca/',
+		'oyun/adam-asmaca' => '/oyunlar/adam-asmaca/',
+		'oyunlari/adam-asmaca' => '/oyunlar/adam-asmaca/',
+		'games/adam-asmaca' => '/oyunlar/adam-asmaca/',
+		'soccer-match-ai/tr' => '/soccer-match-ai/?zo_lang=tr',
+		'home' => '/',
+		'homepage' => '/',
+		'main' => '/',
+		'start' => '/',
+		'welcome' => '/',
+		'ana' => '/',
+		'baslangic' => '/',
+		'başlangıç' => '/',
+		'anasayfa' => '/',
+		'inicio' => '/',
+		'accueil' => '/',
+		'asker-oyunlari' => '/askerin-oyunlari/',
+		'asker' => '/askerin-oyunlari/',
+		'askers-games' => '/askerin-oyunlari/',
+		'asker-games' => '/askerin-oyunlari/',
+		'asker-games-list' => '/askerin-oyunlari/',
+		'askerin-games' => '/askerin-oyunlari/',
+		'asker-oyun' => '/askerin-oyunlari/',
+		'asker-oyunlar' => '/askerin-oyunlari/',
+		'askerins-games' => '/askerin-oyunlari/',
+		'asker-play' => '/askerin-oyunlari/',
+		'juegos-de-asker' => '/askerin-oyunlari/',
+		'jeux-asker' => '/askerin-oyunlari/',
+		'asker-spiele' => '/askerin-oyunlari/',
+		'askerinoyunlari' => '/askerin-oyunlari/',
+		'askerin-oyunlari' => '/askerin-oyunlari/',
+		'askerin-oyunlar' => '/askerin-oyunlari/',
+		'askerin-oyunları' => '/askerin-oyunlari/',
+		'arslan-oyunlari' => '/arslanin-oyunlari/',
+		'arslans-games' => '/arslanin-oyunlari/',
+		'arslan-games' => '/arslanin-oyunlari/',
+		'arslan-oyun' => '/arslanin-oyunlari/',
+		'arslan-oyunlar' => '/arslanin-oyunlari/',
+		'arslanoyunlari' => '/arslanin-oyunlari/',
+		'arslan-play' => '/arslanin-oyunlari/',
+		'arslanin-games' => '/arslanin-oyunlari/',
+		'arslaninoyunlari' => '/arslanin-oyunlari/',
+		'arslanin-oyunlari' => '/arslanin-oyunlari/',
+		'arslanin-oyunlar' => '/arslanin-oyunlari/',
+		'arslanın-oyunları' => '/arslanin-oyunlari/',
+		'arslanin-oyunları' => '/arslanin-oyunlari/',
+		'hakkinda' => '/about/',
+		'hakkimizda' => '/about/',
+		'hakkımızda' => '/about/',
+		'sobre' => '/about/',
+		'uber-uns' => '/about/',
+		'ueber-uns' => '/about/',
+		'info' => '/about/',
+		'bilgi' => '/about/',
+		'site-info' => '/about/',
+		'about-game-site' => '/about/',
+		'about-me' => '/about/',
+		'who-we-are' => '/about/',
+		'site-bilgisi' => '/about/',
+		'zeka-bilgi' => '/about/',
+		'about-us' => '/about/',
+		'about-site' => '/about/',
+		'zeka-hakkinda' => '/about/',
+		'site-hakkinda' => '/about/',
+		'about-asker' => '/about-askerin-oyunlari/',
+		'asker-about' => '/about-askerin-oyunlari/',
+		'about-asker-games' => '/about-askerin-oyunlari/',
+		'askerin-oyunlari-hakkinda' => '/about-askerin-oyunlari/',
+		'acerca-de-asker' => '/about-askerin-oyunlari/',
+		'sobre-asker' => '/about-askerin-oyunlari/',
+		'asker-hakkinda' => '/about-askerin-oyunlari/',
+		'about-askerin - oyunlari' => '/about-askerin-oyunlari/',
+		'about askerin oyunlari' => '/about-askerin-oyunlari/',
+	);
+}
+
+function zo_maybe_redirect_bad_urls() {
+	if (is_admin() || wp_doing_ajax()) {
+		return;
+	}
+
+	if (empty($_SERVER['REQUEST_URI']) || !is_string($_SERVER['REQUEST_URI'])) {
+		return;
+	}
+
+	$request_uri = wp_unslash($_SERVER['REQUEST_URI']);
+	$path = (string) wp_parse_url($request_uri, PHP_URL_PATH);
+	$query = (string) wp_parse_url($request_uri, PHP_URL_QUERY);
+
+	if ($path === '') {
+		return;
+	}
+
+	$decoded_path = rawurldecode($path);
+	$key = strtolower(trim($decoded_path, '/'));
+	$key = preg_replace('/\s+/', ' ', $key);
+	$key = is_string($key) ? $key : '';
+
+	$redirects = zo_get_bad_url_redirect_map();
+	if ($key === '' || empty($redirects[$key])) {
+		return;
+	}
+
+	$target_path = $redirects[$key];
+	$target_url_path = (string) wp_parse_url($target_path, PHP_URL_PATH);
+	$target_url_query = (string) wp_parse_url($target_path, PHP_URL_QUERY);
+	if ($decoded_path === $target_url_path && ($target_url_query === '' || $query === $target_url_query)) {
+		return;
+	}
+
+	$target_url = home_url($target_path);
+	if ($query !== '' && $target_url_query === '') {
+		$target_url .= '?' . $query;
+	}
+
+	wp_safe_redirect($target_url, 301);
+	exit;
+}
+add_action('template_redirect', 'zo_maybe_redirect_bad_urls', 1);
 
 function zo_get_requested_game_slug() {
 	if (is_singular('zeka_oyunu')) {
