@@ -16,7 +16,7 @@ if (!function_exists('zo_game_sudoku_render')) {
 			<div class="zo-sudoku">
 				<div class="zo-sudoku__hero">
 					<div>
-						<p class="zo-sudoku__eyebrow">Asker's Puzzle</p>
+						<p class="zo-sudoku__eyebrow">Arslan's Puzzle</p>
 						<h3 class="zo-sudoku__title">Sudoku</h3>
 						<p class="zo-sudoku__intro">
 							Fill the 9x9 board so every row, every column, and every 3x3 box contains the numbers 1-9 exactly once.
@@ -115,7 +115,7 @@ if (!function_exists('zo_game_sudoku_render')) {
 return array(
 	'slug'            => 'sudoku',
 	'name'            => 'Sudoku',
-	'author'          => 'Asker',
+	'author'          => 'Arslan',
 	'description'     => 'A classic 9x9 Sudoku puzzle with easy, medium, and hard boards.',
 	'render_callback' => 'zo_game_sudoku_render',
 );

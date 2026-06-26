@@ -9603,6 +9603,9 @@ function zo_get_bad_url_redirect_map() {
 		'game' => '/oyunlar/',
 		'oyun' => '/oyunlar/',
 		'oyunlari' => '/oyunlar/',
+		'oyunalr' => '/oyunlar/',
+		'oyunlra' => '/oyunlar/',
+		'oyunlarrr' => '/oyunlar/',
 		'oyunları' => '/oyunlar/',
 		'all-games' => '/oyunlar/',
 		'game-list' => '/oyunlar/',
@@ -9634,11 +9637,24 @@ function zo_get_bad_url_redirect_map() {
 		'games/mini-brawl-roster' => '/oyunlar/mini-brawl-roster/',
 		'oyunlari/mini-brawl-roster' => '/oyunlar/mini-brawl-roster/',
 		'oyunlar/adamasmaca' => '/oyunlar/adam-asmaca/',
+		'sudoku' => '/oyunlar/sudoku/',
+		'game/sudoku' => '/oyunlar/sudoku/',
+		'games/sudoku' => '/oyunlar/sudoku/',
+		'play/sudoku' => '/oyunlar/sudoku/',
+		'oyun/sudoku' => '/oyunlar/sudoku/',
+		'snake' => '/oyunlar/snake/',
+		'araba' => '/oyunlar/arabali/',
+		'arabali' => '/oyunlar/arabali/',
+		'adam-asmaca' => '/oyunlar/adam-asmaca/',
+		'hangman' => '/oyunlar/adam-asmaca/',
 		'game/adam-asmaca' => '/oyunlar/adam-asmaca/',
 		'oyun/adam-asmaca' => '/oyunlar/adam-asmaca/',
 		'oyunlari/adam-asmaca' => '/oyunlar/adam-asmaca/',
 		'games/adam-asmaca' => '/oyunlar/adam-asmaca/',
 		'soccer-match-ai/tr' => '/soccer-match-ai/?zo_lang=tr',
+		'404' => '/404/',
+		'not-found' => '/404/',
+		'page-not-found' => '/404/',
 		'home' => '/',
 		'homepage' => '/',
 		'main' => '/',
@@ -9651,6 +9667,10 @@ function zo_get_bad_url_redirect_map() {
 		'inicio' => '/',
 		'accueil' => '/',
 		'asker-oyunlari' => '/askerin-oyunlari/',
+		'asker-oyunlarii' => '/askerin-oyunlari/',
+		'askerin oyunlari' => '/askerin-oyunlari/',
+		'category/asker' => '/askerin-oyunlari/',
+		'askerspiele' => '/askerin-oyunlari/',
 		'asker' => '/askerin-oyunlari/',
 		'askers-games' => '/askerin-oyunlari/',
 		'asker-games' => '/askerin-oyunlari/',
@@ -9660,14 +9680,45 @@ function zo_get_bad_url_redirect_map() {
 		'asker-oyunlar' => '/askerin-oyunlari/',
 		'askerins-games' => '/askerin-oyunlari/',
 		'asker-play' => '/askerin-oyunlari/',
+		'asker-page' => '/askerin-oyunlari/',
+		'asker-game-page' => '/askerin-oyunlari/',
 		'juegos-de-asker' => '/askerin-oyunlari/',
 		'jeux-asker' => '/askerin-oyunlari/',
 		'asker-spiele' => '/askerin-oyunlari/',
 		'askerinoyunlari' => '/askerin-oyunlari/',
+		'askerinoyunlar' => '/askerin-oyunlari/',
 		'askerin-oyunlari' => '/askerin-oyunlari/',
+		'askerin-oyunlarii' => '/askerin-oyunlari/',
+		'askerin-oyunlariii' => '/askerin-oyunlari/',
+		'askerin-oyunlair' => '/askerin-oyunlari/',
+		'askerin-oyunlrai' => '/askerin-oyunlari/',
+		'askerin-oyunalri' => '/askerin-oyunlari/',
+		'askerin-oyunlai' => '/askerin-oyunlari/',
+		'askerin-oyunari' => '/askerin-oyunlari/',
+		'askerin-oynulari' => '/askerin-oyunlari/',
+		'askerin-ouynlari' => '/askerin-oyunlari/',
+		'askerin-oyunlari2' => '/askerin-oyunlari/',
+		'askerin-oyunlar2' => '/askerin-oyunlari/',
+		'askerin-oyunlr' => '/askerin-oyunlari/',
+		'askerin-oynlar' => '/askerin-oyunlari/',
+		'askerin-oyunlarri' => '/askerin-oyunlari/',
+		'askerinn-oyunlari' => '/askerin-oyunlari/',
+		'askerin-oyunlari-' => '/askerin-oyunlari/',
+		'askerin--oyunlari' => '/askerin-oyunlari/',
+		'askerino-yunlari' => '/askerin-oyunlari/',
+		'askerinoyunlari-' => '/askerin-oyunlari/',
+		'askerin-oyunlari1' => '/askerin-oyunlari/',
+		'askerin-oyunlarim' => '/askerin-oyunlari/',
+		'askerinoyunlarii' => '/askerin-oyunlari/',
+		'askerinoyunlai' => '/askerin-oyunlari/',
+		'askerinoyunari' => '/askerin-oyunlari/',
 		'askerin-oyunlar' => '/askerin-oyunlari/',
 		'askerin-oyunları' => '/askerin-oyunlari/',
 		'arslan-oyunlari' => '/arslanin-oyunlari/',
+		'arslan-oyunlarii' => '/arslanin-oyunlari/',
+		'arslanin oyunlari' => '/arslanin-oyunlari/',
+		'category/arslan' => '/arslanin-oyunlari/',
+		'aslanin-oyunlari' => '/arslanin-oyunlari/',
 		'arslans-games' => '/arslanin-oyunlari/',
 		'arslan-games' => '/arslanin-oyunlari/',
 		'arslan-oyun' => '/arslanin-oyunlari/',
@@ -9676,7 +9727,30 @@ function zo_get_bad_url_redirect_map() {
 		'arslan-play' => '/arslanin-oyunlari/',
 		'arslanin-games' => '/arslanin-oyunlari/',
 		'arslaninoyunlari' => '/arslanin-oyunlari/',
+		'arslaninoyunlar' => '/arslanin-oyunlari/',
 		'arslanin-oyunlari' => '/arslanin-oyunlari/',
+		'arslanin-oyunlarii' => '/arslanin-oyunlari/',
+		'arslanin-oyunlariii' => '/arslanin-oyunlari/',
+		'arslanin-oyunlair' => '/arslanin-oyunlari/',
+		'arslanin-oyunlrai' => '/arslanin-oyunlari/',
+		'arslanin-oyunalri' => '/arslanin-oyunlari/',
+		'arslanin-oyunlai' => '/arslanin-oyunlari/',
+		'arslanin-oyunari' => '/arslanin-oyunlari/',
+		'arslanin-oynulari' => '/arslanin-oyunlari/',
+		'arslanin-ouynlari' => '/arslanin-oyunlari/',
+		'arslanin-oyunlari2' => '/arslanin-oyunlari/',
+		'arslanin-oyunlar2' => '/arslanin-oyunlari/',
+		'arslanin-oyunlr' => '/arslanin-oyunlari/',
+		'arslanin-oynlar' => '/arslanin-oyunlari/',
+		'arslanin-oyunlarri' => '/arslanin-oyunlari/',
+		'arslann-oyunlari' => '/arslanin-oyunlari/',
+		'arslanin--oyunlari' => '/arslanin-oyunlari/',
+		'arslanino-yunlari' => '/arslanin-oyunlari/',
+		'arslaninoyunlari-' => '/arslanin-oyunlari/',
+		'arslanin-oyunlari1' => '/arslanin-oyunlari/',
+		'arslanin-oyunlarim' => '/arslanin-oyunlari/',
+		'arslaninoyunlai' => '/arslanin-oyunlari/',
+		'arslaninoyunari' => '/arslanin-oyunlari/',
 		'arslanin-oyunlar' => '/arslanin-oyunlari/',
 		'arslanın-oyunları' => '/arslanin-oyunlari/',
 		'arslanin-oyunları' => '/arslanin-oyunlari/',
@@ -9691,6 +9765,7 @@ function zo_get_bad_url_redirect_map() {
 		'site-info' => '/about/',
 		'about-game-site' => '/about/',
 		'about-me' => '/about/',
+		'abotu' => '/about/',
 		'who-we-are' => '/about/',
 		'site-bilgisi' => '/about/',
 		'zeka-bilgi' => '/about/',
@@ -9699,15 +9774,49 @@ function zo_get_bad_url_redirect_map() {
 		'zeka-hakkinda' => '/about/',
 		'site-hakkinda' => '/about/',
 		'about-asker' => '/about-askerin-oyunlari/',
+		'about asker' => '/about-askerin-oyunlari/',
+		'about askerin oyunlari' => '/about-askerin-oyunlari/',
+		'aboutasker' => '/about-askerin-oyunlari/',
+		'aboutaskerinoyunlari' => '/about-askerin-oyunlari/',
+		'askerinfo' => '/about-askerin-oyunlari/',
 		'asker-about' => '/about-askerin-oyunlari/',
+		'asker-bilgi' => '/about-askerin-oyunlari/',
 		'about-asker-games' => '/about-askerin-oyunlari/',
 		'askerin-oyunlari-hakkinda' => '/about-askerin-oyunlari/',
 		'acerca-de-asker' => '/about-askerin-oyunlari/',
 		'sobre-asker' => '/about-askerin-oyunlari/',
 		'asker-hakkinda' => '/about-askerin-oyunlari/',
+		'asker-hakkında' => '/about-askerin-oyunlari/',
 		'about-askerin - oyunlari' => '/about-askerin-oyunlari/',
-		'about askerin oyunlari' => '/about-askerin-oyunlari/',
 	);
+}
+
+function zo_get_game_slug_redirect_path($key) {
+	if (!is_string($key) || $key === '') {
+		return '';
+	}
+
+	$game_prefixes = array('game', 'games', 'play', 'oyun', 'oyunlari', 'juego', 'juegos', 'jeu', 'jeux', 'spiel', 'spiele');
+	$slug_source   = '';
+
+	if (strpos($key, '/') !== false) {
+		$parts = explode('/', $key, 2);
+		$prefix = isset($parts[0]) ? trim($parts[0]) : '';
+		if (!in_array($prefix, $game_prefixes, true)) {
+			return '';
+		}
+
+		$slug_source = isset($parts[1]) ? trim($parts[1], '/') : '';
+	} else {
+		$slug_source = $key;
+	}
+
+	$slug = sanitize_title($slug_source);
+	if ($slug === '' || !zo_get_game_module($slug)) {
+		return '';
+	}
+
+	return '/oyunlar/' . $slug . '/';
 }
 
 function zo_maybe_redirect_bad_urls() {
@@ -9733,11 +9842,15 @@ function zo_maybe_redirect_bad_urls() {
 	$key = is_string($key) ? $key : '';
 
 	$redirects = zo_get_bad_url_redirect_map();
-	if ($key === '' || empty($redirects[$key])) {
+	if ($key === '') {
 		return;
 	}
 
-	$target_path = $redirects[$key];
+	$target_path = !empty($redirects[$key]) ? $redirects[$key] : zo_get_game_slug_redirect_path($key);
+	if ($target_path === '') {
+		return;
+	}
+
 	$target_url_path = (string) wp_parse_url($target_path, PHP_URL_PATH);
 	$target_url_query = (string) wp_parse_url($target_path, PHP_URL_QUERY);
 	if ($decoded_path === $target_url_path && ($target_url_query === '' || $query === $target_url_query)) {

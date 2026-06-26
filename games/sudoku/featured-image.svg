@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="title desc">
+	<title id="title">Sudoku game thumbnail</title>
+	<desc id="desc">A colorful Sudoku board for Arslan's puzzle game.</desc>
+	<defs>
+		<linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+			<stop offset="0" stop-color="#f8fbff"/>
+			<stop offset="0.48" stop-color="#dff0ff"/>
+			<stop offset="1" stop-color="#fff5d6"/>
+		</linearGradient>
+		<linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
+			<stop offset="0" stop-color="#ffffff"/>
+			<stop offset="1" stop-color="#eef7ff"/>
+		</linearGradient>
+		<filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+			<feDropShadow dx="0" dy="20" stdDeviation="18" flood-color="#17466f" flood-opacity="0.22"/>
+		</filter>
+	</defs>
+	<rect width="1200" height="800" fill="url(#bg)"/>
+	<circle cx="1015" cy="145" r="92" fill="#ffd66b" opacity="0.9"/>
+	<circle cx="160" cy="650" r="120" fill="#6fd6c4" opacity="0.32"/>
+	<g filter="url(#shadow)">
+		<rect x="270" y="98" width="660" height="660" rx="34" fill="#244866"/>
+		<g transform="translate(294 122)">
+			<rect width="612" height="612" rx="22" fill="#244866"/>
+			<g font-family="Trebuchet MS, Segoe UI, sans-serif" font-weight="800" font-size="44" text-anchor="middle" dominant-baseline="middle">
+				<rect x="0" y="0" width="68" height="68" fill="#d9eeff"/><text x="34" y="35" fill="#143f68">5</text>
+				<rect x="68" y="0" width="68" height="68" fill="url(#tile)"/><text x="102" y="35" fill="#3479b8">3</text>
+				<rect x="136" y="0" width="68" height="68" fill="#ffffff"/>
+				<rect x="204" y="0" width="68" height="68" fill="url(#tile)"/>
+				<rect x="272" y="0" width="68" height="68" fill="#fff1bd"/><text x="306" y="35" fill="#b36b00">7</text>
+				<rect x="340" y="0" width="68" height="68" fill="#ffffff"/>
+				<rect x="408" y="0" width="68" height="68" fill="url(#tile)"/>
+				<rect x="476" y="0" width="68" height="68" fill="#ffffff"/>
+				<rect x="544" y="0" width="68" height="68" fill="url(#tile)"/>
+				<rect x="0" y="68" width="68" height="68" fill="#d9eeff"/><text x="34" y="103" fill="#143f68">6</text>
+				<rect x="68" y="68" width="68" height="68" fill="#ffffff"/>
+				<rect x="136" y="68" width="68" height="68" fill="url(#tile)"/>
+				<rect x="204" y="68" width="68" height="68" fill="#d9eeff"/><text x="238" y="103" fill="#143f68">1</text>
+				<rect x="272" y="68" width="68" height="68" fill="#d9eeff"/><text x="306" y="103" fill="#143f68">9</text>
+				<rect x="340" y="68" width="68" height="68" fill="#d9eeff"/><text x="374" y="103" fill="#143f68">5</text>
+				<rect x="408" y="68" width="68" height="68" fill="#ffffff"/>
+				<rect x="476" y="68" width="68" height="68" fill="url(#tile)"/>
+				<rect x="544" y="68" width="68" height="68" fill="#ffffff"/>
+				<rect x="0" y="136" width="68" height="68" fill="url(#tile)"/>
+				<rect x="68" y="136" width="68" height="68" fill="#d9eeff"/><text x="102" y="171" fill="#143f68">9</text>
+				<rect x="136" y="136" width="68" height="68" fill="#d9eeff"/><text x="170" y="171" fill="#143f68">8</text>
+				<rect x="204" y="136" width="68" height="68" fill="#ffffff"/>
+				<rect x="272" y="136" width="68" height="68" fill="url(#tile)"/>
+				<rect x="340" y="136" width="68" height="68" fill="#ffffff"/>
+				<rect x="408" y="136" width="68" height="68" fill="url(#tile)"/>
+				<rect x="476" y="136" width="68" height="68" fill="#d9eeff"/><text x="510" y="171" fill="#143f68">6</text>
+				<rect x="544" y="136" width="68" height="68" fill="#ffffff"/>
+				<rect x="0" y="204" width="68" height="68" fill="#d9eeff"/><text x="34" y="239" fill="#143f68">8</text>
+				<rect x="68" y="204" width="68" height="68" fill="#ffffff"/>
+				<rect x="136" y="204" width="68" height="68" fill="url(#tile)"/>
+				<rect x="204" y="204" width="68" height="68" fill="#fff1bd"/><text x="238" y="239" fill="#b36b00">6</text>
+				<rect x="272" y="204" width="68" height="68" fill="url(#tile)"/>
+				<rect x="340" y="204" width="68" height="68" fill="#ffffff"/>
+				<rect x="408" y="204" width="68" height="68" fill="url(#tile)"/>
+				<rect x="476" y="204" width="68" height="68" fill="#ffffff"/>
+				<rect x="544" y="204" width="68" height="68" fill="#d9eeff"/><text x="578" y="239" fill="#143f68">3</text>
+				<rect x="0" y="272" width="68" height="68" fill="#d9eeff"/><text x="34" y="307" fill="#143f68">4</text>
+				<rect x="68" y="272" width="68" height="68" fill="url(#tile)"/>
+				<rect x="136" y="272" width="68" height="68" fill="#ffffff"/>
+				<rect x="204" y="272" width="68" height="68" fill="#d9eeff"/><text x="238" y="307" fill="#143f68">8</text>
+				<rect x="272" y="272" width="68" height="68" fill="#ffffff"/>
+				<rect x="340" y="272" width="68" height="68" fill="#d9eeff"/><text x="374" y="307" fill="#143f68">3</text>
+				<rect x="408" y="272" width="68" height="68" fill="#ffffff"/>
+				<rect x="476" y="272" width="68" height="68" fill="url(#tile)"/>
+				<rect x="544" y="272" width="68" height="68" fill="#d9eeff"/><text x="578" y="307" fill="#143f68">1</text>
+				<rect x="0" y="340" width="68" height="68" fill="#d9eeff"/><text x="34" y="375" fill="#143f68">7</text>
+				<rect x="68" y="340" width="68" height="68" fill="#ffffff"/>
+				<rect x="136" y="340" width="68" height="68" fill="url(#tile)"/>
+				<rect x="204" y="340" width="68" height="68" fill="#ffffff"/>
+				<rect x="272" y="340" width="68" height="68" fill="#fff1bd"/><text x="306" y="375" fill="#b36b00">2</text>
+				<rect x="340" y="340" width="68" height="68" fill="url(#tile)"/>
+				<rect x="408" y="340" width="68" height="68" fill="#ffffff"/>
+				<rect x="476" y="340" width="68" height="68" fill="#d9eeff"/><text x="510" y="375" fill="#143f68">6</text>
+				<rect x="544" y="340" width="68" height="68" fill="#ffffff"/>
+				<rect x="0" y="408" width="68" height="68" fill="#ffffff"/>
+				<rect x="68" y="408" width="68" height="68" fill="#d9eeff"/><text x="102" y="443" fill="#143f68">6</text>
+				<rect x="136" y="408" width="68" height="68" fill="url(#tile)"/>
+				<rect x="204" y="408" width="68" height="68" fill="#ffffff"/>
+				<rect x="272" y="408" width="68" height="68" fill="url(#tile)"/>
+				<rect x="340" y="408" width="68" height="68" fill="#ffffff"/>
+				<rect x="408" y="408" width="68" height="68" fill="#fff1bd"/><text x="442" y="443" fill="#b36b00">2</text>
+				<rect x="476" y="408" width="68" height="68" fill="#d9eeff"/><text x="510" y="443" fill="#143f68">8</text>
+				<rect x="544" y="408" width="68" height="68" fill="#ffffff"/>
+				<rect x="0" y="476" width="68" height="68" fill="#ffffff"/>
+				<rect x="68" y="476" width="68" height="68" fill="url(#tile)"/>
+				<rect x="136" y="476" width="68" height="68" fill="#ffffff"/>
+				<rect x="204" y="476" width="68" height="68" fill="#d9eeff"/><text x="238" y="511" fill="#143f68">4</text>
+				<rect x="272" y="476" width="68" height="68" fill="#d9eeff"/><text x="306" y="511" fill="#143f68">1</text>
+				<rect x="340" y="476" width="68" height="68" fill="#d9eeff"/><text x="374" y="511" fill="#143f68">9</text>
+				<rect x="408" y="476" width="68" height="68" fill="#ffffff"/>
+				<rect x="476" y="476" width="68" height="68" fill="url(#tile)"/>
+				<rect x="544" y="476" width="68" height="68" fill="#d9eeff"/><text x="578" y="511" fill="#143f68">5</text>
+				<rect x="0" y="544" width="68" height="68" fill="url(#tile)"/>
+				<rect x="68" y="544" width="68" height="68" fill="#ffffff"/>
+				<rect x="136" y="544" width="68" height="68" fill="#fff1bd"/><text x="170" y="579" fill="#b36b00">5</text>
+				<rect x="204" y="544" width="68" height="68" fill="#ffffff"/>
+				<rect x="272" y="544" width="68" height="68" fill="#d9eeff"/><text x="306" y="579" fill="#143f68">8</text>
+				<rect x="340" y="544" width="68" height="68" fill="url(#tile)"/>
+				<rect x="408" y="544" width="68" height="68" fill="#ffffff"/>
+				<rect x="476" y="544" width="68" height="68" fill="#d9eeff"/><text x="510" y="579" fill="#143f68">7</text>
+				<rect x="544" y="544" width="68" height="68" fill="#d9eeff"/><text x="578" y="579" fill="#143f68">9</text>
+			</g>
+			<g stroke="#244866" stroke-width="6">
+				<line x1="204" y1="0" x2="204" y2="612"/>
+				<line x1="408" y1="0" x2="408" y2="612"/>
+				<line x1="0" y1="204" x2="612" y2="204"/>
+				<line x1="0" y1="408" x2="612" y2="408"/>
+			</g>
+			<g stroke="#9ec3e2" stroke-width="2" opacity="0.75">
+				<path d="M68 0v612M136 0v612M272 0v612M340 0v612M476 0v612M544 0v612M0 68h612M0 136h612M0 272h612M0 340h612M0 476h612M0 544h612"/>
+			</g>
+		</g>
+	</g>
+	<text x="600" y="68" font-family="Trebuchet MS, Segoe UI, sans-serif" font-size="44" font-weight="900" text-anchor="middle" fill="#173d5f">Sudoku</text>
+	<text x="600" y="775" font-family="Trebuchet MS, Segoe UI, sans-serif" font-size="26" font-weight="800" text-anchor="middle" fill="#416783">Arslan's Puzzle</text>
+</svg>
