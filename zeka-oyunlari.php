@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.16.asker.arslan
+ * Version: 1.5.17.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-define('ZO_PLUGIN_VERSION', '1.4.73.asker.arslan');
+define('ZO_PLUGIN_VERSION', '1.5.17.asker.arslan');
 define('ZO_PLUGIN_FILE', __FILE__);
 define('ZO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('ZO_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -294,6 +294,33 @@ function zo_register_admin_health_page() {
 }
 add_action('admin_menu', 'zo_register_admin_health_page');
 
+function zo_admin_prepare_csv_cell($value) {
+	$is_string = is_string($value);
+
+	if (is_bool($value)) {
+		$cell = $value ? '1' : '0';
+	} elseif ($value === null) {
+		$cell = '';
+	} elseif (is_scalar($value)) {
+		$cell = (string) $value;
+	} else {
+		$cell = wp_json_encode($value);
+		$cell = is_string($cell) ? $cell : '';
+	}
+
+	$cell = str_replace(array("\r\n", "\r", "\n"), ' ', $cell);
+
+	if ($is_string && preg_match('/^[ \t]*[=+\-@]/', $cell)) {
+		return "'" . $cell;
+	}
+
+	return $cell;
+}
+
+function zo_admin_write_csv_row($output, array $row) {
+	fputcsv($output, array_map('zo_admin_prepare_csv_cell', $row));
+}
+
 function zo_admin_export_report() {
 	if (!current_user_can('manage_options')) {
 		wp_die(esc_html__('Sorry, you are not allowed to export this report.', 'zeka-oyunlari'));
@@ -309,34 +336,34 @@ function zo_admin_export_report() {
 		header('Content-Type: text/csv; charset=utf-8');
 		header('Content-Disposition: attachment; filename=zeka-content-look-up-report.csv');
 		$output = fopen('php://output', 'w');
-		fputcsv($output, array('section', 'name', 'status', 'priority', 'details'));
-		fputcsv($output, array('summary', 'Site score', $report['score']['score'], $report['score']['status'], implode(' | ', $report['score']['reasons'])));
+		zo_admin_write_csv_row($output, array('section', 'name', 'status', 'priority', 'details'));
+		zo_admin_write_csv_row($output, array('summary', 'Site score', $report['score']['score'], $report['score']['status'], implode(' | ', $report['score']['reasons'])));
 		foreach ($report['security_checks'] as $row) {
-			fputcsv($output, array('security', $row['label'], $row['status'], $row['priority'], $row['message']));
+			zo_admin_write_csv_row($output, array('security', $row['label'], $row['status'], $row['priority'], $row['message']));
 		}
 		foreach ($report['site_kit_import'] as $row) {
-			fputcsv($output, array('site_kit', $row['label'], $row['status'], $row['priority'], $row['message']));
+			zo_admin_write_csv_row($output, array('site_kit', $row['label'], $row['status'], $row['priority'], $row['message']));
 		}
 		foreach ($report['game_quality'] as $row) {
-			fputcsv($output, array('game_quality', $row['name'], $row['score'], $row['status'], implode(' | ', $row['issues'])));
+			zo_admin_write_csv_row($output, array('game_quality', $row['name'], $row['score'], $row['status'], implode(' | ', $row['issues'])));
 		}
 		foreach ($report['recently_broken'] as $row) {
-			fputcsv($output, array('recently_broken', $row['folder'], $row['modified'], $row['priority'], implode(' | ', $row['issues'])));
+			zo_admin_write_csv_row($output, array('recently_broken', $row['folder'], $row['modified'], $row['priority'], implode(' | ', $row['issues'])));
 		}
 		foreach ($report['top_content'] as $row) {
-			fputcsv($output, array('top_content', $row['title'], $row['pageviews'], $row['sessions'], $row['path']));
+			zo_admin_write_csv_row($output, array('top_content', $row['title'], $row['pageviews'], $row['sessions'], $row['path']));
 		}
 		foreach ($report['chrome_user_import'] as $row) {
-			fputcsv($output, array('chrome_user_import', $row['label'], $row['status'], $row['priority'], $row['message']));
+			zo_admin_write_csv_row($output, array('chrome_user_import', $row['label'], $row['status'], $row['priority'], $row['message']));
 		}
 		foreach ($report['problem_timeline'] as $row) {
-			fputcsv($output, array('problem_timeline', $row['label'], $row['type'], $row['priority'], $row['first_seen'] . ' | ' . $row['details']));
+			zo_admin_write_csv_row($output, array('problem_timeline', $row['label'], $row['type'], $row['priority'], $row['first_seen'] . ' | ' . $row['details']));
 		}
 		foreach ($report['game_traffic_winners'] as $row) {
-			fputcsv($output, array('game_traffic_winners', $row['title'], $row['pageviews'], $row['sessions'], $row['path']));
+			zo_admin_write_csv_row($output, array('game_traffic_winners', $row['title'], $row['pageviews'], $row['sessions'], $row['path']));
 		}
 		foreach ($report['translation_quality'] as $row) {
-			fputcsv($output, array('translation_quality', $row['name'], 'check', $row['priority'], implode(' | ', $row['issues'])));
+			zo_admin_write_csv_row($output, array('translation_quality', $row['name'], 'check', $row['priority'], implode(' | ', $row['issues'])));
 		}
 		fclose($output);
 		exit;
