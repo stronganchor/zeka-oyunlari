@@ -412,7 +412,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			selected: null,
 			mustRemove: false,
 			winner: null,
-			hint: 'Place a stone on any visible spot.'
+			hint: 'Taşını boş bir noktaya koy.'
 		};
 
 		lines.forEach(function (pair) {
@@ -425,7 +425,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			button.className = 'zo-dt-point';
 			button.style.left = pos.x + '%';
 			button.style.top = pos.y + '%';
-			button.setAttribute('aria-label', 'Point ' + (index + 1));
+			button.setAttribute('aria-label', 'Nokta ' + (index + 1));
 			button.dataset.index = String(index);
 
 			button.addEventListener('click', function () {
@@ -441,9 +441,9 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function updateStats() {
-			turnEl.textContent = state.currentPlayer === 'W' ? 'White' : 'Black';
-			whiteEl.textContent = String(countPieces(state, 'W')) + ' on board, ' + String(state.toPlace.W) + ' left';
-			blackEl.textContent = String(countPieces(state, 'B')) + ' on board, ' + String(state.toPlace.B) + ' left';
+			turnEl.textContent = state.currentPlayer === 'W' ? 'Beyaz' : 'Siyah';
+			whiteEl.textContent = String(countPieces(state, 'W')) + ' tahtada, ' + String(state.toPlace.W) + ' kaldı';
+			blackEl.textContent = String(countPieces(state, 'B')) + ' tahtada, ' + String(state.toPlace.B) + ' kaldı';
 		}
 
 		function refreshBoard() {
@@ -504,33 +504,33 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function setHintMessage() {
 			if (state.winner) {
-				state.hint = (state.winner === 'W' ? 'White' : 'Black') + ' wins.';
+				state.hint = (state.winner === 'W' ? 'Beyaz' : 'Siyah') + ' kazandı.';
 				return;
 			}
 
 			if (state.mustRemove) {
-				state.hint = 'You made a mill. Remove one enemy stone.';
+				state.hint = 'Üçlü yaptın. Rakibin bir taşını al.';
 				return;
 			}
 
 			if (state.phase === 'placing') {
-				state.hint = 'Place a stone on any visible spot.';
+				state.hint = 'Taşını boş bir noktaya koy.';
 				return;
 			}
 
 			if (state.selected === null) {
 				const pieceCount = countPieces(state, state.currentPlayer);
 				if (pieceCount <= 3) {
-					state.hint = 'Select one of your stones, then move it to any empty spot.';
+					state.hint = 'Bir taşını seç, sonra herhangi bir boş noktaya taşı.';
 				} else {
-					state.hint = 'Select one of your stones, then move it to a connected empty spot.';
+					state.hint = 'Bir taşını seç, sonra bağlı bir boş noktaya taşı.';
 				}
 			} else {
 				const pieceCount = countPieces(state, state.currentPlayer);
 				if (pieceCount <= 3) {
-					state.hint = 'Now choose any empty spot.';
+					state.hint = 'Şimdi herhangi bir boş nokta seç.';
 				} else {
-					state.hint = 'Now choose a connected empty spot.';
+					state.hint = 'Şimdi bağlı bir boş nokta seç.';
 				}
 			}
 		}
@@ -548,9 +548,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			refreshBoard();
 
 			if (state.winner) {
-				updateStatus((state.winner === 'W' ? 'White' : 'Black') + ' wins.');
+				updateStatus((state.winner === 'W' ? 'Beyaz' : 'Siyah') + ' kazandı.');
 			} else {
-				updateStatus((state.currentPlayer === 'W' ? 'White' : 'Black') + '\'s turn.');
+				updateStatus('Sıra ' + (state.currentPlayer === 'W' ? 'beyazda' : 'siyahta') + '.');
 			}
 		}
 
@@ -559,7 +559,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				state.mustRemove = true;
 				setHintMessage();
 				refreshBoard();
-				updateStatus((state.currentPlayer === 'W' ? 'White' : 'Black') + ' made a mill. Remove one enemy stone.');
+				updateStatus((state.currentPlayer === 'W' ? 'Beyaz' : 'Siyah') + ' üçlü yaptı. Rakibin bir taşını al.');
 				return;
 			}
 
@@ -571,7 +571,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			const removable = getRemovablePieces(state, enemy);
 
 			if (removable.indexOf(index) === -1) {
-				updateStatus('Choose a removable enemy stone.');
+				updateStatus('Alınabilecek bir rakip taşı seç.');
 				return;
 			}
 
@@ -582,7 +582,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (state.winner) {
 				setHintMessage();
 				refreshBoard();
-				updateStatus((state.winner === 'W' ? 'White' : 'Black') + ' wins.');
+				updateStatus((state.winner === 'W' ? 'Beyaz' : 'Siyah') + ' kazandı.');
 				return;
 			}
 
@@ -591,7 +591,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function handlePlacing(index) {
 			if (state.board[index] !== null) {
-				updateStatus('Pick an empty spot.');
+				updateStatus('Boş bir nokta seç.');
 				return;
 			}
 
@@ -604,14 +604,14 @@ document.addEventListener('DOMContentLoaded', function () {
 		function handleMoving(index) {
 			if (state.selected === null) {
 				if (state.board[index] !== state.currentPlayer) {
-					updateStatus('Select one of your own stones.');
+					updateStatus('Kendi taşlarından birini seç.');
 					return;
 				}
 
 				state.selected = index;
 				setHintMessage();
 				refreshBoard();
-				updateStatus('Stone selected. Choose where to move.');
+				updateStatus('Taş seçildi. Nereye gideceğini seç.');
 				return;
 			}
 
@@ -619,7 +619,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				state.selected = null;
 				setHintMessage();
 				refreshBoard();
-				updateStatus('Selection cleared.');
+				updateStatus('Seçim temizlendi.');
 				return;
 			}
 
@@ -627,18 +627,18 @@ document.addEventListener('DOMContentLoaded', function () {
 				state.selected = index;
 				setHintMessage();
 				refreshBoard();
-				updateStatus('Stone selected. Choose where to move.');
+				updateStatus('Taş seçildi. Nereye gideceğini seç.');
 				return;
 			}
 
 			if (state.board[index] !== null) {
-				updateStatus('That spot is not empty.');
+				updateStatus('O nokta boş değil.');
 				return;
 			}
 
 			const allowedTargets = getAllowedTargets(state, state.selected);
 			if (allowedTargets.indexOf(index) === -1) {
-				updateStatus('Move to a connected spot.');
+				updateStatus('Bağlı bir noktaya git.');
 				return;
 			}
 
@@ -676,7 +676,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.winner = null;
 			setHintMessage();
 			refreshBoard();
-			updateStatus('White starts. Place a stone on a visible spot.');
+			updateStatus('Beyaz başlar. Taşını boş bir noktaya koy.');
 		}
 
 		resetBtn.addEventListener('click', function () {
@@ -701,28 +701,28 @@ if (!function_exists('zo_game_dokuz_tas_render')) {
 		?>
 		<div class="zo-game-root zo-game-root--dokuz-tas" id="<?php echo esc_attr($instance_id); ?>">
 			<div class="zo-dt-card">
-				<h2 class="zo-dt-title">Dokuz Taş</h2>
-				<p class="zo-dt-subtitle">Turkish Nine Men's Morris. First place all 9 stones each. Make a line of 3 to remove one enemy stone. Reduce your opponent to 2 stones or block all moves to win.</p>
+				<h2 class="zo-dt-title">9 Taş</h2>
+				<p class="zo-dt-subtitle">Klasik 9 taş oyunu. Sırayla taşlarını yerleştir, üçlü yapınca rakibin bir taşını al, sonra taşlarını çizgiler üzerinde hareket ettir.</p>
 
 				<div class="zo-dt-stats">
-					<div class="zo-dt-stat">Turn: <span class="zo-dt-turn-value">White</span></div>
-					<div class="zo-dt-stat">White: <span class="zo-dt-white-value">0 on board, 9 left</span></div>
-					<div class="zo-dt-stat">Black: <span class="zo-dt-black-value">0 on board, 9 left</span></div>
+					<div class="zo-dt-stat">Sıra: <span class="zo-dt-turn-value">Beyaz</span></div>
+					<div class="zo-dt-stat">Beyaz: <span class="zo-dt-white-value">0 tahtada, 9 kaldı</span></div>
+					<div class="zo-dt-stat">Siyah: <span class="zo-dt-black-value">0 tahtada, 9 kaldı</span></div>
 				</div>
 
-				<div class="zo-dt-status" aria-live="polite">White starts. Place a stone on a visible spot.</div>
+				<div class="zo-dt-status" aria-live="polite">Beyaz başlar. Taşını boş bir noktaya koy.</div>
 
 				<div class="zo-dt-board-wrap">
 					<div class="zo-dt-board"></div>
 				</div>
 
 				<div class="zo-dt-actions">
-					<button type="button" class="zo-dt-btn zo-dt-reset">Restart</button>
-					<button type="button" class="zo-dt-btn zo-dt-hint">Show Hint</button>
+					<button type="button" class="zo-dt-btn zo-dt-reset">Yeniden Başlat</button>
+					<button type="button" class="zo-dt-btn zo-dt-hint">İpucu Göster</button>
 				</div>
 
 				<div class="zo-dt-help">
-					<strong>How to play:</strong> During the first phase, players take turns placing stones on empty spots. When all stones are placed, players move one stone per turn. If a player has only 3 stones left, that player may jump to any empty spot. Making a row of 3 stones lets you remove one enemy stone. Stones inside a mill cannot be removed unless all enemy stones are in mills.
+					<strong>Nasıl oynanır:</strong> İlk bölümde oyuncular sırayla boş noktalara taş koyar. Üç taşını aynı çizgiye getirirsen rakibin bir taşını alırsın. Bütün taşlar konduktan sonra her turda bir taşını bağlı boş noktaya hareket ettir. Sadece 3 taşın kaldığında herhangi bir boş noktaya zıplayabilirsin.
 				</div>
 			</div>
 		</div>
@@ -733,9 +733,9 @@ if (!function_exists('zo_game_dokuz_tas_render')) {
 
 return array(
 	'slug'            => 'dokuz-tas',
-	'name'            => 'Dokuz Taş',
+	'name'            => '9 Taş',
 	'author'          => 'Arslan',
-	'description'     => 'A browser-based Turkish Nine Men\'s Morris game for two players.',
+	'description'     => 'Klasik 9 taş kurallarıyla oynanan iki kişilik tarayıcı oyunu.',
 	'render_callback' => 'zo_game_dokuz_tas_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,

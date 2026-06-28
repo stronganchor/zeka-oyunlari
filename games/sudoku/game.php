@@ -115,6 +115,7 @@ if (!function_exists('zo_game_sudoku_render')) {
 return array(
 	'slug'            => 'sudoku',
 	'name'            => 'Sudoku',
+	'owner'           => 'arslan',
 	'author'          => 'Arslan',
 	'description'     => 'A classic 9x9 Sudoku puzzle with easy, medium, and hard boards.',
 	'render_callback' => 'zo_game_sudoku_render',
