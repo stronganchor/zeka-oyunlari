@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.18.asker.arslan
+ * Version: 1.5.19.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -10282,6 +10282,16 @@ function zo_game_report_shortcode($atts = array()) {
 	$devices = zo_get_game_report_device_options();
 	$sent = !empty($_GET['sent']);
 	$error = !empty($_GET['report_error']) ? sanitize_key(wp_unslash($_GET['report_error'])) : '';
+	$report_games = array();
+
+	foreach (zo_get_game_modules() as $slug => $game_module) {
+		$name = !empty($game_module['name']) ? (string) $game_module['name'] : (string) $slug;
+		$report_games[] = array(
+			'title' => $name,
+			'slug'  => (string) $slug,
+			'url'   => zo_get_game_module_fallback_url($slug),
+		);
+	}
 
 	ob_start();
 	?>
@@ -10316,12 +10326,17 @@ function zo_game_report_shortcode($atts = array()) {
 			<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
 				<input type="hidden" name="action" value="zo_submit_game_report">
 				<?php wp_nonce_field('zo_submit_game_report', 'zo_report_nonce'); ?>
-				<input type="hidden" name="zo_game_slug" value="<?php echo esc_attr($game_slug); ?>">
-				<input type="hidden" name="zo_game_url" value="<?php echo esc_url($game_url); ?>">
+				<input id="zo_report_game_slug" type="hidden" name="zo_game_slug" value="<?php echo esc_attr($game_slug); ?>">
+				<input id="zo_report_game_url" type="hidden" name="zo_game_url" value="<?php echo esc_url($game_url); ?>">
 				<p class="zo-report-hp"><label>Website <input type="text" name="zo_website" value="" tabindex="-1" autocomplete="off"></label></p>
 				<div class="zo-report-field">
 					<label for="zo_report_game_title">Game</label>
-					<input id="zo_report_game_title" name="zo_game_title" type="text" value="<?php echo esc_attr($game_title); ?>" placeholder="Game name">
+					<input id="zo_report_game_title" name="zo_game_title" type="text" value="<?php echo esc_attr($game_title); ?>" placeholder="Game name" list="zo_report_game_names" autocomplete="off">
+					<datalist id="zo_report_game_names">
+						<?php foreach ($report_games as $report_game) : ?>
+						<option value="<?php echo esc_attr($report_game['title']); ?>"></option>
+						<?php endforeach; ?>
+					</datalist>
 				</div>
 				<div class="zo-report-grid">
 					<div class="zo-report-field">
@@ -10357,6 +10372,33 @@ function zo_game_report_shortcode($atts = array()) {
 				</div>
 				<button class="zo-report-button" type="submit">Send Report</button>
 			</form>
+			<script>
+			(function(){
+				var games = <?php echo wp_json_encode($report_games); ?>;
+				var input = document.getElementById('zo_report_game_title');
+				var slug = document.getElementById('zo_report_game_slug');
+				var url = document.getElementById('zo_report_game_url');
+				if (!input || !slug || !url || !Array.isArray(games)) {
+					return;
+				}
+				function normalize(value) {
+					return String(value || '').trim().toLowerCase();
+				}
+				function syncGame() {
+					var typed = normalize(input.value);
+					var match = games.find(function(game) {
+						return normalize(game.title) === typed || normalize(game.slug) === typed;
+					});
+					if (match) {
+						slug.value = match.slug || '';
+						url.value = match.url || '';
+					}
+				}
+				input.addEventListener('input', syncGame);
+				input.addEventListener('change', syncGame);
+				syncGame();
+			})();
+			</script>
 		</div>
 	</section>
 	<?php
