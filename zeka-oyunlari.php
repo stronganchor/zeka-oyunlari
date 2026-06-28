@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.17.asker.arslan
+ * Version: 1.5.18.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -9682,6 +9682,7 @@ function zo_get_bad_url_redirect_map() {
 		'404' => '/404/',
 		'not-found' => '/404/',
 		'page-not-found' => '/404/',
+		'repot' => '/report/',
 		'home' => '/',
 		'homepage' => '/',
 		'main' => '/',
@@ -10162,6 +10163,395 @@ function zo_register_game_post_type() {
 }
 add_action('init', 'zo_register_game_post_type');
 add_action('init', 'zo_sync_game_module_posts', 20);
+
+function zo_register_game_report_post_type() {
+	$labels = array(
+		'name'               => 'Game Reports',
+		'singular_name'      => 'Game Report',
+		'menu_name'          => 'Game Reports',
+		'name_admin_bar'     => 'Game Report',
+		'add_new_item'       => 'Add Game Report',
+		'edit_item'          => 'View Game Report',
+		'new_item'           => 'New Game Report',
+		'view_item'          => 'View Game Report',
+		'all_items'          => 'All Game Reports',
+		'search_items'       => 'Search Game Reports',
+		'not_found'          => 'No game reports found.',
+		'not_found_in_trash' => 'No game reports found in trash.',
+	);
+
+	register_post_type(
+		'zo_game_report',
+		array(
+			'labels'              => $labels,
+			'public'              => false,
+			'publicly_queryable'  => false,
+			'exclude_from_search' => true,
+			'show_ui'             => true,
+			'show_in_menu'        => true,
+			'menu_icon'           => 'dashicons-warning',
+			'supports'            => array('title', 'editor'),
+			'capability_type'     => 'post',
+			'map_meta_cap'        => true,
+		)
+	);
+}
+add_action('init', 'zo_register_game_report_post_type');
+
+function zo_ensure_game_report_page() {
+	if (wp_installing() || !function_exists('get_page_by_path')) {
+		return;
+	}
+
+	$page = get_page_by_path('report');
+	if ($page instanceof WP_Post) {
+		return;
+	}
+
+	wp_insert_post(
+		wp_slash(
+			array(
+				'post_type'    => 'page',
+				'post_status'  => 'publish',
+				'post_title'   => 'Report a Problem',
+				'post_name'    => 'report',
+				'post_content' => '[zeka_game_report]',
+			)
+		)
+	);
+}
+add_action('init', 'zo_ensure_game_report_page', 30);
+
+function zo_get_game_report_url($slug = '') {
+	$url = home_url('/report/');
+	$slug = sanitize_title($slug);
+
+	return $slug !== '' ? add_query_arg('game', $slug, $url) : $url;
+}
+
+function zo_render_game_report_link($slug = '', $language = '') {
+	$slug = sanitize_title($slug);
+	if ($slug === '') {
+		return '';
+	}
+
+	$label = $language === 'tr' ? 'Bu oyunda sorun bildir' : 'Report a problem with this game';
+
+	return '<p class="zo-game-report-link"><a href="' . esc_url(zo_get_game_report_url($slug)) . '">' . esc_html($label) . '</a></p>';
+}
+
+function zo_get_game_report_problem_types() {
+	return array(
+		'load'        => 'Game will not load',
+		'controls'    => 'Buttons or controls do not work',
+		'mobile'      => 'Too small or hard to use on phone',
+		'sound'       => 'Sound problem',
+		'translation' => 'Wrong translation',
+		'other'       => 'Other',
+	);
+}
+
+function zo_get_game_report_statuses() {
+	return array(
+		'new'      => 'New',
+		'checking' => 'Checking',
+		'fixed'    => 'Fixed',
+		'wont_fix' => 'Will not fix',
+	);
+}
+
+function zo_get_game_report_device_options() {
+	return array(
+		'phone'    => 'Phone',
+		'tablet'   => 'Tablet',
+		'computer' => 'Computer',
+		'unknown'  => 'Not sure',
+	);
+}
+
+function zo_game_report_shortcode($atts = array()) {
+	$game_slug = '';
+	if (!empty($_GET['game']) && is_string($_GET['game'])) {
+		$game_slug = sanitize_title(wp_unslash($_GET['game']));
+	}
+
+	$module = $game_slug !== '' ? zo_get_game_module($game_slug) : null;
+	$game_title = $module && !empty($module['name']) ? $module['name'] : $game_slug;
+	$game_url = $game_slug !== '' ? zo_get_game_module_fallback_url($game_slug) : '';
+	$problem_types = zo_get_game_report_problem_types();
+	$devices = zo_get_game_report_device_options();
+	$sent = !empty($_GET['sent']);
+	$error = !empty($_GET['report_error']) ? sanitize_key(wp_unslash($_GET['report_error'])) : '';
+
+	ob_start();
+	?>
+	<section class="zo-report-page">
+		<style>
+			.zo-report-page{max-width:780px;margin:40px auto;padding:0 18px;color:#111827}
+			.zo-report-card{background:#fff;border:1px solid #dbe3ef;border-radius:8px;padding:24px;box-shadow:0 18px 42px rgba(15,23,42,.08)}
+			.zo-report-card h1{margin:0 0 10px;font-size:clamp(2rem,4vw,3rem);line-height:1.05}
+			.zo-report-card p{font-size:1rem;color:#435066}
+			.zo-report-field{display:grid;gap:8px;margin:16px 0}
+			.zo-report-field label{font-weight:700}
+			.zo-report-field input,.zo-report-field select,.zo-report-field textarea{width:100%;box-sizing:border-box;border:1px solid #cbd5e1;border-radius:6px;padding:11px 12px;font:inherit}
+			.zo-report-field textarea{min-height:150px;resize:vertical}
+			.zo-report-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+			.zo-report-button{border:0;border-radius:999px;background:#0f766e;color:#fff;font-weight:800;padding:12px 20px;cursor:pointer}
+			.zo-report-success{border-left:4px solid #0f766e;background:#ecfdf5;padding:12px 14px;margin:0 0 18px}
+			.zo-report-error{border-left:4px solid #dc2626;background:#fef2f2;padding:12px 14px;margin:0 0 18px}
+			.zo-report-hp{position:absolute;left:-9999px}
+			.zo-game-report-link{margin:18px 0 0;text-align:center}
+			.zo-game-report-link a{display:inline-flex;align-items:center;justify-content:center;border:1px solid #99f6e4;border-radius:999px;color:#0f766e;background:#ecfeff;padding:10px 16px;font-weight:800;text-decoration:none}
+			@media (max-width:640px){.zo-report-grid{grid-template-columns:1fr}.zo-report-card{padding:18px}}
+		</style>
+		<div class="zo-report-card">
+			<h1>Report a Problem</h1>
+			<p>Tell us what went wrong. Reports are saved privately in WordPress admin.</p>
+			<?php if ($sent) : ?>
+			<div class="zo-report-success">Thank you. The report was saved.</div>
+			<?php endif; ?>
+			<?php if ($error !== '') : ?>
+			<div class="zo-report-error">The report could not be saved. Please try again.</div>
+			<?php endif; ?>
+			<form method="post" action="<?php echo esc_url(admin_url('admin-post.php')); ?>">
+				<input type="hidden" name="action" value="zo_submit_game_report">
+				<?php wp_nonce_field('zo_submit_game_report', 'zo_report_nonce'); ?>
+				<input type="hidden" name="zo_game_slug" value="<?php echo esc_attr($game_slug); ?>">
+				<input type="hidden" name="zo_game_url" value="<?php echo esc_url($game_url); ?>">
+				<p class="zo-report-hp"><label>Website <input type="text" name="zo_website" value="" tabindex="-1" autocomplete="off"></label></p>
+				<div class="zo-report-field">
+					<label for="zo_report_game_title">Game</label>
+					<input id="zo_report_game_title" name="zo_game_title" type="text" value="<?php echo esc_attr($game_title); ?>" placeholder="Game name">
+				</div>
+				<div class="zo-report-grid">
+					<div class="zo-report-field">
+						<label for="zo_problem_type">Problem type</label>
+						<select id="zo_problem_type" name="zo_problem_type">
+							<?php foreach ($problem_types as $value => $label) : ?>
+							<option value="<?php echo esc_attr($value); ?>"><?php echo esc_html($label); ?></option>
+							<?php endforeach; ?>
+						</select>
+					</div>
+					<div class="zo-report-field">
+						<label for="zo_device">Device</label>
+						<select id="zo_device" name="zo_device">
+							<?php foreach ($devices as $value => $label) : ?>
+							<option value="<?php echo esc_attr($value); ?>"><?php echo esc_html($label); ?></option>
+							<?php endforeach; ?>
+						</select>
+					</div>
+				</div>
+				<div class="zo-report-field">
+					<label for="zo_message">What happened?</label>
+					<textarea id="zo_message" name="zo_message" required placeholder="Example: the start button does not work on my phone."></textarea>
+				</div>
+				<div class="zo-report-grid">
+					<div class="zo-report-field">
+						<label for="zo_browser">Browser</label>
+						<input id="zo_browser" name="zo_browser" type="text" value="" placeholder="Chrome, Safari, Edge...">
+					</div>
+					<div class="zo-report-field">
+						<label for="zo_email">Email optional</label>
+						<input id="zo_email" name="zo_email" type="email" value="" placeholder="you@example.com">
+					</div>
+				</div>
+				<button class="zo-report-button" type="submit">Send Report</button>
+			</form>
+		</div>
+	</section>
+	<?php
+
+	return ob_get_clean();
+}
+add_shortcode('zeka_game_report', 'zo_game_report_shortcode');
+
+function zo_handle_game_report_submission() {
+	if (empty($_POST['zo_report_nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['zo_report_nonce'])), 'zo_submit_game_report')) {
+		wp_safe_redirect(add_query_arg('report_error', 'nonce', home_url('/report/')));
+		exit;
+	}
+
+	if (!empty($_POST['zo_website'])) {
+		wp_safe_redirect(add_query_arg('sent', '1', home_url('/report/')));
+		exit;
+	}
+
+	$ip = !empty($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : 'unknown';
+	$rate_key = 'zo_game_report_' . md5($ip);
+	if (get_transient($rate_key)) {
+		wp_safe_redirect(add_query_arg('report_error', 'rate', home_url('/report/')));
+		exit;
+	}
+	set_transient($rate_key, '1', MINUTE_IN_SECONDS);
+
+	$slug = !empty($_POST['zo_game_slug']) ? sanitize_title(wp_unslash($_POST['zo_game_slug'])) : '';
+	$title = !empty($_POST['zo_game_title']) ? sanitize_text_field(wp_unslash($_POST['zo_game_title'])) : '';
+	$game_url = !empty($_POST['zo_game_url']) ? esc_url_raw(wp_unslash($_POST['zo_game_url'])) : '';
+	$problem_type = !empty($_POST['zo_problem_type']) ? sanitize_key(wp_unslash($_POST['zo_problem_type'])) : 'other';
+	$device = !empty($_POST['zo_device']) ? sanitize_key(wp_unslash($_POST['zo_device'])) : 'unknown';
+	$message = !empty($_POST['zo_message']) ? sanitize_textarea_field(wp_unslash($_POST['zo_message'])) : '';
+	$browser = !empty($_POST['zo_browser']) ? sanitize_text_field(wp_unslash($_POST['zo_browser'])) : '';
+	$email = !empty($_POST['zo_email']) ? sanitize_email(wp_unslash($_POST['zo_email'])) : '';
+	$user_agent = !empty($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])) : '';
+	$language = function_exists('zo_get_current_language') ? zo_get_current_language() : '';
+
+	if ($message === '') {
+		wp_safe_redirect(add_query_arg(array('report_error' => 'message', 'game' => $slug), home_url('/report/')));
+		exit;
+	}
+
+	if ($title === '' && $slug !== '') {
+		$title = $slug;
+	}
+
+	$post_id = wp_insert_post(
+		wp_slash(
+			array(
+				'post_type'    => 'zo_game_report',
+				'post_status'  => 'private',
+				'post_title'   => 'Game Report - ' . ($title !== '' ? $title : current_time('mysql')),
+				'post_content' => $message,
+			)
+		),
+		true
+	);
+
+	if (is_wp_error($post_id) || $post_id <= 0) {
+		wp_safe_redirect(add_query_arg(array('report_error' => 'save', 'game' => $slug), home_url('/report/')));
+		exit;
+	}
+
+	$meta = array(
+		'_zo_report_game_slug'    => $slug,
+		'_zo_report_game_title'   => $title,
+		'_zo_report_game_url'     => $game_url,
+		'_zo_report_problem_type' => $problem_type,
+		'_zo_report_device'       => $device,
+		'_zo_report_browser'      => $browser,
+		'_zo_report_email'        => $email,
+		'_zo_report_status'       => 'new',
+		'_zo_report_language'     => $language,
+		'_zo_report_user_agent'   => $user_agent,
+		'_zo_report_user_id'      => get_current_user_id(),
+	);
+
+	foreach ($meta as $key => $value) {
+		update_post_meta($post_id, $key, $value);
+	}
+
+	wp_safe_redirect(add_query_arg(array('sent' => '1', 'game' => $slug), home_url('/report/')));
+	exit;
+}
+add_action('admin_post_zo_submit_game_report', 'zo_handle_game_report_submission');
+add_action('admin_post_nopriv_zo_submit_game_report', 'zo_handle_game_report_submission');
+
+function zo_add_game_report_meta_box() {
+	add_meta_box(
+		'zo_game_report_details',
+		'Report Details',
+		'zo_render_game_report_meta_box',
+		'zo_game_report',
+		'normal',
+		'high'
+	);
+}
+add_action('add_meta_boxes_zo_game_report', 'zo_add_game_report_meta_box');
+
+function zo_render_game_report_meta_box($post) {
+	$statuses = zo_get_game_report_statuses();
+	$status = get_post_meta($post->ID, '_zo_report_status', true);
+	$status = isset($statuses[$status]) ? $status : 'new';
+	$fields = array(
+		'Game title'   => get_post_meta($post->ID, '_zo_report_game_title', true),
+		'Game slug'    => get_post_meta($post->ID, '_zo_report_game_slug', true),
+		'Game URL'     => get_post_meta($post->ID, '_zo_report_game_url', true),
+		'Problem type' => get_post_meta($post->ID, '_zo_report_problem_type', true),
+		'Device'       => get_post_meta($post->ID, '_zo_report_device', true),
+		'Browser'      => get_post_meta($post->ID, '_zo_report_browser', true),
+		'Email'        => get_post_meta($post->ID, '_zo_report_email', true),
+		'Language'     => get_post_meta($post->ID, '_zo_report_language', true),
+		'User agent'   => get_post_meta($post->ID, '_zo_report_user_agent', true),
+	);
+
+	wp_nonce_field('zo_save_game_report_status', 'zo_report_status_nonce');
+	echo '<p><label for="zo_report_status"><strong>Status</strong></label><br>';
+	echo '<select id="zo_report_status" name="zo_report_status">';
+	foreach ($statuses as $value => $label) {
+		echo '<option value="' . esc_attr($value) . '"' . selected($status, $value, false) . '>' . esc_html($label) . '</option>';
+	}
+	echo '</select></p>';
+	echo '<table class="widefat striped"><tbody>';
+	foreach ($fields as $label => $value) {
+		echo '<tr><th style="width:160px">' . esc_html($label) . '</th><td>' . esc_html((string) $value) . '</td></tr>';
+	}
+	echo '</tbody></table>';
+}
+
+function zo_save_game_report_status($post_id) {
+	if (get_post_type($post_id) !== 'zo_game_report') {
+		return;
+	}
+
+	if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) {
+		return;
+	}
+
+	if (empty($_POST['zo_report_status_nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_POST['zo_report_status_nonce'])), 'zo_save_game_report_status')) {
+		return;
+	}
+
+	if (!current_user_can('edit_post', $post_id)) {
+		return;
+	}
+
+	$statuses = zo_get_game_report_statuses();
+	$status = !empty($_POST['zo_report_status']) ? sanitize_key(wp_unslash($_POST['zo_report_status'])) : 'new';
+	if (!isset($statuses[$status])) {
+		$status = 'new';
+	}
+
+	update_post_meta($post_id, '_zo_report_status', $status);
+}
+add_action('save_post_zo_game_report', 'zo_save_game_report_status');
+
+function zo_game_report_columns($columns) {
+	return array(
+		'cb'           => isset($columns['cb']) ? $columns['cb'] : '',
+		'title'        => 'Report',
+		'game'         => 'Game',
+		'problem_type' => 'Problem',
+		'device'       => 'Device',
+		'status'       => 'Status',
+		'date'         => 'Date',
+	);
+}
+add_filter('manage_zo_game_report_posts_columns', 'zo_game_report_columns');
+
+function zo_render_game_report_column($column, $post_id) {
+	if ($column === 'game') {
+		$title = get_post_meta($post_id, '_zo_report_game_title', true);
+		$url = get_post_meta($post_id, '_zo_report_game_url', true);
+		echo $url !== '' ? '<a href="' . esc_url($url) . '">' . esc_html($title !== '' ? $title : $url) . '</a>' : esc_html($title);
+		return;
+	}
+
+	if ($column === 'problem_type') {
+		echo esc_html(get_post_meta($post_id, '_zo_report_problem_type', true));
+		return;
+	}
+
+	if ($column === 'device') {
+		echo esc_html(get_post_meta($post_id, '_zo_report_device', true));
+		return;
+	}
+
+	if ($column === 'status') {
+		$statuses = zo_get_game_report_statuses();
+		$status = get_post_meta($post_id, '_zo_report_status', true);
+		echo esc_html(isset($statuses[$status]) ? $statuses[$status] : 'New');
+	}
+}
+add_action('manage_zo_game_report_posts_custom_column', 'zo_render_game_report_column', 10, 2);
 
 function zo_add_game_meta_box() {
 	add_meta_box(
@@ -11094,7 +11484,13 @@ function zo_render_game($slug, $post_id = 0) {
 		$html = '<p>Bu oyun henüz görüntülenemiyor.</p>';
 	}
 
-	return zo_wrap_game_runtime_translator($html, $module, $language);
+	$wrapped_html = zo_wrap_game_runtime_translator($html, $module, $language);
+
+	if ((int) $post_id <= 0) {
+		$wrapped_html .= zo_render_game_report_link($slug, $language);
+	}
+
+	return $wrapped_html;
 }
 
 function zo_get_game_posts_by_slug() {

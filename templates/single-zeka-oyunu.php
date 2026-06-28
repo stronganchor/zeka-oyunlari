@@ -599,6 +599,9 @@ if (function_exists('zo_get_related_game_items')) {
 			<?php endif; ?>
 			<div class="zo-game-page__bottom-actions">
 				<a class="zo-game-page__back" href="<?php echo esc_url($games_url); ?>"><?php echo esc_html(function_exists('zo_get_interface_text') ? zo_get_interface_text('back_to_games', $language) : 'Back to games'); ?></a>
+				<?php if (function_exists('zo_render_game_report_link')) : ?>
+				<?php echo zo_render_game_report_link($slug, $language); ?>
+				<?php endif; ?>
 			</div>
 		</main>
 	</div>
