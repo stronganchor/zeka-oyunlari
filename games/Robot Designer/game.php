@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				requirements: { power: 5, speed: 8, defense: 4, intel: 4 }
 			},
 			{
-				text: 'Hack into a secure research facility.',
+				text: 'Analyze a research facility safety map.',
 				requirements: { power: 3, speed: 4, defense: 4, intel: 9 }
 			},
 			{
@@ -176,7 +176,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			weapon: [
 				{ name: 'Energy Blaster', power: 6, speed: 2, defense: 1, intel: 2 },
 				{ name: 'Shield System', power: 2, speed: 1, defense: 6, intel: 2 },
-				{ name: 'Hacking Module', power: 1, speed: 2, defense: 1, intel: 7 }
+				{ name: 'Research Scanner', power: 1, speed: 2, defense: 1, intel: 7 }
 			]
 		};
 

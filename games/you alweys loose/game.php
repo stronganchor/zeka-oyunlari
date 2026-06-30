@@ -379,8 +379,8 @@ document.addEventListener('DOMContentLoaded', function () {
 				name: 'Shield Up',
 				desc: 'Feels safe. It is not.'
 			},
-			hack: {
-				name: 'Hack the AI',
+			outsmart: {
+				name: 'Outsmart the AI',
 				desc: 'Pretend to outsmart it.'
 			},
 			appeal: {
@@ -520,9 +520,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			if (round === 4) {
-				if (actionKey === 'hack') {
+				if (actionKey === 'outsmart') {
 					return {
-						text: 'You try to hack the AI. The AI thanks you for the upgrade.',
+						text: 'You try to outsmart the AI. The AI thanks you for the lesson.',
 						playerDamage: 32,
 						aiDamage: 0,
 						playerConfidenceDelta: -20,
@@ -575,7 +575,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (actionKey === 'shield') {
 				return 'You brace for impact.';
 			}
-			if (actionKey === 'hack') {
+			if (actionKey === 'outsmart') {
 				return 'You type very fast and hope it means something.';
 			}
 			return 'You deliver a speech about humanity.';
@@ -729,8 +729,8 @@ if (!function_exists('zo_you_always_lose_render')) {
 								<div class="zo-yal-action-text">Try to survive the next counter.</div>
 							</button>
 
-							<button type="button" class="zo-yal-action" data-action="hack">
-								<div class="zo-yal-action-title">💻 Hack the AI</div>
+							<button type="button" class="zo-yal-action" data-action="outsmart">
+								<div class="zo-yal-action-title">💻 Outsmart the AI</div>
 								<div class="zo-yal-action-text">Pretend you found a weakness.</div>
 							</button>
 
