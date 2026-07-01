@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.25.asker.arslan
+ * Version: 1.5.27.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -3900,7 +3900,7 @@ function zo_get_interface_text($key, $lang = '') {
 		'report_problem_intro' => array(
 			'tr' => 'Neyin yanlış gittiğini yaz. Raporlar WordPress yönetiminde gizli olarak kaydedilir.',
 			'en' => 'Tell us what went wrong. Reports are saved privately in WordPress admin.',
-			'es-mx' => 'Dinos que salio mal. Los reportes se guardan de forma privada en WordPress.',
+			'es-mx' => 'Dinos qué salió mal. Los reportes se guardan de forma privada en WordPress.',
 			'es-es' => 'Dinos que ha fallado. Los informes se guardan de forma privada en WordPress.',
 			'fr' => 'Dis-nous ce qui ne va pas. Les rapports sont enregistres en prive dans WordPress.',
 			'de' => 'Sag uns, was nicht funktioniert hat. Berichte werden privat in WordPress gespeichert.',
@@ -3924,8 +3924,8 @@ function zo_get_interface_text($key, $lang = '') {
 		'report_problem_error' => array(
 			'tr' => 'Rapor kaydedilemedi. Lütfen tekrar dene.',
 			'en' => 'The report could not be saved. Please try again.',
-			'es-mx' => 'No se pudo guardar el reporte. Intentalo de nuevo.',
-			'es-es' => 'No se pudo guardar el informe. Intentalo de nuevo.',
+			'es-mx' => 'No se pudo guardar el reporte. Inténtalo de nuevo.',
+			'es-es' => 'No se pudo guardar el informe. Inténtalo de nuevo.',
 			'fr' => 'Le rapport n a pas pu etre enregistre. Reessaie.',
 			'de' => 'Der Bericht konnte nicht gespeichert werden. Bitte versuche es erneut.',
 		),
@@ -3933,22 +3933,23 @@ function zo_get_interface_text($key, $lang = '') {
 		'report_game_placeholder' => array('tr' => 'Oyun adı', 'en' => 'Game name', 'es-mx' => 'Nombre del juego', 'es-es' => 'Nombre del juego', 'fr' => 'Nom du jeu', 'de' => 'Spielname'),
 		'report_problem_type' => array('tr' => 'Sorun türü', 'en' => 'Problem type', 'es-mx' => 'Tipo de problema', 'es-es' => 'Tipo de problema', 'fr' => 'Type de probleme', 'de' => 'Problemtyp'),
 		'report_device' => array('tr' => 'Cihaz', 'en' => 'Device', 'es-mx' => 'Dispositivo', 'es-es' => 'Dispositivo', 'fr' => 'Appareil', 'de' => 'Gerat'),
-		'report_message_label' => array('tr' => 'Ne oldu?', 'en' => 'What happened?', 'es-mx' => 'Que paso?', 'es-es' => 'Que ha pasado?', 'fr' => 'Que s est-il passe?', 'de' => 'Was ist passiert?'),
-		'report_message_placeholder' => array('tr' => 'Örnek: telefonda başlat düğmesi çalışmıyor.', 'en' => 'Example: the start button does not work on my phone.', 'es-mx' => 'Ejemplo: el boton de inicio no funciona en mi telefono.', 'es-es' => 'Ejemplo: el boton de inicio no funciona en mi telefono.', 'fr' => 'Exemple : le bouton demarrer ne marche pas sur mon telephone.', 'de' => 'Beispiel: Der Startknopf funktioniert auf meinem Handy nicht.'),
+		'report_message_label' => array('tr' => 'Ne oldu?', 'en' => 'What happened?', 'es-mx' => '¿Qué pasó?', 'es-es' => '¿Qué ha pasado?', 'fr' => 'Que s est-il passe?', 'de' => 'Was ist passiert?'),
+		'report_message_placeholder' => array('tr' => 'Örnek: telefonda başlat düğmesi çalışmıyor.', 'en' => 'Example: the start button does not work on my phone.', 'es-mx' => 'Ejemplo: el botón de inicio no funciona en mi teléfono.', 'es-es' => 'Ejemplo: el botón de inicio no funciona en mi teléfono.', 'fr' => 'Exemple : le bouton demarrer ne marche pas sur mon telephone.', 'de' => 'Beispiel: Der Startknopf funktioniert auf meinem Handy nicht.'),
+		'report_required_message' => array('tr' => 'Lütfen bu alanı doldur.', 'en' => 'Please fill out this field.', 'es-mx' => 'Completa este campo.', 'es-es' => 'Completa este campo.', 'fr' => 'Remplis ce champ.', 'de' => 'Bitte fülle dieses Feld aus.'),
 		'report_browser' => array('tr' => 'Tarayıcı', 'en' => 'Browser', 'es-mx' => 'Navegador', 'es-es' => 'Navegador', 'fr' => 'Navigateur', 'de' => 'Browser'),
 		'report_browser_placeholder' => array('tr' => 'Chrome, Safari, Edge...', 'en' => 'Chrome, Safari, Edge...', 'es-mx' => 'Chrome, Safari, Edge...', 'es-es' => 'Chrome, Safari, Edge...', 'fr' => 'Chrome, Safari, Edge...', 'de' => 'Chrome, Safari, Edge...'),
 		'report_email_optional' => array('tr' => 'E-posta isteğe bağlı', 'en' => 'Email optional', 'es-mx' => 'Correo opcional', 'es-es' => 'Correo opcional', 'fr' => 'E-mail facultatif', 'de' => 'E-Mail optional'),
 		'report_screenshot_optional' => array('tr' => 'Ekran görüntüsü isteğe bağlı', 'en' => 'Screenshot optional', 'es-mx' => 'Captura opcional', 'es-es' => 'Captura opcional', 'fr' => 'Capture facultative', 'de' => 'Screenshot optional'),
-		'report_screenshot_help' => array('tr' => 'Sadece PNG veya JPG, en fazla 1 MB.', 'en' => 'PNG or JPG only, max 1 MB.', 'es-mx' => 'Solo PNG o JPG, maximo 1 MB.', 'es-es' => 'Solo PNG o JPG, maximo 1 MB.', 'fr' => 'PNG ou JPG seulement, maximum 1 Mo.', 'de' => 'Nur PNG oder JPG, maximal 1 MB.'),
+		'report_screenshot_help' => array('tr' => 'Sadece PNG veya JPG, en fazla 1 MB.', 'en' => 'PNG or JPG only, max 1 MB.', 'es-mx' => 'Solo PNG o JPG, máximo 1 MB.', 'es-es' => 'Solo PNG o JPG, máximo 1 MB.', 'fr' => 'PNG ou JPG seulement, maximum 1 Mo.', 'de' => 'Nur PNG oder JPG, maximal 1 MB.'),
 		'report_submit' => array('tr' => 'Rapor Gönder', 'en' => 'Send Report', 'es-mx' => 'Enviar reporte', 'es-es' => 'Enviar informe', 'fr' => 'Envoyer le rapport', 'de' => 'Bericht senden'),
 		'report_game_link' => array('tr' => 'Bu oyunda sorun bildir', 'en' => 'Report a problem with this game', 'es-mx' => 'Reportar un problema con este juego', 'es-es' => 'Informar de un problema con este juego', 'fr' => 'Signaler un probleme avec ce jeu', 'de' => 'Ein Problem mit diesem Spiel melden'),
 		'report_type_load' => array('tr' => 'Oyun açılmıyor', 'en' => 'Game will not load', 'es-mx' => 'El juego no carga', 'es-es' => 'El juego no carga', 'fr' => 'Le jeu ne charge pas', 'de' => 'Das Spiel ladt nicht'),
 		'report_type_controls' => array('tr' => 'Tuşlar veya kontroller çalışmıyor', 'en' => 'Buttons or controls do not work', 'es-mx' => 'Los botones o controles no funcionan', 'es-es' => 'Los botones o controles no funcionan', 'fr' => 'Les boutons ou commandes ne marchent pas', 'de' => 'Tasten oder Steuerung funktionieren nicht'),
-		'report_type_mobile' => array('tr' => 'Telefonda çok küçük veya zor', 'en' => 'Too small or hard to use on phone', 'es-mx' => 'Muy pequeno o dificil en telefono', 'es-es' => 'Muy pequeno o dificil en telefono', 'fr' => 'Trop petit ou difficile sur telephone', 'de' => 'Auf dem Handy zu klein oder schwierig'),
+		'report_type_mobile' => array('tr' => 'Telefonda çok küçük veya zor', 'en' => 'Too small or hard to use on phone', 'es-mx' => 'Muy pequeño o difícil en teléfono', 'es-es' => 'Muy pequeño o difícil en teléfono', 'fr' => 'Trop petit ou difficile sur telephone', 'de' => 'Auf dem Handy zu klein oder schwierig'),
 		'report_type_sound' => array('tr' => 'Ses sorunu', 'en' => 'Sound problem', 'es-mx' => 'Problema de sonido', 'es-es' => 'Problema de sonido', 'fr' => 'Probleme de son', 'de' => 'Tonproblem'),
-		'report_type_translation' => array('tr' => 'Yanlış çeviri', 'en' => 'Wrong translation', 'es-mx' => 'Traduccion incorrecta', 'es-es' => 'Traduccion incorrecta', 'fr' => 'Mauvaise traduction', 'de' => 'Falsche Ubersetzung'),
+		'report_type_translation' => array('tr' => 'Yanlış çeviri', 'en' => 'Wrong translation', 'es-mx' => 'Traducción incorrecta', 'es-es' => 'Traducción incorrecta', 'fr' => 'Mauvaise traduction', 'de' => 'Falsche Ubersetzung'),
 		'report_type_other' => array('tr' => 'Diğer', 'en' => 'Other', 'es-mx' => 'Otro', 'es-es' => 'Otro', 'fr' => 'Autre', 'de' => 'Andere'),
-		'report_device_phone' => array('tr' => 'Telefon', 'en' => 'Phone', 'es-mx' => 'Telefono', 'es-es' => 'Telefono', 'fr' => 'Telephone', 'de' => 'Handy'),
+		'report_device_phone' => array('tr' => 'Telefon', 'en' => 'Phone', 'es-mx' => 'Teléfono', 'es-es' => 'Teléfono', 'fr' => 'Telephone', 'de' => 'Handy'),
 		'report_device_tablet' => array('tr' => 'Tablet', 'en' => 'Tablet', 'es-mx' => 'Tableta', 'es-es' => 'Tableta', 'fr' => 'Tablette', 'de' => 'Tablet'),
 		'report_device_computer' => array('tr' => 'Bilgisayar', 'en' => 'Computer', 'es-mx' => 'Computadora', 'es-es' => 'Ordenador', 'fr' => 'Ordinateur', 'de' => 'Computer'),
 		'report_device_unknown' => array('tr' => 'Emin değilim', 'en' => 'Not sure', 'es-mx' => 'No estoy seguro', 'es-es' => 'No estoy seguro', 'fr' => 'Je ne sais pas', 'de' => 'Nicht sicher'),
@@ -10531,6 +10532,18 @@ function zo_game_report_shortcode($atts = array()) {
 				var input = document.getElementById('zo_report_game_title');
 				var slug = document.getElementById('zo_report_game_slug');
 				var url = document.getElementById('zo_report_game_url');
+				var message = document.getElementById('zo_message');
+				var requiredMessage = <?php echo wp_json_encode(zo_get_interface_text('report_required_message', $language)); ?>;
+				if (message) {
+					message.addEventListener('invalid', function() {
+						if (!message.value.trim()) {
+							message.setCustomValidity(requiredMessage || 'Please fill out this field.');
+						}
+					});
+					message.addEventListener('input', function() {
+						message.setCustomValidity('');
+					});
+				}
 				if (!input || !slug || !url || !Array.isArray(games)) {
 					return;
 				}
@@ -13408,89 +13421,15 @@ function zo_games_grid_shortcode($atts = array()) {
 		echo '</section>';
 	}
 
-	if ($author_filter === 'asker') {
-		$streak_image_code = in_array($language, array('tr', 'en', 'de', 'fr'), true) ? $language : 'es';
-		$week_image_url    = ZO_PLUGIN_URL . 'assets/play-streak/play-streak-week-' . $streak_image_code . '.png';
-		$week_alt          = zo_get_interface_text('week_streak_badge', $language) . '. ' . zo_get_interface_text('week_streak_badge_text', $language);
-		$month_image_url   = ZO_PLUGIN_URL . 'assets/play-streak/play-streak-month-' . $streak_image_code . '.png';
-		$month_alt         = zo_get_interface_text('month_streak_badge', $language) . '. ' . zo_get_interface_text('month_streak_badge_text', $language);
-		$streak_image_url  = ZO_PLUGIN_URL . 'assets/play-streak/play-streak-' . $streak_image_code . '.png';
-		$streak_alt        = zo_get_interface_text('play_streak_badge', $language) . '. ' . zo_get_interface_text('play_streak_badge_text', $language);
-		$focus_image_url   = ZO_PLUGIN_URL . 'assets/play-streak/play-streak-20-' . $streak_image_code . '.png';
-		$focus_alt         = zo_get_interface_text('focus_hero_badge', $language) . '. ' . zo_get_interface_text('focus_hero_badge_text', $language);
-		$champion_image_url = ZO_PLUGIN_URL . 'assets/play-streak/play-streak-30-' . $streak_image_code . '.png';
-		$champion_alt       = zo_get_interface_text('daily_champion_badge', $language) . '. ' . zo_get_interface_text('daily_champion_badge_text', $language);
-
-		echo '<section class="zo-games-grid__feature-section" aria-label="' . esc_attr(zo_get_interface_text('badge_center', $language)) . '">';
-		echo '<h2 class="zo-games-grid__feature-title">' . esc_html(zo_get_interface_text('badge_center', $language)) . '</h2>';
-		echo '<div class="zo-badge-center">';
-		echo '<div class="zo-badge-center__card is-locked" data-zo-asker-streak-badge data-threshold="300" data-target-days="7" data-achievement-name="' . esc_attr(zo_get_interface_text('week_streak_badge', $language)) . '">';
-		echo '<img class="zo-badge-center__image zo-games-grid__streak-image" src="' . esc_url($week_image_url) . '" alt="' . esc_attr($week_alt) . '" loading="lazy" decoding="async">';
-		echo '<div class="zo-badge-center__body">';
-		echo '<span class="zo-badge-center__title">' . esc_html(zo_get_interface_text('week_streak_badge', $language)) . '</span>';
-		echo '<span class="zo-badge-center__status" data-zo-badge-status data-locked="' . esc_attr(zo_get_interface_text('badge_locked', $language)) . '" data-unlocked="' . esc_attr(zo_get_interface_text('badge_unlocked', $language)) . '">' . esc_html(zo_get_interface_text('badge_locked', $language)) . '</span>';
-		echo '<span class="zo-badge-center__progress-track" aria-hidden="true"><span class="zo-badge-center__progress-fill" data-zo-badge-progress-fill></span></span>';
-		echo '<span class="zo-badge-center__progress-text" data-zo-badge-progress-text data-template="' . esc_attr(zo_get_interface_text('badge_progress', $language)) . '">' . esc_html(sprintf(zo_get_interface_text('badge_progress', $language), 0, 7)) . '</span>';
-		echo '</div>';
-		echo '</div>';
-		echo '<div class="zo-badge-center__card is-locked" data-zo-asker-streak-badge data-threshold="120" data-target-days="30" data-achievement-name="' . esc_attr(zo_get_interface_text('month_streak_badge', $language)) . '">';
-		echo '<img class="zo-badge-center__image zo-games-grid__streak-image" src="' . esc_url($month_image_url) . '" alt="' . esc_attr($month_alt) . '" loading="lazy" decoding="async">';
-		echo '<div class="zo-badge-center__body">';
-		echo '<span class="zo-badge-center__title">' . esc_html(zo_get_interface_text('month_streak_badge', $language)) . '</span>';
-		echo '<span class="zo-badge-center__status" data-zo-badge-status data-locked="' . esc_attr(zo_get_interface_text('badge_locked', $language)) . '" data-unlocked="' . esc_attr(zo_get_interface_text('badge_unlocked', $language)) . '">' . esc_html(zo_get_interface_text('badge_locked', $language)) . '</span>';
-		echo '<span class="zo-badge-center__progress-track" aria-hidden="true"><span class="zo-badge-center__progress-fill" data-zo-badge-progress-fill></span></span>';
-		echo '<span class="zo-badge-center__progress-text" data-zo-badge-progress-text data-template="' . esc_attr(zo_get_interface_text('badge_progress', $language)) . '">' . esc_html(sprintf(zo_get_interface_text('badge_progress', $language), 0, 30)) . '</span>';
-		echo '</div>';
-		echo '</div>';
-		echo '<div class="zo-badge-center__card is-locked" data-zo-asker-streak-badge data-threshold="600" data-achievement-name="' . esc_attr(zo_get_interface_text('play_streak_badge', $language)) . '">';
-		echo '<img class="zo-badge-center__image zo-games-grid__streak-image" src="' . esc_url($streak_image_url) . '" alt="' . esc_attr($streak_alt) . '" loading="lazy" decoding="async">';
-		echo '<div class="zo-badge-center__body">';
-		echo '<span class="zo-badge-center__title">' . esc_html(zo_get_interface_text('play_streak_badge', $language)) . '</span>';
-		echo '<span class="zo-badge-center__status" data-zo-badge-status data-locked="' . esc_attr(zo_get_interface_text('badge_locked', $language)) . '" data-unlocked="' . esc_attr(zo_get_interface_text('badge_unlocked', $language)) . '">' . esc_html(zo_get_interface_text('badge_locked', $language)) . '</span>';
-		echo '<span class="zo-badge-center__progress-track" aria-hidden="true"><span class="zo-badge-center__progress-fill" data-zo-badge-progress-fill></span></span>';
-		echo '<span class="zo-badge-center__progress-text" data-zo-badge-progress-text data-template="' . esc_attr(zo_get_interface_text('badge_progress', $language)) . '">' . esc_html(sprintf(zo_get_interface_text('badge_progress', $language), 0, 5)) . '</span>';
-		echo '</div>';
-		echo '</div>';
-		echo '<div class="zo-badge-center__card is-locked" data-zo-asker-streak-badge data-threshold="1200" data-achievement-name="' . esc_attr(zo_get_interface_text('focus_hero_badge', $language)) . '">';
-		echo '<img class="zo-badge-center__image zo-games-grid__streak-image" src="' . esc_url($focus_image_url) . '" alt="' . esc_attr($focus_alt) . '" loading="lazy" decoding="async">';
-		echo '<div class="zo-badge-center__body">';
-		echo '<span class="zo-badge-center__title">' . esc_html(zo_get_interface_text('focus_hero_badge', $language)) . '</span>';
-		echo '<span class="zo-badge-center__status" data-zo-badge-status data-locked="' . esc_attr(zo_get_interface_text('badge_locked', $language)) . '" data-unlocked="' . esc_attr(zo_get_interface_text('badge_unlocked', $language)) . '">' . esc_html(zo_get_interface_text('badge_locked', $language)) . '</span>';
-		echo '<span class="zo-badge-center__progress-track" aria-hidden="true"><span class="zo-badge-center__progress-fill" data-zo-badge-progress-fill></span></span>';
-		echo '<span class="zo-badge-center__progress-text" data-zo-badge-progress-text data-template="' . esc_attr(zo_get_interface_text('badge_progress', $language)) . '">' . esc_html(sprintf(zo_get_interface_text('badge_progress', $language), 0, 5)) . '</span>';
-		echo '</div>';
-		echo '</div>';
-		echo '<div class="zo-badge-center__card is-locked" data-zo-asker-streak-badge data-threshold="1800" data-achievement-name="' . esc_attr(zo_get_interface_text('daily_champion_badge', $language)) . '">';
-		echo '<img class="zo-badge-center__image zo-games-grid__streak-image" src="' . esc_url($champion_image_url) . '" alt="' . esc_attr($champion_alt) . '" loading="lazy" decoding="async">';
-		echo '<div class="zo-badge-center__body">';
-		echo '<span class="zo-badge-center__title">' . esc_html(zo_get_interface_text('daily_champion_badge', $language)) . '</span>';
-		echo '<span class="zo-badge-center__status" data-zo-badge-status data-locked="' . esc_attr(zo_get_interface_text('badge_locked', $language)) . '" data-unlocked="' . esc_attr(zo_get_interface_text('badge_unlocked', $language)) . '">' . esc_html(zo_get_interface_text('badge_locked', $language)) . '</span>';
-		echo '<span class="zo-badge-center__progress-track" aria-hidden="true"><span class="zo-badge-center__progress-fill" data-zo-badge-progress-fill></span></span>';
-		echo '<span class="zo-badge-center__progress-text" data-zo-badge-progress-text data-template="' . esc_attr(zo_get_interface_text('badge_progress', $language)) . '">' . esc_html(sprintf(zo_get_interface_text('badge_progress', $language), 0, 5)) . '</span>';
-		echo '</div>';
-		echo '</div>';
-		echo '</div>';
-		echo '</section>';
-	}
-
-	if ($author_filter === 'arslan') {
-		echo '<section class="zo-games-grid__feature-section" aria-label="' . esc_attr(zo_get_interface_text('badge_center', $language)) . '">';
-		echo '<h2 class="zo-games-grid__feature-title">' . esc_html(zo_get_interface_text('badge_center', $language)) . '</h2>';
-		echo '<div class="zo-badge-center" data-zo-badge-scope>';
-
-		foreach (zo_get_asker_badge_items($language, 'arslan') as $badge) {
-			zo_render_asker_badge_card($badge, $language, 'arslan');
-		}
-
-		echo zo_get_badge_center_script($language, 'arslan');
-		echo '</div>';
-		echo '</section>';
-	}
-
 	echo '<section class="zo-games-grid__feature-section" data-zo-recent-section hidden aria-label="' . esc_attr(zo_get_interface_text('recently_played', $language)) . '">';
 	echo '<h2 class="zo-games-grid__feature-title">' . esc_html(zo_get_interface_text('recently_played', $language)) . '</h2>';
 	echo '<div class="zo-games-grid__mini-row" data-zo-recent-list></div>';
 	echo '</section>';
+	if ($author_filter === 'asker') {
+		echo '<div class="zo-games-grid__footer">';
+		echo '<a class="zo-games-grid__about" href="' . esc_url(add_query_arg('zo_lang', $language, home_url('/rozetler/'))) . '">' . esc_html(zo_get_interface_text('badge_center', $language)) . '</a>';
+		echo '</div>';
+	}
 	echo '<section class="zo-games-grid__feature-section" data-zo-favorites-section hidden aria-label="' . esc_attr(zo_get_interface_text('favorites', $language)) . '">';
 	echo '<h2 class="zo-games-grid__feature-title">' . esc_html(zo_get_interface_text('favorites', $language)) . '</h2>';
 	echo '<div class="zo-games-grid__mini-row" data-zo-favorites-list></div>';
@@ -13564,9 +13503,6 @@ function zo_games_grid_shortcode($atts = array()) {
 	echo '</div>';
 	echo '<script>(function(){var script=document.currentScript;var wrap=script&&script.closest(".zo-games-grid-wrap");if(!wrap){return;}var input=wrap.querySelector("#zo-game-search");var category=wrap.querySelector("#zo-game-category");var sort=wrap.querySelector("#zo-game-sort");var grid=wrap.querySelector("[data-zo-games-grid]");var count=wrap.querySelector("[data-zo-games-count]");var empty=wrap.querySelector("[data-zo-games-live-empty]");var panel=wrap.querySelector("[data-zo-games-search-panel]");var button=wrap.querySelector("[data-zo-games-search-toggle]");function normalize(value){return String(value||"").toLowerCase();}function updateCount(total){if(count){count.textContent=String(count.getAttribute("data-count-template")||"%d").replace("%d",total);}}function openPanel(){if(panel){panel.removeAttribute("hidden");}if(button){button.setAttribute("aria-expanded","true");}}function applyFilters(){if(!grid){return;}var q=normalize(input&&input.value).trim();var cat=category?category.value:"all";var sortValue=sort?sort.value:"title";var cards=Array.prototype.slice.call(grid.querySelectorAll("[data-zo-game-card]"));var visible=[];cards.forEach(function(card){var matchesText=!q||normalize(card.getAttribute("data-search")).indexOf(q)!==-1;var matchesCategory=cat==="all"||card.getAttribute("data-category")===cat;var show=matchesText&&matchesCategory;card.hidden=!show;if(show){visible.push(card);}});visible.sort(function(a,b){if(sortValue==="newest"){return Number(b.getAttribute("data-timestamp")||0)-Number(a.getAttribute("data-timestamp")||0)||normalize(a.getAttribute("data-title")).localeCompare(normalize(b.getAttribute("data-title")));}if(sortValue==="category"){return normalize(a.getAttribute("data-category-label")).localeCompare(normalize(b.getAttribute("data-category-label")))||normalize(a.getAttribute("data-title")).localeCompare(normalize(b.getAttribute("data-title")));}return normalize(a.getAttribute("data-title")).localeCompare(normalize(b.getAttribute("data-title")));});visible.forEach(function(card){grid.appendChild(card);});updateCount(visible.length);if(empty){empty.hidden=visible.length!==0;}}if(input){input.addEventListener("input",applyFilters);}if(category){category.addEventListener("change",applyFilters);}if(sort){sort.addEventListener("change",applyFilters);}Array.prototype.forEach.call(wrap.querySelectorAll("[data-zo-games-reset]"),function(reset){reset.addEventListener("click",function(event){event.preventDefault();if(input){input.value="";}if(category){category.value="all";}if(sort){sort.value="title";}openPanel();applyFilters();if(input){input.focus();}});});applyFilters();})();</script>';
 	echo '<script>(function(){var script=document.currentScript;var wrap=script&&script.closest(".zo-games-grid-wrap");if(!wrap){return;}var grid=wrap.querySelector("[data-zo-games-grid]");if(!grid){return;}var recentKey="zoRecentlyPlayedGames";var favoriteKey="zoFavoriteGames";var cards=Array.prototype.slice.call(grid.querySelectorAll("[data-zo-game-card]"));var gameMap={};function read(key){try{var value=JSON.parse(localStorage.getItem(key)||"[]");return Array.isArray(value)?value:[];}catch(error){return [];}}function write(key,value){try{localStorage.setItem(key,JSON.stringify(value));}catch(error){}}function itemFromCard(card){return {slug:card.getAttribute("data-slug")||"",title:card.getAttribute("data-title")||"",url:card.getAttribute("data-url")||"",thumb:card.getAttribute("data-thumb")||""};}function miniCard(item){var a=document.createElement("a");a.className="zo-games-grid__mini-card";a.href=item.url||"#";var media;if(item.thumb){media=document.createElement("img");media.className="zo-games-grid__mini-thumb";media.src=item.thumb;media.alt="";media.loading="lazy";}else{media=document.createElement("span");media.className="zo-games-grid__mini-thumb";media.setAttribute("aria-hidden","true");}var title=document.createElement("span");title.className="zo-games-grid__mini-title";title.textContent=item.title||item.slug;a.appendChild(media);a.appendChild(title);return a;}function render(sectionSelector,listSelector,items){var section=wrap.querySelector(sectionSelector);var list=wrap.querySelector(listSelector);if(!section||!list){return;}list.innerHTML="";items.filter(function(item){return item&&item.slug&&gameMap[item.slug];}).slice(0,4).forEach(function(item){list.appendChild(miniCard(Object.assign({},gameMap[item.slug],item)));});section.hidden=!list.children.length;}function updateFavoriteButton(button,active){button.classList.toggle("is-active",active);button.setAttribute("aria-pressed",active?"true":"false");button.setAttribute("aria-label",button.getAttribute(active?"data-label-remove":"data-label-add")||"");button.innerHTML=active?"&#9733;":"&#9734;";}function renderAll(){var favorites=read(favoriteKey);var recent=read(recentKey);render("[data-zo-favorites-section]","[data-zo-favorites-list]",favorites);render("[data-zo-recent-section]","[data-zo-recent-list]",recent);}cards.forEach(function(card){var item=itemFromCard(card);if(!item.slug){return;}gameMap[item.slug]=item;var favButton=card.querySelector("[data-zo-favorite-toggle]");if(favButton){updateFavoriteButton(favButton,read(favoriteKey).some(function(favorite){return favorite.slug===item.slug;}));favButton.addEventListener("click",function(event){event.preventDefault();event.stopPropagation();var favorites=read(favoriteKey).filter(function(favorite){return favorite.slug!==item.slug;});var active=!favButton.classList.contains("is-active");if(active){favorites.unshift(item);}favorites=favorites.slice(0,40);write(favoriteKey,favorites);updateFavoriteButton(favButton,active);renderAll();});}card.addEventListener("click",function(event){if(event.target.closest("[data-zo-favorite-toggle]")){return;}if(!event.target.closest("a")){return;}var recent=read(recentKey).filter(function(recentItem){return recentItem.slug!==item.slug;});recent.unshift(item);write(recentKey,recent.slice(0,20));});});renderAll();})();</script>';
-	echo '<script>(function(){var script=document.currentScript;var wrap=script&&script.closest(".zo-games-grid-wrap");if(!wrap){return;}var badges=Array.prototype.slice.call(wrap.querySelectorAll("[data-zo-asker-streak-badge]"));if(!badges.length){return;}function showPopup(badge,threshold,targetDays){var seenKey="zoAchievementSeen:"+threshold+":"+targetDays;if(localStorage.getItem(seenKey)==="1"){return;}localStorage.setItem(seenKey,"1");var img=badge.querySelector("img");var popup=document.createElement("div");popup.className="zo-achievement-popup";popup.setAttribute("role","status");popup.setAttribute("aria-live","polite");var media=document.createElement("img");media.className="zo-achievement-popup__image";media.alt="";media.src=img?img.src:"";var body=document.createElement("span");var eyebrow=document.createElement("span");eyebrow.className="zo-achievement-popup__eyebrow";eyebrow.textContent=' . wp_json_encode(zo_get_interface_text('achievement_unlocked', $language)) . ';var title=document.createElement("span");title.className="zo-achievement-popup__title";title.textContent=badge.getAttribute("data-achievement-name")||"";body.appendChild(eyebrow);body.appendChild(title);popup.appendChild(media);popup.appendChild(body);document.body.appendChild(popup);window.setTimeout(function(){popup.classList.add("is-visible");},30);window.setTimeout(function(){popup.classList.remove("is-visible");window.setTimeout(function(){if(popup.parentNode){popup.parentNode.removeChild(popup);}},260);},5200);}function formatProgress(template,done,total){return String(template||"%1$d / %2$d days").replace("%1$d",done).replace("%2$d",total);}try{var data=JSON.parse(localStorage.getItem("zoAskerPlayStreak")||"{}");var days=data&&data.days&&typeof data.days==="object"?data.days:{};badges.forEach(function(badge){var threshold=Number(badge.getAttribute("data-threshold")||600);var targetDays=Number(badge.getAttribute("data-target-days")||5);var qualified=Object.keys(days).filter(function(day){return Number(days[day]||0)>=threshold;}).length;var capped=Math.min(targetDays,qualified);var unlocked=qualified>=targetDays;var status=badge.querySelector("[data-zo-badge-status]");var fill=badge.querySelector("[data-zo-badge-progress-fill]");var text=badge.querySelector("[data-zo-badge-progress-text]");badge.classList.toggle("is-unlocked",unlocked);badge.classList.toggle("is-locked",!unlocked);if(status){status.textContent=status.getAttribute(unlocked?"data-unlocked":"data-locked")||"";}if(fill){fill.style.width=Math.round((capped/targetDays)*100)+"%";}if(text){text.textContent=formatProgress(text.getAttribute("data-template"),capped,targetDays);}if(unlocked){showPopup(badge,threshold,targetDays);}});}catch(error){}})();</script>';
-	echo '<script>(function(){var script=document.currentScript;var wrap=script&&script.closest(".zo-games-grid-wrap");if(!wrap){return;}var badges=Array.prototype.slice.call(wrap.querySelectorAll("[data-zo-asker-streak-badge]"));if(!badges.length){return;}function readHistory(){try{var value=JSON.parse(localStorage.getItem("zoBadgeUnlockHistory")||"{}");return value&&typeof value==="object"?value:{};}catch(error){return {};}}function writeHistory(value){try{localStorage.setItem("zoBadgeUnlockHistory",JSON.stringify(value));}catch(error){}}try{var data=JSON.parse(localStorage.getItem("zoAskerPlayStreak")||"{}");var days=data&&data.days&&typeof data.days==="object"?data.days:{};var history=readHistory();var changed=false;badges.forEach(function(badge){var threshold=Number(badge.getAttribute("data-threshold")||600);var targetDays=Number(badge.getAttribute("data-target-days")||5);var qualified=Object.keys(days).filter(function(day){return Number(days[day]||0)>=threshold;}).length;var key=String(threshold)+":"+String(targetDays);if(qualified>=targetDays&&!history[key]){history[key]=(new Date()).toISOString();changed=true;}});if(changed){writeHistory(history);}}catch(error){}})();</script>';
-
 	if (!$has_results) {
 		echo '<p class="zo-games-grid__empty">' . esc_html(zo_get_interface_text('no_live_results', $language)) . '</p>';
 		echo '<p><a class="zo-games-grid__reset" href="' . esc_url(add_query_arg('zo_lang', $language, remove_query_arg(array('zo_game_search', 'zo_game_category', 'zo_game_sort', 'zo_lang', 'paged')))) . '">' . esc_html(zo_get_interface_text('filter_reset', $language)) . '</a></p>';
