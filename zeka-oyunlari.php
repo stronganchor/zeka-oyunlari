@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.24asker.arslan
+ * Version: 1.5.25.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -10418,13 +10418,13 @@ function zo_game_report_shortcode($atts = array()) {
 	<section class="zo-report-page">
 		<style>
 			.zo-report-page{max-width:780px;margin:40px auto;padding:0 18px;color:#111827}
-			.zo-report-language{display:flex;align-items:center;gap:7px;margin:0 0 14px;min-height:32px}
-			.zo-report-language__label{font-weight:800;font-size:12px;color:#111827}
-			.zo-report-language__option{display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:30px;border:1px solid #cbd5e1;border-radius:999px;background:#fff;color:#0f172a;font-size:12px;font-weight:800;text-decoration:none}
+			.zo-report-language{display:flex;align-items:center;gap:9px;margin:0 0 18px;min-height:44px}
+			.zo-report-language__label{font-weight:800;font-size:15px;color:#111827}
+			.zo-report-language__option{display:inline-flex;align-items:center;justify-content:center;min-width:42px;height:38px;border:1px solid #cbd5e1;border-radius:999px;background:#fff;color:#0f172a;font-size:14px;font-weight:800;text-decoration:none}
 			.zo-report-language__option.is-active{background:#2563eb;border-color:#2563eb;color:#fff}
 			.zo-report-language__option:hover,.zo-report-language__option:focus{border-color:#2563eb;color:#2563eb;outline:none}
 			.zo-report-language__option.is-active:hover,.zo-report-language__option.is-active:focus{color:#fff}
-			.zo-report-language__logo{margin-left:auto;width:38px;height:auto;display:block}
+			.zo-report-language__logo{margin-left:auto;width:56px;height:auto;display:block}
 			.zo-report-card{background:#fff;border:1px solid #dbe3ef;border-radius:8px;padding:24px;box-shadow:0 18px 42px rgba(15,23,42,.08)}
 			.zo-report-card h1{margin:0 0 10px;font-size:clamp(2rem,4vw,3rem);line-height:1.05}
 			.zo-report-card p{font-size:1rem;color:#435066}
