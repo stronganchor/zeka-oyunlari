@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.22.asker.arslan
+ * Version: 1.5.2.3asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -1476,6 +1476,8 @@ function zo_admin_get_content_lookup_report() {
 	$translation_quality = zo_admin_get_translation_quality_checks();
 	$admin_note_targets = zo_admin_get_note_targets($image_issues, $translation_issues, $recently_broken, $duplicates, $translation_quality);
 	$admin_notes = zo_admin_get_issue_notes();
+	$game_reports = zo_get_recent_game_reports_for_admin(8);
+	$codex_report_mirror = zo_write_codex_game_report_snapshot(50);
 	$visitors_28 = zo_admin_get_visitor_points(28);
 	$visitors_7 = zo_admin_get_visitor_points(7);
 	$visitor_graphs = array(
@@ -1512,6 +1514,8 @@ function zo_admin_get_content_lookup_report() {
 		'translation_quality' => $translation_quality,
 		'admin_note_targets' => $admin_note_targets,
 		'admin_notes' => $admin_notes,
+		'game_reports' => $game_reports,
+		'codex_report_mirror' => $codex_report_mirror,
 		'visitor_graphs' => $visitor_graphs,
 		'visitor_summary_cards' => zo_admin_get_visitor_summary_cards($visitor_graphs, $top_content),
 	);
@@ -2121,6 +2125,8 @@ function zo_render_admin_health_page() {
 	$translation_quality = $report['translation_quality'];
 	$admin_note_targets = $report['admin_note_targets'];
 	$admin_notes = $report['admin_notes'];
+	$game_reports = $report['game_reports'];
+	$codex_report_mirror = $report['codex_report_mirror'];
 	$total_modules = $report['total_modules'];
 	$recheck_key = zo_admin_recheck_key();
 
@@ -2240,10 +2246,36 @@ function zo_render_admin_health_page() {
 	echo '<div class="zo-admin-health-summary">';
 	echo '<div class="zo-admin-health-card zo-admin-health-card--score zo-admin-health-card--' . esc_attr($score['status']) . '"><strong>' . esc_html((string) $score['score']) . '/100</strong><span>Site score</span></div>';
 	echo '<div class="zo-admin-health-card"><strong>' . esc_html((string) $total_modules) . '</strong><span>Loaded games</span></div>';
+	echo '<div class="zo-admin-health-card"><strong>' . esc_html((string) count($game_reports)) . '</strong><span>Recent reports</span></div>';
 	echo '<div class="zo-admin-health-card"><strong>' . esc_html((string) count($image_issues)) . '</strong><span>Image issues</span></div>';
 	echo '<div class="zo-admin-health-card"><strong>' . esc_html((string) count($translation_issues)) . '</strong><span>Translation issues</span></div>';
 	echo '<div class="zo-admin-health-card"><strong>' . esc_html((string) count($broken_games)) . '</strong><span>Broken games</span></div>';
 	echo '<div class="zo-admin-health-card"><strong>' . esc_html((string) count($duplicates)) . '</strong><span>Duplicate groups</span></div>';
+	echo '</div>';
+
+	echo '<div class="zo-admin-section"><h2>Game Reports</h2>';
+	echo '<p><a class="button button-primary" href="' . esc_url(admin_url('edit.php?post_type=zo_game_report')) . '">Open all reports</a></p>';
+	if (!empty($codex_report_mirror['path'])) {
+		echo '<p class="zo-admin-muted">Codex local mirror: <code>' . esc_html($codex_report_mirror['path']) . '</code></p>';
+	} elseif (!empty($codex_report_mirror['error'])) {
+		echo '<p>' . zo_admin_status_badge('warn', 'Check') . ' Codex mirror could not be written: ' . esc_html($codex_report_mirror['error']) . '</p>';
+	}
+	if (empty($game_reports)) {
+		echo '<p>' . zo_admin_status_badge('good', 'Good') . ' No game reports yet.</p>';
+	} else {
+		echo '<table class="widefat striped"><thead><tr><th>Date</th><th>Game</th><th>Problem</th><th>Device</th><th>Status</th><th>Open</th></tr></thead><tbody>';
+		foreach ($game_reports as $item) {
+			echo '<tr>';
+			echo '<td>' . esc_html($item['date']) . '</td>';
+			echo '<td><strong>' . esc_html($item['game_title']) . '</strong><br><code>' . esc_html($item['game_slug']) . '</code></td>';
+			echo '<td>' . esc_html($item['problem_type']) . '</td>';
+			echo '<td>' . esc_html($item['device']) . '</td>';
+			echo '<td>' . esc_html($item['status']) . '</td>';
+			echo '<td><a class="button button-small" href="' . esc_url($item['edit_url']) . '">Open report</a></td>';
+			echo '</tr>';
+		}
+		echo '</tbody></table>';
+	}
 	echo '</div>';
 
 	echo '<div class="zo-admin-section"><h2>Score System</h2>';
@@ -3866,7 +3898,7 @@ function zo_get_interface_text($key, $lang = '') {
 			'de' => 'Problem melden',
 		),
 		'report_problem_intro' => array(
-			'tr' => 'Neyin yanlis gittigini yaz. Raporlar WordPress yonetiminde gizli olarak kaydedilir.',
+			'tr' => 'Neyin yanlış gittiğini yaz. Raporlar WordPress yönetiminde gizli olarak kaydedilir.',
 			'en' => 'Tell us what went wrong. Reports are saved privately in WordPress admin.',
 			'es-mx' => 'Dinos que salio mal. Los reportes se guardan de forma privada en WordPress.',
 			'es-es' => 'Dinos que ha fallado. Los informes se guardan de forma privada en WordPress.',
@@ -3874,7 +3906,7 @@ function zo_get_interface_text($key, $lang = '') {
 			'de' => 'Sag uns, was nicht funktioniert hat. Berichte werden privat in WordPress gespeichert.',
 		),
 		'report_problem_success' => array(
-			'tr' => 'Tesekkurler. Rapor kaydedildi.',
+			'tr' => 'Teşekkürler. Rapor kaydedildi.',
 			'en' => 'Thank you. The report was saved.',
 			'es-mx' => 'Gracias. El reporte fue guardado.',
 			'es-es' => 'Gracias. El informe se ha guardado.',
@@ -3882,7 +3914,7 @@ function zo_get_interface_text($key, $lang = '') {
 			'de' => 'Danke. Der Bericht wurde gespeichert.',
 		),
 		'report_back_to_game' => array(
-			'tr' => 'Oyuna don',
+			'tr' => 'Oyuna dön',
 			'en' => 'Back to game',
 			'es-mx' => 'Volver al juego',
 			'es-es' => 'Volver al juego',
@@ -3890,7 +3922,7 @@ function zo_get_interface_text($key, $lang = '') {
 			'de' => 'Zuruck zum Spiel',
 		),
 		'report_problem_error' => array(
-			'tr' => 'Rapor kaydedilemedi. Lutfen tekrar dene.',
+			'tr' => 'Rapor kaydedilemedi. Lütfen tekrar dene.',
 			'en' => 'The report could not be saved. Please try again.',
 			'es-mx' => 'No se pudo guardar el reporte. Intentalo de nuevo.',
 			'es-es' => 'No se pudo guardar el informe. Intentalo de nuevo.',
@@ -3898,28 +3930,28 @@ function zo_get_interface_text($key, $lang = '') {
 			'de' => 'Der Bericht konnte nicht gespeichert werden. Bitte versuche es erneut.',
 		),
 		'report_game_label' => array('tr' => 'Oyun', 'en' => 'Game', 'es-mx' => 'Juego', 'es-es' => 'Juego', 'fr' => 'Jeu', 'de' => 'Spiel'),
-		'report_game_placeholder' => array('tr' => 'Oyun adi', 'en' => 'Game name', 'es-mx' => 'Nombre del juego', 'es-es' => 'Nombre del juego', 'fr' => 'Nom du jeu', 'de' => 'Spielname'),
-		'report_problem_type' => array('tr' => 'Sorun turu', 'en' => 'Problem type', 'es-mx' => 'Tipo de problema', 'es-es' => 'Tipo de problema', 'fr' => 'Type de probleme', 'de' => 'Problemtyp'),
+		'report_game_placeholder' => array('tr' => 'Oyun adı', 'en' => 'Game name', 'es-mx' => 'Nombre del juego', 'es-es' => 'Nombre del juego', 'fr' => 'Nom du jeu', 'de' => 'Spielname'),
+		'report_problem_type' => array('tr' => 'Sorun türü', 'en' => 'Problem type', 'es-mx' => 'Tipo de problema', 'es-es' => 'Tipo de problema', 'fr' => 'Type de probleme', 'de' => 'Problemtyp'),
 		'report_device' => array('tr' => 'Cihaz', 'en' => 'Device', 'es-mx' => 'Dispositivo', 'es-es' => 'Dispositivo', 'fr' => 'Appareil', 'de' => 'Gerat'),
 		'report_message_label' => array('tr' => 'Ne oldu?', 'en' => 'What happened?', 'es-mx' => 'Que paso?', 'es-es' => 'Que ha pasado?', 'fr' => 'Que s est-il passe?', 'de' => 'Was ist passiert?'),
-		'report_message_placeholder' => array('tr' => 'Ornek: telefonda baslat dugmesi calismiyor.', 'en' => 'Example: the start button does not work on my phone.', 'es-mx' => 'Ejemplo: el boton de inicio no funciona en mi telefono.', 'es-es' => 'Ejemplo: el boton de inicio no funciona en mi telefono.', 'fr' => 'Exemple : le bouton demarrer ne marche pas sur mon telephone.', 'de' => 'Beispiel: Der Startknopf funktioniert auf meinem Handy nicht.'),
-		'report_browser' => array('tr' => 'Tarayici', 'en' => 'Browser', 'es-mx' => 'Navegador', 'es-es' => 'Navegador', 'fr' => 'Navigateur', 'de' => 'Browser'),
+		'report_message_placeholder' => array('tr' => 'Örnek: telefonda başlat düğmesi çalışmıyor.', 'en' => 'Example: the start button does not work on my phone.', 'es-mx' => 'Ejemplo: el boton de inicio no funciona en mi telefono.', 'es-es' => 'Ejemplo: el boton de inicio no funciona en mi telefono.', 'fr' => 'Exemple : le bouton demarrer ne marche pas sur mon telephone.', 'de' => 'Beispiel: Der Startknopf funktioniert auf meinem Handy nicht.'),
+		'report_browser' => array('tr' => 'Tarayıcı', 'en' => 'Browser', 'es-mx' => 'Navegador', 'es-es' => 'Navegador', 'fr' => 'Navigateur', 'de' => 'Browser'),
 		'report_browser_placeholder' => array('tr' => 'Chrome, Safari, Edge...', 'en' => 'Chrome, Safari, Edge...', 'es-mx' => 'Chrome, Safari, Edge...', 'es-es' => 'Chrome, Safari, Edge...', 'fr' => 'Chrome, Safari, Edge...', 'de' => 'Chrome, Safari, Edge...'),
-		'report_email_optional' => array('tr' => 'E-posta istege bagli', 'en' => 'Email optional', 'es-mx' => 'Correo opcional', 'es-es' => 'Correo opcional', 'fr' => 'E-mail facultatif', 'de' => 'E-Mail optional'),
-		'report_screenshot_optional' => array('tr' => 'Ekran goruntusu istege bagli', 'en' => 'Screenshot optional', 'es-mx' => 'Captura opcional', 'es-es' => 'Captura opcional', 'fr' => 'Capture facultative', 'de' => 'Screenshot optional'),
+		'report_email_optional' => array('tr' => 'E-posta isteğe bağlı', 'en' => 'Email optional', 'es-mx' => 'Correo opcional', 'es-es' => 'Correo opcional', 'fr' => 'E-mail facultatif', 'de' => 'E-Mail optional'),
+		'report_screenshot_optional' => array('tr' => 'Ekran görüntüsü isteğe bağlı', 'en' => 'Screenshot optional', 'es-mx' => 'Captura opcional', 'es-es' => 'Captura opcional', 'fr' => 'Capture facultative', 'de' => 'Screenshot optional'),
 		'report_screenshot_help' => array('tr' => 'Sadece PNG veya JPG, en fazla 1 MB.', 'en' => 'PNG or JPG only, max 1 MB.', 'es-mx' => 'Solo PNG o JPG, maximo 1 MB.', 'es-es' => 'Solo PNG o JPG, maximo 1 MB.', 'fr' => 'PNG ou JPG seulement, maximum 1 Mo.', 'de' => 'Nur PNG oder JPG, maximal 1 MB.'),
-		'report_submit' => array('tr' => 'Rapor Gonder', 'en' => 'Send Report', 'es-mx' => 'Enviar reporte', 'es-es' => 'Enviar informe', 'fr' => 'Envoyer le rapport', 'de' => 'Bericht senden'),
+		'report_submit' => array('tr' => 'Rapor Gönder', 'en' => 'Send Report', 'es-mx' => 'Enviar reporte', 'es-es' => 'Enviar informe', 'fr' => 'Envoyer le rapport', 'de' => 'Bericht senden'),
 		'report_game_link' => array('tr' => 'Bu oyunda sorun bildir', 'en' => 'Report a problem with this game', 'es-mx' => 'Reportar un problema con este juego', 'es-es' => 'Informar de un problema con este juego', 'fr' => 'Signaler un probleme avec ce jeu', 'de' => 'Ein Problem mit diesem Spiel melden'),
-		'report_type_load' => array('tr' => 'Oyun acilmiyor', 'en' => 'Game will not load', 'es-mx' => 'El juego no carga', 'es-es' => 'El juego no carga', 'fr' => 'Le jeu ne charge pas', 'de' => 'Das Spiel ladt nicht'),
-		'report_type_controls' => array('tr' => 'Tuslar veya kontroller calismiyor', 'en' => 'Buttons or controls do not work', 'es-mx' => 'Los botones o controles no funcionan', 'es-es' => 'Los botones o controles no funcionan', 'fr' => 'Les boutons ou commandes ne marchent pas', 'de' => 'Tasten oder Steuerung funktionieren nicht'),
-		'report_type_mobile' => array('tr' => 'Telefonda cok kucuk veya zor', 'en' => 'Too small or hard to use on phone', 'es-mx' => 'Muy pequeno o dificil en telefono', 'es-es' => 'Muy pequeno o dificil en telefono', 'fr' => 'Trop petit ou difficile sur telephone', 'de' => 'Auf dem Handy zu klein oder schwierig'),
+		'report_type_load' => array('tr' => 'Oyun açılmıyor', 'en' => 'Game will not load', 'es-mx' => 'El juego no carga', 'es-es' => 'El juego no carga', 'fr' => 'Le jeu ne charge pas', 'de' => 'Das Spiel ladt nicht'),
+		'report_type_controls' => array('tr' => 'Tuşlar veya kontroller çalışmıyor', 'en' => 'Buttons or controls do not work', 'es-mx' => 'Los botones o controles no funcionan', 'es-es' => 'Los botones o controles no funcionan', 'fr' => 'Les boutons ou commandes ne marchent pas', 'de' => 'Tasten oder Steuerung funktionieren nicht'),
+		'report_type_mobile' => array('tr' => 'Telefonda çok küçük veya zor', 'en' => 'Too small or hard to use on phone', 'es-mx' => 'Muy pequeno o dificil en telefono', 'es-es' => 'Muy pequeno o dificil en telefono', 'fr' => 'Trop petit ou difficile sur telephone', 'de' => 'Auf dem Handy zu klein oder schwierig'),
 		'report_type_sound' => array('tr' => 'Ses sorunu', 'en' => 'Sound problem', 'es-mx' => 'Problema de sonido', 'es-es' => 'Problema de sonido', 'fr' => 'Probleme de son', 'de' => 'Tonproblem'),
-		'report_type_translation' => array('tr' => 'Yanlis ceviri', 'en' => 'Wrong translation', 'es-mx' => 'Traduccion incorrecta', 'es-es' => 'Traduccion incorrecta', 'fr' => 'Mauvaise traduction', 'de' => 'Falsche Ubersetzung'),
-		'report_type_other' => array('tr' => 'Diger', 'en' => 'Other', 'es-mx' => 'Otro', 'es-es' => 'Otro', 'fr' => 'Autre', 'de' => 'Andere'),
+		'report_type_translation' => array('tr' => 'Yanlış çeviri', 'en' => 'Wrong translation', 'es-mx' => 'Traduccion incorrecta', 'es-es' => 'Traduccion incorrecta', 'fr' => 'Mauvaise traduction', 'de' => 'Falsche Ubersetzung'),
+		'report_type_other' => array('tr' => 'Diğer', 'en' => 'Other', 'es-mx' => 'Otro', 'es-es' => 'Otro', 'fr' => 'Autre', 'de' => 'Andere'),
 		'report_device_phone' => array('tr' => 'Telefon', 'en' => 'Phone', 'es-mx' => 'Telefono', 'es-es' => 'Telefono', 'fr' => 'Telephone', 'de' => 'Handy'),
 		'report_device_tablet' => array('tr' => 'Tablet', 'en' => 'Tablet', 'es-mx' => 'Tableta', 'es-es' => 'Tableta', 'fr' => 'Tablette', 'de' => 'Tablet'),
 		'report_device_computer' => array('tr' => 'Bilgisayar', 'en' => 'Computer', 'es-mx' => 'Computadora', 'es-es' => 'Ordenador', 'fr' => 'Ordinateur', 'de' => 'Computer'),
-		'report_device_unknown' => array('tr' => 'Emin degilim', 'en' => 'Not sure', 'es-mx' => 'No estoy seguro', 'es-es' => 'No estoy seguro', 'fr' => 'Je ne sais pas', 'de' => 'Nicht sicher'),
+		'report_device_unknown' => array('tr' => 'Emin değilim', 'en' => 'Not sure', 'es-mx' => 'No estoy seguro', 'es-es' => 'No estoy seguro', 'fr' => 'Je ne sais pas', 'de' => 'Nicht sicher'),
 		'intro' => array(
 			'tr' => 'Çocuklar, ilkokul öğrencileri ve yaşlılar için ücretsiz online eğitici zeka oyunları, mantık oyunları ve hafıza oyunları oynayın.',
 			'en' => 'Play free online educational brain games, logic games, and memory games for kids, primary school students, and older people.',
@@ -10370,6 +10402,7 @@ function zo_game_report_shortcode($atts = array()) {
 	$sent = !empty($_GET['sent']);
 	$error = !empty($_GET['report_error']) ? sanitize_key(wp_unslash($_GET['report_error'])) : '';
 	$report_games = array();
+	$report_logo_url = plugin_dir_url(__FILE__) . 'zeka-logo.png';
 
 	foreach (zo_get_game_modules() as $slug => $game_module) {
 		$name = !empty($game_module['name']) ? (string) $game_module['name'] : (string) $slug;
@@ -10385,6 +10418,13 @@ function zo_game_report_shortcode($atts = array()) {
 	<section class="zo-report-page">
 		<style>
 			.zo-report-page{max-width:780px;margin:40px auto;padding:0 18px;color:#111827}
+			.zo-report-language{display:flex;align-items:center;gap:7px;margin:0 0 14px;min-height:32px}
+			.zo-report-language__label{font-weight:800;font-size:12px;color:#111827}
+			.zo-report-language__option{display:inline-flex;align-items:center;justify-content:center;min-width:32px;height:30px;border:1px solid #cbd5e1;border-radius:999px;background:#fff;color:#0f172a;font-size:12px;font-weight:800;text-decoration:none}
+			.zo-report-language__option.is-active{background:#2563eb;border-color:#2563eb;color:#fff}
+			.zo-report-language__option:hover,.zo-report-language__option:focus{border-color:#2563eb;color:#2563eb;outline:none}
+			.zo-report-language__option.is-active:hover,.zo-report-language__option.is-active:focus{color:#fff}
+			.zo-report-language__logo{margin-left:auto;width:38px;height:auto;display:block}
 			.zo-report-card{background:#fff;border:1px solid #dbe3ef;border-radius:8px;padding:24px;box-shadow:0 18px 42px rgba(15,23,42,.08)}
 			.zo-report-card h1{margin:0 0 10px;font-size:clamp(2rem,4vw,3rem);line-height:1.05}
 			.zo-report-card p{font-size:1rem;color:#435066}
@@ -10402,6 +10442,20 @@ function zo_game_report_shortcode($atts = array()) {
 			.zo-game-report-link a{display:inline-flex;align-items:center;justify-content:center;border:1px solid #99f6e4;border-radius:999px;color:#0f766e;background:#ecfeff;padding:10px 16px;font-weight:800;text-decoration:none}
 			@media (max-width:640px){.zo-report-grid{grid-template-columns:1fr}.zo-report-card{padding:18px}}
 		</style>
+		<nav class="zo-report-language" aria-label="<?php echo esc_attr(zo_get_interface_text('language_label', $language)); ?>">
+			<span class="zo-report-language__label"><?php echo esc_html(zo_get_interface_text('language_label', $language)); ?></span>
+			<?php foreach (zo_get_language_options() as $code => $label) : ?>
+				<?php
+				$lang_args = array('zo_lang' => $code);
+				if ($game_slug !== '') {
+					$lang_args['game'] = $game_slug;
+				}
+				$lang_class = 'zo-report-language__option' . ($code === $language ? ' is-active' : '');
+				?>
+				<a class="<?php echo esc_attr($lang_class); ?>" href="<?php echo esc_url(add_query_arg($lang_args, home_url('/report/'))); ?>"><?php echo esc_html($label); ?></a>
+			<?php endforeach; ?>
+			<img class="zo-report-language__logo" src="<?php echo esc_url($report_logo_url); ?>" alt="">
+		</nav>
 		<div class="zo-report-card">
 			<h1><?php echo esc_html(zo_get_interface_text('report_problem_title', $language)); ?></h1>
 			<p><?php echo esc_html(zo_get_interface_text('report_problem_intro', $language)); ?></p>
@@ -10505,6 +10559,130 @@ function zo_game_report_shortcode($atts = array()) {
 	return ob_get_clean();
 }
 add_shortcode('zeka_game_report', 'zo_game_report_shortcode');
+
+function zo_get_codex_report_mirror_dir() {
+	return trailingslashit(plugin_dir_path(__FILE__)) . 'codex-reports';
+}
+
+function zo_prepare_codex_report_mirror_dir() {
+	$dir = zo_get_codex_report_mirror_dir();
+	if (!wp_mkdir_p($dir)) {
+		return new WP_Error('zo_report_mirror_dir', 'Could not create codex report mirror folder.');
+	}
+
+	$protect_files = array(
+		'.htaccess' => "Require all denied\nDeny from all\n",
+		'web.config' => "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<configuration><system.webServer><security><authorization><remove users=\"*\" roles=\"\" verbs=\"\" /><add accessType=\"Deny\" users=\"*\" /></authorization></security></system.webServer></configuration>\n",
+		'index.html' => '',
+	);
+
+	foreach ($protect_files as $file => $contents) {
+		$path = trailingslashit($dir) . $file;
+		if (!file_exists($path) && @file_put_contents($path, $contents, LOCK_EX) === false) {
+			return new WP_Error('zo_report_mirror_protect', 'Could not write codex report protection files.');
+		}
+	}
+
+	return $dir;
+}
+
+function zo_format_game_report_for_codex($post_id) {
+	$post = get_post($post_id);
+	if (!$post || $post->post_type !== 'zo_game_report') {
+		return null;
+	}
+
+	$screenshot_id = (int) get_post_meta($post_id, '_zo_report_screenshot_id', true);
+
+	return array(
+		'id' => (int) $post_id,
+		'date' => get_the_date('Y-m-d H:i:s', $post_id),
+		'status' => get_post_meta($post_id, '_zo_report_status', true) ?: 'new',
+		'game_slug' => get_post_meta($post_id, '_zo_report_game_slug', true),
+		'game_title' => get_post_meta($post_id, '_zo_report_game_title', true),
+		'game_url' => get_post_meta($post_id, '_zo_report_game_url', true),
+		'problem_type' => get_post_meta($post_id, '_zo_report_problem_type', true),
+		'device' => get_post_meta($post_id, '_zo_report_device', true),
+		'browser' => get_post_meta($post_id, '_zo_report_browser', true),
+		'language' => get_post_meta($post_id, '_zo_report_language', true),
+		'message' => wp_strip_all_tags($post->post_content),
+		'has_screenshot' => $screenshot_id > 0,
+		'screenshot_id' => $screenshot_id,
+		'edit_url' => get_edit_post_link($post_id, ''),
+	);
+}
+
+function zo_get_recent_game_reports_for_admin($limit = 8) {
+	$posts = get_posts(
+		array(
+			'post_type' => 'zo_game_report',
+			'post_status' => array('private', 'publish', 'draft'),
+			'posts_per_page' => max(1, (int) $limit),
+			'orderby' => 'date',
+			'order' => 'DESC',
+			'fields' => 'ids',
+		)
+	);
+
+	$reports = array();
+	foreach ($posts as $post_id) {
+		$report = zo_format_game_report_for_codex((int) $post_id);
+		if ($report) {
+			$reports[] = $report;
+		}
+	}
+
+	return $reports;
+}
+
+function zo_write_codex_game_report_snapshot($limit = 50) {
+	$dir = zo_prepare_codex_report_mirror_dir();
+	if (is_wp_error($dir)) {
+		return array(
+			'path' => '',
+			'count' => 0,
+			'error' => $dir->get_error_message(),
+		);
+	}
+
+	$reports = zo_get_recent_game_reports_for_admin($limit);
+	$path = trailingslashit($dir) . 'game-reports.local.json';
+	$data = array(
+		'generated_at' => current_time('mysql'),
+		'note' => 'Local Codex mirror. Email, IP, and user-agent are intentionally omitted.',
+		'reports' => $reports,
+	);
+	$written = @file_put_contents($path, wp_json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), LOCK_EX);
+
+	if ($written === false) {
+		return array(
+			'path' => '',
+			'count' => count($reports),
+			'error' => 'Could not write game-reports.local.json.',
+		);
+	}
+
+	return array(
+		'path' => $path,
+		'count' => count($reports),
+		'error' => '',
+	);
+}
+
+function zo_append_codex_game_report_mirror($post_id) {
+	$dir = zo_prepare_codex_report_mirror_dir();
+	if (is_wp_error($dir)) {
+		return;
+	}
+
+	$report = zo_format_game_report_for_codex($post_id);
+	if (!$report) {
+		return;
+	}
+
+	@file_put_contents(trailingslashit($dir) . 'game-reports.local.jsonl', wp_json_encode($report, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n", FILE_APPEND | LOCK_EX);
+	zo_write_codex_game_report_snapshot(50);
+}
 
 function zo_handle_game_report_submission() {
 	$posted_language = !empty($_POST['zo_lang']) ? sanitize_key(wp_unslash($_POST['zo_lang'])) : zo_get_current_language();
@@ -10644,6 +10822,8 @@ function zo_handle_game_report_submission() {
 			update_post_meta($post_id, '_zo_report_screenshot_error', sanitize_text_field($upload['error']));
 		}
 	}
+
+	zo_append_codex_game_report_mirror($post_id);
 
 	wp_safe_redirect(add_query_arg(array('sent' => '1', 'game' => $slug), $report_url));
 	exit;
