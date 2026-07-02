@@ -85,10 +85,12 @@ if (!function_exists('zo_game_sudoku_render')) {
 						<div class="zo-sudoku__card">
 							<h4 class="zo-sudoku__card-title">Rules</h4>
 							<ul class="zo-sudoku__rules">
-								<li>Each row must contain 1-9 once.</li>
-								<li>Each column must contain 1-9 once.</li>
-								<li>Each 3x3 box must contain 1-9 once.</li>
-								<li>Blue numbers are fixed clues and cannot be changed.</li>
+								<li>Fill every empty square with a number from 1 to 9.</li>
+								<li>Each row must have the numbers 1-9, with no repeats.</li>
+								<li>Each column must have the numbers 1-9, with no repeats.</li>
+								<li>Each 3x3 box must have the numbers 1-9, with no repeats.</li>
+								<li>You cannot change the numbers already printed in the puzzle.</li>
+								<li>Use logic, not guessing, to figure out where each number goes.</li>
 							</ul>
 						</div>
 

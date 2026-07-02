@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.27.asker.arslan
+ * Version: 1.5.29.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -4233,6 +4233,30 @@ function zo_get_interface_text($key, $lang = '') {
 			'fr' => '%1$d / %2$d jours',
 			'de' => '%1$d / %2$d Tage',
 		),
+		'series_player_badge' => array(
+			'tr' => 'Seri Oyuncu Rozeti',
+			'en' => 'Streak Player Badge',
+			'es-mx' => 'Insignia de jugador en racha',
+			'es-es' => 'Insignia de jugador en racha',
+			'fr' => 'Badge joueur en serie',
+			'de' => 'Serienspieler-Abzeichen',
+		),
+		'series_player_badge_text' => array(
+			'tr' => 'Askerin Oyunlari icinde 3 gun boyunca her gun 2+ dakika oynadin.',
+			'en' => 'You played Asker\'s Games for 2+ minutes every day for 3 days.',
+			'es-mx' => 'Jugaste Asker\'s Games mas de 2 minutos cada dia durante 3 dias.',
+			'es-es' => 'Has jugado a Asker\'s Games mas de 2 minutos cada dia durante 3 dias.',
+			'fr' => 'Tu as joue aux jeux d\'Asker plus de 2 minutes par jour pendant 3 jours.',
+			'de' => 'Du hast Askers Spiele 3 Tage lang jeden Tag mehr als 2 Minuten gespielt.',
+		),
+		'arslan_series_player_badge_text' => array(
+			'tr' => 'Arslanin Oyunlari icinde 3 gun boyunca her gun 2+ dakika oynadin.',
+			'en' => 'You played Arslan\'s Games for 2+ minutes every day for 3 days.',
+			'es-mx' => 'Jugaste Arslan\'s Games mas de 2 minutos cada dia durante 3 dias.',
+			'es-es' => 'Has jugado a Arslan\'s Games mas de 2 minutos cada dia durante 3 dias.',
+			'fr' => 'Tu as joue aux jeux d\'Arslan plus de 2 minutes par jour pendant 3 jours.',
+			'de' => 'Du hast Arslans Spiele 3 Tage lang jeden Tag mehr als 2 Minuten gespielt.',
+		),
 		'week_streak_badge' => array(
 			'tr' => 'Hafta Serisi',
 			'en' => 'Week Streak',
@@ -4504,6 +4528,14 @@ function zo_get_interface_text($key, $lang = '') {
 		$text['arslan_games_title']['es-es'] = 'Juegos de Arslan';
 	}
 
+	if ($lang === 'tr') {
+		$text['asker_games_link']['tr'] = 'Askerin oyunlarina git';
+		$text['badge_showcase_intro']['tr'] = 'Askerin Oyunlari rozetlerini, gereksinimlerini ve bu cihazdaki ilerlemeni gor.';
+		$text['badge_unlocked']['tr'] = 'Acildi';
+		$text['badge_unlocked_on']['tr'] = 'Acilma tarihi';
+		$text['badge_not_unlocked']['tr'] = 'Henuz acilmadi';
+	}
+
 	return isset($text[$key][$lang]) ? $text[$key][$lang] : '';
 }
 
@@ -4514,6 +4546,13 @@ function zo_get_asker_badge_items($language = '', $owner = 'asker') {
 	$prefix = $owner === 'arslan' ? 'arslan_' : '';
 
 	return array(
+		array(
+			'title_key' => 'series_player_badge',
+			'text_key' => $prefix . 'series_player_badge_text',
+			'image' => ZO_PLUGIN_URL . 'assets/play-streak/play-streak-' . $image_code . '.png',
+			'threshold' => 120,
+			'target_days' => 3,
+		),
 		array(
 			'title_key' => 'week_streak_badge',
 			'text_key' => $prefix . 'week_streak_badge_text',
@@ -10748,6 +10787,12 @@ function zo_handle_game_report_submission() {
 		exit;
 	}
 
+	$duplicate_key = 'zo_game_report_dup_' . md5($ip . '|' . $slug . '|' . strtolower($message_check));
+	if (get_transient($duplicate_key)) {
+		wp_safe_redirect(add_query_arg(array('report_error' => 'rate', 'game' => $slug), $report_url));
+		exit;
+	}
+
 	$screenshot_file = isset($_FILES['zo_screenshot']) && is_array($_FILES['zo_screenshot']) ? $_FILES['zo_screenshot'] : array();
 	$has_screenshot = !empty($screenshot_file['name']);
 	if ($has_screenshot) {
@@ -10837,6 +10882,7 @@ function zo_handle_game_report_submission() {
 	}
 
 	zo_append_codex_game_report_mirror($post_id);
+	set_transient($duplicate_key, '1', 30 * DAY_IN_SECONDS);
 
 	wp_safe_redirect(add_query_arg(array('sent' => '1', 'game' => $slug), $report_url));
 	exit;
@@ -12307,7 +12353,7 @@ function zo_enqueue_grid_styles() {
 }
 .zo-badge-showcase .zo-badge-center {
 	grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 190px));
-	justify-content: start;
+	justify-content: center;
 	gap: 12px;
 }
 .zo-badge-showcase .zo-badge-center__card {
@@ -12343,24 +12389,50 @@ function zo_enqueue_grid_styles() {
 .zo-badge-showcase__header {
 	display: grid;
 	gap: 8px;
+	text-align: center;
 }
 .zo-badge-showcase__title {
 	margin: 0;
-	color: #f8fafc;
+	color: #111827;
 	font-size: clamp(2rem, 5vw, 4rem);
 	line-height: 1;
 }
 .zo-badge-showcase__intro {
 	max-width: 780px;
-	margin: 0;
-	color: #e5e7eb;
+	margin: 0 auto;
+	color: #374151;
 	font-size: 1.08rem;
+	font-weight: 700;
 	line-height: 1.55;
 }
 .zo-badge-showcase__actions {
 	display: flex;
 	flex-wrap: wrap;
+	justify-content: center;
 	gap: 10px;
+	width: 100%;
+	text-align: center;
+}
+.zo-badge-showcase .zo-badge-showcase__back {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 42px;
+	padding: 0 18px;
+	border-radius: 999px;
+	background: #1d4ed8;
+	color: #fff;
+	font-weight: 800;
+	line-height: 1.25;
+	text-align: center;
+	text-decoration: none;
+	box-shadow: 0 10px 22px rgba(29, 78, 216, 0.18);
+}
+.zo-badge-showcase .zo-badge-showcase__back:hover,
+.zo-badge-showcase .zo-badge-showcase__back:focus {
+	background: #1e40af;
+	color: #fff;
+	text-decoration: none;
 }
 .zo-achievement-popup {
 	position: fixed;
@@ -12681,6 +12753,9 @@ function zo_enqueue_grid_styles() {
 	display: flex;
 	justify-content: center;
 	margin: 28px 0 0;
+}
+.zo-games-grid__footer--badge-link {
+	margin: 28px 0 34px;
 }
 .zo-games-grid__about {
 	display: inline-flex;
@@ -13426,7 +13501,7 @@ function zo_games_grid_shortcode($atts = array()) {
 	echo '<div class="zo-games-grid__mini-row" data-zo-recent-list></div>';
 	echo '</section>';
 	if ($author_filter === 'asker') {
-		echo '<div class="zo-games-grid__footer">';
+		echo '<div class="zo-games-grid__footer zo-games-grid__footer--badge-link">';
 		echo '<a class="zo-games-grid__about" href="' . esc_url(add_query_arg('zo_lang', $language, home_url('/rozetler/'))) . '">' . esc_html(zo_get_interface_text('badge_center', $language)) . '</a>';
 		echo '</div>';
 	}
@@ -13528,7 +13603,7 @@ add_shortcode('zeka_oyunlari_grid', 'zo_games_grid_shortcode');
 function zo_badge_showcase_shortcode($atts = array()) {
 	$language = zo_get_current_language();
 	$home_url = home_url('/');
-	$games_url = zo_get_owner_about_url('asker', $language);
+	$games_url = zo_get_owner_games_url('asker', $language);
 
 	zo_enqueue_grid_styles();
 
@@ -13563,7 +13638,7 @@ function zo_badge_showcase_shortcode($atts = array()) {
 
 	echo '</div>';
 	echo '<div class="zo-badge-showcase__actions">';
-	echo '<a class="zo-games-grid__home" href="' . esc_url($games_url) . '">' . esc_html(zo_get_interface_text('asker_games_link', $language)) . '</a>';
+	echo '<a class="zo-badge-showcase__back" href="' . esc_url($games_url) . '">' . esc_html(zo_get_interface_text('asker_games_link', $language)) . '</a>';
 	echo '</div>';
 	echo zo_get_badge_center_script($language);
 	echo '</div>';
