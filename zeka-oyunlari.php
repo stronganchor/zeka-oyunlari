@@ -4549,7 +4549,7 @@ function zo_get_asker_badge_items($language = '', $owner = 'asker') {
 		array(
 			'title_key' => 'series_player_badge',
 			'text_key' => $prefix . 'series_player_badge_text',
-			'image' => ZO_PLUGIN_URL . 'assets/play-streak/play-streak-' . $image_code . '.png',
+			'image' => ZO_PLUGIN_URL . 'assets/play-streak/play-streak-series-' . $image_code . '.png',
 			'threshold' => 120,
 			'target_days' => 3,
 		),
