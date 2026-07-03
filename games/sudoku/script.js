@@ -346,6 +346,16 @@ document.addEventListener('DOMContentLoaded', function () {
 		return { index: choice, data: list[choice] };
 	}
 
+	function getDifficultyLabel(level) {
+		const labels = {
+			easy: 'easy',
+			medium: 'middle',
+			hard: 'hard'
+		};
+
+		return labels[level] || 'easy';
+	}
+
 	function setStatus(statusEl, message, type) {
 		statusEl.textContent = message;
 		statusEl.classList.remove('is-success', 'is-warning');
@@ -664,7 +674,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			history = [];
 			noteMode = false;
 			timerEl.textContent = '00:00';
-			setStatus(statusEl, 'New ' + level + ' puzzle ready. Choose an empty square to begin.', '');
+			setStatus(statusEl, 'New ' + getDifficultyLabel(level) + ' puzzle ready. Choose an empty square to begin.', '');
 			updateNotesButton();
 			buildBoard();
 			updateStats();
@@ -727,6 +737,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 
 		newBtn.addEventListener('click', loadPuzzle);
+		difficultyEl.addEventListener('change', loadPuzzle);
 		notesBtn.addEventListener('click', function () {
 			noteMode = !noteMode;
 			updateNotesButton();

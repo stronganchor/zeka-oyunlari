@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.29.asker.arslan
+ * Version: 1.5.30.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -4528,12 +4528,111 @@ function zo_get_interface_text($key, $lang = '') {
 		$text['arslan_games_title']['es-es'] = 'Juegos de Arslan';
 	}
 
-	if ($lang === 'tr') {
-		$text['asker_games_link']['tr'] = 'Askerin oyunlarina git';
-		$text['badge_showcase_intro']['tr'] = 'Askerin Oyunlari rozetlerini, gereksinimlerini ve bu cihazdaki ilerlemeni gor.';
-		$text['badge_unlocked']['tr'] = 'Acildi';
-		$text['badge_unlocked_on']['tr'] = 'Acilma tarihi';
-		$text['badge_not_unlocked']['tr'] = 'Henuz acilmadi';
+	$translation_overrides = array(
+		'tr' => array(
+			'achievement_unlocked' => 'Rozet açıldı',
+			'badge_showcase_intro' => 'Askerin Oyunları rozetlerini, gereksinimlerini ve bu cihazdaki ilerlemeni gör.',
+			'arslan_badge_showcase_intro' => 'Arslan’ın Oyunları rozetlerini, gereksinimlerini ve bu cihazdaki ilerlemeni gör.',
+			'badge_unlocked' => 'Açıldı',
+			'badge_unlocked_on' => 'Açılma tarihi',
+			'badge_not_unlocked' => 'Henüz açılmadı',
+			'badge_progress' => '%1$d / %2$d gün',
+			'series_player_badge_text' => 'Askerin Oyunları içinde 3 gün boyunca her gün 2+ dakika oynadın.',
+			'arslan_series_player_badge_text' => 'Arslan’ın Oyunları içinde 3 gün boyunca her gün 2+ dakika oynadın.',
+			'week_streak_badge_text' => 'Askerin Oyunları içinde 7 gün boyunca her gün 5+ dakika oynadın.',
+			'arslan_week_streak_badge_text' => 'Arslan’ın Oyunları içinde 7 gün boyunca her gün 5+ dakika oynadın.',
+			'month_streak_badge_text' => 'Askerin Oyunları içinde 30 gün boyunca her gün 2+ dakika oynadın.',
+			'arslan_month_streak_badge_text' => 'Arslan’ın Oyunları içinde 30 gün boyunca her gün 2+ dakika oynadın.',
+			'play_streak_badge' => '5 Günlük Asker Rozeti',
+			'arslan_play_streak_badge' => '5 Günlük Arslan Rozeti',
+			'play_streak_badge_text' => 'Askerin Oyunları içinde 5 gün boyunca her gün 10+ dakika oynadın.',
+			'arslan_play_streak_badge_text' => 'Arslan’ın Oyunları içinde 5 gün boyunca her gün 10+ dakika oynadın.',
+			'focus_hero_badge' => 'Odak Kahramanı',
+			'focus_hero_badge_text' => 'Askerin Oyunları içinde 5 gün boyunca her gün 20+ dakika oynadın.',
+			'arslan_focus_hero_badge_text' => 'Arslan’ın Oyunları içinde 5 gün boyunca her gün 20+ dakika oynadın.',
+			'daily_champion_badge' => 'Günlük Şampiyon',
+			'daily_champion_badge_text' => 'Askerin Oyunları içinde 5 gün boyunca her gün 30+ dakika oynadın.',
+			'arslan_daily_champion_badge_text' => 'Arslan’ın Oyunları içinde 5 gün boyunca her gün 30+ dakika oynadın.',
+			'remove_favorite' => 'Favoriden çıkar',
+			'badge_popular' => 'Popüler',
+			'results_count' => '%d oyun gösteriliyor',
+			'language_unavailable' => 'Bu oyun seçili dilde kullanılamıyor.',
+			'asker_about' => 'Askerin Oyunları Hakkında',
+			'asker_games_link' => 'Askerin oyunlarına git',
+			'asker_games_title' => 'Askerin Oyunları',
+			'arslan_games_title' => 'Arslan’ın Oyunları',
+		),
+		'en' => array(
+			'asker_about' => 'About Asker\'s Games',
+			'asker_games_link' => 'Go to Asker\'s Games',
+			'asker_games_title' => 'Asker\'s Games',
+			'arslan_games_title' => 'Arslan\'s Games',
+			'play_streak_badge_text' => 'You played Asker\'s Games for 10+ minutes every day for 5 days.',
+			'focus_hero_badge_text' => 'You played Asker\'s Games for 20+ minutes every day for 5 days.',
+			'daily_champion_badge_text' => 'You played Asker\'s Games for 30+ minutes every day for 5 days.',
+		),
+		'fr' => array(
+			'achievement_unlocked' => 'Badge débloqué',
+			'badge_locked' => 'Verrouillé',
+			'badge_unlocked' => 'Débloqué',
+			'badge_unlocked_on' => 'Débloqué le',
+			'badge_not_unlocked' => 'Pas encore débloqué',
+			'week_streak_badge' => 'Série semaine',
+			'month_streak_badge' => 'Série mois',
+			'series_player_badge_text' => 'Tu as joué aux jeux d\'Asker plus de 2 minutes par jour pendant 3 jours.',
+			'week_streak_badge_text' => 'Tu as joué aux jeux d\'Asker plus de 5 minutes par jour pendant 7 jours.',
+			'month_streak_badge_text' => 'Tu as joué aux jeux d\'Asker plus de 2 minutes par jour pendant 30 jours.',
+			'play_streak_badge_text' => 'Tu as joué aux jeux d\'Asker plus de 10 minutes par jour pendant 5 jours.',
+			'focus_hero_badge_text' => 'Tu as joué aux jeux d\'Asker plus de 20 minutes par jour pendant 5 jours.',
+			'daily_champion_badge_text' => 'Tu as joué aux jeux d\'Asker plus de 30 minutes par jour pendant 5 jours.',
+			'asker_about' => 'À propos des jeux d\'Asker',
+			'asker_games_link' => 'Aller aux jeux d\'Asker',
+			'asker_games_title' => 'Jeux d\'Asker',
+			'arslan_games_title' => 'Jeux d\'Arslan',
+			'results_count' => '%d jeux affichés',
+			'language_unavailable' => 'Ce jeu n\'est pas disponible dans la langue sélectionnée.',
+		),
+		'de' => array(
+			'badge_showcase_intro' => 'Sieh Askers Spiele-Abzeichen, Anforderungen und deinen Fortschritt auf diesem Gerät.',
+			'arslan_badge_showcase_intro' => 'Sieh Arslans Spiele-Abzeichen, Anforderungen und deinen Fortschritt auf diesem Gerät.',
+			'asker_about' => 'Über Askers Spiele',
+		),
+		'es-mx' => array(
+			'badge_not_unlocked' => 'Aún no desbloqueada',
+			'badge_progress' => '%1$d / %2$d días',
+			'series_player_badge_text' => 'Jugaste Asker\'s Games más de 2 minutos cada día durante 3 días.',
+			'week_streak_badge_text' => 'Jugaste Asker\'s Games más de 5 minutos cada día durante 7 días.',
+			'month_streak_badge_text' => 'Jugaste Asker\'s Games más de 2 minutos cada día durante 30 días.',
+			'play_streak_badge' => 'Insignia Asker de 5 días',
+			'play_streak_badge_text' => 'Jugaste Asker\'s Games más de 10 minutos cada día durante 5 días.',
+			'focus_hero_badge' => 'Héroe Focus',
+			'focus_hero_badge_text' => 'Jugaste Asker\'s Games más de 20 minutos cada día durante 5 días.',
+			'daily_champion_badge' => 'Campeón diario',
+			'daily_champion_badge_text' => 'Jugaste Asker\'s Games más de 30 minutos cada día durante 5 días.',
+			'language_unavailable' => 'Este juego no está disponible en el idioma seleccionado.',
+		),
+		'es-es' => array(
+			'badge_not_unlocked' => 'Aún no desbloqueada',
+			'badge_progress' => '%1$d / %2$d días',
+			'series_player_badge_text' => 'Has jugado a Asker\'s Games más de 2 minutos cada día durante 3 días.',
+			'week_streak_badge_text' => 'Has jugado a Asker\'s Games más de 5 minutos cada día durante 7 días.',
+			'month_streak_badge_text' => 'Has jugado a Asker\'s Games más de 2 minutos cada día durante 30 días.',
+			'play_streak_badge' => 'Insignia Asker de 5 días',
+			'play_streak_badge_text' => 'Has jugado a Asker\'s Games más de 10 minutos cada día durante 5 días.',
+			'focus_hero_badge' => 'Héroe Focus',
+			'focus_hero_badge_text' => 'Has jugado a Asker\'s Games más de 20 minutos cada día durante 5 días.',
+			'daily_champion_badge' => 'Campeón diario',
+			'daily_champion_badge_text' => 'Has jugado a Asker\'s Games más de 30 minutos cada día durante 5 días.',
+			'language_unavailable' => 'Este juego no está disponible en el idioma seleccionado.',
+		),
+	);
+
+	if (isset($translation_overrides[$lang])) {
+		foreach ($translation_overrides[$lang] as $override_key => $override_value) {
+			if (isset($text[$override_key])) {
+				$text[$override_key][$lang] = $override_value;
+			}
+		}
 	}
 
 	return isset($text[$key][$lang]) ? $text[$key][$lang] : '';
@@ -4591,21 +4690,40 @@ function zo_get_asker_badge_items($language = '', $owner = 'asker') {
 	);
 }
 
+function zo_get_badge_requirement_text($threshold, $target_days, $language = '') {
+	$language = array_key_exists($language, zo_get_language_options()) ? $language : zo_get_current_language();
+	$minutes = max(1, (int) ceil(((int) $threshold) / 60));
+	$days = max(1, (int) $target_days);
+
+	$templates = array(
+		'tr' => 'Açmak için: %1$d gün boyunca her gün %2$d+ dakika oyna.',
+		'en' => 'To unlock: play %2$d+ minutes every day for %1$d days.',
+		'de' => 'Freischalten: Spiele %1$d Tage lang jeden Tag %2$d+ Minuten.',
+		'fr' => 'Pour débloquer : joue %2$d+ minutes chaque jour pendant %1$d jours.',
+		'es-mx' => 'Para desbloquear: juega %2$d+ minutos cada día durante %1$d días.',
+		'es-es' => 'Para desbloquear: juega %2$d+ minutos cada día durante %1$d días.',
+	);
+
+	$template = isset($templates[$language]) ? $templates[$language] : $templates['en'];
+
+	return sprintf($template, $days, $minutes);
+}
+
 function zo_render_asker_badge_card($badge, $language = '', $owner = 'asker') {
 	$language = array_key_exists($language, zo_get_language_options()) ? $language : zo_get_current_language();
 	$owner = zo_normalize_game_owner($owner);
 	$owner = $owner !== '' ? $owner : 'asker';
 	$title = zo_get_interface_text($badge['title_key'], $language);
-	$text = zo_get_interface_text($badge['text_key'], $language);
 	$target_days = isset($badge['target_days']) ? (int) $badge['target_days'] : 5;
 	$threshold = isset($badge['threshold']) ? (int) $badge['threshold'] : 600;
-	$alt = trim($title . '. ' . $text);
+	$requirement = zo_get_badge_requirement_text($threshold, $target_days, $language);
+	$alt = trim($title . '. ' . $requirement);
 
 	echo '<div class="zo-badge-center__card is-locked" data-zo-streak-badge data-owner="' . esc_attr($owner) . '" data-threshold="' . esc_attr((string) $threshold) . '" data-target-days="' . esc_attr((string) $target_days) . '" data-achievement-name="' . esc_attr($title) . '">';
 	echo '<img class="zo-badge-center__image zo-games-grid__streak-image" src="' . esc_url($badge['image']) . '" alt="' . esc_attr($alt) . '" loading="lazy" decoding="async">';
 	echo '<div class="zo-badge-center__body">';
 	echo '<span class="zo-badge-center__title">' . esc_html($title) . '</span>';
-	echo '<span class="zo-badge-center__description">' . esc_html($text) . '</span>';
+	echo '<span class="zo-badge-center__description">' . esc_html($requirement) . '</span>';
 	echo '<span class="zo-badge-center__status" data-zo-badge-status data-locked="' . esc_attr(zo_get_interface_text('badge_locked', $language)) . '" data-unlocked="' . esc_attr(zo_get_interface_text('badge_unlocked', $language)) . '">' . esc_html(zo_get_interface_text('badge_locked', $language)) . '</span>';
 	echo '<span class="zo-badge-center__progress-track" aria-hidden="true"><span class="zo-badge-center__progress-fill" data-zo-badge-progress-fill></span></span>';
 	echo '<span class="zo-badge-center__progress-text" data-zo-badge-progress-text data-template="' . esc_attr(zo_get_interface_text('badge_progress', $language)) . '">' . esc_html(sprintf(zo_get_interface_text('badge_progress', $language), 0, $target_days)) . '</span>';
@@ -8090,6 +8208,151 @@ function zo_get_runtime_translation_exact_map($lang) {
 		$translations[$lang] = array_merge($translations[$lang], $common_exact[$lang]);
 	}
 
+	$runtime_translation_cleanups = array(
+		'tr' => array(
+			'Start' => 'Başlat',
+			'Restart' => 'Yeniden Başlat',
+			'Restart Game' => 'Oyunu Yeniden Başlat',
+			'Restart Round' => 'Turu Yeniden Başlat',
+			'Next Stage' => 'Sonraki Aşama',
+			'Paused' => 'Duraklatıldı',
+			'Submit' => 'Gönder',
+			'Hint' => 'İpucu',
+			'Show Hint' => 'İpucu Göster',
+			'Best' => 'En İyi',
+			'Stage' => 'Aşama',
+			'Time' => 'Süre',
+			'Health' => 'Sağlık',
+			'Gold' => 'Altın',
+			'Correct' => 'Doğru',
+			'Wrong' => 'Yanlış',
+			'GAME OVER' => 'OYUN BİTTİ',
+			'You Win' => 'Kazandın',
+			'You Win!' => 'Kazandın!',
+			'How to Play' => 'Nasıl Oynanır',
+			'Round History' => 'Tur Geçmişi',
+			'Press Start.' => 'Başlat düğmesine bas.',
+			'Press Start to begin.' => 'Başlamak için Başlat düğmesine bas.',
+			'Press action to begin the challenge.' => 'Mücadeleye başlamak için hamle yap.',
+			'Correct.' => 'Doğru.',
+			'Wrong.' => 'Yanlış.',
+			'Correct!' => 'Doğru!',
+			'Wrong!' => 'Yanlış!',
+			'Time is up.' => 'Süre doldu.',
+			'Time finished.' => 'Süre bitti.',
+		),
+		'en' => array(
+			'Başlat' => 'Start',
+			'Başla' => 'Start',
+			'Yeniden Başlat' => 'Restart',
+			'Oyunu Yeniden Başlat' => 'Restart Game',
+			'Turu Yeniden Başlat' => 'Restart Round',
+			'Sonraki Aşama' => 'Next Stage',
+			'Gönder' => 'Submit',
+			'İpucu' => 'Hint',
+			'İpucu Göster' => 'Show Hint',
+			'En İyi' => 'Best',
+			'Aşama' => 'Stage',
+			'Süre' => 'Time',
+			'Sağlık' => 'Health',
+			'Altın' => 'Gold',
+			'Doğru' => 'Correct',
+			'Yanlış' => 'Wrong',
+			'OYUN BİTTİ' => 'GAME OVER',
+			'Kazandın' => 'You Win',
+			'Kazandın!' => 'You Win!',
+			'Nasıl Oynanır' => 'How to Play',
+			'Tur Geçmişi' => 'Round History',
+			'Başlat düğmesine bas.' => 'Press Start.',
+			'Başlamak için Başlat düğmesine bas.' => 'Press Start to begin.',
+			'Süre doldu.' => 'Time is up.',
+			'Süre bitti.' => 'Time finished.',
+		),
+		'de' => array(
+			'Press Start.' => 'Drücke Starten.',
+			'Press Start to begin.' => 'Drücke Starten, um zu beginnen.',
+			'Press action to begin the challenge.' => 'Drücke die Aktion, um die Herausforderung zu starten.',
+			'Başlat' => 'Starten',
+			'Yeniden Başlat' => 'Neu starten',
+			'Oyunu Yeniden Başlat' => 'Spiel neu starten',
+			'Gönder' => 'Senden',
+			'İpucu' => 'Hinweis',
+			'Süre' => 'Zeit',
+			'Sağlık' => 'Gesundheit',
+			'Doğru' => 'Richtig',
+			'Yanlış' => 'Falsch',
+			'Kazandın' => 'Du gewinnst',
+			'Nasıl Oynanır' => 'Spielanleitung',
+			'Başlat düğmesine bas.' => 'Drücke Starten.',
+			'Başlamak için Başlat düğmesine bas.' => 'Drücke Starten, um zu beginnen.',
+		),
+		'fr' => array(
+			'Start' => 'Démarrer',
+			'Restart' => 'Redémarrer',
+			'Restart Game' => 'Redémarrer le jeu',
+			'Show Hint' => 'Afficher l\'indice',
+			'Stage' => 'Étape',
+			'Health' => 'Santé',
+			'Coins' => 'Pièces',
+			'Game Over' => 'Partie terminée',
+			'GAME OVER' => 'PARTIE TERMINÉE',
+			'You Win' => 'Tu as gagné',
+			'You Win!' => 'Tu as gagné !',
+			'Rules' => 'Règles',
+			'Press Start.' => 'Appuie sur Démarrer.',
+			'Press Start to begin.' => 'Appuie sur Démarrer pour commencer.',
+			'Press action to begin the challenge.' => 'Appuie sur action pour commencer le défi.',
+			'Try again.' => 'Réessaie.',
+			'Time is up.' => 'Le temps est écoulé.',
+			'Time finished.' => 'Le temps est terminé.',
+			'Başlat' => 'Démarrer',
+			'Yeniden Başlat' => 'Redémarrer',
+			'Süre' => 'Temps',
+			'Doğru' => 'Correct',
+			'Yanlış' => 'Incorrect',
+		),
+		'es-mx' => array(
+			'You Win!' => '¡Ganaste!',
+			'How to Play' => 'Cómo jugar',
+			'Press action to begin the challenge.' => 'Pulsa acción para comenzar el reto.',
+			'Correct!' => '¡Correcto!',
+			'Wrong!' => '¡Incorrecto!',
+			'Try again.' => 'Inténtalo de nuevo.',
+			'Time is up.' => 'Se acabó el tiempo.',
+			'Score' => 'Puntuación',
+			'Başla' => 'Empezar',
+			'Sıfırla' => 'Reiniciar',
+			'Süre bitti' => 'Se acabó el tiempo',
+			'Kapılar' => 'Puertas',
+			'Kapı' => 'Puerta',
+			'Sayı seçenekleri' => 'Opciones de número',
+			'Çarpma.' => 'No choques.',
+			'Sağ ve sol ile şerit değiştir.' => 'Cambia de carril con izquierda y derecha.',
+		),
+		'es-es' => array(
+			'You Win!' => '¡Ganaste!',
+			'How to Play' => 'Cómo jugar',
+			'Press action to begin the challenge.' => 'Pulsa acción para comenzar el reto.',
+			'Correct!' => '¡Correcto!',
+			'Wrong!' => '¡Incorrecto!',
+			'Try again.' => 'Inténtalo de nuevo.',
+			'Time is up.' => 'Se acabó el tiempo.',
+			'Score' => 'Puntuación',
+			'Başla' => 'Empezar',
+			'Sıfırla' => 'Reiniciar',
+			'Süre bitti' => 'Se acabó el tiempo',
+			'Kapılar' => 'Puertas',
+			'Kapı' => 'Puerta',
+			'Sayı seçenekleri' => 'Opciones de número',
+			'Çarpma.' => 'No choques.',
+			'Sağ ve sol ile şerit değiştir.' => 'Cambia de carril con izquierda y derecha.',
+		),
+	);
+
+	if (isset($translations[$lang], $runtime_translation_cleanups[$lang])) {
+		$translations[$lang] = array_merge($translations[$lang], $runtime_translation_cleanups[$lang]);
+	}
+
 	return isset($translations[$lang]) ? $translations[$lang] : array();
 }
 
@@ -8802,6 +9065,79 @@ function zo_get_runtime_translation_replacements($lang) {
 
 	if (isset($phrases[$lang], $common_replacements[$lang])) {
 		$phrases[$lang] = array_merge($common_replacements[$lang], $phrases[$lang]);
+	}
+
+	$replacement_cleanups = array(
+		'tr' => array(
+			array('Time', 'Süre'),
+			array('Health', 'Sağlık'),
+			array('Correct', 'Doğru'),
+			array('Wrong', 'Yanlış'),
+			array('Press Start', 'Başlat düğmesine bas'),
+			array('Press Restart', 'Yeniden Başlat düğmesine bas'),
+			array('Press R', 'R tuşuna bas'),
+			array('Press Space', 'Boşluk tuşuna bas'),
+			array('Press SPACE', 'BOŞLUK tuşuna bas'),
+			array('Start Quiz', 'Teste Başla'),
+			array('You win', 'Kazandın'),
+			array('You Win', 'Kazandın'),
+			array('Avoid', 'Kaçın'),
+			array('Restart', 'Yeniden Başlat'),
+			array('Start', 'Başlat'),
+		),
+		'en' => array(
+			array('Süre', 'Time'),
+			array('Sağlık', 'Health'),
+			array('Doğru', 'Correct'),
+			array('Yanlış', 'Wrong'),
+			array('Başlat düğmesine bas', 'Press Start'),
+			array('Yeniden Başlat düğmesine bas', 'Press Restart'),
+			array('Kazandın', 'You Win'),
+			array('Kaçın', 'Avoid'),
+			array('Yeniden Başlat', 'Restart'),
+			array('Başlat', 'Start'),
+		),
+		'de' => array(
+			array('Coins', 'Münzen'),
+			array('Press Start', 'Drücke Starten'),
+			array('Press Restart', 'Drücke Neu starten'),
+			array('Press SPACE', 'DRÜCKE DIE LEERTASTE'),
+			array('Next Question', 'Nächste Frage'),
+			array('Süre', 'Zeit'),
+			array('Doğru', 'Richtig'),
+			array('Yanlış', 'Falsch'),
+			array('Başlat', 'Starten'),
+			array('Yeniden Başlat', 'Neu starten'),
+		),
+		'fr' => array(
+			array('Health', 'Santé'),
+			array('Coins', 'Pièces'),
+			array('Game Over', 'Partie terminée'),
+			array('Press Start', 'Appuie sur Démarrer'),
+			array('Press Restart', 'Appuie sur Redémarrer'),
+			array('Try again', 'Réessaie'),
+			array('You found', 'Tu as trouvé'),
+			array('You win', 'Tu as gagné'),
+			array('You Win', 'Tu as gagné'),
+			array('Avoid', 'Évite'),
+			array('Move', 'Déplacement'),
+			array('Restart', 'Redémarrer'),
+			array('Start', 'Démarrer'),
+		),
+		'es-mx' => array(
+			array('Final Score', 'Puntuación final'),
+			array('Score', 'Puntuación'),
+			array('Try again', 'Inténtalo de nuevo'),
+		),
+		'es-es' => array(
+			array('Final Score', 'Puntuación final'),
+			array('Score', 'Puntuación'),
+			array('Try again', 'Inténtalo de nuevo'),
+		),
+	);
+
+	if (isset($phrases[$lang], $replacement_cleanups[$lang])) {
+		$phrases[$lang] = array_merge($replacement_cleanups[$lang], $phrases[$lang]);
 	}
 
 	return isset($phrases[$lang]) ? $phrases[$lang] : array();
@@ -12372,7 +12708,11 @@ function zo_enqueue_grid_styles() {
 	font-size: 0.9rem;
 }
 .zo-badge-showcase .zo-badge-center__description {
-	display: none;
+	display: block;
+	color: #1f2937;
+	font-size: 0.78rem;
+	font-weight: 800;
+	line-height: 1.28;
 }
 .zo-badge-showcase .zo-badge-center__status {
 	min-height: 24px;

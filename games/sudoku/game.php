@@ -48,7 +48,7 @@ if (!function_exists('zo_game_sudoku_render')) {
 						<span>Difficulty</span>
 						<select class="zo-sudoku__difficulty" data-role="difficulty">
 							<option value="easy">Easy</option>
-							<option value="medium">Medium</option>
+							<option value="medium">Middle</option>
 							<option value="hard">Hard</option>
 						</select>
 					</label>
@@ -119,7 +119,7 @@ return array(
 	'name'            => 'Sudoku',
 	'owner'           => 'arslan',
 	'author'          => 'Arslan',
-	'description'     => 'A classic 9x9 Sudoku puzzle with easy, medium, and hard boards.',
+	'description'     => 'A classic 9x9 Sudoku puzzle with easy, middle, and hard boards.',
 	'render_callback' => 'zo_game_sudoku_render',
 );
 
