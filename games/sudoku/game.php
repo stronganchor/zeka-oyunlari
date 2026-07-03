@@ -9,6 +9,7 @@ if (!defined('ABSPATH')) {
 if (!function_exists('zo_game_sudoku_render')) {
 	function zo_game_sudoku_render($post_id = 0, $module = array()) {
 		$instance_id = 'zo-sudoku-' . ($post_id ? absint($post_id) : wp_rand(1000, 999999));
+		$worksheet_url = !empty($module['url']) ? trailingslashit($module['url']) . 'sudoku_60_worksheets.pdf' : '';
 
 		ob_start();
 		?>
@@ -55,6 +56,9 @@ if (!function_exists('zo_game_sudoku_render')) {
 
 					<div class="zo-sudoku__actions">
 						<button type="button" class="zo-sudoku__button zo-sudoku__button--primary" data-action="new">New Puzzle</button>
+						<?php if ($worksheet_url !== '') : ?>
+							<a class="zo-sudoku__button" href="<?php echo esc_url($worksheet_url); ?>" target="_blank" rel="noopener" download>Sudoku Sheets</a>
+						<?php endif; ?>
 						<button type="button" class="zo-sudoku__button" data-action="notes" aria-pressed="false">Notes: Off</button>
 						<button type="button" class="zo-sudoku__button" data-action="reset">Reset</button>
 						<button type="button" class="zo-sudoku__button" data-action="check">Check</button>

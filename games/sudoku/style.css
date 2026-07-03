@@ -14,7 +14,7 @@
 .zo-game-root--sudoku .zo-sudoku__difficulty { min-height: 42px; padding: 0 14px; border: 1px solid #b9cee3; border-radius: 999px; background: #fff; color: #1d2a3a; font: inherit; }
 .zo-game-root--sudoku .zo-sudoku__actions { display: flex; flex-wrap: wrap; gap: 10px; }
 .zo-game-root--sudoku .zo-sudoku__button, .zo-game-root--sudoku .zo-sudoku__key { border: 0; border-radius: 999px; background: #e4eef9; color: #1d2a3a; cursor: pointer; font: inherit; font-weight: 800; transition: transform 0.12s ease, background 0.12s ease, box-shadow 0.12s ease; }
-.zo-game-root--sudoku .zo-sudoku__button { min-height: 44px; padding: 0 18px; }
+.zo-game-root--sudoku .zo-sudoku__button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 18px; text-decoration: none; }
 .zo-game-root--sudoku .zo-sudoku__button:hover, .zo-game-root--sudoku .zo-sudoku__button:focus-visible, .zo-game-root--sudoku .zo-sudoku__key:hover, .zo-game-root--sudoku .zo-sudoku__key:focus-visible { transform: translateY(-1px); outline: none; box-shadow: 0 10px 20px rgba(49, 88, 130, 0.12); }
 .zo-game-root--sudoku .zo-sudoku__button--primary { background: linear-gradient(180deg, #1f73c9 0%, #1459a0 100%); color: #fff; }
 .zo-game-root--sudoku .zo-sudoku__button.is-active { background: linear-gradient(180deg, #1f7a5a 0%, #14543f 100%); color: #fff; }
