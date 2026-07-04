@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.31.asker.arslan
+ * Version: 1.5.33.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -13596,7 +13596,8 @@ function zo_games_grid_shortcode($atts = array()) {
 		'zeka_oyunlari_grid'
 	);
 
-	$author_filter    = sanitize_title($atts['author']);
+	$author_filters   = array_filter(array_map('sanitize_title', preg_split('/[\s,]+/', (string) $atts['author'])));
+	$author_filter    = count($author_filters) === 1 ? reset($author_filters) : '';
 	$limit            = (int) $atts['limit'];
 	$modules          = zo_get_game_modules();
 	$language         = zo_get_current_language();
@@ -13710,7 +13711,7 @@ function zo_games_grid_shortcode($atts = array()) {
 			$owner = $module_owner;
 		}
 
-		if ($author_filter !== '' && $owner !== $author_filter) {
+		if (!empty($author_filters) && !in_array($owner, $author_filters, true)) {
 			continue;
 		}
 
@@ -13989,6 +13990,12 @@ add_shortcode('zeka_rozetleri', 'zo_badge_showcase_shortcode');
 add_shortcode('zeka_badge_showcase', 'zo_badge_showcase_shortcode');
 
 function zo_locate_game_template($template) {
+	if (is_post_type_archive('zeka_oyunu')) {
+		$archive_template = ZO_PLUGIN_DIR . 'templates/archive-zeka-oyunu.php';
+
+		return file_exists($archive_template) ? $archive_template : $template;
+	}
+
 	$slug = zo_get_requested_game_slug();
 
 	if ($slug === '') {
