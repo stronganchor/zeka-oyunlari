@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.33.asker.arslan
+ * Version: 1.5.34.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -12344,6 +12344,42 @@ function zo_enqueue_grid_styles() {
 	align-items: center;
 	margin: 0 0 20px;
 }
+.zo-games-grid__tabs {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	width: 100%;
+	margin: 0 0 14px;
+}
+.zo-games-grid__tab {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-height: 34px;
+	padding: 0 14px;
+	border: 1px solid #cbd5e1;
+	border-radius: 999px;
+	background: #fff;
+	color: #1e293b;
+	font-size: 0.86rem;
+	font-weight: 800;
+	line-height: 1;
+	text-decoration: none;
+	white-space: nowrap;
+	box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+}
+.zo-games-grid__tab:hover,
+.zo-games-grid__tab:focus {
+	border-color: #94a3b8;
+	background: #f8fafc;
+	color: #0f172a;
+	text-decoration: none;
+}
+.zo-games-grid__tab.is-active {
+	border-color: #2563eb;
+	background: #2563eb;
+	color: #fff;
+}
 .zo-games-grid__search-toggle {
 	display: inline-flex;
 	align-items: center;
@@ -13631,7 +13667,12 @@ function zo_games_grid_shortcode($atts = array()) {
 
 	$posts_by_slug = zo_get_game_posts_by_slug();
 	$home_url      = home_url('/');
+	$archive_url   = get_post_type_archive_link('zeka_oyunu');
 	$filters_id    = 'zo-games-grid-filters-' . wp_rand(1000, 999999);
+
+	if (!is_string($archive_url) || $archive_url === '') {
+		$archive_url = home_url('/oyunlar/');
+	}
 
 	if (!is_front_page() && !is_home() && is_string($home_url) && $home_url !== '') {
 		$show_home_button = true;
@@ -13643,6 +13684,34 @@ function zo_games_grid_shortcode($atts = array()) {
 
 	echo '<div class="zo-games-grid-wrap zo-shortcode-frame zo-shortcode-frame--games-grid">';
 	echo zo_get_shortcode_logo_html('games-grid');
+
+	$tabs = array(
+		array(
+			'key' => 'all',
+			'label' => 'Tüm Oyunlar',
+			'url' => add_query_arg('zo_lang', $language, $archive_url),
+			'active' => count($author_filters) !== 1,
+		),
+		array(
+			'key' => 'asker',
+			'label' => 'Askerin Oyunları',
+			'url' => zo_get_owner_games_url('asker', $language),
+			'active' => $author_filter === 'asker',
+		),
+		array(
+			'key' => 'arslan',
+			'label' => 'Arslanın Oyunları',
+			'url' => zo_get_owner_games_url('arslan', $language),
+			'active' => $author_filter === 'arslan',
+		),
+	);
+
+	echo '<nav class="zo-games-grid__tabs" aria-label="Oyun listeleri">';
+	foreach ($tabs as $tab) {
+		$class = 'zo-games-grid__tab' . ($tab['active'] ? ' is-active' : '');
+		echo '<a class="' . esc_attr($class) . '" href="' . esc_url($tab['url']) . '"' . ($tab['active'] ? ' aria-current="page"' : '') . '>' . esc_html($tab['label']) . '</a>';
+	}
+	echo '</nav>';
 
 	echo '<div class="zo-games-grid__toolbar">';
 	echo '<button class="zo-games-grid__search-toggle" type="button" aria-label="' . esc_attr(zo_get_interface_text('search_label', $language)) . '" aria-controls="' . esc_attr($filters_id) . '" aria-expanded="' . ($filters_open ? 'true' : 'false') . '" data-zo-games-search-toggle>';
