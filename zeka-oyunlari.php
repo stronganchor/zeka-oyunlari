@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.38.asker.arslan
+ * Version: 1.5.39.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -12333,8 +12333,11 @@ function zo_enqueue_grid_styles() {
 	$handle = 'zo-shared-styles';
 	$css    = zo_get_shortcode_logo_css() . '
 .zo-games-grid-wrap {
+	box-sizing: border-box;
 	width: min(100%, 1120px);
 	margin: 0 auto;
+	padding-left: 10px;
+	padding-right: 10px;
 }
 .zo-games-grid__topbar {
 	display: flex;
@@ -12344,9 +12347,13 @@ function zo_enqueue_grid_styles() {
 	margin: 0 0 20px;
 }
 .zo-games-grid__topbar .zo-shortcode-logo {
+	position: static;
+	order: 3;
+	flex: 0 0 auto;
 	margin: 0;
 }
 .zo-games-grid__toolbar {
+	order: 1;
 	display: flex;
 	flex-wrap: wrap;
 	gap: 12px;
@@ -12355,6 +12362,7 @@ function zo_enqueue_grid_styles() {
 	margin: 0;
 }
 .zo-games-grid__tabs {
+	order: 2;
 	position: relative;
 	display: inline-grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
