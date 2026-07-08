@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.39.asker.arslan
+ * Version: 1.5.40.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -12341,10 +12341,14 @@ function zo_enqueue_grid_styles() {
 }
 .zo-games-grid__topbar {
 	display: flex;
-	flex-wrap: wrap;
+	flex-wrap: nowrap;
 	align-items: center;
 	gap: 12px;
 	margin: 0 0 20px;
+	max-width: 100%;
+	overflow-x: auto;
+	overflow-y: visible;
+	-webkit-overflow-scrolling: touch;
 }
 .zo-games-grid__topbar .zo-shortcode-logo {
 	position: static;
@@ -12355,7 +12359,8 @@ function zo_enqueue_grid_styles() {
 .zo-games-grid__toolbar {
 	order: 1;
 	display: flex;
-	flex-wrap: wrap;
+	flex-wrap: nowrap;
+	flex: 0 0 auto;
 	gap: 12px;
 	justify-content: flex-start;
 	align-items: center;
@@ -12363,10 +12368,11 @@ function zo_enqueue_grid_styles() {
 }
 .zo-games-grid__tabs {
 	order: 2;
+	flex: 0 0 430px;
 	position: relative;
 	display: inline-grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
-	width: min(100%, 430px);
+	width: 430px;
 	margin: 0;
 	padding: 4px;
 	border: 1px solid #dbe3ee;
@@ -12591,6 +12597,7 @@ function zo_enqueue_grid_styles() {
 	color: #374151;
 	font-size: 1.05rem;
 	line-height: 1.6;
+	text-align: center;
 }
 .zo-games-grid__intro strong {
 	color: #111827;
@@ -13212,6 +13219,17 @@ function zo_enqueue_grid_styles() {
 	display: none;
 }
 @media (max-width: 820px) {
+	.zo-games-grid__tabs {
+		flex-basis: min(78vw, 330px);
+		width: min(78vw, 330px);
+	}
+
+	.zo-games-grid__tab {
+		min-height: 32px;
+		padding: 0 7px;
+		font-size: 0.76rem;
+	}
+
 	.zo-games-grid__filters {
 		grid-template-columns: 1fr;
 	}
