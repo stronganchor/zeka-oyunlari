@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.40.asker.arslan
+ * Version: 1.5.41.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -13219,15 +13219,55 @@ function zo_enqueue_grid_styles() {
 	display: none;
 }
 @media (max-width: 820px) {
+	.zo-games-grid__topbar {
+		gap: 8px;
+		overflow-x: visible;
+	}
+
+	.zo-games-grid__toolbar {
+		gap: 6px;
+	}
+
+	.zo-games-grid__search-toggle {
+		width: 44px;
+		height: 44px;
+	}
+
+	.zo-games-grid__search-toggle img {
+		width: 38px;
+		height: 38px;
+	}
+
+	.zo-games-grid__home {
+		min-height: 34px;
+		padding: 0 10px;
+		font-size: 0.78rem;
+	}
+
+	.zo-games-grid__language {
+		gap: 5px;
+	}
+
+	.zo-games-grid__language-label {
+		font-size: 0.78rem;
+	}
+
+	.zo-games-grid__language-option {
+		min-width: 34px;
+		height: 34px;
+		padding: 0 7px;
+		font-size: 0.76rem;
+	}
+
 	.zo-games-grid__tabs {
-		flex-basis: min(78vw, 330px);
-		width: min(78vw, 330px);
+		flex: 1 1 260px;
+		width: clamp(230px, 30vw, 300px);
 	}
 
 	.zo-games-grid__tab {
-		min-height: 32px;
-		padding: 0 7px;
-		font-size: 0.76rem;
+		min-height: 30px;
+		padding: 0 5px;
+		font-size: 0.7rem;
 	}
 
 	.zo-games-grid__filters {
