@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.42.asker.arslan
+ * Version: 1.5.43.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -12341,7 +12341,7 @@ function zo_enqueue_grid_styles() {
 }
 .zo-games-grid__topbar {
 	display: flex;
-	flex-wrap: nowrap;
+	flex-wrap: wrap;
 	align-items: center;
 	gap: 12px;
 	margin: 0 0 20px;
@@ -12349,9 +12349,9 @@ function zo_enqueue_grid_styles() {
 	overflow: visible;
 }
 .zo-games-grid__topbar .zo-shortcode-logo {
-	position: static;
-	order: 3;
-	flex: 0 0 auto;
+	position: absolute;
+	top: 12px;
+	right: 12px;
 	margin: 0;
 }
 .zo-games-grid__toolbar {
@@ -12366,18 +12366,18 @@ function zo_enqueue_grid_styles() {
 }
 .zo-games-grid__tabs {
 	order: 2;
-	flex: 0 0 430px;
+	flex: 0 0 min(100%, 430px);
 	position: relative;
 	display: inline-grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
 	width: 430px;
-	margin: 0;
+	margin: 2px auto 0;
 	padding: 4px;
 	border: 1px solid #dbe3ee;
 	border-radius: 999px;
 	background: #f8fafc;
 	overflow: hidden;
-	cursor: grab;
+	cursor: pointer;
 	touch-action: none;
 	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 5px 14px rgba(15, 23, 42, 0.07);
 }
@@ -12414,6 +12414,7 @@ function zo_enqueue_grid_styles() {
 	position: relative;
 	z-index: 1;
 	display: inline-flex;
+	min-width: 0;
 	align-items: center;
 	justify-content: center;
 	min-height: 36px;
@@ -12427,6 +12428,8 @@ function zo_enqueue_grid_styles() {
 	line-height: 1;
 	text-decoration: none;
 	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 	-webkit-user-drag: none;
 	user-select: none;
 }
@@ -12434,6 +12437,10 @@ function zo_enqueue_grid_styles() {
 .zo-games-grid__tab:focus {
 	color: #0f172a;
 	text-decoration: none;
+}
+.zo-games-grid__tab:focus-visible {
+	outline: 2px solid #93c5fd;
+	outline-offset: -4px;
 }
 .zo-games-grid__tab.is-active {
 	color: #fff;
@@ -13315,14 +13322,14 @@ function zo_enqueue_grid_styles() {
 	}
 
 	.zo-games-grid__tabs {
-		flex: 0 0 270px;
-		width: 270px;
+		flex-basis: min(100%, 390px);
+		width: min(100%, 390px);
 	}
 
 	.zo-games-grid__tab {
 		min-height: 30px;
-		padding: 0 5px;
-		font-size: 0.7rem;
+		padding: 0 6px;
+		font-size: 0.72rem;
 	}
 
 	.zo-games-grid__filters {
@@ -13332,12 +13339,12 @@ function zo_enqueue_grid_styles() {
 
 @media (max-width: 820px) {
 	.zo-games-grid__tabs {
-		flex-basis: 220px;
-		width: 220px;
+		flex-basis: min(100%, 340px);
+		width: min(100%, 340px);
 	}
 
 	.zo-games-grid__tab {
-		font-size: 0.64rem;
+		font-size: 0.62rem;
 	}
 }
 ';
@@ -13899,7 +13906,7 @@ function zo_games_grid_shortcode($atts = array()) {
 		echo '<a class="' . esc_attr($class) . '" href="' . esc_url($tab['url']) . '" data-zo-games-tab="' . esc_attr($tab['key']) . '"' . ($tab['active'] ? ' aria-current="page"' : '') . '>' . esc_html($tab['label']) . '</a>';
 	}
 	echo '</nav>';
-	echo '<script>(function(){var script=document.currentScript;var nav=script&&script.previousElementSibling;if(!nav||!nav.matches("[data-zo-games-tabs]")){return;}var tabs=Array.prototype.slice.call(nav.querySelectorAll("[data-zo-games-tab]"));var keys=["all","asker","arslan"];var pointerId=null;var startX=0;var startKey="all";var liveKey="all";var moved=false;function getActiveKey(){var active=nav.querySelector("[data-zo-games-tab].is-active");return active?active.getAttribute("data-zo-games-tab")||"all":"all";}function setActive(key,offset){nav.classList.remove("zo-games-grid__tabs--all","zo-games-grid__tabs--asker","zo-games-grid__tabs--arslan");nav.classList.add("zo-games-grid__tabs--"+key);if(offset){nav.style.setProperty("--zo-tab-offset",offset);}else{nav.style.removeProperty("--zo-tab-offset");}tabs.forEach(function(tab){var active=tab.getAttribute("data-zo-games-tab")===key;tab.classList.toggle("is-active",active);if(active){tab.setAttribute("aria-current","page");}else{tab.removeAttribute("aria-current");}});}function metrics(){var rect=nav.getBoundingClientRect();var width=(rect.width-8)/3;return {left:rect.left,width:width,max:width*2};}function keyFromPoint(clientX,moveThumb){var m=metrics();var offset=Math.max(0,Math.min(m.max,clientX-m.left-4-(m.width/2)));var index=Math.max(0,Math.min(2,Math.round(offset/m.width)));var key=keys[index];if(moveThumb){setActive(key,offset+"px");}return key;}function navigateTo(key){var tab=nav.querySelector("[data-zo-games-tab=\""+key+"\"]");if(tab&&tab.href){window.location.href=tab.href;}}nav.addEventListener("pointerdown",function(event){if(event.button!==0){return;}event.preventDefault();pointerId=event.pointerId;startX=event.clientX;startKey=getActiveKey();liveKey=startKey;moved=false;nav.classList.add("is-dragging");try{nav.setPointerCapture(pointerId);}catch(error){}});nav.addEventListener("pointermove",function(event){if(pointerId!==event.pointerId){return;}event.preventDefault();if(Math.abs(event.clientX-startX)>6){moved=true;}if(moved){liveKey=keyFromPoint(event.clientX,true);}});function finish(event,cancelled){if(pointerId!==event.pointerId){return;}event.preventDefault();try{nav.releasePointerCapture(event.pointerId);}catch(error){}pointerId=null;nav.classList.remove("is-dragging");if(cancelled||!moved){setActive(startKey);return;}var targetKey=liveKey;setActive(targetKey);if(targetKey!==startKey){window.setTimeout(function(){navigateTo(targetKey);},210);}}nav.addEventListener("pointerup",function(event){finish(event,false);});nav.addEventListener("pointercancel",function(event){finish(event,true);});tabs.forEach(function(tab){tab.addEventListener("click",function(event){event.preventDefault();});tab.addEventListener("dragstart",function(event){event.preventDefault();});});})();</script>';
+	echo '<script>(function(){var script=document.currentScript;var nav=script&&script.previousElementSibling;if(!nav||!nav.matches("[data-zo-games-tabs]")){return;}var tabs=Array.prototype.slice.call(nav.querySelectorAll("[data-zo-games-tab]"));var keys=["all","asker","arslan"];var pointerId=null;var startX=0;var startKey="all";var liveKey="all";var moved=false;var suppressClick=false;function getActiveKey(){var active=nav.querySelector("[data-zo-games-tab].is-active");return active?active.getAttribute("data-zo-games-tab")||"all":"all";}function setActive(key,offset){nav.classList.remove("zo-games-grid__tabs--all","zo-games-grid__tabs--asker","zo-games-grid__tabs--arslan");nav.classList.add("zo-games-grid__tabs--"+key);if(offset){nav.style.setProperty("--zo-tab-offset",offset);}else{nav.style.removeProperty("--zo-tab-offset");}tabs.forEach(function(tab){var active=tab.getAttribute("data-zo-games-tab")===key;tab.classList.toggle("is-active",active);if(active){tab.setAttribute("aria-current","page");}else{tab.removeAttribute("aria-current");}});}function metrics(){var rect=nav.getBoundingClientRect();var width=(rect.width-8)/3;return {left:rect.left,width:width,max:width*2};}function keyFromPoint(clientX,moveThumb){var m=metrics();var offset=Math.max(0,Math.min(m.max,clientX-m.left-4-(m.width/2)));var index=Math.max(0,Math.min(2,Math.round(offset/m.width)));var key=keys[index];if(moveThumb){setActive(key,offset+"px");}return key;}function navigateTo(key){var tab=nav.querySelector("[data-zo-games-tab=\""+key+"\"]");if(tab&&tab.href){window.location.href=tab.href;}}nav.addEventListener("pointerdown",function(event){if(event.button!==0){return;}pointerId=event.pointerId;startX=event.clientX;startKey=getActiveKey();liveKey=startKey;moved=false;nav.classList.add("is-dragging");try{nav.setPointerCapture(pointerId);}catch(error){}});nav.addEventListener("pointermove",function(event){if(pointerId!==event.pointerId){return;}if(Math.abs(event.clientX-startX)>6){moved=true;}if(moved){event.preventDefault();liveKey=keyFromPoint(event.clientX,true);}});function finish(event,cancelled){if(pointerId!==event.pointerId){return;}try{nav.releasePointerCapture(event.pointerId);}catch(error){}pointerId=null;nav.classList.remove("is-dragging");if(cancelled){setActive(startKey);return;}if(!moved){return;}event.preventDefault();suppressClick=true;window.setTimeout(function(){suppressClick=false;},260);var targetKey=liveKey;setActive(targetKey);if(targetKey!==startKey){window.setTimeout(function(){navigateTo(targetKey);},210);}}nav.addEventListener("pointerup",function(event){finish(event,false);});nav.addEventListener("pointercancel",function(event){finish(event,true);});tabs.forEach(function(tab){tab.addEventListener("click",function(event){if(suppressClick){event.preventDefault();return;}if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey){return;}var key=tab.getAttribute("data-zo-games-tab");if(!key||tab.classList.contains("is-active")){return;}event.preventDefault();setActive(key);window.setTimeout(function(){window.location.href=tab.href;},210);});tab.addEventListener("dragstart",function(event){event.preventDefault();});});})();</script>';
 
 	echo '<div class="zo-games-grid__toolbar">';
 	echo '<button class="zo-games-grid__search-toggle" type="button" aria-label="' . esc_attr(zo_get_interface_text('search_label', $language)) . '" aria-controls="' . esc_attr($filters_id) . '" aria-expanded="' . ($filters_open ? 'true' : 'false') . '" data-zo-games-search-toggle>';
