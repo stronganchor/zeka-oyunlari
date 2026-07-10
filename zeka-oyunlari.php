@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.41.asker.arslan
+ * Version: 1.5.42.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -12346,9 +12346,7 @@ function zo_enqueue_grid_styles() {
 	gap: 12px;
 	margin: 0 0 20px;
 	max-width: 100%;
-	overflow-x: auto;
-	overflow-y: visible;
-	-webkit-overflow-scrolling: touch;
+	overflow: visible;
 }
 .zo-games-grid__topbar .zo-shortcode-logo {
 	position: static;
@@ -12560,13 +12558,70 @@ function zo_enqueue_grid_styles() {
 	font-weight: 700;
 }
 .zo-games-grid__language {
+	position: relative;
+	display: inline-block;
+}
+.zo-games-grid__language-summary {
 	display: inline-flex;
 	align-items: center;
 	gap: 8px;
+	min-height: 36px;
+	padding: 0 8px 0 12px;
+	border: 1px solid #cbd5e1;
+	border-radius: 999px;
+	background: #fff;
+	color: #1f2937;
+	font-weight: 800;
+	cursor: pointer;
+	list-style: none;
+	box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+}
+.zo-games-grid__language-summary::-webkit-details-marker {
+	display: none;
+}
+.zo-games-grid__language-summary::after {
+	content: "";
+	width: 0;
+	height: 0;
+	border-left: 4px solid transparent;
+	border-right: 4px solid transparent;
+	border-top: 5px solid #475569;
+}
+.zo-games-grid__language[open] .zo-games-grid__language-summary::after {
+	transform: rotate(180deg);
 }
 .zo-games-grid__language-label {
 	color: #374151;
-	font-weight: 700;
+	font-weight: 800;
+}
+.zo-games-grid__language-current {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 38px;
+	min-height: 30px;
+	padding: 0 9px;
+	border-radius: 999px;
+	background: #1d4ed8;
+	color: #fff;
+	font-size: 0.86rem;
+	font-weight: 900;
+}
+.zo-games-grid__language-menu {
+	position: absolute;
+	top: calc(100% + 6px);
+	left: 0;
+	z-index: 50;
+	display: none;
+	gap: 6px;
+	padding: 8px;
+	border: 1px solid #dbe3ee;
+	border-radius: 16px;
+	background: #fff;
+	box-shadow: 0 16px 36px rgba(15, 23, 42, 0.16);
+}
+.zo-games-grid__language[open] .zo-games-grid__language-menu {
+	display: flex;
 }
 .zo-games-grid__language-option {
 	display: inline-flex;
@@ -13218,7 +13273,7 @@ function zo_enqueue_grid_styles() {
 .zo-games-grid:empty {
 	display: none;
 }
-@media (max-width: 820px) {
+@media (max-width: 1120px) {
 	.zo-games-grid__topbar {
 		gap: 8px;
 		overflow-x: visible;
@@ -13260,8 +13315,8 @@ function zo_enqueue_grid_styles() {
 	}
 
 	.zo-games-grid__tabs {
-		flex: 1 1 260px;
-		width: clamp(230px, 30vw, 300px);
+		flex: 0 0 270px;
+		width: 270px;
 	}
 
 	.zo-games-grid__tab {
@@ -13272,6 +13327,17 @@ function zo_enqueue_grid_styles() {
 
 	.zo-games-grid__filters {
 		grid-template-columns: 1fr;
+	}
+}
+
+@media (max-width: 820px) {
+	.zo-games-grid__tabs {
+		flex-basis: 220px;
+		width: 220px;
+	}
+
+	.zo-games-grid__tab {
+		font-size: 0.64rem;
 	}
 }
 ';
@@ -13844,15 +13910,27 @@ function zo_games_grid_shortcode($atts = array()) {
 		echo '<a class="zo-games-grid__home" href="' . esc_url(add_query_arg('zo_lang', $language, $home_url)) . '">' . esc_html(zo_get_interface_text('home', $language)) . '</a>';
 	}
 
-	echo '<div class="zo-games-grid__language" aria-label="' . esc_attr(zo_get_interface_text('language_label', $language)) . '">';
-	echo '<span class="zo-games-grid__language-label">' . esc_html(zo_get_interface_text('language_label', $language)) . '</span>';
+	$language_options = zo_get_language_options();
+	$current_language_label = isset($language_options[$language]) ? $language_options[$language] : strtoupper($language);
 
-	foreach (zo_get_language_options() as $code => $label) {
-		$class = 'zo-games-grid__language-option' . ($code === $language ? ' is-active' : '');
+	echo '<details class="zo-games-grid__language">';
+	echo '<summary class="zo-games-grid__language-summary" aria-label="' . esc_attr(zo_get_interface_text('language_label', $language)) . '">';
+	echo '<span class="zo-games-grid__language-label">' . esc_html(zo_get_interface_text('language_label', $language)) . '</span>';
+	echo '<span class="zo-games-grid__language-current">' . esc_html($current_language_label) . '</span>';
+	echo '</summary>';
+	echo '<div class="zo-games-grid__language-menu">';
+
+	foreach ($language_options as $code => $label) {
+		if ($code === $language) {
+			continue;
+		}
+
+		$class = 'zo-games-grid__language-option';
 		echo '<a class="' . esc_attr($class) . '" href="' . esc_url(add_query_arg('zo_lang', $code)) . '">' . esc_html($label) . '</a>';
 	}
 
 	echo '</div>';
+	echo '</details>';
 	echo '</div>';
 	echo '</div>';
 
