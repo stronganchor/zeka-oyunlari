@@ -12341,12 +12341,14 @@ function zo_enqueue_grid_styles() {
 }
 .zo-games-grid__topbar {
 	display: flex;
-	flex-wrap: wrap;
+	flex-wrap: nowrap;
 	align-items: center;
 	gap: 12px;
 	margin: 0 0 20px;
 	max-width: 100%;
-	overflow: visible;
+	overflow-x: auto;
+	overflow-y: visible;
+	-webkit-overflow-scrolling: touch;
 }
 .zo-games-grid__topbar .zo-shortcode-logo {
 	position: static;
@@ -12359,7 +12361,7 @@ function zo_enqueue_grid_styles() {
 	order: 1;
 	display: flex;
 	flex-wrap: nowrap;
-	flex: 0 0 100%;
+	flex: 0 0 auto;
 	gap: 12px;
 	justify-content: flex-start;
 	align-items: center;
@@ -13284,7 +13286,6 @@ function zo_enqueue_grid_styles() {
 @media (max-width: 1120px) {
 	.zo-games-grid__topbar {
 		gap: 8px;
-		overflow-x: visible;
 	}
 
 	.zo-games-grid__toolbar {
