@@ -1,1 +1,14 @@
 *.php text eol=lf
+/.gitattributes export-ignore
+/.gitignore export-ignore
+/.vscode/** export-ignore
+/ai-game-instructions.md export-ignore
+/build_puzzle_bank.py export-ignore
+/format_puzzles.py export-ignore
+/gen_1000_sudoku.py export-ignore
+/generate-featured-images.ps1 export-ignore
+/puzzle_bank_new.js export-ignore
+/puzzles_easy.txt export-ignore
+/puzzles_hard.txt export-ignore
+/puzzles_medium.txt export-ignore
+**/featured-image.png.tmp.png export-ignore
