@@ -1,6 +1,7 @@
 *.php text eol=lf
 /.gitattributes export-ignore
 /.gitignore export-ignore
+/.vscode export-ignore
 /.vscode/** export-ignore
 /ai-game-instructions.md export-ignore
 /build_puzzle_bank.py export-ignore
