@@ -14268,6 +14268,24 @@ function zo_badge_showcase_shortcode($atts = array()) {
 add_shortcode('zeka_rozetleri', 'zo_badge_showcase_shortcode');
 add_shortcode('zeka_badge_showcase', 'zo_badge_showcase_shortcode');
 
+/**
+ * Print Elementor's frontend configuration when add-ons enqueue its runtime on
+ * the virtual game archive. Elementor normally prints this configuration only
+ * after rendering Elementor-authored content, which the archive does not have.
+ */
+function zo_ensure_elementor_archive_config() {
+	if (!is_post_type_archive('zeka_oyunu') || !class_exists('\\Elementor\\Plugin')) {
+		return;
+	}
+
+	$elementor = \Elementor\Plugin::$instance;
+
+	if (isset($elementor->frontend) && method_exists($elementor->frontend, 'enqueue_scripts')) {
+		$elementor->frontend->enqueue_scripts();
+	}
+}
+add_action('wp_enqueue_scripts', 'zo_ensure_elementor_archive_config', 999);
+
 function zo_locate_game_template($template) {
 	if (is_post_type_archive('zeka_oyunu')) {
 		$archive_template = ZO_PLUGIN_DIR . 'templates/archive-zeka-oyunu.php';
