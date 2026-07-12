@@ -73,7 +73,6 @@ $game_category = 'puzzle';
 $game_category_label = '';
 $difficulty_key = 'medium';
 $difficulty_label = '';
-$related_games = array();
 $game_thumbnail_url = function_exists('zo_get_game_thumbnail_url') ? zo_get_game_thumbnail_url($post_id ? get_post($post_id) : null, $module) : '';
 $game_owner = $post_id && function_exists('zo_get_game_owner_for_post') ? zo_get_game_owner_for_post($post_id) : '';
 if ($game_owner === '' && function_exists('zo_get_game_owner_for_module')) {
@@ -104,10 +103,6 @@ if (function_exists('zo_get_game_difficulty_key')) {
 
 if (function_exists('zo_get_game_difficulty_label')) {
 	$difficulty_label = zo_get_game_difficulty_label($module, $game_category, $language);
-}
-
-if (function_exists('zo_get_related_game_items')) {
-	$related_games = zo_get_related_game_items($slug, $language, 4);
 }
 
 ?>
@@ -576,27 +571,6 @@ if (function_exists('zo_get_related_game_items')) {
 			<div class="zo-game-page__stage">
 				<?php echo zo_render_game($slug, $post_id); ?>
 			</div>
-			<?php if (!empty($related_games)) : ?>
-			<section class="zo-game-page__related" aria-label="<?php echo esc_attr(function_exists('zo_get_interface_text') ? zo_get_interface_text('related_games', $language) : 'Related games'); ?>">
-				<h2 class="zo-game-page__related-title"><?php echo esc_html(function_exists('zo_get_interface_text') ? zo_get_interface_text('related_games', $language) : 'Related games'); ?></h2>
-				<div class="zo-game-page__related-grid">
-					<?php foreach ($related_games as $related) : ?>
-						<a class="zo-game-page__related-card" href="<?php echo esc_url($related['url']); ?>">
-							<?php if (!empty($related['thumbnail_url'])) : ?>
-							<img class="zo-game-page__related-thumb" src="<?php echo esc_url($related['thumbnail_url']); ?>" alt="" loading="lazy">
-							<?php else : ?>
-							<span class="zo-game-page__related-thumb" aria-hidden="true"></span>
-							<?php endif; ?>
-							<span class="zo-game-page__related-category"><?php echo esc_html($related['category_label']); ?></span>
-							<span class="zo-game-page__related-name"><?php echo esc_html($related['title']); ?></span>
-							<?php if (!empty($related['description'])) : ?>
-							<span class="zo-game-page__related-description"><?php echo esc_html(wp_trim_words(wp_strip_all_tags($related['description']), 18)); ?></span>
-							<?php endif; ?>
-						</a>
-					<?php endforeach; ?>
-				</div>
-			</section>
-			<?php endif; ?>
 			<div class="zo-game-page__bottom-actions">
 				<a class="zo-game-page__back" href="<?php echo esc_url($games_url); ?>"><?php echo esc_html(function_exists('zo_get_interface_text') ? zo_get_interface_text('back_to_games', $language) : 'Back to games'); ?></a>
 				<?php if (function_exists('zo_render_game_report_link')) : ?>
