@@ -24,13 +24,21 @@ if (!is_string($page_intro)) {
 	$page_intro = '';
 }
 
+$document_title = $page_title . ($site_name ? ' | ' . $site_name : '');
+add_filter(
+	'pre_get_document_title',
+	static function () use ($document_title) {
+		return $document_title;
+	},
+	20
+);
+
 ?><!doctype html>
 <html <?php language_attributes(); ?>>
 <head>
 	<meta charset="<?php bloginfo('charset'); ?>">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="description" content="<?php echo esc_attr($page_intro); ?>">
-	<title><?php echo esc_html($page_title . ($site_name ? ' | ' . $site_name : '')); ?></title>
 	<?php wp_head(); ?>
 	<style>
 		body {

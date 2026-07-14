@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.53.asker.arslan
+ * Version: 1.5.55.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-define('ZO_PLUGIN_VERSION', '1.5.17.asker.arslan');
+define('ZO_PLUGIN_VERSION', '1.5.54.asker.arslan');
 define('ZO_PLUGIN_FILE', __FILE__);
 define('ZO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('ZO_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -12396,7 +12396,12 @@ function zo_enqueue_grid_styles() {
 	left: 4px;
 	width: calc((100% - 8px) / 3);
 	border-radius: 999px;
-	background: #2563eb;
+	background:
+		linear-gradient(90deg, transparent calc(50% - 11px), rgba(255, 255, 255, 0.82) calc(50% - 11px), rgba(255, 255, 255, 0.82) calc(50% - 8px), transparent calc(50% - 8px), transparent calc(50% - 2px), rgba(255, 255, 255, 0.82) calc(50% - 2px), rgba(255, 255, 255, 0.82) calc(50% + 1px), transparent calc(50% + 1px), transparent calc(50% + 7px), rgba(255, 255, 255, 0.82) calc(50% + 7px), rgba(255, 255, 255, 0.82) calc(50% + 10px), transparent calc(50% + 10px)),
+		#2563eb;
+	background-size: 100% 5px, auto;
+	background-position: center calc(100% - 7px), center;
+	background-repeat: no-repeat;
 	box-shadow: 0 6px 14px rgba(37, 99, 235, 0.24);
 	transform: translateX(var(--zo-tab-offset, 0));
 	transition: transform 180ms ease;
@@ -13340,13 +13345,57 @@ function zo_enqueue_grid_styles() {
 }
 
 @media (max-width: 820px) {
+	.zo-games-grid__topbar {
+		flex-wrap: wrap;
+		align-items: center;
+		overflow-x: visible;
+	}
+
+	.zo-games-grid__toolbar {
+		flex: 1 1 100%;
+		min-width: 0;
+		gap: 5px;
+	}
+
+	.zo-games-grid__topbar .zo-shortcode-logo {
+		order: 4;
+		width: 38px;
+		margin-left: auto;
+	}
+
 	.zo-games-grid__tabs {
-		flex-basis: min(100%, 340px);
-		width: min(100%, 340px);
+		order: 3;
+		flex: 1 1 calc(100% - 48px);
+		width: auto;
+		margin-top: 0;
+	}
+
+	.zo-games-grid__search-toggle {
+		width: 38px;
+		height: 38px;
+	}
+
+	.zo-games-grid__search-toggle img {
+		width: 32px;
+		height: 32px;
+	}
+
+	.zo-games-grid__home {
+		min-height: 32px;
+		padding: 0 9px;
+		font-size: 0.72rem;
+	}
+
+	.zo-games-grid__language-summary {
+		min-height: 32px;
+		padding: 0 7px 0 10px;
+		gap: 6px;
 	}
 
 	.zo-games-grid__tab {
-		font-size: 0.62rem;
+		min-height: 32px;
+		padding: 0 4px;
+		font-size: 0.68rem;
 	}
 }
 ';
