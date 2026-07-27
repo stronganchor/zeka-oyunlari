@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.56.asker.arslan
+ * Version: 1.5.58.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -3738,7 +3738,7 @@ function zo_get_game_category_label($category, $lang = '') {
 	$options = zo_get_game_category_options();
 	$category = isset($options[$category]) ? $category : 'all';
 
-	return $options[$category][$lang] ?? $options[$category]['en'];
+	return zo_fix_mojibake_text($options[$category][$lang] ?? $options[$category]['en']);
 }
 
 function zo_get_game_category_icon($category) {
@@ -3870,6 +3870,89 @@ function zo_get_current_language() {
 	return array_key_exists($lang, zo_get_language_options()) ? $lang : 'tr';
 }
 
+function zo_count_mojibake_markers($text) {
+	$text = is_string($text) ? $text : '';
+
+	if ($text === '') {
+		return 0;
+	}
+
+	return preg_match_all('/(?:[\x{00C2}\x{00C3}\x{00C5}]|\x{00C4}[\x{00B1}\x{0178}\x{017E}\x{00B0}\x{00B3}]|\x{00E2}\x{20AC})/u', $text);
+}
+
+function zo_fix_mojibake_text($value) {
+	if (is_array($value)) {
+		foreach ($value as $key => $item) {
+			$value[$key] = zo_fix_mojibake_text($item);
+		}
+
+		return $value;
+	}
+
+	if (!is_string($value) || $value === '') {
+		return $value;
+	}
+
+	$bad_count = zo_count_mojibake_markers($value);
+
+	if ($bad_count <= 0) {
+		return $value;
+	}
+
+	if (function_exists('mb_convert_encoding')) {
+		$bytes = @mb_convert_encoding($value, 'Windows-1252', 'UTF-8');
+		$decoded = is_string($bytes) && $bytes !== '' ? @mb_convert_encoding($bytes, 'UTF-8', 'UTF-8') : '';
+	} elseif (function_exists('iconv')) {
+		$decoded = @iconv('UTF-8', 'Windows-1252//TRANSLIT//IGNORE', $value);
+	} else {
+		return $value;
+	}
+
+	if (!is_string($decoded) || $decoded === '') {
+		return $value;
+	}
+
+	return zo_count_mojibake_markers($decoded) < $bad_count ? $decoded : $value;
+}
+
+function zo_fix_runtime_replacement_pairs($phrases) {
+	if (!is_array($phrases)) {
+		return array();
+	}
+
+	foreach ($phrases as $index => $pair) {
+		if (!is_array($pair) || !array_key_exists(1, $pair)) {
+			continue;
+		}
+
+		$phrases[$index][1] = zo_fix_mojibake_text($pair[1]);
+	}
+
+	return $phrases;
+}
+
+function zo_translate_multilingual_runtime_text($value, $lang = '') {
+	if (!is_string($value) || $value === '') {
+		return $value;
+	}
+
+	$lang = array_key_exists($lang, zo_get_language_options()) ? $lang : zo_get_current_language();
+
+	if (!preg_match('/(?:^|[\s|])(?:TR|EN|DE|FR|ES-MX|ES-ES):/i', $value)) {
+		return $value;
+	}
+
+	return preg_replace_callback(
+		'/(?:TR|EN|DE|FR|ES-MX|ES-ES):\s*[^<>"\'`;{}]*(?:\s*\|\s*(?:TR|EN|DE|FR|ES-MX|ES-ES):\s*[^<>"\'`;{}]*)+/iu',
+		function ($matches) use ($lang) {
+			$localized = zo_get_localized_text($matches[0], $lang);
+
+			return $localized !== '' ? $localized : $matches[0];
+		},
+		$value
+	);
+}
+
 function zo_get_interface_text($key, $lang = '') {
 	$lang = array_key_exists($lang, zo_get_language_options()) ? $lang : zo_get_current_language();
 	$text = array(
@@ -3976,6 +4059,30 @@ function zo_get_interface_text($key, $lang = '') {
 			'es-es' => 'Idioma',
 			'fr' => 'Langue',
 			'de' => 'Sprache',
+		),
+		'owner_tab_all' => array(
+			'tr' => 'Tüm Oyunlar',
+			'en' => 'All Games',
+			'es-mx' => 'Todos los juegos',
+			'es-es' => 'Todos los juegos',
+			'fr' => 'Tous les jeux',
+			'de' => 'Alle Spiele',
+		),
+		'owner_tabs_label' => array(
+			'tr' => 'Oyun listeleri',
+			'en' => 'Game lists',
+			'es-mx' => 'Listas de juegos',
+			'es-es' => 'Listas de juegos',
+			'fr' => 'Listes de jeux',
+			'de' => 'Spiellisten',
+		),
+		'owner_counts_label' => array(
+			'tr' => 'Oyun sayıları',
+			'en' => 'Game counts',
+			'es-mx' => 'Conteo de juegos',
+			'es-es' => 'Recuento de juegos',
+			'fr' => 'Nombre de jeux',
+			'de' => 'Spielanzahl',
 		),
 		'search_label' => array(
 			'tr' => 'Oyun ara',
@@ -4635,7 +4742,7 @@ function zo_get_interface_text($key, $lang = '') {
 		}
 	}
 
-	return isset($text[$key][$lang]) ? $text[$key][$lang] : '';
+	return zo_fix_mojibake_text(isset($text[$key][$lang]) ? $text[$key][$lang] : '');
 }
 
 function zo_get_asker_badge_items($language = '', $owner = 'asker') {
@@ -8208,6 +8315,237 @@ function zo_get_runtime_translation_exact_map($lang) {
 		$translations[$lang] = array_merge($translations[$lang], $common_exact[$lang]);
 	}
 
+	$more_runtime_exact = array(
+		'tr' => array(
+			'No answers yet.' => 'Henüz cevap yok.',
+			'No moves yet.' => 'Henüz hamle yok.',
+			'Duck found' => 'Ördek bulundu',
+			'No duck' => 'Ördek yok',
+			'Quiet' => 'Sessiz',
+			'Heard' => 'Duyuldu',
+			'Tracked' => 'İzlendi',
+			'Swarming' => 'Kalabalık',
+			'Sell' => 'Sat',
+			'SELL' => 'SAT',
+			'Buy' => 'Satın Al',
+			'Captain' => 'Kaptan',
+			'Captain changed.' => 'Kaptan değişti.',
+			'You win the match.' => 'Maçı kazandın.',
+			'You lose the match.' => 'Maçı kaybettin.',
+			'The match ends in a draw.' => 'Maç berabere bitti.',
+			'New season started.' => 'Yeni sezon başladı.',
+			'Scout network improved.' => 'Gözlemci ağı gelişti.',
+			'Training improved the squad.' => 'Antrenman takımı geliştirdi.',
+			'Stadium upgraded. Better home income.' => 'Stadyum yükseltildi. İç saha geliri arttı.',
+			'Medical staff refreshed the squad.' => 'Sağlık ekibi takımı yeniledi.',
+			'No match played yet.' => 'Henüz maç oynanmadı.',
+			'Game finished' => 'Oyun bitti',
+			'Finished' => 'Bitti',
+			'Perfect Balance' => 'Mükemmel Denge',
+			'Rule check: looking good so far.' => 'Kural kontrolü: şimdilik iyi görünüyor.',
+			'Rule check: 1 row or column rule is currently broken.' => 'Kural kontrolü: 1 satır veya sütun kuralı bozuk.',
+			'Correct! Next level.' => 'Doğru! Sonraki seviye.',
+			'Decode the message by replacing each cipher letter with the correct plain letter.' => 'Şifreli harfleri doğru harflerle değiştirerek mesajı çöz.',
+			'Correct! You cracked the cryptogram. Great job!' => 'Doğru! Şifreyi çözdün. Harika iş!',
+			'Listen in your head. What family does it belong to?' => 'Kafanda dinle. Hangi aileye ait?',
+			'First round: Tap the SAME sound family' => 'İlk tur: AYNI ses ailesine dokun',
+			'First round: Tap a DIFFERENT sound family' => 'İlk tur: FARKLI ses ailesine dokun',
+			'Press Start Game' => 'Oyunu Başlat',
+			'Sort each sound into the right family.' => 'Her sesi doğru aileye ayır.',
+			'Bomb hit. Be careful.' => 'Bomba vurdu. Dikkatli ol.',
+			'Nice slice.' => 'Güzel kesiş.',
+			'You missed a fruit.' => 'Bir meyveyi kaçırdın.',
+			'Slice the fruit. Avoid bombs.' => 'Meyveyi kes. Bombalardan kaç.',
+			'Invent a language. Combine syllables and test whether your word has the right power.' => 'Bir dil icat et. Heceleri birleştir ve kelimenin doğru güce sahip olup olmadığını dene.',
+			'Your invented language now bends the room itself.' => 'İcat ettiğin dil artık odanın kendisini büküyor.',
+			'The word worked. The next puzzle needs a richer phrase.' => 'Kelime işe yaradı. Sonraki bulmaca daha zengin bir ifade istiyor.',
+			'The word failed. The grammar is still incomplete.' => 'Kelime başarısız oldu. Dil bilgisi hâlâ eksik.',
+			'You cleared the phrase and started a new line of meaning.' => 'İfadeyi temizledin ve yeni bir anlam satırı başlattın.',
+			'(empty)' => '(boş)',
+			'Open matching pairs. Use few hints.' => 'Eşleşen çiftleri aç. Az ipucu kullan.',
+			'Great! Board solved.' => 'Harika! Tahta çözüldü.',
+			'Hint used.' => 'İpucu kullanıldı.',
+			'Town' => 'Kasaba',
+			'You might beat the AI this time.' => 'Bu kez yapay zekayı yenebilirsin.',
+			'Round 1. The AI looks beatable.' => 'Tur 1. Yapay zeka yenilebilir görünüyor.',
+			'Defeat is complete.' => 'Yenilgi tamamlandı.',
+			'The joke is the setup. The first rounds make it look possible. Then the AI learns too fast and the result becomes fixed.' => 'Şaka düzende. İlk turlar mümkün gibi gösterir. Sonra yapay zeka çok hızlı öğrenir ve sonuç sabitlenir.',
+			'This shared puzzle is blocked because its data is invalid.' => 'Bu paylaşılan bulmaca verisi geçersiz olduğu için engellendi.',
+			'Play mode. Use arrow keys.' => 'Oyun modu. Ok tuşlarını kullan.',
+			'Puzzle solved.' => 'Bulmaca çözüldü.',
+			'Saved to system.' => 'Sisteme kaydedildi.',
+			'Could not reach the puzzle save service.' => 'Bulmaca kayıt servisine ulaşılamadı.',
+			'Delete' => 'Sil',
+			'Could not load shared puzzles.' => 'Paylaşılan bulmacalar yüklenemedi.',
+			'Watch:' => 'İzle:',
+			'Build the sequence.' => 'Diziyi oluştur.',
+			'Wrong order.' => 'Yanlış sıra.',
+			'Game over.' => 'Oyun bitti.',
+			'Great job! Plant grew.' => 'Harika! Bitki büyüdü.',
+			'Sequence cleared.' => 'Dizi temizlendi.',
+			'Place walls, then check the path.' => 'Duvarları yerleştir, sonra yolu kontrol et.',
+			'Path exists! Great builder.' => 'Yol var! Harika inşa ettin.',
+			'No path. Move or remove some walls.' => 'Yol yok. Bazı duvarları taşı veya kaldır.',
+			'Board cleared.' => 'Tahta temizlendi.',
+			'Solved. Every click was mirrored across both axes.' => 'Çözüldü. Her tıklama iki eksende de aynalandı.',
+			'Each cell toggles itself and its horizontal/vertical mirror partners.' => 'Her hücre kendisini ve yatay/dikey ayna eşlerini değiştirir.',
+			'Find the different color' => 'Farklı rengi bul',
+		),
+		'en' => array(
+			'Sağ ve sol ile şerit değiştir.' => 'Change lanes with left and right.',
+			'Kaza yaptın.' => 'You crashed.',
+			'Çarpma.' => 'Do not crash.',
+			'Balonlara tıkla.' => 'Click the balloons.',
+			'Süre bitti.' => 'Time is up.',
+			'Patlat.' => 'Pop them.',
+			'Başlat ve zıpla. Boşluk, W, Yukarı.' => 'Start and jump. Space, W, Up.',
+			'Oyun bitti. Tekrar dene.' => 'Game over. Try again.',
+			'Kaç.' => 'Run.',
+			'Hayvanı bul ve ahıra götür.' => 'Find the animal and take it to the barn.',
+			'Çamura girdin. Baştan dön.' => 'You stepped in mud. Go back to the start.',
+			'Hayvanı aldın. Ahıra götür.' => 'You picked up the animal. Take it to the barn.',
+			'Hepsi kurtarıldı.' => 'All rescued.',
+			'Güzel. Yenisi geliyor.' => 'Good. A new one is coming.',
+			'Kurtar.' => 'Rescue.',
+			'Hazır. Başla butonuna bas.' => 'Ready. Press Start.',
+			'Kaç. Zıpla. Hazineden puan topla.' => 'Run. Jump. Collect treasure points.',
+			'Yakalandın. Tekrar dene.' => 'You were caught. Try again.',
+			'Bu Mısır işareti neyi gösteriyor?' => 'What does this Egyptian sign mean?',
+			'Başlamak için Başla butonuna bas.' => 'Press Start to begin.',
+		),
+		'de' => array(
+			'No answers yet.' => 'Noch keine Antworten.',
+			'No moves yet.' => 'Noch keine Züge.',
+			'Duck found' => 'Ente gefunden',
+			'No duck' => 'Keine Ente',
+			'Quiet' => 'Leise',
+			'Heard' => 'Gehört',
+			'Tracked' => 'Verfolgt',
+			'Swarming' => 'Schwärmend',
+			'SELL' => 'VERKAUFEN',
+			'Buy' => 'Kaufen',
+			'Sell' => 'Verkaufen',
+			'Captain' => 'Kapitän',
+			'Captain changed.' => 'Kapitän geändert.',
+			'You win the match.' => 'Du gewinnst das Spiel.',
+			'You lose the match.' => 'Du verlierst das Spiel.',
+			'The match ends in a draw.' => 'Das Spiel endet unentschieden.',
+			'New season started.' => 'Neue Saison gestartet.',
+			'No match played yet.' => 'Noch kein Spiel gespielt.',
+			'Game finished' => 'Spiel beendet',
+			'Finished' => 'Beendet',
+			'Perfect Balance' => 'Perfektes Gleichgewicht',
+			'Correct! Next level.' => 'Richtig! Nächstes Level.',
+			'Press Start Game' => 'Spiel starten',
+			'Bomb hit. Be careful.' => 'Bombe getroffen. Sei vorsichtig.',
+			'Nice slice.' => 'Guter Schnitt.',
+			'You missed a fruit.' => 'Du hast eine Frucht verpasst.',
+			'Slice the fruit. Avoid bombs.' => 'Schneide die Frucht. Meide Bomben.',
+			'(empty)' => '(leer)',
+			'Great! Board solved.' => 'Super! Brett gelöst.',
+			'Hint used.' => 'Hinweis genutzt.',
+			'Town' => 'Stadt',
+			'Puzzle solved.' => 'Rätsel gelöst.',
+			'Delete' => 'Löschen',
+			'Build the sequence.' => 'Baue die Sequenz.',
+			'Wrong order.' => 'Falsche Reihenfolge.',
+			'Game over.' => 'Spiel vorbei.',
+			'Board cleared.' => 'Brett geleert.',
+			'Find the different color' => 'Finde die andere Farbe',
+		),
+		'fr' => array(
+			'No answers yet.' => 'Pas encore de réponses.',
+			'No moves yet.' => 'Aucun coup pour l instant.',
+			'Duck found' => 'Canard trouvé',
+			'No duck' => 'Pas de canard',
+			'Quiet' => 'Silencieux',
+			'Heard' => 'Entendu',
+			'Tracked' => 'Suivi',
+			'Swarming' => 'En essaim',
+			'SELL' => 'VENDRE',
+			'Buy' => 'Acheter',
+			'Sell' => 'Vendre',
+			'Captain' => 'Capitaine',
+			'Captain changed.' => 'Capitaine changé.',
+			'You win the match.' => 'Tu gagnes le match.',
+			'You lose the match.' => 'Tu perds le match.',
+			'The match ends in a draw.' => 'Le match se termine par un nul.',
+			'New season started.' => 'Nouvelle saison commencée.',
+			'No match played yet.' => 'Aucun match joué.',
+			'Game finished' => 'Jeu terminé',
+			'Finished' => 'Terminé',
+			'Perfect Balance' => 'Équilibre parfait',
+			'Correct! Next level.' => 'Correct ! Niveau suivant.',
+			'Press Start Game' => 'Démarrer le jeu',
+			'Bomb hit. Be careful.' => 'Bombe touchée. Attention.',
+			'Nice slice.' => 'Belle coupe.',
+			'You missed a fruit.' => 'Tu as raté un fruit.',
+			'Slice the fruit. Avoid bombs.' => 'Coupe les fruits. Évite les bombes.',
+			'(empty)' => '(vide)',
+			'Great! Board solved.' => 'Super ! Plateau résolu.',
+			'Hint used.' => 'Indice utilisé.',
+			'Town' => 'Ville',
+			'Puzzle solved.' => 'Puzzle résolu.',
+			'Delete' => 'Supprimer',
+			'Build the sequence.' => 'Construis la séquence.',
+			'Wrong order.' => 'Mauvais ordre.',
+			'Game over.' => 'Partie terminée.',
+			'Board cleared.' => 'Plateau effacé.',
+			'Find the different color' => 'Trouve la couleur différente',
+		),
+		'es-mx' => array(
+			'No answers yet.' => 'Todavía no hay respuestas.',
+			'No moves yet.' => 'Todavía no hay movimientos.',
+			'Duck found' => 'Pato encontrado',
+			'No duck' => 'No hay pato',
+			'Quiet' => 'Silencioso',
+			'Heard' => 'Escuchado',
+			'Tracked' => 'Rastreado',
+			'Swarming' => 'En enjambre',
+			'SELL' => 'VENDER',
+			'Buy' => 'Comprar',
+			'Sell' => 'Vender',
+			'Captain' => 'Capitán',
+			'Captain changed.' => 'Capitán cambiado.',
+			'You win the match.' => 'Ganas el partido.',
+			'You lose the match.' => 'Pierdes el partido.',
+			'The match ends in a draw.' => 'El partido termina en empate.',
+			'New season started.' => 'Nueva temporada iniciada.',
+			'No match played yet.' => 'Todavía no se jugó ningún partido.',
+			'Game finished' => 'Juego terminado',
+			'Finished' => 'Terminado',
+			'Perfect Balance' => 'Equilibrio perfecto',
+			'Correct! Next level.' => '¡Correcto! Siguiente nivel.',
+			'Press Start Game' => 'Iniciar juego',
+			'Bomb hit. Be careful.' => 'Bomba golpeada. Ten cuidado.',
+			'Nice slice.' => 'Buen corte.',
+			'You missed a fruit.' => 'Fallaste una fruta.',
+			'Slice the fruit. Avoid bombs.' => 'Corta la fruta. Evita bombas.',
+			'(empty)' => '(vacío)',
+			'Great! Board solved.' => '¡Genial! Tablero resuelto.',
+			'Hint used.' => 'Pista usada.',
+			'Town' => 'Pueblo',
+			'Puzzle solved.' => 'Rompecabezas resuelto.',
+			'Delete' => 'Eliminar',
+			'Build the sequence.' => 'Construye la secuencia.',
+			'Wrong order.' => 'Orden incorrecto.',
+			'Game over.' => 'Fin del juego.',
+			'Board cleared.' => 'Tablero limpiado.',
+			'Find the different color' => 'Encuentra el color diferente',
+		),
+	);
+	$more_runtime_exact['es-es'] = array_merge($more_runtime_exact['es-mx'], array(
+		'No match played yet.' => 'Todavía no se ha jugado ningún partido.',
+		'Delete' => 'Borrar',
+		'Puzzle solved.' => 'Puzle resuelto.',
+	));
+
+	foreach ($more_runtime_exact as $more_exact_lang => $more_exact_items) {
+		if (isset($translations[$more_exact_lang])) {
+			$translations[$more_exact_lang] = array_merge($translations[$more_exact_lang], $more_exact_items);
+		}
+	}
+
 	$runtime_translation_cleanups = array(
 		'tr' => array(
 			'Start' => 'Başlat',
@@ -8353,7 +8691,7 @@ function zo_get_runtime_translation_exact_map($lang) {
 		$translations[$lang] = array_merge($translations[$lang], $runtime_translation_cleanups[$lang]);
 	}
 
-	return isset($translations[$lang]) ? $translations[$lang] : array();
+	return isset($translations[$lang]) ? zo_fix_mojibake_text($translations[$lang]) : array();
 }
 
 function zo_get_runtime_translation_replacements($lang) {
@@ -9063,6 +9401,177 @@ function zo_get_runtime_translation_replacements($lang) {
 		}
 	}
 
+	$more_game_replacements = array(
+		'tr' => array(
+			array('Turn: ', 'Sıra: '),
+			array(' | You: ', ' | Sen: '),
+			array('White', 'Beyaz'),
+			array('Black', 'Siyah'),
+			array('Round ', 'Tur '),
+			array(' of ', ' / '),
+			array('Week ', 'Hafta '),
+			array(' is ready.', ' hazır.'),
+			array('Level ', 'Seviye '),
+			array(' ready. Launch the ball.', ' hazır. Topu fırlat.'),
+			array('Target: ', 'Hedef: '),
+			array('Target Combo: ', 'Hedef Kombo: '),
+			array('Box ', 'Kutu '),
+			array('Watch: ', 'İzle: '),
+			array('Use: ', 'Kullan: '),
+			array(' first', ' önce'),
+			array('Matched cells: ', 'Eşleşen hücreler: '),
+			array('. Find the symmetry that creates the target.', '. Hedefi oluşturan simetriyi bul.'),
+			array('Trust: ', 'Güven: '),
+			array('Corrections made: ', 'Düzeltmeler: '),
+			array('Scout Upgrade', 'Gözlemci Yükseltmesi'),
+			array('Training Upgrade', 'Antrenman Yükseltmesi'),
+			array('Stadium Upgrade', 'Stadyum Yükseltmesi'),
+			array('Recover Squad', 'Takımı Yenile'),
+			array('Youth Academy', 'Genç Akademi'),
+			array(' coins', ' coin'),
+			array('Div ', 'Lig '),
+			array('HP ', 'Can '),
+			array(' • Güç ', ' • Güç '),
+			array(' • Hız ', ' • Hız '),
+			array('Fiyat: ', 'Fiyat: '),
+			array('Seviye: ', 'Seviye: '),
+			array('Skor: ', 'Skor: '),
+			array('Can: ', 'Can: '),
+			array('En iyi: ', 'En iyi: '),
+			array('Adım: ', 'Adım: '),
+			array('Hamle: ', 'Hamle: '),
+		),
+		'en' => array(
+			array('Seviye: ', 'Level: '),
+			array('Skor: ', 'Score: '),
+			array('Can: ', 'Lives: '),
+			array('En iyi: ', 'Best: '),
+			array('Adım: ', 'Step: '),
+			array('Hamle: ', 'Moves: '),
+			array('Eşleşme: ', 'Matches: '),
+			array('Tur: ', 'Round: '),
+			array('Fiyat: ', 'Price: '),
+			array('Güç ', 'Power '),
+			array('Hız ', 'Speed '),
+			array('Satın Al', 'Buy'),
+		),
+		'de' => array(
+			array('Turn: ', 'Zug: '),
+			array(' | You: ', ' | Du: '),
+			array('White', 'Weiß'),
+			array('Black', 'Schwarz'),
+			array('Round ', 'Runde '),
+			array(' of ', ' von '),
+			array('Week ', 'Woche '),
+			array(' is ready.', ' ist bereit.'),
+			array('Level ', 'Level '),
+			array(' ready. Launch the ball.', ' bereit. Starte den Ball.'),
+			array('Target: ', 'Ziel: '),
+			array('Target Combo: ', 'Ziel-Kombo: '),
+			array('Box ', 'Kiste '),
+			array('Watch: ', 'Merke: '),
+			array('Use: ', 'Nutze: '),
+			array(' first', ' zuerst'),
+			array('Matched cells: ', 'Passende Felder: '),
+			array('. Find the symmetry that creates the target.', '. Finde die Symmetrie, die das Ziel erzeugt.'),
+			array('Trust: ', 'Vertrauen: '),
+			array('Corrections made: ', 'Korrekturen: '),
+			array('Scout Upgrade', 'Scout-Upgrade'),
+			array('Training Upgrade', 'Trainings-Upgrade'),
+			array('Stadium Upgrade', 'Stadion-Upgrade'),
+			array('Recover Squad', 'Kader erholen'),
+			array('Youth Academy', 'Jugendakademie'),
+			array(' coins', ' Münzen'),
+			array('Div ', 'Liga '),
+			array('Seviye: ', 'Level: '),
+			array('Skor: ', 'Punkte: '),
+			array('Can: ', 'Leben: '),
+			array('En iyi: ', 'Bestwert: '),
+			array('Adım: ', 'Schritt: '),
+			array('Hamle: ', 'Züge: '),
+		),
+		'fr' => array(
+			array('Turn: ', 'Tour : '),
+			array(' | You: ', ' | Toi : '),
+			array('White', 'Blanc'),
+			array('Black', 'Noir'),
+			array('Round ', 'Manche '),
+			array(' of ', ' sur '),
+			array('Week ', 'Semaine '),
+			array(' is ready.', ' est prête.'),
+			array('Level ', 'Niveau '),
+			array(' ready. Launch the ball.', ' prêt. Lance la balle.'),
+			array('Target: ', 'Cible : '),
+			array('Target Combo: ', 'Combo cible : '),
+			array('Box ', 'Boîte '),
+			array('Watch: ', 'Regarde : '),
+			array('Use: ', 'Utilise : '),
+			array(' first', ' d abord'),
+			array('Matched cells: ', 'Cellules trouvées : '),
+			array('. Find the symmetry that creates the target.', '. Trouve la symétrie qui crée la cible.'),
+			array('Trust: ', 'Confiance : '),
+			array('Corrections made: ', 'Corrections : '),
+			array('Scout Upgrade', 'Amélioration recruteur'),
+			array('Training Upgrade', 'Amélioration entraînement'),
+			array('Stadium Upgrade', 'Amélioration stade'),
+			array('Recover Squad', 'Récupérer l équipe'),
+			array('Youth Academy', 'Académie jeunes'),
+			array(' coins', ' pièces'),
+			array('Div ', 'Div. '),
+			array('Seviye: ', 'Niveau : '),
+			array('Skor: ', 'Score : '),
+			array('Can: ', 'Vies : '),
+			array('En iyi: ', 'Meilleur : '),
+			array('Adım: ', 'Pas : '),
+			array('Hamle: ', 'Coups : '),
+		),
+		'es-mx' => array(
+			array('Turn: ', 'Turno: '),
+			array(' | You: ', ' | Tú: '),
+			array('White', 'Blancas'),
+			array('Black', 'Negras'),
+			array('Round ', 'Ronda '),
+			array(' of ', ' de '),
+			array('Week ', 'Semana '),
+			array(' is ready.', ' está lista.'),
+			array('Level ', 'Nivel '),
+			array(' ready. Launch the ball.', ' listo. Lanza la pelota.'),
+			array('Target: ', 'Objetivo: '),
+			array('Target Combo: ', 'Combo objetivo: '),
+			array('Box ', 'Caja '),
+			array('Watch: ', 'Mira: '),
+			array('Use: ', 'Usa: '),
+			array(' first', ' primero'),
+			array('Matched cells: ', 'Celdas coincidentes: '),
+			array('. Find the symmetry that creates the target.', '. Encuentra la simetría que crea el objetivo.'),
+			array('Trust: ', 'Confianza: '),
+			array('Corrections made: ', 'Correcciones: '),
+			array('Scout Upgrade', 'Mejora de scouts'),
+			array('Training Upgrade', 'Mejora de entrenamiento'),
+			array('Stadium Upgrade', 'Mejora de estadio'),
+			array('Recover Squad', 'Recuperar plantilla'),
+			array('Youth Academy', 'Academia juvenil'),
+			array(' coins', ' monedas'),
+			array('Div ', 'Div. '),
+			array('Seviye: ', 'Nivel: '),
+			array('Skor: ', 'Puntuación: '),
+			array('Can: ', 'Vidas: '),
+			array('En iyi: ', 'Mejor: '),
+			array('Adım: ', 'Paso: '),
+			array('Hamle: ', 'Movimientos: '),
+		),
+	);
+	$more_game_replacements['es-es'] = array_merge($more_game_replacements['es-mx'], array(
+		array('Youth Academy', 'Cantera'),
+		array('Recover Squad', 'Recuperar equipo'),
+	));
+
+	foreach ($more_game_replacements as $more_rep_lang => $more_rep_items) {
+		if (isset($common_replacements[$more_rep_lang])) {
+			$common_replacements[$more_rep_lang] = array_merge($more_rep_items, $common_replacements[$more_rep_lang]);
+		}
+	}
+
 	if (isset($phrases[$lang], $common_replacements[$lang])) {
 		$phrases[$lang] = array_merge($common_replacements[$lang], $phrases[$lang]);
 	}
@@ -9140,7 +9649,7 @@ function zo_get_runtime_translation_replacements($lang) {
 		$phrases[$lang] = array_merge($replacement_cleanups[$lang], $phrases[$lang]);
 	}
 
-	return isset($phrases[$lang]) ? $phrases[$lang] : array();
+	return isset($phrases[$lang]) ? zo_fix_runtime_replacement_pairs($phrases[$lang]) : array();
 }
 
 function zo_wrap_game_runtime_translator($html, $module, $lang) {
@@ -9188,11 +9697,13 @@ function zo_wrap_game_runtime_translator($html, $module, $lang) {
 		. 'const exact=payload.exact||{};'
 		. 'const reps=payload.replacements||[];'
 		. 'const locale=(payload.locale&&payload.locale[payload.lang])||"";'
+		. 'const labelMap={TR:"tr",EN:"en",DE:"de",FR:"fr","ES-MX":"es-mx","ES-ES":"es-es"};'
 		. 'const skip={SCRIPT:1,STYLE:1,NOSCRIPT:1,TEXTAREA:1,CODE:1,PRE:1};'
 		. 'const attrNames=["aria-label","aria-description","aria-valuetext","alt","title","placeholder","label","data-label","data-title","data-message","data-prompt","data-name","data-zone-label"];'
 		. 'const attrSelector=attrNames.map(function(name){return "["+name+"]";}).concat(["[data-locale]","button","input","option"]).join(",");'
 		. 'function applyCase(from,to){return from===from.toUpperCase()?to.toUpperCase():to;}'
-		. 'function tx(value){if(typeof value!=="string"){return value;}const m=value.match(/^(\\s*)([\\s\\S]*?)(\\s*)$/);const lead=m?m[1]:"";let text=m?m[2]:value;const trail=m?m[3]:"";if(!text.trim()){return value;}const trimmed=text.trim();if(Object.prototype.hasOwnProperty.call(exact,trimmed)){return lead+exact[trimmed]+trail;}reps.forEach(function(pair){const from=pair[0];const to=pair[1];if(!from||!to){return;}text=text.split(from).join(applyCase(from,to));});return lead+text+trail;}'
+		. 'function pickMultilingual(text){if(typeof text!=="string"||!/(^|[\\s|])(TR|EN|DE|FR|ES-MX|ES-ES):/i.test(text)){return text;}const parts=[];const re=/(TR|EN|DE|FR|ES-MX|ES-ES):\\s*/ig;let match,last=null;while((match=re.exec(text))){if(last){parts.push({lang:labelMap[last.label.toUpperCase()],value:text.slice(last.end,match.index).replace(/^\\s*\\|\\s*/,"").replace(/\\s*\\|\\s*$/,"").trim()});}last={label:match[1],end:re.lastIndex};}if(last){parts.push({lang:labelMap[last.label.toUpperCase()],value:text.slice(last.end).replace(/^\\s*\\|\\s*/,"").replace(/\\s*\\|\\s*$/,"").trim()});}const wanted=parts.find(function(part){return part.lang===payload.lang&&part.value;})||parts.find(function(part){return part.lang==="en"&&part.value;})||parts.find(function(part){return part.value;});return wanted&&wanted.value?wanted.value:text;}'
+		. 'function tx(value){if(typeof value!=="string"){return value;}const m=value.match(/^(\\s*)([\\s\\S]*?)(\\s*)$/);const lead=m?m[1]:"";let text=m?m[2]:value;const trail=m?m[3]:"";if(!text.trim()){return value;}text=pickMultilingual(text);const trimmed=text.trim();if(Object.prototype.hasOwnProperty.call(exact,trimmed)){return lead+exact[trimmed]+trail;}reps.forEach(function(pair){const from=pair[0];const to=pair[1];if(!from||!to){return;}text=text.split(from).join(applyCase(from,to));});return lead+text+trail;}'
 		. 'root.__zoTranslate=tx;window.__zoGameI18nTranslateCanvas=function(canvas,value){if(typeof value!=="string"||!canvas||canvas.hasAttribute("data-zo-no-canvas-translate")){return value;}const shell=canvas.closest&&canvas.closest(".zo-game-shell");const fn=shell&&shell.__zoTranslate;return fn?fn(value):value;};'
 		. 'if(window.CanvasRenderingContext2D&&!CanvasRenderingContext2D.prototype.__zoI18nPatched){["fillText","strokeText"].forEach(function(method){const original=CanvasRenderingContext2D.prototype[method];CanvasRenderingContext2D.prototype[method]=function(text){if(typeof text==="string"&&window.__zoGameI18nTranslateCanvas){arguments[0]=window.__zoGameI18nTranslateCanvas(this.canvas,text);}return original.apply(this,arguments);};});CanvasRenderingContext2D.prototype.__zoI18nPatched=true;}'
 		. 'function nodeText(node){if(!node||!node.nodeValue){return;}const next=tx(node.nodeValue);if(next!==node.nodeValue){node.nodeValue=next;}}'
@@ -12277,6 +12788,7 @@ function zo_render_game($slug, $post_id = 0) {
 		$html = '<p>Bu oyun henüz görüntülenemiyor.</p>';
 	}
 
+	$html = zo_translate_multilingual_runtime_text($html, $language);
 	$wrapped_html = zo_wrap_game_runtime_translator($html, $module, $language);
 
 	if ((int) $post_id <= 0) {
@@ -13189,12 +13701,28 @@ function zo_enqueue_grid_styles() {
 	padding: 18px;
 }
 .zo-games-grid__author {
+	display: inline-flex;
+	align-items: center;
+	width: fit-content;
+	min-height: 26px;
+	padding: 0 9px;
+	border-radius: 999px;
+	background: #dbeafe;
 	margin: 0;
 	font-size: 0.85rem;
-	font-weight: 600;
-	letter-spacing: 0.04em;
+	font-weight: 800;
+	letter-spacing: 0.02em;
 	text-transform: uppercase;
-	color: #b45309;
+	color: #1d4ed8;
+	line-height: 1;
+}
+.zo-games-grid__author--arslan {
+	background: #ffedd5;
+	color: #ea580c;
+}
+.zo-games-grid__author--asker {
+	background: #dbeafe;
+	color: #1d4ed8;
 }
 .zo-games-grid__meta {
 	display: flex;
@@ -13698,12 +14226,12 @@ function zo_get_asker_about_content($lang = '') {
 	);
 
 	if ($lang === 'all') {
-		return $content;
+		return zo_fix_mojibake_text($content);
 	}
 
 	$lang = array_key_exists($lang, zo_get_language_options()) ? $lang : zo_get_current_language();
 
-	return $content[$lang] ?? $content['tr'];
+	return zo_fix_mojibake_text($content[$lang] ?? $content['tr']);
 }
 
 function zo_asker_about_shortcode($atts = array()) {
@@ -13757,7 +14285,7 @@ function zo_asker_about_shortcode($atts = array()) {
 			continue;
 		}
 
-		$content = $all_content[$code];
+		$content = zo_fix_mojibake_text($all_content[$code]);
 		$games_url = zo_get_owner_games_url('asker', $code);
 		$home_url = add_query_arg('zo_lang', $code, home_url('/'));
 
@@ -13811,12 +14339,12 @@ function zo_get_site_about_content($lang = '') {
 	);
 
 	if ($lang === 'all') {
-		return $content;
+		return zo_fix_mojibake_text($content);
 	}
 
 	$lang = array_key_exists($lang, zo_get_language_options()) ? $lang : zo_get_current_language();
 
-	return $content[$lang] ?? $content['tr'];
+	return zo_fix_mojibake_text($content[$lang] ?? $content['tr']);
 }
 
 function zo_site_about_shortcode($atts = array()) {
@@ -13868,7 +14396,7 @@ function zo_site_about_shortcode($atts = array()) {
 			continue;
 		}
 
-		$content = $all_content[$code];
+		$content = zo_fix_mojibake_text($all_content[$code]);
 		$asker_url = zo_get_owner_games_url('asker', $code);
 		$arslan_url = zo_get_owner_games_url('arslan', $code);
 		$home_url = add_query_arg('zo_lang', $code, home_url('/'));
@@ -13984,19 +14512,19 @@ function zo_games_grid_shortcode($atts = array()) {
 	$tabs = array(
 		array(
 			'key' => 'all',
-			'label' => 'Tüm Oyunlar',
+			'label' => zo_get_interface_text('owner_tab_all', $language),
 			'url' => add_query_arg('zo_lang', $language, $archive_url),
 			'active' => count($author_filters) !== 1,
 		),
 		array(
 			'key' => 'asker',
-			'label' => 'Askerin Oyunları',
+			'label' => zo_get_interface_text('asker_games_title', $language),
 			'url' => zo_get_owner_games_url('asker', $language),
 			'active' => $author_filter === 'asker',
 		),
 		array(
 			'key' => 'arslan',
-			'label' => 'Arslanın Oyunları',
+			'label' => zo_get_interface_text('arslan_games_title', $language),
 			'url' => zo_get_owner_games_url('arslan', $language),
 			'active' => $author_filter === 'arslan',
 		),
@@ -14010,13 +14538,13 @@ function zo_games_grid_shortcode($atts = array()) {
 		}
 	}
 
-	echo '<nav class="zo-games-grid__tabs zo-games-grid__tabs--' . esc_attr($active_tab) . '" aria-label="Oyun listeleri" data-zo-games-tabs>';
+	echo '<nav class="zo-games-grid__tabs zo-games-grid__tabs--' . esc_attr($active_tab) . '" aria-label="' . esc_attr(zo_get_interface_text('owner_tabs_label', $language)) . '" data-zo-games-tabs>';
 	foreach ($tabs as $tab) {
 		$class = 'zo-games-grid__tab' . ($tab['active'] ? ' is-active' : '');
 		echo '<a class="' . esc_attr($class) . '" href="' . esc_url($tab['url']) . '" data-zo-games-tab="' . esc_attr($tab['key']) . '"' . ($tab['active'] ? ' aria-current="page"' : '') . '>' . esc_html($tab['label']) . '</a>';
 	}
 	echo '</nav>';
-	echo '<div class="zo-games-grid__owner-counts" aria-label="Oyun sayıları">';
+	echo '<div class="zo-games-grid__owner-counts" aria-label="' . esc_attr(zo_get_interface_text('owner_counts_label', $language)) . '">';
 	echo '<span><span class="zo-games-grid__owner-counts-owner">Asker</span>: ' . esc_html((string) $owner_counts['asker']) . '</span>';
 	echo '<span class="zo-games-grid__owner-counts-separator" aria-hidden="true"></span>';
 	echo '<span><span class="zo-games-grid__owner-counts-owner zo-games-grid__owner-counts-owner--arslan">Arslan</span>: ' . esc_html((string) $owner_counts['arslan']) . '</span>';
@@ -14249,6 +14777,7 @@ function zo_games_grid_shortcode($atts = array()) {
 		$slug = $item['slug'];
 		$module = $item['module'];
 		$post = $item['post'];
+		$owner = isset($item['owner']) ? zo_normalize_game_owner($item['owner']) : '';
 		$author = $item['author'];
 		$title = $item['title'];
 		$excerpt = $item['excerpt'];
@@ -14257,10 +14786,11 @@ function zo_games_grid_shortcode($atts = array()) {
 		$category_label = zo_get_game_category_label($category, $language);
 		$category_icon = zo_get_game_category_icon($category);
 		$timestamp = (int) $item['timestamp'];
-		$is_popular = $index < 6;
+		$popular_badge_limit = $author_filter === '' ? 3 : 2;
+		$is_popular = !$filters_open && $index < $popular_badge_limit;
 		$search_text = $title . ' ' . $excerpt . ' ' . $slug . ' ' . $author . ' ' . $category_label;
 
-		echo '<article class="zo-games-grid__card" data-zo-game-card data-slug="' . esc_attr($slug) . '" data-title="' . esc_attr($title) . '" data-url="' . esc_url($url) . '" data-thumb="' . esc_url($item['thumbnail_url']) . '" data-category="' . esc_attr($category) . '" data-category-label="' . esc_attr($category_label) . '" data-timestamp="' . esc_attr((string) $timestamp) . '" data-search="' . esc_attr($search_text) . '">';
+		echo '<article class="zo-games-grid__card" data-zo-game-card data-slug="' . esc_attr($slug) . '" data-title="' . esc_attr($title) . '" data-url="' . esc_url($url) . '" data-thumb="' . esc_url($item['thumbnail_url']) . '" data-category="' . esc_attr($category) . '" data-category-label="' . esc_attr($category_label) . '" data-owner="' . esc_attr($owner) . '" data-timestamp="' . esc_attr((string) $timestamp) . '" data-search="' . esc_attr($search_text) . '">';
 
 		echo '<button class="zo-games-grid__favorite" type="button" aria-label="' . esc_attr(zo_get_interface_text('favorite_game', $language)) . '" aria-pressed="false" data-zo-favorite-toggle data-label-add="' . esc_attr(zo_get_interface_text('favorite_game', $language)) . '" data-label-remove="' . esc_attr(zo_get_interface_text('remove_favorite', $language)) . '">&#9734;</button>';
 
@@ -14279,7 +14809,11 @@ function zo_games_grid_shortcode($atts = array()) {
 		}
 
 		if ($author !== '') {
-			echo '<p class="zo-games-grid__author">' . esc_html($author) . '</p>';
+			$author_class = 'zo-games-grid__author';
+			if ($owner !== '') {
+				$author_class .= ' zo-games-grid__author--' . $owner;
+			}
+			echo '<p class="' . esc_attr($author_class) . '">' . esc_html($author) . '</p>';
 		}
 
 		echo '<div class="zo-games-grid__meta">';
