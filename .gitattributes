@@ -8,6 +8,7 @@
 /format_puzzles.py export-ignore
 /gen_1000_sudoku.py export-ignore
 /generate-featured-images.ps1 export-ignore
+/tests export-ignore
 /puzzle_bank_new.js export-ignore
 /puzzles_easy.txt export-ignore
 /puzzles_hard.txt export-ignore
