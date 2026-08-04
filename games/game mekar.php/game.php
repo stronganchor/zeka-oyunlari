@@ -260,13 +260,13 @@ document.addEventListener('DOMContentLoaded', function () {
 				keywords: ['breakout', 'ball', 'blocks', 'brick', 'arcade', 'paddle', 'fast', 'level', 'levels']
 			},
 			{
-				name: 'Word Ladder',
+				name: 'Kelime Merdiveni',
 				url: '/oyun/word-ladder/',
 				description: 'Change one letter at a time to reach a new word.',
 				keywords: ['word', 'words', 'spelling', 'letters', 'vocabulary', 'kelime', 'harf', 'ladder']
 			},
 			{
-				name: 'Category Blitz',
+				name: 'Kategori Yarışı',
 				url: '/oyun/category-blitz/',
 				description: 'Think fast and sort ideas into the right categories.',
 				keywords: ['category', 'categories', 'quiz', 'thinking', 'brain', 'fast', 'match', 'sort']
@@ -407,7 +407,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			openButton.setAttribute('data-url', best.item.url);
 			openButton.setAttribute('data-name', best.item.name);
 
-			setStatus('Best match found. Press "Open Selected Game".', 'good');
+			setStatus('Best match found. Press "Open Seçildi: Game".', 'good');
 		}
 
 		findButton.addEventListener('click', function () {
@@ -491,7 +491,7 @@ if (!function_exists('zo_game_arslanin_oyunlari_launcher_render')) {
 							<ul class="zo-ayo-list"></ul>
 
 							<div class="zo-ayo-actions">
-								<button type="button" class="zo-ayo-btn zo-ayo-btn--primary zo-ayo-open">Open Selected Game</button>
+								<button type="button" class="zo-ayo-btn zo-ayo-btn--primary zo-ayo-open">Open Seçildi: Game</button>
 							</div>
 						</div>
 

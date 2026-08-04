@@ -270,7 +270,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			scoreEl.textContent = String(score);
 			livesEl.textContent = String(lives);
 			bestEl.textContent = String(best);
-			progressEl.textContent = 'Remember the order, then tap it back';
+			progressEl.textContent = 'Sırayı hatırla, sonra aynı sırayla dokun';
 		}
 
 		function setPadsDisabled(disabled) {
@@ -315,7 +315,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			canPlay = false;
 			setPadsDisabled(true);
 			sequenceDisplayEl.textContent = sequence.join(' - ');
-			setStatus('Watch the sequence carefully.', '');
+			setStatus('Diziyi dikkatlice izle.', '');
 
 			await wait(500);
 
@@ -326,7 +326,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			showingSequence = false;
 			resetPlayerTurn();
-			setStatus('Now repeat the sequence.', '');
+			setStatus('Simdi diziyi tekrar et.', '');
 		}
 
 		function addStep() {
@@ -342,8 +342,8 @@ document.addEventListener('DOMContentLoaded', function () {
 		function endGame() {
 			canPlay = false;
 			setPadsDisabled(true);
-			sequenceDisplayEl.textContent = 'Game Over';
-			setStatus('Final score: ' + score + '. Press Restart to play again.', 'bad');
+			sequenceDisplayEl.textContent = 'Oyun Bitti';
+			setStatus('Son puan:' + score + '. Tekrar oynamak için Yeniden Başlat düğmesine bas.', 'bad');
 		}
 
 		function handleCorrectRound() {
@@ -351,7 +351,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (level > best) {
 				best = level;
 			}
-			setStatus('Correct. Get ready for the next level.', 'good');
+			setStatus('Dogru. Sonraki seviyeye hazirlan.', 'good');
 			canPlay = false;
 			setPadsDisabled(true);
 			level += 1;
@@ -373,7 +373,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			canPlay = false;
 			setPadsDisabled(true);
-			setStatus('Wrong order. Watch the sequence again.', 'bad');
+			setStatus('Yanlis sira. Diziyi tekrar izle.', 'bad');
 
 			window.setTimeout(function () {
 				showSequence();
@@ -393,7 +393,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				if (playerIndex >= sequence.length) {
 					handleCorrectRound();
 				} else {
-					setStatus('Good. Keep going.', 'good');
+					setStatus('Guzel. Devam et.', 'good');
 				}
 			} else {
 				handleWrongTap();
@@ -409,7 +409,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			canPlay = false;
 			showingSequence = false;
 			sequenceDisplayEl.textContent = '-';
-			setStatus('Watch the sequence, then repeat it.', '');
+			setStatus('Diziyi izle, sonra tekrar et.', '');
 			updateStats();
 			startLevel();
 		}
@@ -464,7 +464,7 @@ if (!function_exists('zo_game_sequence_memory_render')) {
 					</div>
 				</div>
 
-				<div class="sm-status" aria-live="polite">Watch the sequence, then repeat it.</div>
+				<div class="sm-status" aria-live="polite">Diziyi izle, sonra tekrar et.</div>
 
 				<div class="sm-sequence-card">
 					<span class="sm-sequence-label">Sequence</span>
@@ -483,7 +483,7 @@ if (!function_exists('zo_game_sequence_memory_render')) {
 					<button type="button" class="sm-btn sm-btn--restart">Restart</button>
 				</div>
 
-				<div class="sm-progress">Remember the order, then tap it back</div>
+				<div class="sm-progress">Sırayı hatırla, sonra aynı sırayla dokun</div>
 			</div>
 		</div>
 		<?php

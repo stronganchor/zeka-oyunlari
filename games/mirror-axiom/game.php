@@ -299,15 +299,15 @@ if (!function_exists('zo_game_mirror_axiom')) {
 		ob_start();
 		?>
 		<div class="zo-game-root zo-game-root--mirror-axiom" id="<?php echo esc_attr($instance_id); ?>">
-			<section class="zo-ma" aria-label="Mirror Axiom game">
+			<section class="zo-ma" aria-label="Ayna Aksiyomu game">
 				<header class="zo-ma__head">
 					<div>
 						<p class="zo-ma__kicker">Symmetry logic</p>
-						<h2 class="zo-ma__title">Mirror Axiom</h2>
+						<h2 class="zo-ma__title">Ayna Aksiyomu</h2>
 					</div>
 					<div class="zo-ma__credit">
 						<strong>Idea asker:</strong> Asker<br>
-						<strong>Game author:</strong> Asker + Codex
+						<strong>Oyun yazarı:</strong> Asker + Codex
 					</div>
 				</header>
 				<div class="zo-ma__layout">
@@ -342,7 +342,7 @@ if (!function_exists('zo_game_mirror_axiom')) {
 
 return array(
 	'slug' => 'mirror-axiom',
-	'name' => 'Mirror Axiom',
+	'name' => 'Ayna Aksiyomu',
 	'author' => 'Asker',
 	'description' => 'A hard symmetry puzzle where every click reflects across both axes.',
 	'render_callback' => 'zo_game_mirror_axiom',

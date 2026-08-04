@@ -136,7 +136,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function gameOver() {
 			running = false;
-			alert('Game Over. Score: '+score);
+			alert('Oyun Bitti. Score: '+score);
 		}
 
 		function updateScore() {
@@ -190,7 +190,7 @@ if (!function_exists('zo_game_snake_game_render')) {
 		ob_start();
 		?>
 		<div class="zo-game-root zo-game-root--snake-game" id="<?php echo esc_attr($instance_id); ?>">
-			<div class="sg-title">Snake Game</div>
+			<div class="sg-title">Yılan Oyunu</div>
 
 			<div class="sg-top">
 				Score: <span data-role="score">0</span>
@@ -207,7 +207,7 @@ if (!function_exists('zo_game_snake_game_render')) {
 
 return array(
 	'slug'            => 'snake-game',
-	'name'            => 'Snake Game',
+	'name'            => 'Yılan Oyunu',
 	'author'          => 'Arslan',
 	'description'     => 'Classic snake game converted from Python to browser.',
 	'render_callback' => 'zo_game_snake_game_render',

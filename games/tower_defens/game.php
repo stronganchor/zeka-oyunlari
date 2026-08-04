@@ -493,7 +493,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			let income = 0;
 			towers.forEach(function (tower) {
 				if (tower.type === 'bank') {
-					income += tower.income;
+					income += kulesi.income;
 				}
 			});
 			return income;
@@ -506,7 +506,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			scoreEl.textContent = String(score);
 			towersEl.textContent = String(towers.length);
 			incomeEl.textContent = String(getPassiveIncome());
-			progressEl.textContent = 'Every 5 seconds the game sends 1 enemy. More Enemies sends 2.';
+			progressEl.textContent = 'Her 5 saniyede oyun 1 düşman gönderir. Daha Fazla Düşman 2 gönderir.';
 		}
 
 		function isTopPathCell(x, y) {
@@ -564,7 +564,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function towerAt(x, y) {
 			return towers.find(function (tower) {
-				return tower.x === x && tower.y === y;
+				return kulesi.x === x && kulesi.y === y;
 			});
 		}
 
@@ -603,8 +603,8 @@ document.addEventListener('DOMContentLoaded', function () {
 				const tower = towerAt(x, y);
 				if (tower) {
 					const towerEl = document.createElement('div');
-					towerEl.className = 'tdp-tower tdp-tower--' + tower.type;
-					towerEl.textContent = tower.label;
+					towerEl.className = 'tdp-tower tdp-tower--' + kulesi.type;
+					towerEl.textContent = kulesi.label;
 					cell.appendChild(towerEl);
 				}
 
@@ -693,19 +693,19 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			if (isPathCell(x, y)) {
-				setStatus('You cannot build on the path.', 'bad');
+				setStatus('Yolun üstüne inşa edemezsin.', 'bad');
 				return;
 			}
 
 			if (towerAt(x, y)) {
-				setStatus('There is already a tower here.', 'bad');
+				setStatus('Burada zaten bir kule var.', 'bad');
 				return;
 			}
 
 			const cost = towerTypes[selectedTowerType].cost;
 
 			if (money < cost) {
-				setStatus('Not enough money for that tower.', 'bad');
+				setStatus('Bu kule için yeterli para yok.', 'bad');
 				return;
 			}
 
@@ -729,26 +729,26 @@ document.addEventListener('DOMContentLoaded', function () {
 			renderBoard();
 
 			if (selectedTowerType === 'bank') {
-				setStatus('Bank tower placed for $110. It makes money over time.', 'good');
+				setStatus('Banka kulesi 110 dolara yerleştirildi. Zamanla para üretir.', 'good');
 			} else {
 				setStatus(towerData.name + ' tower placed.', 'good');
 			}
 		}
 
 		function getEnemyDistance(tower, enemy) {
-			return Math.hypot(enemy.displayX - tower.x, enemy.displayY - tower.y);
+			return Math.hypot(enemy.displayX - kulesi.x, enemy.displayY - kulesi.y);
 		}
 
 		function applyTowerAttack(tower, enemy) {
 			if (tower.type === 'freeze') {
-				enemy.hp -= tower.damage;
+				enemy.hp -= kulesi.damage;
 				enemy.slowTicks = Math.max(enemy.slowTicks, 6);
 			} else if (tower.type === 'poison') {
-				enemy.hp -= tower.damage;
+				enemy.hp -= kulesi.damage;
 				enemy.poisonTicks = Math.max(enemy.poisonTicks, 10);
 				enemy.poisonDamage = Math.max(enemy.poisonDamage, 4);
 			} else {
-				enemy.hp -= tower.damage;
+				enemy.hp -= kulesi.damage;
 			}
 
 			if (enemy.hp <= 0) {
@@ -793,7 +793,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			const passiveIncome = getPassiveIncome();
 			if (passiveIncome > 0 && tick % 10 === 0) {
 				money += passiveIncome;
-				setStatus('Your Bank towers made +' + passiveIncome + ' money.', 'good');
+				setStatus('Banka kulelerin kazandırdı: +' + passiveIncome + ' money.', 'good');
 			}
 		}
 
@@ -813,7 +813,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 				enemies.forEach(function (enemy) {
 					const dist = getEnemyDistance(tower, enemy);
-					if (dist <= tower.range) {
+					if (dist <= kulesi.range) {
 						if (enemy.step > bestStep) {
 							bestStep = enemy.step;
 							target = enemy;
@@ -823,7 +823,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 				if (target) {
 					applyTowerAttack(tower, target);
-					tower.cooldown = tower.fireDelay;
+					tower.cooldown = kulesi.fireDelay;
 				}
 			});
 		}
@@ -920,7 +920,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			spawnQueue += 2;
-			setStatus('More Enemies added 2 enemies.', 'good');
+			setStatus('Daha Fazla Düşman 2 düşman ekledi.', 'good');
 		}
 
 		function maybeSpawn() {
@@ -948,7 +948,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				clearInterval(gameLoop);
 				gameLoop = null;
 			}
-			setStatus('Game Over. Press Restart.', 'bad');
+			setStatus('Oyun Bitti. Press Restart.', 'bad');
 			updateStats();
 		}
 
@@ -958,7 +958,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			if (workCooldown > 0) {
-				setStatus('Work is cooling down. Wait a little.', 'bad');
+				setStatus('Çalışma beklemede. Biraz bekle.', 'bad');
 				return;
 			}
 
@@ -966,7 +966,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			money += earned;
 			workCooldown = 12;
 			updateStats();
-			setStatus('You worked and earned +' + earned + ' money.', 'good');
+			setStatus('Çalıştın ve kazandın: +' + earned + ' money.', 'good');
 		}
 
 		function tickGame() {
@@ -1017,7 +1017,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			updateStats();
 			renderTowerSelection();
 			renderBoard();
-			setStatus('Bank towers now cost $110.', '');
+			setStatus('Banka kuleleri artık 110 dolar.', '');
 			gameLoop = setInterval(tickGame, 250);
 		}
 
@@ -1025,7 +1025,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			button.addEventListener('click', function () {
 				selectedTowerType = button.getAttribute('data-type');
 				renderTowerSelection();
-				setStatus('Selected ' + towerTypes[selectedTowerType].name + ' tower.', '');
+				setStatus('Seçildi: ' + towerTypes[selectedTowerType].name + ' kulesi.', '');
 			});
 		});
 
@@ -1033,36 +1033,36 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (topBlocked) {
 				topBlocked = false;
 				renderBoard();
-				setStatus('Top path opened.', '');
+				setStatus('Üst yol açıldı.', '');
 				return;
 			}
 
 			if (bottomBlocked) {
-				setStatus('At least one path must stay open.', 'bad');
+				setStatus('En az bir yol açık kalmalı.', 'bad');
 				return;
 			}
 
 			topBlocked = true;
 			renderBoard();
-			setStatus('Top path blocked.', 'good');
+			setStatus('Üst yol kapandı.', 'good');
 		});
 
 		toggleBottomBtn.addEventListener('click', function () {
 			if (bottomBlocked) {
 				bottomBlocked = false;
 				renderBoard();
-				setStatus('Bottom path opened.', '');
+				setStatus('Alt yol açıldı.', '');
 				return;
 			}
 
 			if (topBlocked) {
-				setStatus('At least one path must stay open.', 'bad');
+				setStatus('En az bir yol açık kalmalı.', 'bad');
 				return;
 			}
 
 			bottomBlocked = true;
 			renderBoard();
-			setStatus('Bottom path blocked.', 'good');
+			setStatus('Alt yol kapandı.', 'good');
 		});
 
 		waveBtn.addEventListener('click', startWave);
@@ -1084,7 +1084,7 @@ if (!function_exists('zo_game_tower_defense_paths_render')) {
 		<div class="zo-game-root zo-game-root--tower-defense-paths" id="<?php echo esc_attr($instance_id); ?>">
 			<div class="tdp-card">
 				<h2 class="tdp-title">Tower Defense Paths</h2>
-				<p class="tdp-instructions">This version has a map that is 4 times bigger, smaller squares, automatic enemy spawning every 5 seconds, More Enemies adds 2 enemies, and Bank towers now cost $110.</p>
+				<p class="tdp-instructions">This version has a map that is 4 times bigger, smaller squares, automatic enemy spawning every 5 seconds, More Enemies adds 2 enemies, and Banka kuleleri artık 110 dolar.</p>
 
 				<div class="tdp-topbar">
 					<div class="tdp-stat">
@@ -1113,7 +1113,7 @@ if (!function_exists('zo_game_tower_defense_paths_render')) {
 					</div>
 				</div>
 
-				<div class="tdp-status" aria-live="polite">Bank towers now cost $110.</div>
+				<div class="tdp-status" aria-live="polite">Banka kuleleri artık 110 dolar.</div>
 
 				<div class="tdp-layout">
 					<div class="tdp-board-wrap">
@@ -1139,7 +1139,7 @@ if (!function_exists('zo_game_tower_defense_paths_render')) {
 									<div class="tdp-guide-dot tdp-guide-dot--basic"></div>
 									<div>
 										<span class="tdp-guide-name">Basic</span>
-										<span class="tdp-guide-text">Cheap all-around tower. Medium range. Good starter tower.</span>
+										<span class="tdp-guide-text">Cheap all-around kulesi. Medium range. Good starter kulesi.</span>
 									</div>
 								</div>
 								<div class="tdp-guide-item">
@@ -1186,7 +1186,7 @@ if (!function_exists('zo_game_tower_defense_paths_render')) {
 					</div>
 				</div>
 
-				<div class="tdp-progress">Every 5 seconds the game sends 1 enemy. More Enemies sends 2.</div>
+				<div class="tdp-progress">Her 5 saniyede oyun 1 düşman gönderir. Daha Fazla Düşman 2 gönderir.</div>
 			</div>
 		</div>
 		<?php

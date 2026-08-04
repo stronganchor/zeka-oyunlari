@@ -182,7 +182,7 @@ if (!function_exists('zo_game_two_worlds_render')) {
 		ob_start();
 		?>
 		<div class="zo-game-root zo-game-root--two-worlds" id="<?php echo esc_attr($instance_id); ?>">
-			<h2>Two Worlds</h2>
+			<h2>İki Dünya</h2>
 			<div class="two-worlds-instructions">
 				<p>Move the player (P) to the goal (G) by switching between worlds A and B. Red walls are in world A, blue walls are in world B.</p>
 			</div>
@@ -204,7 +204,7 @@ if (!function_exists('zo_game_two_worlds_render')) {
 
 return array(
 	'slug'            => 'two-worlds',
-	'name'            => 'Two Worlds',
+	'name'            => 'İki Dünya',
 	'author'          => 'arslan',
 	'description'     => 'Switch between dimensions to solve puzzles.',
 	'render_callback' => 'zo_game_two_worlds_render',

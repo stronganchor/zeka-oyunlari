@@ -468,14 +468,14 @@ document.addEventListener('DOMContentLoaded', function () {
 			];
 			updateStats();
 			setActiveSpawnButton();
-			setMessage('Press Start. Blue goes first.');
+			setMessage('Başlat düğmesine bas. Mavi önce başlar.');
 			draw();
 		}
 
 		function startGame() {
 			state.started = true;
 			state.gameOver = false;
-			setMessage('Blue turn. Spawn or select a unit.');
+			setMessage('Mavi turu. Birim çıkar veya bir birim seç.');
 			updateStats();
 			draw();
 		}
@@ -517,12 +517,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function spawnUnitAt(q, r) {
 			if (!isSpawnTile(state.currentSide, q, r)) {
-				setMessage('You can only spawn on your spawn tiles.');
+				setMessage('Sadece kendi doğma karelerinde birim çıkarabilirsin.');
 				return;
 			}
 
 			if (getUnitAt(q, r)) {
-				setMessage('That spawn tile is occupied.');
+				setMessage('Bu doğma karesi dolu.');
 				return;
 			}
 
@@ -541,7 +541,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function selectUnit(unit) {
 			if (unit.side !== state.currentSide) {
-				setMessage('That is not your unit.');
+				setMessage('Bu senin birimin değil.');
 				return;
 			}
 			state.selectedUnitId = unit.id;
@@ -554,7 +554,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		function moveOrAttackSelected(q, r) {
 			const unit = getSelectedUnit();
 			if (!unit) {
-				setMessage('No unit selected.');
+				setMessage('Birim seçilmedi.');
 				return;
 			}
 
@@ -564,15 +564,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			if (target && target.side !== unit.side) {
 				if (unit.acted) {
-					setMessage('This unit already attacked.');
+					setMessage('Bu birim zaten saldırdı.');
 					return;
 				}
 				if (state.wits[state.currentSide] < 1) {
-					setMessage('You need 1 wit to attack.');
+					setMessage('Saldırmak için 1 zeka gerekir.');
 					return;
 				}
 				if (distance > unit.range) {
-					setMessage('Target is out of range.');
+					setMessage('Hedef menzil dışında.');
 					return;
 				}
 
@@ -600,11 +600,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			if (!target) {
 				if (unit.moved) {
-					setMessage('This unit already moved.');
+					setMessage('Bu birim zaten hamle yaptı.');
 					return;
 				}
 				if (state.wits[state.currentSide] < 1) {
-					setMessage('You need 1 wit to move.');
+					setMessage('Hareket etmek için 1 zeka gerekir.');
 					return;
 				}
 				if (distance > unit.move) {
@@ -632,7 +632,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				return;
 			}
 
-			setMessage('That tile is occupied.');
+			setMessage('Bu kare dolu.');
 		}
 
 		function checkWin() {
@@ -646,7 +646,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				state.baseHp.red = 0;
 				state.gameOver = true;
 				state.winner = 'Blue';
-				setMessage('Blue wins.');
+				setMessage('Mavi kazandı.');
 			}
 		}
 
@@ -739,10 +739,10 @@ document.addEventListener('DOMContentLoaded', function () {
 			ctx.fillStyle = '#1e3a8a';
 			ctx.font = 'bold 14px Arial';
 			ctx.textAlign = 'center';
-			ctx.fillText('Blue Base', bluePos.x, bluePos.y - 42);
+			ctx.fillText('Mavi Üs', bluePos.x, bluePos.y - 42);
 
 			ctx.fillStyle = '#991b1b';
-			ctx.fillText('Red Base', redPos.x, redPos.y - 42);
+			ctx.fillText('Kırmızı Üs', redPos.x, redPos.y - 42);
 		}
 
 		function drawOverlay() {
@@ -761,12 +761,12 @@ document.addEventListener('DOMContentLoaded', function () {
 				ctx.font = 'bold 38px Arial';
 				ctx.fillText(state.winner + ' Wins', canvas.width / 2, canvas.height / 2 - 10);
 				ctx.font = 'bold 18px Arial';
-				ctx.fillText('Press Restart to play again.', canvas.width / 2, canvas.height / 2 + 24);
+				ctx.fillText('Tekrar oynamak için Yeniden Başlat düğmesine bas.', canvas.width / 2, canvas.height / 2 + 24);
 			} else {
 				ctx.font = 'bold 34px Arial';
-				ctx.fillText('Wit Bases', canvas.width / 2, canvas.height / 2 - 10);
+				ctx.fillText('Zeka Üsleri', canvas.width / 2, canvas.height / 2 - 10);
 				ctx.font = 'bold 18px Arial';
-				ctx.fillText('Press Start to begin.', canvas.width / 2, canvas.height / 2 + 24);
+				ctx.fillText('Başlamak için Başlat düğmesine bas.', canvas.width / 2, canvas.height / 2 + 24);
 			}
 
 			ctx.restore();
@@ -887,7 +887,7 @@ if (!function_exists('zo_wit_bases_render')) {
 		?>
 		<div class="zo-game-root zo-game-root--wit-bases" id="<?php echo esc_attr($game_id); ?>">
 			<div class="zo-wb-wrap">
-				<h2 class="zo-wb-title">Wit Bases</h2>
+				<h2 class="zo-wb-title">Zeka Üsleri</h2>
 				<p class="zo-wb-subtitle">Big-map turn-based base battle where every move spends limited command points.</p>
 
 				<div class="zo-wb-topbar">
@@ -895,27 +895,27 @@ if (!function_exists('zo_wit_bases_render')) {
 						<div class="zo-wb-stat">Turn: <span class="zo-wb-turn">1</span></div>
 						<div class="zo-wb-stat">Side: <span class="zo-wb-side-name">Blue</span></div>
 						<div class="zo-wb-stat">Wits: <span class="zo-wb-wits">5</span></div>
-						<div class="zo-wb-stat">Blue Base: <span class="zo-wb-blue-base">5</span></div>
-						<div class="zo-wb-stat">Red Base: <span class="zo-wb-red-base">5</span></div>
-						<div class="zo-wb-stat">Selected: <span class="zo-wb-selected">Scout</span></div>
-						<div class="zo-wb-stat">Winner: <span class="zo-wb-winner">-</span></div>
+						<div class="zo-wb-stat">Mavi Üs: <span class="zo-wb-blue-base">5</span></div>
+						<div class="zo-wb-stat">Kırmızı Üs: <span class="zo-wb-red-base">5</span></div>
+						<div class="zo-wb-stat">Seçili: <span class="zo-wb-selected">Scout</span></div>
+						<div class="zo-wb-stat">Kazanan: <span class="zo-wb-winner">-</span></div>
 					</div>
 
 					<div class="zo-wb-controls">
 						<button type="button" class="zo-wb-btn zo-wb-btn--primary zo-wb-start">Start</button>
-						<button type="button" class="zo-wb-btn zo-wb-end-turn">End Turn</button>
+						<button type="button" class="zo-wb-btn zo-wb-end-turn">Turu Bitir</button>
 						<button type="button" class="zo-wb-btn zo-wb-btn--danger zo-wb-restart">Restart</button>
 					</div>
 				</div>
 
 				<div class="zo-wb-layout">
 					<div class="zo-wb-board-wrap">
-						<canvas class="zo-wb-canvas" width="1180" height="650" aria-label="Wit Bases board"></canvas>
-						<div class="zo-wb-message">Press Start. Blue goes first.</div>
+						<canvas class="zo-wb-canvas" width="1180" height="650" aria-label="Zeka Üsleri board"></canvas>
+						<div class="zo-wb-message">Başlat düğmesine bas. Mavi önce başlar.</div>
 					</div>
 
 					<div class="zo-wb-side">
-						<h3>Spawn Units</h3>
+						<h3>Birim Çıkar</h3>
 
 						<div class="zo-wb-unit-grid">
 							<button type="button" class="zo-wb-unit-btn is-active" data-unit="scout">🏃 Scout - Cost 1</button>
@@ -924,23 +924,23 @@ if (!function_exists('zo_wit_bases_render')) {
 							<button type="button" class="zo-wb-unit-btn" data-unit="heavy">🛡️ Heavy - Cost 4</button>
 						</div>
 
-						<h3>How to Play</h3>
+						<h3>Nasıl Oynanır</h3>
 						<ul>
 							<li>Each turn you get 5 wits, plus bonus from captured wit tiles.</li>
-							<li>Spawning costs wits.</li>
+							<li>Birim çıkarmak zeka puanı ister.</li>
 							<li>Moving costs 1 wit.</li>
 							<li>Attacking costs 1 wit.</li>
 							<li>Capture yellow +1 tiles by standing on them.</li>
-							<li>Destroy the enemy base to win.</li>
+							<li>Kazanmak için düşman üssünü yok et.</li>
 						</ul>
 
-						<h3>Controls</h3>
+						<h3>Kontroller</h3>
 						<ul>
 							<li>Choose a unit on the right to enter spawn mode.</li>
 							<li>Click your spawn tile to create that unit.</li>
-							<li>Click one of your units to select it.</li>
+							<li>Seçmek için kendi birimlerinden birine tıkla.</li>
 							<li>Click another tile to move or attack.</li>
-							<li>Press End Turn when done.</li>
+							<li>Press Turu Bitir when done.</li>
 						</ul>
 					</div>
 				</div>
@@ -953,7 +953,7 @@ if (!function_exists('zo_wit_bases_render')) {
 
 return array(
 	'slug'            => 'wit-bases',
-	'name'            => 'Wit Bases',
+	'name'            => 'Zeka Üsleri',
 	'author'          => 'Arslan',
 	'description'     => 'A big-map turn-based tactics game with bases and wit points.',
 	'render_callback' => 'zo_wit_bases_render',

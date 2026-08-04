@@ -240,7 +240,7 @@ if (!function_exists('zo_game_rock_paper_scissors_render')) {
 		ob_start();
 		?>
 		<div class="zo-game-root zo-game-root--rock-paper-scissors" id="<?php echo esc_attr($instance_id); ?>">
-			<h2 class="zo-rps-title">Rock Paper Scissors</h2>
+			<h2 class="zo-rps-title">Taş Kağıt Makas</h2>
 			<p class="zo-rps-desc">Choose Rock, Paper, or Scissors. Beat the computer to win.</p>
 
 			<div class="zo-rps-buttons">
@@ -279,7 +279,7 @@ if (!function_exists('zo_game_rock_paper_scissors_render')) {
 
 return array(
 	'slug'            => 'rock-paper-scissors',
-	'name'            => 'Rock Paper Scissors',
+	'name'            => 'Taş Kağıt Makas',
 	'author'          => 'Asker',
 	'description'     => 'A simple rock paper scissors game for kids with score tracking and restart.',
 	'render_callback' => 'zo_game_rock_paper_scissors_render',

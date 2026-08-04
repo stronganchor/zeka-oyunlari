@@ -906,7 +906,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			updateDifficultyButtons();
 			renderBushes();
 			renderAll();
-			showOverlay('Roster Brawl 1000', 'AI her level daha iyi olur. Daha çok AI gelir. Her kazanç sadece 5 para verir.', 'start');
+			showOverlay('1000 Kadrolu Dövüş', 'AI her level daha iyi olur. Daha çok AI gelir. Her kazanç sadece 5 para verir.', 'start');
 		}
 
 		function movePlayer(dt) {
@@ -1219,7 +1219,7 @@ if (!function_exists('zo_game_mini_brawl_roster_render')) {
 		ob_start();
 		?>
 		<div class="zo-game-root zo-game-root--mini-brawl-roster" id="<?php echo esc_attr($instance_id); ?>" tabindex="0">
-			<div class="mbr-title">Roster Brawl 1000</div>
+			<div class="mbr-title">1000 Kadrolu Dövüş</div>
 			<div class="mbr-instructions">1000 kişi var. Parayla daha iyi kişi al. AI her level daha iyi olur ve daha çok gelir. Her level kazanınca sadece 5 para gelir.</div>
 
 			<div class="mbr-topbar">
@@ -1266,7 +1266,7 @@ if (!function_exists('zo_game_mini_brawl_roster_render')) {
 
 					<div class="mbr-overlay" data-role="overlay">
 						<div class="mbr-panel-pop">
-							<div class="mbr-panel-pop-title" data-role="overlay-title">Roster Brawl 1000</div>
+							<div class="mbr-panel-pop-title" data-role="overlay-title">1000 Kadrolu Dövüş</div>
 							<div class="mbr-panel-pop-text" data-role="overlay-text">Karakter seç ve başla.</div>
 							<div class="mbr-btn-row">
 								<button type="button" class="mbr-btn" data-role="start-btn">Başla</button>
@@ -1296,7 +1296,7 @@ if (!function_exists('zo_game_mini_brawl_roster_render')) {
 
 return array(
 	'slug'            => 'mini-brawl-roster',
-	'name'            => 'Roster Brawl 1000',
+	'name'            => '1000 Kadrolu Dövüş',
 	'author'          => 'Arslan',
 	'description'     => 'An endless arena game with 1000 buyable characters, stronger AI each level, more enemies per level, and 5 coins per win.',
 	'render_callback' => 'zo_game_mini_brawl_roster_render',

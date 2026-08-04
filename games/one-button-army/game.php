@@ -8,10 +8,10 @@ document.addEventListener('DOMContentLoaded',function(){document.querySelectorAl
 JS;
 if(!function_exists('zo_game_one_button_army_render')){function zo_game_one_button_army_render($post_id=0,$module=array()){ob_start();?>
 <div class="zo-game-root zo-game-root--one-button-army">
-<h2>One Button Army</h2><p>All units share one input. Timing changes the whole formation, so the same button can make a wall, a spear, or a mess.</p>
+<h2>Tek Düğme Ordusu</h2><p>All units share one input. Timing changes the whole formation, so the same button can make a wall, a spear, or a mess.</p>
 <div class="oba-top"><div class="oba-stat"><strong>Wave</strong><span data-wave>1</span></div><div class="oba-stat"><strong>Units</strong><span data-units>3</span></div><div class="oba-stat"><strong>Enemies</strong><span data-goal>3 foes</span></div><div class="oba-stat"><strong>Formation</strong><span data-mode>march</span></div></div>
 <div class="oba-lanes" data-board></div>
-<div class="oba-panel"><div class="oba-btns"><button class="oba-btn" data-command>Command</button><button class="oba-btn" data-tick>Wait Beat</button><button class="oba-btn" data-restart>Restart</button></div><p data-log></p></div>
+<div class="oba-panel"><div class="oba-btns"><button class="oba-btn" data-command>Command</button><button class="oba-btn" data-tick>Ritmi Bekle</button><button class="oba-btn" data-restart>Restart</button></div><p data-log></p></div>
 </div>
 <?php return ob_get_clean();}}
-return array('slug'=>'one-button-army','name'=>'One Button Army','author'=>'Arslan','description'=>'All units share one input, so timing creates the formation you need.','render_callback'=>'zo_game_one_button_army_render','inline_style'=>$css,'inline_script'=>$js);
+return array('slug'=>'one-button-army','name'=>'Tek Düğme Ordusu','author'=>'Arslan','description'=>'All units share one input, so timing creates the formation you need.','render_callback'=>'zo_game_one_button_army_render','inline_style'=>$css,'inline_script'=>$js);

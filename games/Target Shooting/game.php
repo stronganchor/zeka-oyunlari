@@ -313,7 +313,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (score >= 120) {
 				setStatus('Great job. You won.');
 			} else {
-				setStatus('Time is up. Press Restart to play again.');
+				setStatus('Time is up. Tekrar oynamak için Yeniden Başlat düğmesine bas.');
 			}
 		}
 
@@ -324,7 +324,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			timeLeft = 30;
 			playing = true;
 			updateStats();
-			setStatus('Tap the moving target.');
+			setStatus('Hareket eden hedefe dokun.');
 
 			arena.innerHTML = '';
 			placeTarget();
@@ -357,7 +357,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (event.target === arena) {
 				misses += 1;
 				updateStats();
-				setStatus('Miss. Try again.');
+				setStatus('Miss. Tekrar dene.');
 			}
 		});
 
@@ -378,7 +378,7 @@ if (!function_exists('zo_game_target_shooting_render')) {
 		?>
 		<div class="zo-game-root zo-game-root--target-shooting" id="<?php echo esc_attr($instance_id); ?>">
 			<div class="zo-tsg-card">
-				<h2 class="zo-tsg-title">Target Shooting</h2>
+				<h2 class="zo-tsg-title">Hedef Vurma</h2>
 				<p class="zo-tsg-subtitle">Tap the moving target as many times as you can before time runs out. Each hit gives 10 points.</p>
 
 				<div class="zo-tsg-stats">
@@ -388,7 +388,7 @@ if (!function_exists('zo_game_target_shooting_render')) {
 					<div class="zo-tsg-stat">Time: <span class="zo-tsg-time-value">30</span></div>
 				</div>
 
-				<div class="zo-tsg-status" aria-live="polite">Tap the moving target.</div>
+				<div class="zo-tsg-status" aria-live="polite">Hareket eden hedefe dokun.</div>
 
 				<div class="zo-tsg-arena"></div>
 
@@ -406,7 +406,7 @@ if (!function_exists('zo_game_target_shooting_render')) {
 
 return array(
 	'slug'            => 'target-shooting',
-	'name'            => 'Target Shooting',
+	'name'            => 'Hedef Vurma',
 	'author'          => 'Arslan',
 	'description'     => 'A simple target tapping game where players hit a moving target before time runs out.',
 	'render_callback' => 'zo_game_target_shooting_render',

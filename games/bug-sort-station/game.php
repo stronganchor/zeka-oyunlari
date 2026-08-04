@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			currentBug = null;
 			if (lives <= 0) {
 				stopGame();
-				result.textContent = 'You lost all lives. Press Start.';
+				result.textContent = 'You lost all lives. Başlat düğmesine bas.';
 			}
 		}
 
@@ -183,7 +183,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			currentBug = bugs[idx];
 			bugName.textContent = currentBug.name;
 			bugText.textContent = currentBug.type.charAt(0).toUpperCase() + currentBug.type.slice(1) + ' Bin';
-			result.textContent = 'Classify the bug.';
+			result.textContent = 'Böceği sınıflandır.';
 			activeTimeout = setTimeout(function () {
 				if (!running || !currentBug) {
 					return;
@@ -211,13 +211,13 @@ document.addEventListener('DOMContentLoaded', function () {
 			timeLeft = 30;
 			currentBug = null;
 			updateHud();
-			result.textContent = 'Classify the bugs before time runs out.';
+			result.textContent = 'Süre bitmeden böcekleri sınıflandır.';
 			timerInterval = setInterval(function () {
 				timeLeft -= 1;
 				updateHud();
 				if (timeLeft <= 0) {
 					stopGame();
-					result.textContent = 'Time finished. Score: ' + score;
+					result.textContent = 'Süre bitti. Puan: ' + score;
 				}
 			}, 1000);
 
@@ -232,7 +232,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			const expected = bugToBin[currentBug.type] || currentBug.type;
 			if (targetBin === expected) {
 				score += 1;
-				result.textContent = 'Correct bin.';
+				result.textContent = 'Doğru kutu.';
 				updateHud();
 			} else {
 				loseLife('Wrong bin.');
@@ -262,7 +262,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		bugName.textContent = '';
 		bugText.textContent = '';
 		updateHud();
-		result.textContent = 'Press Start.';
+		result.textContent = 'Başlat düğmesine bas.';
 	});
 });
 JS;
@@ -278,7 +278,7 @@ if (!function_exists('zo_game_bug_sort_station_render')) {
 			<div class="zo-bs-zone">
 				<div class="zo-bs-bug-name"></div>
 				<div class="zo-bs-bug"></div>
-				<div class="zo-bs-result">Press Start.</div>
+				<div class="zo-bs-result">Başlat düğmesine bas.</div>
 			</div>
 			<div class="zo-bs-hud">
 				<div class="zo-bs-stat">Score <span class="zo-bs-score">0</span></div>

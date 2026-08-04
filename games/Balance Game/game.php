@@ -351,7 +351,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			});
 
 			updateTopbar();
-			setStatus('Pick the number that makes the scale balance.', '');
+			setStatus('Teraziyi dengeleyen sayiyi sec.', '');
 			nextBtn.disabled = true;
 		}
 
@@ -374,12 +374,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (selected === currentAnswer) {
 				score += 1;
 				streak += 1;
-				setStatus('Correct. The equation is balanced.', 'good');
+				setStatus('Dogru. Denklem dengede.', 'good');
 			} else {
 				lives -= 1;
 				streak = 0;
 				clickedButton.classList.add('is-wrong');
-				setStatus('Not balanced. The right answer is ' + currentAnswer + '.', 'bad');
+				setStatus('Dengede degil. Dogru cevap:' + currentAnswer + '.', 'bad');
 			}
 
 			updateTopbar();
@@ -391,17 +391,17 @@ document.addEventListener('DOMContentLoaded', function () {
 			answerEl.textContent = '';
 
 			if (lives <= 0) {
-				equationEl.textContent = 'Game Over';
-				setStatus('You ran out of lives. Final score: ' + score + ' / ' + totalRounds, 'bad');
+				equationEl.textContent = 'Oyun Bitti';
+				setStatus('Canin bitti. Son puan:' + score + ' / ' + totalRounds, 'bad');
 			} else if (score === totalRounds) {
-				equationEl.textContent = 'Perfect Balance';
-				setStatus('Amazing. Final score: ' + score + ' / ' + totalRounds, 'good');
+				equationEl.textContent = 'Mükemmel Denge';
+				setStatus('Harika. Son puan:' + score + ' / ' + totalRounds, 'good');
 			} else {
-				equationEl.textContent = 'Finished';
-				setStatus('Final score: ' + score + ' / ' + totalRounds, score >= Math.ceil(totalRounds / 2) ? 'good' : '');
+				equationEl.textContent = 'Bitti';
+				setStatus('Son puan:' + score + ' / ' + totalRounds, score >= Math.ceil(totalRounds / 2) ? 'good' : '');
 			}
 
-			progressEl.textContent = 'Game finished';
+			progressEl.textContent = 'Oyun bitti';
 			roundEl.textContent = String(Math.min(round - 1, totalRounds));
 			nextBtn.disabled = true;
 		}
@@ -412,7 +412,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			if (canAnswer) {
-				setStatus('Answer this round first.', 'bad');
+				setStatus('Önce bu turu cevapla.', 'bad');
 				return;
 			}
 
@@ -468,7 +468,7 @@ if (!function_exists('zo_game_balance_game_render')) {
 					</div>
 				</div>
 
-				<div class="bg-status" aria-live="polite">Pick the number that makes the scale balance.</div>
+				<div class="bg-status" aria-live="polite">Teraziyi dengeleyen sayıyı seç.</div>
 
 				<div class="bg-equation-card">
 					<span class="bg-equation-label">Equation</span>
@@ -483,11 +483,11 @@ if (!function_exists('zo_game_balance_game_render')) {
 				<div class="bg-choices"></div>
 
 				<div class="bg-actions">
-					<button type="button" class="bg-btn bg-btn--next">Next Round</button>
+					<button type="button" class="bg-btn bg-btn--next">Sonraki Tur</button>
 					<button type="button" class="bg-btn bg-btn--restart">Restart</button>
 				</div>
 
-				<div class="bg-progress">Round 1 of 10</div>
+				<div class="bg-progress">10 turun 1. turu</div>
 			</div>
 		</div>
 		<?php

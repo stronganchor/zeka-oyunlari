@@ -290,12 +290,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function checkEnd() {
 			if (lives <= 0) {
-				endGame('Game over. Score: ' + score);
+				endGame('Oyun bitti. Score: ' + score);
 				return true;
 			}
 
 			if (timeLeft <= 0) {
-				endGame('Time up. Final score: ' + score);
+				endGame('Time up. Son puan: ' + score);
 				return true;
 			}
 

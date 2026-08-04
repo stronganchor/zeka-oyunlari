@@ -518,7 +518,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				return;
 			}
 
-			setMessage(text + ' AI is thinking...');
+			setMessage(text + ' Yapay zeka düşünüyor...');
 
 			window.setTimeout(function () {
 				aiTurn();
@@ -570,7 +570,7 @@ if (!function_exists('zo_game_team_battle_render')) {
 		?>
 		<div class="zo-game-root zo-game-root--team-battle" id="<?php echo esc_attr($instance_id); ?>">
 			<div class="zo-team-battle-card">
-				<h2 class="zo-team-battle-title">Team Battle vs AI</h2>
+				<h2 class="zo-team-battle-title">Yapay Zekaya Karşı Takım Savaşı</h2>
 				<p class="zo-team-battle-help">You control one team. The other team is AI. Attack, heal, or shield and defeat the AI team.</p>
 
 				<div class="zo-team-battle-topbar">
@@ -623,7 +623,7 @@ if (!function_exists('zo_game_team_battle_render')) {
 
 return array(
 	'slug'            => 'team-battle',
-	'name'            => 'Team Battle vs AI',
+	'name'            => 'Yapay Zekaya Karşı Takım Savaşı',
 	'author'          => 'Arslan',
 	'description'     => 'A simple team battle game where you control one team and fight an AI team.',
 	'render_callback' => 'zo_game_team_battle_render',

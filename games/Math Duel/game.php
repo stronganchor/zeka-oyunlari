@@ -365,12 +365,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (selectedAnswer === currentAnswer) {
 				playerScore += 1;
 				streak += 1;
-				setStatus('Correct. You win this round.', 'good');
+				setStatus('Doğru. You win this round.', 'good');
 			} else {
 				cpuScore += 1;
 				streak = 0;
 				clickedButton.classList.add('is-wrong');
-				setStatus('Wrong. The computer wins this round.', 'bad');
+				setStatus('Yanlış. The computer wins this round.', 'bad');
 			}
 
 			updateTopbar();
@@ -382,14 +382,14 @@ document.addEventListener('DOMContentLoaded', function () {
 			problemEl.textContent = playerScore > cpuScore ? 'You Win' : (playerScore < cpuScore ? 'Computer Wins' : 'Tie Game');
 
 			if (playerScore > cpuScore) {
-				setStatus('Final score: You ' + playerScore + ' - ' + cpuScore + ' Computer', 'good');
+				setStatus('Son puan: ' + playerScore + ' - ' + cpuScore + ' Computer', 'good');
 			} else if (playerScore < cpuScore) {
-				setStatus('Final score: You ' + playerScore + ' - ' + cpuScore + ' Computer', 'bad');
+				setStatus('Son puan: ' + playerScore + ' - ' + cpuScore + ' Computer', 'bad');
 			} else {
-				setStatus('Final score: You ' + playerScore + ' - ' + cpuScore + ' Computer', '');
+				setStatus('Son puan: ' + playerScore + ' - ' + cpuScore + ' Computer', '');
 			}
 
-			progressEl.textContent = 'Game finished';
+			progressEl.textContent = 'Oyun bitti';
 			roundEl.textContent = String(totalRounds);
 			nextBtn.disabled = true;
 		}
@@ -400,7 +400,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			if (canAnswer) {
-				setStatus('Answer this round first.', 'bad');
+				setStatus('Önce bu turu cevapla.', 'bad');
 				return;
 			}
 
@@ -466,11 +466,11 @@ if (!function_exists('zo_game_math_duel_render')) {
 				<div class="md-status" aria-live="polite"></div>
 
 				<div class="md-actions">
-					<button type="button" class="md-btn md-btn--next">Next Round</button>
+					<button type="button" class="md-btn md-btn--next">Sonraki Tur</button>
 					<button type="button" class="md-btn md-btn--restart">Restart</button>
 				</div>
 
-				<div class="md-progress">Round 1 of 10</div>
+				<div class="md-progress">10 turun 1. turu</div>
 			</div>
 		</div>
 		<?php

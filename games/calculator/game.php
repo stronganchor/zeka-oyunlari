@@ -178,7 +178,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			if (!op) {
 				resultEl.textContent = '?';
-				statusEl.textContent = 'Select an operation.';
+				statusEl.textContent = 'Bir işlem seç.';
 				return;
 			}
 
@@ -187,13 +187,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			if (raw1 !== '' && Number.isNaN(num1)) {
 				resultEl.textContent = '?';
-				statusEl.textContent = 'Please enter a valid first number.';
+				statusEl.textContent = 'Geçerli bir ilk sayı gir.';
 				return;
 			}
 
 			if (op !== 'sqrt' && raw2 !== '' && Number.isNaN(num2)) {
 				resultEl.textContent = '?';
-				statusEl.textContent = 'Please enter a valid second number.';
+				statusEl.textContent = 'Geçerli bir ikinci sayı gir.';
 				return;
 			}
 
@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			} else if (op === 'divide') {
 				if (num2 === 0) {
 					resultEl.textContent = '?';
-					statusEl.textContent = 'Cannot divide by zero.';
+					statusEl.textContent = 'Sıfıra bölünemez.';
 					return;
 				}
 				result = num1 / num2;
@@ -217,13 +217,13 @@ document.addEventListener('DOMContentLoaded', function () {
 			} else if (op === 'sqrt') {
 				if (num1 < 0) {
 					resultEl.textContent = '?';
-					statusEl.textContent = 'Cannot take the square root of a negative number.';
+					statusEl.textContent = 'Negatif sayının karekökü alınamaz.';
 					return;
 				}
 				result = Math.sqrt(num1);
 			} else {
 				resultEl.textContent = '?';
-				statusEl.textContent = 'Select an operation.';
+				statusEl.textContent = 'Bir işlem seç.';
 				return;
 			}
 
@@ -274,7 +274,7 @@ if (!function_exists('zo_game_kids_calculator_render')) {
 		ob_start();
 		?>
 		<div class="zo-game-root zo-game-root--kids-calculator" id="<?php echo esc_attr($instance_id); ?>">
-			<h2 class="zo-kc-title">Simple Calculator for Kids</h2>
+			<h2 class="zo-kc-title">Çocuklar İçin Basit Hesap Makinesi</h2>
 			<p class="zo-kc-desc">Type numbers, choose an operation, and press Calculate. Use Square Root to work with the first number only.</p>
 
 			<div class="zo-kc-grid">
@@ -321,7 +321,7 @@ if (!function_exists('zo_game_kids_calculator_render')) {
 
 return array(
 	'slug'            => 'kids-calculator',
-	'name'            => 'Simple Calculator for Kids',
+	'name'            => 'Çocuklar İçin Basit Hesap Makinesi',
 	'author'          => 'Asker',
 	'description'     => 'A simple calculator game for kids with add, subtract, multiply, divide, power, and square root.',
 	'render_callback' => 'zo_game_kids_calculator_render',

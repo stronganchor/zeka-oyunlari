@@ -360,7 +360,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			clearTimers();
 			moleEl.hidden = true;
 			state.currentHoleIndex = null;
-			showOverlay('Game Over', 'Final Score: ' + state.score, false);
+			showOverlay('Oyun Bitti', 'Son Puan: ' + state.score, false);
 			updateHud();
 		}
 

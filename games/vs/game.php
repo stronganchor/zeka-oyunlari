@@ -569,10 +569,10 @@ document.addEventListener('DOMContentLoaded', function () {
 				ctx.font = 'bold 34px Arial';
 				ctx.fillText(state.winner + ' Wins', WIDTH / 2, HEIGHT / 2 - 12);
 				ctx.font = 'bold 18px Arial';
-				ctx.fillText('Press restart to play again.', WIDTH / 2, HEIGHT / 2 + 22);
+				ctx.fillText('Tekrar oynamak için yeniden başlat.', WIDTH / 2, HEIGHT / 2 + 22);
 			} else {
 				ctx.font = 'bold 34px Arial';
-				ctx.fillText('Monster Team vs Block World', WIDTH / 2, HEIGHT / 2 - 12);
+				ctx.fillText('Canavar Takımı Blok Dünyasına Karşı', WIDTH / 2, HEIGHT / 2 - 12);
 				ctx.font = 'bold 18px Arial';
 				ctx.fillText('Start, then send units from the left side.', WIDTH / 2, HEIGHT / 2 + 22);
 			}
@@ -655,7 +655,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.enemySpawnTimer = 0;
 			state.winner = '-';
 			updateStats();
-			setMessage('Press Start. Then choose a monster unit.');
+			setMessage('Başlat düğmesine bas. Then choose a monster unit.');
 			draw();
 		}
 
@@ -672,7 +672,7 @@ if (!function_exists('zo_monster_vs_block_world_render')) {
 		?>
 		<div class="zo-game-root zo-game-root--monster-vs-block-world" id="<?php echo esc_attr($game_id); ?>">
 			<div class="zo-mvb-wrap">
-				<h2 class="zo-mvb-title">Monster Team vs Block World</h2>
+				<h2 class="zo-mvb-title">Canavar Takımı Blok Dünyasına Karşı</h2>
 				<p class="zo-mvb-subtitle">Left side sends creature fighters. Right side sends blocky defenders in a simple base battle.</p>
 
 				<div class="zo-mvb-topbar">
@@ -680,7 +680,7 @@ if (!function_exists('zo_monster_vs_block_world_render')) {
 						<div class="zo-mvb-stat">Energy: <span class="zo-mvb-energy">45</span></div>
 						<div class="zo-mvb-stat">Monster Base: <span class="zo-mvb-left-base">320</span></div>
 						<div class="zo-mvb-stat">Block Base: <span class="zo-mvb-right-base">320</span></div>
-						<div class="zo-mvb-stat">Winner: <span class="zo-mvb-winner">-</span></div>
+						<div class="zo-mvb-stat">Kazanan: <span class="zo-mvb-winner">-</span></div>
 					</div>
 
 					<div class="zo-mvb-controls">
@@ -692,7 +692,7 @@ if (!function_exists('zo_monster_vs_block_world_render')) {
 				<div class="zo-mvb-layout">
 					<div class="zo-mvb-board-wrap">
 						<canvas class="zo-mvb-canvas" width="900" height="440" aria-label="Monster vs block world battle"></canvas>
-						<div class="zo-mvb-message">Press Start. Then choose a monster unit.</div>
+						<div class="zo-mvb-message">Başlat düğmesine bas. Then choose a monster unit.</div>
 					</div>
 
 					<div class="zo-mvb-side">
@@ -729,7 +729,7 @@ if (!function_exists('zo_monster_vs_block_world_render')) {
 
 return array(
 	'slug'            => 'monster-vs-block-world',
-	'name'            => 'Monster Team vs Block World',
+	'name'            => 'Canavar Takımı Blok Dünyasına Karşı',
 	'author'          => 'Arslan',
 	'description'     => 'A creature team versus blocky defender base battle.',
 	'render_callback' => 'zo_monster_vs_block_world_render',

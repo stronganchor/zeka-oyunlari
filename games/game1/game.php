@@ -463,8 +463,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			clearInterval(state.timerId);
 			state.timerId = 0;
 			startBtn.disabled = false;
-			setStatus('Game over. Final score: ' + state.score);
-			setFeedback('Press Start Game to play again.');
+			setStatus('Oyun bitti. Son puan:' + state.score);
+			setFeedback('Oyunu Başlat düğmesine bas to play again.');
 		}
 
 		function startGame() {
@@ -477,7 +477,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.lastRuleKey = '';
 			updateStats();
 			startBtn.disabled = true;
-			setStatus('Watch the rule. Then tap the correct arrow.');
+			setStatus('Kuralı izle. Sonra doğru oka dokun.');
 			setFeedback('');
 			nextRound();
 
@@ -508,10 +508,10 @@ document.addEventListener('DOMContentLoaded', function () {
 			clearInterval(state.timerId);
 			state.timerId = 0;
 			startBtn.disabled = false;
-			ruleTextEl.textContent = 'Press Start Game';
+			ruleTextEl.textContent = 'Oyunu Başlat düğmesine bas';
 			symbolEl.textContent = '⬤';
-			setStatus('Press Start Game to begin.');
-			setFeedback('Easy: same or opposite. Medium: adds clockwise. Hard: adds counterclockwise too.');
+			setStatus('Başlamak için Oyunu Başlat düğmesine bas.');
+			setFeedback('Kolay: aynı veya ters. Orta: saat yönünü ekler. Zor: saat yönünün tersini de ekler.');
 			updateStats();
 		}
 
@@ -532,13 +532,13 @@ document.addEventListener('DOMContentLoaded', function () {
 				if (state.score > state.best) {
 					state.best = state.score;
 				}
-				setStatus('Correct');
+				setStatus('Dogru');
 				setFeedback('Nice. Combo bonus is now ' + state.streak + '.');
 				pulseBox(true);
 			} else {
 				state.streak = 0;
-				setStatus('Wrong');
-				setFeedback('Correct answer was ' + correctValue.toUpperCase() + '.');
+				setStatus('Yanlis');
+				setFeedback('Doğru cevap: ' + correctValue.toUpperCase() + '.');
 				pulseBox(false);
 			}
 
@@ -608,7 +608,7 @@ if (!function_exists('zo_game_rule_switch_rush_render')) {
 		ob_start();
 		?>
 		<div class="zo-game-root zo-game-root--rule-switch-rush" id="<?php echo esc_attr($instance_id); ?>" tabindex="0">
-			<h2 class="rsr-title">Rule Switch Rush</h2>
+			<h2 class="rsr-title">Kural Değiştirme Yarışı</h2>
 			<p class="rsr-subtitle">Think fast. The rule keeps changing. Watch the big arrow, read the rule, and tap the correct answer before time runs out.</p>
 
 			<div class="rsr-panel">
@@ -637,15 +637,15 @@ if (!function_exists('zo_game_rule_switch_rush_render')) {
 			</div>
 
 			<div class="rsr-controls">
-				<button type="button" class="rsr-btn rsr-start">Start Game</button>
+				<button type="button" class="rsr-btn rsr-start">Oyunu Başlat</button>
 				<button type="button" class="rsr-btn rsr-btn--secondary rsr-reset">Reset</button>
 			</div>
 
-			<p class="rsr-status">Press Start Game to begin.</p>
+			<p class="rsr-status">Başlamak için Oyunu Başlat düğmesine bas.</p>
 
 			<div class="rsr-stage">
 				<div class="rsr-rule-banner">
-					<div class="rsr-rule-text">Press Start Game</div>
+					<div class="rsr-rule-text">Oyunu Başlat düğmesine bas</div>
 				</div>
 
 				<div class="rsr-play-area">
@@ -654,7 +654,7 @@ if (!function_exists('zo_game_rule_switch_rush_render')) {
 						<div class="rsr-prompt">
 							<span class="rsr-symbol">⬤</span>
 						</div>
-						<div class="rsr-feedback">Easy: same or opposite. Medium: adds clockwise. Hard: adds counterclockwise too.</div>
+						<div class="rsr-feedback">Kolay: aynı veya ters. Orta: saat yönünü ekler. Zor: saat yönünün tersini de ekler.</div>
 					</div>
 
 					<div class="rsr-answer-grid">
@@ -675,7 +675,7 @@ if (!function_exists('zo_game_rule_switch_rush_render')) {
 
 return array(
 	'slug'            => 'rule-switch-rush',
-	'name'            => 'Rule Switch Rush',
+	'name'            => 'Kural Değiştirme Yarışı',
 	'author'          => 'Asker',
 	'description'     => 'A fast reflex and thinking game where the rule changes and players must choose the correct direction.',
 	'render_callback' => 'zo_game_rule_switch_rush_render',

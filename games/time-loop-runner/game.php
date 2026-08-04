@@ -199,7 +199,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				target.push(moveset[Math.floor(Math.random() * moveset.length)]);
 			}
 			pathReplay = target.join(' ');
-			routine.textContent = 'Repeat: ' + pathReplay;
+			routine.textContent = 'Tekrarla: ' + pathReplay;
 		}
 
 		function markCell(index, type) {
@@ -263,9 +263,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			});
 			checkBtn.disabled = true;
 			newRoutine();
-			status.textContent = 'Watch the loop sequence.';
+			status.textContent = 'Döngü dizisini izle.';
 			setTimeout(function () {
-				status.textContent = 'Repeat it now.';
+				status.textContent = 'Şimdi tekrar et.';
 				routine.textContent = '';
 				accepting = true;
 				lockedButtons = false;
@@ -296,14 +296,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		checkBtn.addEventListener('click', function () {
 			if (moves.length < target.length) {
-				status.textContent = 'Add all 5 moves.';
+				status.textContent = '5 hamlenin hepsini ekle.';
 				return;
 			}
 			const result = runSimulation(moves);
 			if (result.ok && result.index === goalIndex) {
 				score += 1;
 				round += 1;
-				status.textContent = 'Great loop! You reached the goal.';
+				status.textContent = 'Harika döngü! Hedefe ulaştın.';
 				result.steps.forEach(function (index) {
 					markCell(index, 'path');
 				});
@@ -316,7 +316,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				status.textContent = result.reason || 'Wrong path.';
 				lives = lives - 1;
 				if (lives <= 0) {
-					status.textContent = 'No lives. Press Start.';
+					status.textContent = 'Can yok. Başlat düğmesine bas.';
 					checkBtn.disabled = true;
 					replayBtn.disabled = true;
 					moveButtons.forEach(function (btn) {
@@ -332,7 +332,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (!target.length) {
 				return;
 			}
-			routine.textContent = 'Repeat: ' + pathReplay;
+			routine.textContent = 'Tekrarla: ' + pathReplay;
 		});
 
 		startBtn.addEventListener('click', function () {
@@ -351,7 +351,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		paint();
 		updateHud();
-		status.textContent = 'Press Start.';
+		status.textContent = 'Başlat düğmesine bas.';
 	});
 });
 JS;
@@ -363,8 +363,8 @@ if (!function_exists('zo_game_time_loop_runner_render')) {
 		ob_start();
 		?>
 		<div class="zo-game-root zo-game-root--time-loop-runner" id="<?php echo esc_attr($instance_id); ?>">
-			<h2 class="zo-tl-title">Time Loop Runner</h2>
-			<div class="zo-tl-routine">Press Start.</div>
+			<h2 class="zo-tl-title">Zaman Döngüsü Koşucusu</h2>
+			<div class="zo-tl-routine">Başlat düğmesine bas.</div>
 			<div class="zo-tl-board"></div>
 			<div class="zo-tl-actions">
 				<button type="button" class="zo-tl-control" data-move="U">Up</button>
@@ -382,7 +382,7 @@ if (!function_exists('zo_game_time_loop_runner_render')) {
 				<button type="button" class="zo-tl-btn zo-tl-check">Check</button>
 				<button type="button" class="zo-tl-btn zo-tl-replay">Replay</button>
 			</div>
-			<div class="zo-tl-status">Press Start.</div>
+			<div class="zo-tl-status">Başlat düğmesine bas.</div>
 		</div>
 		<?php
 		return ob_get_clean();
@@ -391,7 +391,7 @@ if (!function_exists('zo_game_time_loop_runner_render')) {
 
 return array(
 	'slug'            => 'time-loop-runner',
-	'name'            => 'Time Loop Runner',
+	'name'            => 'Zaman Döngüsü Koşucusu',
 	'author'          => 'Asker',
 	'description'     => 'Watch a 5 step sequence and replay the moves without crashing.',
 	'render_callback' => 'zo_game_time_loop_runner_render',

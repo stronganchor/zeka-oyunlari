@@ -361,7 +361,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				facts: {
 					capital: 'Tokyo',
 					continent: 'Asia',
-					flag: 'White with red circle',
+					flag: 'Kırmızı daireli beyaz',
 					language: 'Japanese',
 					currency: 'Yen',
 					famousFood: 'Sushi',
@@ -378,7 +378,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				facts: {
 					capital: 'Beijing',
 					continent: 'Asia',
-					flag: 'Red with yellow stars',
+					flag: 'Sarı yıldızlı kırmızı',
 					language: 'Chinese',
 					currency: 'Yuan',
 					famousFood: 'Noodles',
@@ -432,7 +432,7 @@ document.addEventListener('DOMContentLoaded', function () {
 					flag: 'Union Jack',
 					language: 'English',
 					currency: 'Pound',
-					famousFood: 'Fish and chips',
+					famousFood: 'Balık ve patates',
 					landmark: 'Big Ben',
 					animal: 'Lion',
 					sea: 'North Sea',
@@ -480,10 +480,10 @@ document.addEventListener('DOMContentLoaded', function () {
 		const allValues = {
 			capital: ['Ankara', 'Berlin', 'Paris', 'Madrid', 'Rome', 'Tokyo', 'Beijing', 'Washington DC', 'Brasilia', 'London', 'Moscow', 'Cairo'],
 			continent: ['Asia', 'Europe', 'North America', 'South America', 'Africa', 'Europe and Asia'],
-			flag: ['Red and white', 'Black red yellow', 'Blue white red', 'Red yellow red', 'Green white red', 'White with red circle', 'Red with yellow stars', 'Stars and stripes', 'Green yellow blue', 'Union Jack', 'White blue red', 'Red white black'],
+			flag: ['Red and white', 'Black red yellow', 'Blue white red', 'Red yellow red', 'Green white red', 'Kırmızı daireli beyaz', 'Sarı yıldızlı kırmızı', 'Stars and stripes', 'Green yellow blue', 'Union Jack', 'White blue red', 'Red white black'],
 			language: ['Turkish', 'German', 'French', 'Spanish', 'Italian', 'Japanese', 'Chinese', 'English', 'Portuguese', 'Russian', 'Arabic'],
 			currency: ['Lira', 'Euro', 'Yen', 'Yuan', 'Dollar', 'Real', 'Pound', 'Ruble', 'Egyptian pound'],
-			famousFood: ['Kebab', 'Sausage', 'Croissant', 'Paella', 'Pizza', 'Sushi', 'Noodles', 'Burger', 'Feijoada', 'Fish and chips', 'Borscht', 'Koshari'],
+			famousFood: ['Kebab', 'Sausage', 'Croissant', 'Paella', 'Pizza', 'Sushi', 'Noodles', 'Burger', 'Feijoada', 'Balık ve patates', 'Borscht', 'Koshari'],
 			landmark: ['Hagia Sophia', 'Brandenburg Gate', 'Eiffel Tower', 'Sagrada Familia', 'Colosseum', 'Mount Fuji', 'Great Wall', 'Statue of Liberty', 'Christ the Redeemer', 'Big Ben', 'Saint Basils Cathedral', 'Pyramids of Giza'],
 			animal: ['Gray wolf', 'Eagle', 'Rooster', 'Bull', 'Wolf', 'Crane', 'Panda', 'Bald eagle', 'Jaguar', 'Lion', 'Bear', 'Camel'],
 			sea: ['Black Sea', 'North Sea', 'Mediterranean Sea', 'Pacific Ocean', 'Atlantic Ocean', 'Arctic Ocean', 'Red Sea'],
@@ -611,12 +611,12 @@ document.addEventListener('DOMContentLoaded', function () {
 						btn.classList.add('is-correct');
 						coins += 10;
 						correctCount++;
-						setMessage('Correct. You win 10 coins.');
+						setMessage('Doğru. You win 10 coins.');
 					} else {
 						btn.classList.add('is-wrong');
 						coins -= 5;
 						wrongCount++;
-						setMessage('Wrong. Correct answer: ' + q.answer + '. You lose 5 coins.');
+						setMessage('Yanlış. Correct answer: ' + q.answer + '. You lose 5 coins.');
 					}
 
 					updateHud();
@@ -671,11 +671,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			updateHud();
 			nextBtn.disabled = true;
-			countryEl.textContent = 'No country selected yet';
-			questionCountEl.textContent = 'Question 0 / 100';
-			questionEl.textContent = 'Write a country name in Turkish or English, then press Start Quiz.';
+			countryEl.textContent = 'Henüz ülke seçilmedi';
+			questionCountEl.textContent = 'Soru 0 / 100';
+			questionEl.textContent = 'Bir ülke adını Türkçe veya İngilizce yaz, sonra Testi Başlat düğmesine bas.';
 			optionsEl.innerHTML = '';
-			setMessage('Type a country name to begin.');
+			setMessage('Başlamak için bir ülke adı yaz.');
 		}
 
 		startBtn.addEventListener('click', function () {
@@ -726,13 +726,13 @@ if (!function_exists('zo_game_arslan_country_quiz_render')) {
 				</div>
 
 				<div class="zo-country-quiz-panel">
-					<div class="zo-country-quiz-country">No country selected yet</div>
-					<div class="zo-country-quiz-question-count">Question 0 / 100</div>
-					<div class="zo-country-quiz-question">Write a country name in Turkish or English, then press Start Quiz.</div>
+					<div class="zo-country-quiz-country">Henüz ülke seçilmedi</div>
+					<div class="zo-country-quiz-question-count">Soru 0 / 100</div>
+					<div class="zo-country-quiz-question">Bir ülke adını Türkçe veya İngilizce yaz, sonra Testi Başlat düğmesine bas.</div>
 					<div class="zo-country-quiz-options"></div>
 				</div>
 
-				<div class="zo-country-quiz-message">Type a country name to begin.</div>
+				<div class="zo-country-quiz-message">Başlamak için bir ülke adı yaz.</div>
 
 				<div class="zo-country-quiz-bottom">
 					<button type="button" class="zo-country-quiz-btn zo-country-quiz-btn--next" disabled>Next Question</button>

@@ -362,7 +362,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			return zeros > values.length / 2 || ones > values.length / 2;
 		}
 
-		function hasDuplicateFinishedLines(lines) {
+		function hasDuplicateBittiLines(lines) {
 			const finished = lines.filter(function (line) {
 				return line.indexOf(null) === -1;
 			}).map(function (line) {
@@ -403,11 +403,11 @@ document.addEventListener('DOMContentLoaded', function () {
 				}
 			});
 
-			if (hasDuplicateFinishedLines(rows)) {
+			if (hasDuplicateBittiLines(rows)) {
 				problems += 1;
 			}
 
-			if (hasDuplicateFinishedLines(columns)) {
+			if (hasDuplicateBittiLines(columns)) {
 				problems += 1;
 			}
 
@@ -468,7 +468,7 @@ document.addEventListener('DOMContentLoaded', function () {
 							renderBoard();
 							updateStats();
 							updateHelper();
-							setStatus('Keep going. Follow the binary rules and fill the full grid.', '');
+							setStatus('Devam et. Ikili kurallari izle ve tum tabloyu doldur.', '');
 						});
 					}
 
@@ -483,7 +483,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			renderBoard();
 			updateStats();
 			updateHelper();
-			setStatus('Fill the empty squares with 0 or 1.', '');
+			setStatus('Bos kareleri 0 veya 1 ile doldur.', '');
 		}
 
 		checkBtn.addEventListener('click', function () {
@@ -493,14 +493,14 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (filled < size * size) {
 				state.mistakes += 1;
 				updateStats();
-				setStatus('The grid is not full yet. Fill every square first.', 'is-warn');
+				setStatus('Tablo henuz dolu degil. Once her kareyi doldur.', 'is-warn');
 				return;
 			}
 
 			if (problems > 0) {
 				state.mistakes += 1;
 				updateStats();
-				setStatus('Almost there. One or more row or column rules are broken.', 'is-warn');
+				setStatus('Az kaldi. Bir veya daha fazla satir ya da sutun kurali bozulmus.', 'is-warn');
 				return;
 			}
 
@@ -517,7 +517,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				state.wins += 1;
 				state.level += 1;
 				updateStats();
-				setStatus('You solved it. Great binary brain work!', 'is-good');
+				setStatus('Cozdun. Harika ikili mantik!', 'is-good');
 
 				window.setTimeout(function () {
 					startLevel();
@@ -525,7 +525,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			} else {
 				state.mistakes += 1;
 				updateStats();
-				setStatus('The rules look okay, but a few squares are still wrong. Try again.', 'is-warn');
+				setStatus('Kurallar iyi gorunuyor ama birkac kare hala yanlis. Tekrar dene.', 'is-warn');
 			}
 		});
 
@@ -541,7 +541,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			renderBoard();
 			updateStats();
 			updateHelper();
-			setStatus('Player moves cleared. Try the puzzle again.', '');
+			setStatus('Oyuncu hamleleri temizlendi. Bulmacayi tekrar dene.', '');
 		});
 
 		newBtn.addEventListener('click', function () {
@@ -594,7 +594,7 @@ if (!function_exists('zo_game_binary_puzzle_render')) {
 				</div>
 
 				<div class="zo-bp-actions">
-					<button class="zo-bp-btn zo-bp-btn--new zo-bp-new" type="button">New Puzzle</button>
+					<button class="zo-bp-btn zo-bp-btn--new zo-bp-new" type="button">Yeni Bulmaca</button>
 					<button class="zo-bp-btn zo-bp-btn--check zo-bp-check" type="button">Check Grid</button>
 					<button class="zo-bp-btn zo-bp-btn--clear zo-bp-clear" type="button">Clear Moves</button>
 				</div>

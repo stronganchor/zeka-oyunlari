@@ -11,7 +11,7 @@ if(!function_exists('zo_game_silent_rhythm_shooter_render')){function zo_game_si
 <h2>Silent Rhythm Shooter</h2><p>No music track. You create rhythm by firing, and enemies learn to sync to the beat pattern you make.</p>
 <div class="srs-top"><div class="srs-stat"><strong>Beat</strong><span data-beat>1</span></div><div class="srs-stat"><strong>Combo</strong><span data-combo>0</span></div><div class="srs-stat"><strong>Enemies</strong><span data-enemy>3</span></div><div class="srs-stat"><strong>Pattern</strong><span data-pattern>none</span></div><div class="srs-stat"><strong>Goal</strong><span data-goal>0/6</span></div></div>
 <div class="srs-track" data-track></div>
-<div class="srs-panel"><div class="srs-btns"><button class="srs-btn" data-fire>Fire</button><button class="srs-btn" data-wait>Wait Beat</button><button class="srs-btn" data-restart>Restart</button></div><p data-log></p></div>
+<div class="srs-panel"><div class="srs-btns"><button class="srs-btn" data-fire>Fire</button><button class="srs-btn" data-wait>Ritmi Bekle</button><button class="srs-btn" data-restart>Restart</button></div><p data-log></p></div>
 </div>
 <?php return ob_get_clean();}}
 return array('slug'=>'silent-rhythm-shooter','name'=>'Silent Rhythm Shooter','author'=>'Arslan','description'=>'A shooter where your firing creates the rhythm and enemies sync to it.','render_callback'=>'zo_game_silent_rhythm_shooter_render','inline_style'=>$css,'inline_script'=>$js);

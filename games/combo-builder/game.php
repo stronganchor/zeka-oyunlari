@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function resetGame() {
 			playerCombo = [];
-			status.textContent = 'Build the combo!';
+			status.textContent = 'Komboyu oluştur!';
 			buttons.forEach(btn => btn.classList.remove('active'));
 			generateCombo();
 		}
@@ -94,9 +94,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (playerCombo.length === targetCombo.length) {
 				const match = playerCombo.every((val, idx) => val === targetCombo[idx]);
 				if (match) {
-					status.textContent = 'Combo Complete! You Win!';
+					status.textContent = 'Kombo tamamlandı! Kazandın!';
 				} else {
-					status.textContent = 'Wrong combo! Try again.';
+					status.textContent = 'Wrong combo! Tekrar dene.';
 					setTimeout(resetGame, 2000);
 				}
 			}

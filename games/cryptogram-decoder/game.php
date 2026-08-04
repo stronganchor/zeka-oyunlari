@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		const restartButton = game.querySelector('.zo-game-root__restart');
 
 		cipherElement.textContent = cipherData.cipher;
-		statusElement.textContent = 'Decode the message by replacing each cipher letter with the correct plain letter.';
+		statusElement.textContent = 'Her şifreli harfi doğru açık harfle değiştirerek mesajı çöz.';
 		resultElement.textContent = '';
 		resultElement.className = 'zo-game-root__result';
 
@@ -167,23 +167,23 @@ document.addEventListener('DOMContentLoaded', function () {
 			const target = normalizeText(phrase.toUpperCase());
 
 			if (!guess) {
-				resultElement.textContent = 'Write your decoded phrase first.';
+				resultElement.textContent = 'Önce çözdüğün ifadeyi yaz.';
 				resultElement.className = 'zo-game-root__result zo-game-root__result--error';
 				return;
 			}
 
 			if (guess === target) {
-				resultElement.textContent = 'Correct! You cracked the cryptogram. Great job!';
+				resultElement.textContent = 'Doğru! You cracked the cryptogram. Great job!';
 				resultElement.className = 'zo-game-root__result zo-game-root__result--success';
 			} else {
-				resultElement.textContent = 'Not quite yet. Check your letters and try again.';
+				resultElement.textContent = 'Henüz değil. Harflerini kontrol et ve tekrar dene.';
 				resultElement.className = 'zo-game-root__result zo-game-root__result--error';
 			}
 		});
 
 		revealButton.addEventListener('click', function () {
 			answerElement.value = phrase;
-			resultElement.textContent = 'Here is the decoded phrase.';
+			resultElement.textContent = 'Çözülmüş ifade burada.';
 			resultElement.className = 'zo-game-root__result zo-game-root__result--success';
 		});
 
@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			const newCipher = createCipher(newPhrase);
 			cipherElement.textContent = newCipher.cipher;
 			answerElement.value = '';
-			statusElement.textContent = 'Decode the message by replacing each cipher letter with the correct plain letter.';
+			statusElement.textContent = 'Her şifreli harfi doğru açık harfle değiştirerek mesajı çöz.';
 			resultElement.textContent = '';
 			resultElement.className = 'zo-game-root__result';
 			return;
@@ -208,17 +208,17 @@ if (!function_exists('zo_game_cryptogram_decoder_render')) {
 		ob_start();
 		?>
 		<div class="zo-game-root zo-game-root--cryptogram-decoder" id="<?php echo esc_attr($instance_id); ?>">
-			<div class="zo-game-root__title">Cryptogram Decoder</div>
+			<div class="zo-game-root__title">Şifre Çözücü</div>
 			<div class="zo-game-root__instructions">A secret phrase is shown using a letter substitution cipher. Decode it and type the original message.</div>
-			<pre class="zo-game-root__cipher" aria-label="Cipher text"></pre>
-			<textarea class="zo-game-root__answer" placeholder="Type your decoded phrase here"></textarea>
+			<pre class="zo-game-root__cipher" aria-label="Şifreli metin"></pre>
+			<textarea class="zo-game-root__answer" placeholder="Çözdüğün ifadeyi buraya yaz"></textarea>
 			<div class="zo-game-root__small">Use the exact letters and spacing of the hidden message.</div>
 			<div class="zo-game-root__controls">
 				<button type="button" class="zo-game-root__button zo-game-root__submit">Check Answer</button>
 				<button type="button" class="zo-game-root__button zo-game-root__reveal">Reveal Answer</button>
 			</div>
 			<div class="zo-game-root__controls" style="margin-top: 0.5rem;">
-				<button type="button" class="zo-game-root__button zo-game-root__restart">New Puzzle</button>
+				<button type="button" class="zo-game-root__button zo-game-root__restart">Yeni Bulmaca</button>
 			</div>
 			<div class="zo-game-root__status"></div>
 			<div class="zo-game-root__result"></div>
@@ -230,7 +230,7 @@ if (!function_exists('zo_game_cryptogram_decoder_render')) {
 
 return array(
 	'slug'            => 'cryptogram-decoder',
-	'name'            => 'Cryptogram Decoder',
+	'name'            => 'Şifre Çözücü',
 	'author'          => 'Asker',
 	'description'     => 'Decode a secret phrase using letter substitution and solve the cryptogram.',
 	'render_callback' => 'zo_game_cryptogram_decoder_render',

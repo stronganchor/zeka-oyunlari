@@ -295,17 +295,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			updateUI();
 			setLog('Welcome, manager. Your small shop is ready.');
-			setStatus('Buy upgrades and press Next Day to run the shop.');
+			setStatus('Yükseltmeler al ve dükkanı çalıştırmak için Sonraki Gün düğmesine bas.');
 		}
 
 		function updateUI() {
 			dayEl.textContent = 'Day: ' + state.day;
 			moneyEl.textContent = 'Money: $' + state.money;
-			customersEl.textContent = 'Customers: ' + state.customers;
-			happinessEl.textContent = 'Happiness: ' + state.happiness;
-			workersEl.textContent = 'Workers: ' + state.workers;
-			productEl.textContent = 'Product Level: ' + state.productLevel;
-			upgradesEl.textContent = 'Upgrades: ' + (state.decorLevel + state.toolsLevel);
+			customersEl.textContent = 'Müşteriler: ' + state.customers;
+			happinessEl.textContent = 'Mutluluk: ' + state.happiness;
+			workersEl.textContent = 'Çalışanlar: ' + state.workers;
+			productEl.textContent = 'Ürün Seviyesi: ' + state.productLevel;
+			upgradesEl.textContent = 'Yükseltmeler: ' + (state.decorLevel + state.toolsLevel);
 
 			buyButtons.forEach(function (btn) {
 				const cost = parseInt(btn.getAttribute('data-cost'), 10);
@@ -323,7 +323,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function buyItem(type, cost) {
 			if (state.money < cost) {
-				setStatus('Not enough money.');
+				setStatus('Yeterli para yok.');
 				return;
 			}
 
@@ -345,12 +345,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			updateUI();
-			setStatus('Upgrade bought.');
+			setStatus('Yükseltme alındı.');
 		}
 
 		function advertise() {
 			if (state.money < 20) {
-				setStatus('You need $20 to advertise.');
+				setStatus('Reklam vermek için 20 dolar gerekir.');
 				return;
 			}
 
@@ -358,7 +358,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.advertisingBoost += 8;
 			updateUI();
 			setLog('You paid for advertising. More people may come next day.');
-			setStatus('Advertising activated.');
+			setStatus('Reklam etkinleştirildi.');
 		}
 
 		function runDay() {
@@ -402,11 +402,11 @@ document.addEventListener('DOMContentLoaded', function () {
 			updateUI();
 
 			if (state.money === 0 && state.playedDays > 2) {
-				setStatus('Your shop is struggling. Buy carefully and keep customers happy.');
+				setStatus('Dükkan zorlanıyor. Dikkatli al ve müşterileri mutlu tut.');
 			} else if (state.money >= 300) {
-				setStatus('Excellent. Your mini business is growing fast.');
+				setStatus('Harika. Mini işletmen hızla büyüyor.');
 			} else {
-				setStatus('New day ready. Choose your next move.');
+				setStatus('Yeni gün hazır. Sonraki hamleni seç.');
 			}
 		}
 
@@ -435,14 +435,14 @@ if (!function_exists('zo_game_mini_manager_style_render')) {
 		?>
 		<div class="zo-game-root zo-game-root--mini-manager-style" id="<?php echo esc_attr($instance_id); ?>">
 			<div class="zo-mini-manager-wrap">
-				<h3 class="zo-mini-manager-title">Mini Manager Style</h3>
+				<h3 class="zo-mini-manager-title">Mini Menajer Tarzı</h3>
 				<p class="zo-mini-manager-text">Run a tiny shop. Buy upgrades. Keep customers happy. Grow your money.</p>
 
 				<div class="zo-mini-manager-topbar">
 					<div class="zo-mini-manager-pill zo-mini-manager-day">Day: 1</div>
 					<div class="zo-mini-manager-pill zo-mini-manager-money">Money: $100</div>
-					<div class="zo-mini-manager-pill zo-mini-manager-customers">Customers: 0</div>
-					<div class="zo-mini-manager-pill zo-mini-manager-happiness">Happiness: 50</div>
+					<div class="zo-mini-manager-pill zo-mini-manager-customers">Müşteriler: 0</div>
+					<div class="zo-mini-manager-pill zo-mini-manager-happiness">Mutluluk: 50</div>
 				</div>
 
 				<div class="zo-mini-manager-layout">
@@ -480,7 +480,7 @@ if (!function_exists('zo_game_mini_manager_style_render')) {
 						</div>
 
 						<div class="zo-mini-manager-actions">
-							<button type="button" class="zo-mini-manager-big-btn zo-mini-manager-next-day">Next Day</button>
+							<button type="button" class="zo-mini-manager-big-btn zo-mini-manager-next-day">Sonraki Gün</button>
 							<button type="button" class="zo-mini-manager-big-btn is-alt zo-mini-manager-advertise">Advertise $20</button>
 						</div>
 					</div>
@@ -489,9 +489,9 @@ if (!function_exists('zo_game_mini_manager_style_render')) {
 						<h4 class="zo-mini-manager-panel-title">Manager Info</h4>
 
 						<div class="zo-mini-manager-stats">
-							<div class="zo-mini-manager-stat zo-mini-manager-workers">Workers: 1</div>
-							<div class="zo-mini-manager-stat zo-mini-manager-product">Product Level: 1</div>
-							<div class="zo-mini-manager-stat zo-mini-manager-upgrades">Upgrades: 0</div>
+							<div class="zo-mini-manager-stat zo-mini-manager-workers">Çalışanlar: 1</div>
+							<div class="zo-mini-manager-stat zo-mini-manager-product">Ürün Seviyesi: 1</div>
+							<div class="zo-mini-manager-stat zo-mini-manager-upgrades">Yükseltmeler: 0</div>
 							<div class="zo-mini-manager-stat">Goal: Grow</div>
 						</div>
 
@@ -501,7 +501,7 @@ if (!function_exists('zo_game_mini_manager_style_render')) {
 							<strong>How to play:</strong><br>
 							1. Start with $100.<br>
 							2. Buy workers, products, decoration, or tools.<br>
-							3. Press <strong>Next Day</strong> to run the shop.<br>
+							3. Press <strong>Sonraki Gün</strong> to run the shop.<br>
 							4. Customers come in, you earn money, and you also pay daily costs.<br>
 							5. Use <strong>Advertise</strong> if you want more customers on the next day.<br>
 							6. Keep happiness high and grow your business as long as you can.
@@ -510,10 +510,10 @@ if (!function_exists('zo_game_mini_manager_style_render')) {
 				</div>
 
 				<div class="zo-mini-manager-controls">
-					<button type="button" class="zo-mini-manager-control-btn zo-mini-manager-restart">Restart Game</button>
+					<button type="button" class="zo-mini-manager-control-btn zo-mini-manager-restart">Oyunu Yeniden Başlat</button>
 				</div>
 
-				<div class="zo-mini-manager-status">Buy upgrades and press Next Day to run the shop.</div>
+				<div class="zo-mini-manager-status">Yükseltmeler al ve dükkanı çalıştırmak için Sonraki Gün düğmesine bas.</div>
 			</div>
 		</div>
 		<?php
@@ -523,7 +523,7 @@ if (!function_exists('zo_game_mini_manager_style_render')) {
 
 return array(
 	'slug'            => 'mini-manager-style',
-	'name'            => 'Mini Manager Style',
+	'name'            => 'Mini Menajer Tarzı',
 	'author'          => 'Arslan',
 	'description'     => 'A simple shop management game with clear instructions.',
 	'render_callback' => 'zo_game_mini_manager_style_render',

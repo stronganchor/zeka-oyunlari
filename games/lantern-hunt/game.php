@@ -313,7 +313,7 @@ if (!function_exists('zo_game_lantern_hunt_render')) {
 		ob_start();
 		?>
 		<div class="zo-game-root zo-game-root--lantern-hunt" id="<?php echo esc_attr($instance_id); ?>">
-			<h2 class="zo-lh-title">Lantern Hunt</h2>
+			<h2 class="zo-lh-title">Fener Avı</h2>
 			<div class="zo-lh-grid"></div>
 			<div class="zo-lh-hints">
 				<button type="button" class="zo-lh-row-hint" data-index="0">Row 1</button>
@@ -340,7 +340,7 @@ if (!function_exists('zo_game_lantern_hunt_render')) {
 
 return array(
 	'slug'            => 'lantern-hunt',
-	'name'            => 'Lantern Hunt',
+	'name'            => 'Fener Avı',
 	'author'          => 'Asker',
 	'description'     => 'Reveal one cell at a time by row or column hints and match all lantern pairs.',
 	'render_callback' => 'zo_game_lantern_hunt_render',

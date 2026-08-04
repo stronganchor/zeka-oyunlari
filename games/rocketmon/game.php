@@ -340,7 +340,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			enemy: randomRocket(),
 			healsLeft: 3,
 			gameOver: false,
-			message: 'A wild rocket appeared. Choose Attack or Heal.'
+			message: 'Vahşi bir roket belirdi. Saldır veya İyileştir seç.'
 		};
 
 		function hpColor(ratio) {
@@ -461,7 +461,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.enemy = randomRocket();
 			state.healsLeft = 3;
 			state.gameOver = false;
-			state.message = 'A wild rocket appeared. Choose Attack or Heal.';
+			state.message = 'Vahşi bir roket belirdi. Saldır veya İyileştir seç.';
 			render();
 		}
 
@@ -575,8 +575,8 @@ if (!function_exists('zo_game_rocket_battle_heal_render')) {
 			</div>
 
 			<div class="rbh-log">
-				<div class="rbh-log-title">Battle Log</div>
-				<div class="rbh-log-text" data-role="log-text">A wild rocket appeared. Choose Attack or Heal.</div>
+				<div class="rbh-log-title">Savaş Günlüğü</div>
+				<div class="rbh-log-text" data-role="log-text">Vahşi bir roket belirdi. Saldır veya İyileştir seç.</div>
 			</div>
 
 			<div class="rbh-actions">

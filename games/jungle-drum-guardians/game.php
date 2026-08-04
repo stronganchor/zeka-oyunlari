@@ -366,7 +366,7 @@ if (!function_exists('zo_game_jungle_drum_guardians_render')) {
 		ob_start();
 		?>
 		<div class="zo-game-root zo-game-root--jungle-drum-guardians" id="<?php echo esc_attr($instance_id); ?>">
-			<h2 class="zo-zdg-title">Jungle Drum Guardians</h2>
+			<h2 class="zo-zdg-title">Orman Davulu Koruyucuları</h2>
 			<p class="zo-zdg-desc">Ancient stone guardians watch one lane at a time. Use drums, birds, and moving shadows to shift their gaze long enough to reach the glowing relic.</p>
 
 			<div class="zo-zdg-top">
@@ -425,7 +425,7 @@ if (!function_exists('zo_game_jungle_drum_guardians_render')) {
 
 return array(
 	'slug' => 'jungle-drum-guardians',
-	'name' => 'Jungle Drum Guardians',
+	'name' => 'Orman Davulu Koruyucuları',
 	'author' => 'asker',
 	'description' => 'A jungle stealth game where you distract ancient stone guardians with drums, birds, and moving shadows.',
 	'render_callback' => 'zo_game_jungle_drum_guardians_render',

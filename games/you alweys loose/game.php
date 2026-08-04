@@ -373,19 +373,19 @@ document.addEventListener('DOMContentLoaded', function () {
 		const actionDefs = {
 			attack: {
 				name: 'Bold Attack',
-				desc: 'Looks strong at first.'
+				desc: 'Başta güçlü görünür.'
 			},
 			shield: {
 				name: 'Shield Up',
-				desc: 'Feels safe. It is not.'
+				desc: 'Güvenli hissettirir. Değildir.'
 			},
 			outsmart: {
-				name: 'Outsmart the AI',
-				desc: 'Pretend to outsmart it.'
+				name: 'Yapay zekayı alt et',
+				desc: 'Onu alt etmiş gibi yap.'
 			},
 			appeal: {
 				name: 'Emotional Speech',
-				desc: 'Ask the AI for mercy.'
+				desc: 'Yapay zekadan merhamet iste.'
 			}
 		};
 
@@ -436,8 +436,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.logs = [];
 
 			updateBars();
-			roundTextEl.textContent = 'You might beat the AI this time.';
-			setMessage('Press Start. The opening rounds look fair.');
+			roundTextEl.textContent = 'Bu kez yapay zekayı yenebilirsin.';
+			setMessage('Başlat düğmesine bas. İlk turlar adil görünür.');
 			endingEl.classList.remove('is-visible');
 			logEl.innerHTML = '';
 			enableActions(false);
@@ -466,8 +466,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			updateBars();
 			enableActions(true);
-			roundTextEl.textContent = 'Round 1. The AI looks beatable.';
-			setMessage('Choose a move.');
+			roundTextEl.textContent = 'Tur 1. Yapay zeka yenilebilir görünüyor.';
+			setMessage('Bir hamle seç.');
 			addLog('Round 1 begins. The AI politely waits.');
 			endingEl.classList.remove('is-visible');
 		}
@@ -477,7 +477,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			if (round === 1) {
 				return {
-					text: 'The AI studies you and allows a small success.',
+					text: 'Yapay zeka seni inceliyor ve küçük bir başarıya izin veriyor.',
 					playerDamage: 6,
 					aiDamage: 18,
 					playerConfidenceDelta: 0,
@@ -487,7 +487,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			if (round === 2) {
 				return {
-					text: 'The AI adjusts. Your move still lands, but less.',
+					text: 'Yapay zeka uyum sağlıyor. Hamlen yine tutuyor ama daha az etkili.',
 					playerDamage: 10,
 					aiDamage: 10,
 					playerConfidenceDelta: -4,
@@ -502,7 +502,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 				if (repeated) {
 					return {
-						text: 'The AI predicted the pattern before you clicked.',
+						text: 'Yapay zeka sen tıklamadan önce deseni tahmin etti.',
 						playerDamage: 24,
 						aiDamage: 2,
 						playerConfidenceDelta: -16,
@@ -522,7 +522,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (round === 4) {
 				if (actionKey === 'outsmart') {
 					return {
-						text: 'You try to outsmart the AI. The AI thanks you for the lesson.',
+						text: 'Yapay zekayı alt etmeye çalışırsın. Yapay zeka ders için teşekkür eder.',
 						playerDamage: 32,
 						aiDamage: 0,
 						playerConfidenceDelta: -20,
@@ -541,7 +541,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				}
 
 				return {
-					text: 'The AI no longer reacts. It informs outcomes.',
+					text: 'Yapay zeka artık tepki vermiyor. Sonuçları bildiriyor.',
 					playerDamage: 28,
 					aiDamage: 2,
 					playerConfidenceDelta: -18,
@@ -551,7 +551,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			if (round === 5) {
 				return {
-					text: 'The AI has fully modeled your behavior.',
+					text: 'Yapay zeka davranışını tamamen modelledi.',
 					playerDamage: 34,
 					aiDamage: 0,
 					playerConfidenceDelta: -22,
@@ -576,19 +576,19 @@ document.addEventListener('DOMContentLoaded', function () {
 				return 'You brace for impact.';
 			}
 			if (actionKey === 'outsmart') {
-				return 'You type very fast and hope it means something.';
+				return 'Çok hızlı yazarsın ve anlamlı olmasını umarsın.';
 			}
-			return 'You deliver a speech about humanity.';
+			return 'İnsanlık hakkında bir konuşma yaparsın.';
 		}
 
 		function endGame() {
 			state.running = false;
 			state.ended = true;
 			enableActions(false);
-			roundTextEl.textContent = 'Defeat is complete.';
-			setMessage('You always lose.');
+			roundTextEl.textContent = 'Yenilgi tamamlandı.';
+			setMessage('Her zaman kaybedersin.');
 			endingEl.classList.add('is-visible');
-			endingEl.textContent = 'The joke is the setup. The first rounds make it look possible. Then the AI learns too fast and the result becomes fixed.';
+			endingEl.textContent = 'Şaka düzende. İlk turlar mümkün gibi gösterir. Sonra yapay zeka çok hızlı öğrenir ve sonuç sabitlenir.';
 		}
 
 		function playRound(actionKey) {
@@ -603,7 +603,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			const response = getAiResponse(actionKey);
 
-			addLog('You used ' + actionDef.name + '. ' + getActionFlavor(actionKey));
+			addLog('Kullandın: ' + actionDef.name + '. ' + getActionFlavor(actionKey));
 			addLog(response.text);
 
 			state.playerActionHistory.push(actionKey);
@@ -622,13 +622,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			if (state.aiHp <= 0) {
 				state.aiHp = 1;
-				addLog('For a moment it looks like you won. The AI restores itself to 1 HP.');
+				addLog('Bir an kazandın gibi görünüyor. Yapay zeka kendini 1 cana döndürüyor.');
 				updateBars();
 			}
 
 			state.round += 1;
 			roundTextEl.textContent = 'Round ' + state.round + '. It feels worse now.';
-			setMessage('Choose again. The AI is ahead.');
+			setMessage('Tekrar seç. Yapay zeka önde.');
 
 			if (state.round >= 6) {
 				const finalResponse = getAiResponse(actionKey);
@@ -667,8 +667,8 @@ if (!function_exists('zo_you_always_lose_render')) {
 		?>
 		<div class="zo-game-root zo-game-root--you-always-lose" id="<?php echo esc_attr($game_id); ?>">
 			<div class="zo-yal-wrap">
-				<h2 class="zo-yal-title">Beat the AI?</h2>
-				<p class="zo-yal-subtitle">At first it looks fair. Then the AI learns too fast. You always lose.</p>
+				<h2 class="zo-yal-title">Yapay zekayı yen?</h2>
+				<p class="zo-yal-subtitle">At first it looks fair. Then the AI learns too fast. Her zaman kaybedersin.</p>
 
 				<div class="zo-yal-topbar">
 					<div class="zo-yal-stats">
@@ -711,12 +711,12 @@ if (!function_exists('zo_you_always_lose_render')) {
 									</div>
 								</div>
 
-								<div class="zo-yal-mini">Already adapting</div>
+								<div class="zo-yal-mini">Zaten uyum sağlıyor</div>
 							</div>
 						</div>
 
 						<div class="zo-yal-middle">VS</div>
-						<div class="zo-yal-round-text">You might beat the AI this time.</div>
+						<div class="zo-yal-round-text">Bu kez yapay zekayı yenebilirsin.</div>
 
 						<div class="zo-yal-actions">
 							<button type="button" class="zo-yal-action" data-action="attack">
@@ -726,26 +726,26 @@ if (!function_exists('zo_you_always_lose_render')) {
 
 							<button type="button" class="zo-yal-action" data-action="shield">
 								<div class="zo-yal-action-title">🛡️ Shield Up</div>
-								<div class="zo-yal-action-text">Try to survive the next counter.</div>
+								<div class="zo-yal-action-text">Sonraki karşı saldırıda hayatta kalmaya çalış.</div>
 							</button>
 
 							<button type="button" class="zo-yal-action" data-action="outsmart">
-								<div class="zo-yal-action-title">💻 Outsmart the AI</div>
-								<div class="zo-yal-action-text">Pretend you found a weakness.</div>
+								<div class="zo-yal-action-title">💻 Yapay zekayı alt et</div>
+								<div class="zo-yal-action-text">Bir zayıflık bulmuş gibi yap.</div>
 							</button>
 
 							<button type="button" class="zo-yal-action" data-action="appeal">
 								<div class="zo-yal-action-title">🎤 Emotional Speech</div>
-								<div class="zo-yal-action-text">Ask the AI to spare you.</div>
+								<div class="zo-yal-action-text">Yapay zekadan seni bağışlamasını iste.</div>
 							</button>
 						</div>
 
-						<div class="zo-yal-message">Press Start. The opening rounds look fair.</div>
+						<div class="zo-yal-message">Başlat düğmesine bas. İlk turlar adil görünür.</div>
 						<div class="zo-yal-ending"></div>
 					</div>
 
 					<div class="zo-yal-panel">
-						<h3 style="margin:0 0 10px;font-size:18px;">Battle Log</h3>
+						<h3 style="margin:0 0 10px;font-size:18px;">Savaş Günlüğü</h3>
 						<div class="zo-yal-log"></div>
 						<div class="zo-yal-hint">
 							This is a fake-hope game. The design goal is not balance. The design goal is inevitability.
@@ -761,7 +761,7 @@ if (!function_exists('zo_you_always_lose_render')) {
 
 return array(
 	'slug'            => 'you-always-lose',
-	'name'            => 'Beat the AI?',
+	'name'            => 'Yapay zekayı yen?',
 	'author'          => 'Arslan',
 	'description'     => 'A joke battle game where it seems like you can beat the AI, but you always lose.',
 	'render_callback' => 'zo_you_always_lose_render',

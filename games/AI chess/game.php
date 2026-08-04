@@ -609,7 +609,7 @@ document.addEventListener('DOMContentLoaded', function () {
 					state.status = moveLabelPrefix + ' ' + moveToText(move) + '. ' + (moverColor === 'w' ? 'White' : 'Black') + ' wins by checkmate.';
 				} else {
 					state.winner = 'draw';
-					state.status = moveLabelPrefix + ' ' + moveToText(move) + '. Stalemate.';
+					state.status = moveLabelPrefix + ' ' + moveToText(move) + '. Pat.';
 				}
 				return;
 			}
@@ -779,7 +779,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			aiThinking = true;
 			state.selected = null;
 			state.legalMoves = [];
-			state.status = 'AI is thinking...';
+			state.status = 'Yapay zeka düşünüyor...';
 			renderBoard();
 
 			window.setTimeout(function () {
@@ -796,7 +796,7 @@ document.addEventListener('DOMContentLoaded', function () {
 							state.status = 'Black has no move. White wins by checkmate.';
 						} else {
 							state.winner = 'draw';
-							state.status = 'Stalemate.';
+							state.status = 'Pat.';
 						}
 						renderBoard();
 						return;
@@ -839,7 +839,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				if (state.legalMoves.length) {
 					state.status = coordToName(r, c) + ' selected.';
 				} else {
-					state.status = 'That piece has no legal move.';
+					state.status = 'Bu taşın yasal hamlesi yok.';
 				}
 				renderBoard();
 				return;
@@ -901,9 +901,9 @@ if (!function_exists('zo_game_turkish_satranc_ai_render')) {
 
 				<div class="zo-ts-controls">
 					<select class="zo-ts-select zo-ts-difficulty" aria-label="AI difficulty">
-						<option value="1">Easy AI</option>
-						<option value="2" selected>Medium AI</option>
-						<option value="3">Hard AI</option>
+						<option value="1">Kolay Yapay Zeka</option>
+						<option value="2" selected>Orta Yapay Zeka</option>
+						<option value="3">Zor Yapay Zeka</option>
 					</select>
 					<button type="button" class="zo-ts-btn zo-ts-reset">Restart</button>
 					<button type="button" class="zo-ts-btn zo-ts-flip">Flip Board</button>

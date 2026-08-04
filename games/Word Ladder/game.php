@@ -523,7 +523,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				best = moves;
 			}
 			updateStats();
-			setStatus('Great. You reached ' + roundData.target + '.', 'good');
+			setStatus('Harika. Şuna ulaştın: ' + roundData.target + '.', 'good');
 
 			window.setTimeout(function () {
 				if (round < totalRounds) {
@@ -536,8 +536,8 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function endGame() {
-			setStatus('Finished. Score: ' + score + ' / ' + totalRounds, score >= 3 ? 'good' : '');
-			progressEl.textContent = 'Game finished';
+			setStatus('Bitti. Puan: ' + score + ' / ' + totalRounds, score >= 3 ? 'good' : '');
+			progressEl.textContent = 'Oyun bitti';
 		}
 
 		function applyLetter(letter) {
@@ -551,19 +551,19 @@ document.addEventListener('DOMContentLoaded', function () {
 			const nextWord = letters.join('');
 
 			if (nextWord === oldWord) {
-				setStatus('That letter is already there.', 'bad');
+				setStatus('Bu harf zaten orada.', 'bad');
 				return;
 			}
 
 			if (!wordsDifferByOne(oldWord, nextWord)) {
-				setStatus('Change only one letter.', 'bad');
+				setStatus('Sadece bir harf değiştir.', 'bad');
 				return;
 			}
 
 			const expectedNextWord = roundData.path[currentPath.length];
 
 			if (nextWord !== expectedNextWord) {
-				setStatus('That step is not on this ladder. Try another letter.', 'bad');
+				setStatus('Bu adım bu merdivende yok. Başka harf dene.', 'bad');
 				return;
 			}
 
@@ -581,12 +581,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			renderChangeButtons();
-			setStatus('Nice. Change one more letter.', 'good');
+			setStatus('Güzel. Bir harf daha değiştir.', 'good');
 		}
 
 		function undoMove() {
 			if (currentPath.length <= 1) {
-				setStatus('Nothing to undo.', 'bad');
+				setStatus('Geri alınacak bir şey yok.', 'bad');
 				return;
 			}
 
@@ -597,7 +597,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			renderCurrentWord();
 			renderHistory();
 			renderChangeButtons();
-			setStatus('Last move removed.', '');
+			setStatus('Son hamle kaldırıldı.', '');
 		}
 
 		function restartRound() {
@@ -610,7 +610,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			renderHistory();
 			renderSelectedPosition();
 			renderChangeButtons();
-			setStatus('Change one letter at a time to reach the target word.', '');
+			setStatus('Hedef kelimeye ulaşmak için her seferinde bir harf değiştir.', '');
 		}
 
 		function startRound() {
@@ -625,7 +625,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				selectedPosition = parseInt(button.getAttribute('data-position'), 10);
 				renderSelectedPosition();
 				renderChangeButtons();
-				setStatus('Pick a new letter for position ' + (selectedPosition + 1) + '.', '');
+				setStatus('Konum için yeni harf seç: ' + (selectedPosition + 1) + '.', '');
 			});
 		});
 
@@ -659,8 +659,8 @@ if (!function_exists('zo_game_word_ladder_render')) {
 		?>
 		<div class="zo-game-root zo-game-root--word-ladder" id="<?php echo esc_attr($instance_id); ?>">
 			<div class="wl-card">
-				<h2 class="wl-title">Word Ladder</h2>
-				<p class="wl-instructions">Start with the first word. Change one letter at a time to reach the target word. Each step must make a new valid ladder word in this puzzle.</p>
+				<h2 class="wl-title">Kelime Merdiveni</h2>
+				<p class="wl-instructions">Start with the first word. Hedef kelimeye ulaşmak için her seferinde bir harf değiştir. Each step must make a new valid ladder word in this puzzle.</p>
 
 				<div class="wl-topbar">
 					<div class="wl-stat">
@@ -695,7 +695,7 @@ if (!function_exists('zo_game_word_ladder_render')) {
 					<div class="wl-current-word">CAT</div>
 				</div>
 
-				<div class="wl-status" aria-live="polite">Change one letter at a time to reach the target word.</div>
+				<div class="wl-status" aria-live="polite">Hedef kelimeye ulaşmak için her seferinde bir harf değiştir.</div>
 
 				<div class="wl-letters">
 					<div class="wl-letter-box">
@@ -737,7 +737,7 @@ if (!function_exists('zo_game_word_ladder_render')) {
 				<div class="wl-actions">
 					<button type="button" class="wl-btn wl-btn--undo">Undo</button>
 					<button type="button" class="wl-btn wl-btn--restart-round">Restart Round</button>
-					<button type="button" class="wl-btn wl-btn--restart-game">Restart Game</button>
+					<button type="button" class="wl-btn wl-btn--restart-game">Oyunu Yeniden Başlat</button>
 				</div>
 
 				<div class="wl-progress">Round 1 of 5</div>
@@ -750,7 +750,7 @@ if (!function_exists('zo_game_word_ladder_render')) {
 
 return array(
 	'slug'            => 'word-ladder',
-	'name'            => 'Word Ladder',
+	'name'            => 'Kelime Merdiveni',
 	'author'          => 'Arslan',
 	'description'     => 'Change one letter at a time to climb from the start word to the target word.',
 	'render_callback' => 'zo_game_word_ladder_render',

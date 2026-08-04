@@ -880,7 +880,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			shots = 0;
 			solved = false;
 			clearBeamState();
-			refreshBoard('Aynalari cevir ve sonra Ates Et dugmesine bas.', 'is-info');
+			refreshBoard('Aynaları çevir ve sonra Ateş Et düğmesine bas.', 'is-info');
 		}
 
 		function newRound() {
@@ -888,7 +888,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			solved = false;
 			buildPuzzle();
 			clearBeamState();
-			refreshBoard('Aynalari cevir ve sonra Ates Et dugmesine bas.', 'is-info');
+			refreshBoard('Aynaları çevir ve sonra Ateş Et düğmesine bas.', 'is-info');
 		}
 
 		fireButton.addEventListener('click', function () {
@@ -916,7 +916,7 @@ if (!function_exists('zo_game_mirror_maze_render')) {
 		ob_start();
 		?>
 		<div class="zo-game-root zo-game-root--mirror-maze" id="<?php echo esc_attr($instance_id); ?>">
-			<h2 class="zo-mm-title">Mirror Maze</h2>
+			<h2 class="zo-mm-title">Ayna Labirenti</h2>
 			<p class="zo-mm-desc">Aynalari cevir, lazeri hedefe yonlendir ve yolu ac. Her bolumde isini sari hedef kutusuna ulastir.</p>
 
 			<div class="zo-mm-top">
@@ -966,7 +966,7 @@ if (!function_exists('zo_game_mirror_maze_render')) {
 					<h3 class="zo-mm-side-title">Nasil Oynanir</h3>
 					<p class="zo-mm-instructions">Mor aynalara tiklayarak yonlerini degistir. Hazir olunca Ates Et dugmesine bas ve mavi isin sari hedefe varsin.</p>
 
-					<div class="zo-mm-status" aria-live="polite">Aynalari cevir ve sonra Ates Et dugmesine bas.</div>
+					<div class="zo-mm-status" aria-live="polite">Aynaları çevir ve sonra Ateş Et düğmesine bas.</div>
 
 					<div class="zo-mm-mirror-tray">
 						<div class="zo-mm-tray-card">
@@ -996,7 +996,7 @@ if (!function_exists('zo_game_mirror_maze_render')) {
 
 return array(
 	'slug'            => 'mirror-maze',
-	'name'            => 'Mirror Maze',
+	'name'            => 'Ayna Labirenti',
 	'author'          => 'Asker',
 	'description'     => 'Aynalari cevirerek lazer isigini hedefe yonlendirdigin bulmaca oyunu.',
 	'render_callback' => 'zo_game_mirror_maze_render',

@@ -188,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			resetDoors();
 			chooseTreasure();
 			updateStats();
-			setStatus('Find the treasure chest.');
+			setStatus('Hazine sandığını bul.');
 		}
 
 		function showTreasure() {
@@ -206,9 +206,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			showTreasure();
 
 			if (win) {
-				setStatus('You won the treasure hunt.');
+				setStatus('Hazine avını kazandın.');
 			} else {
-				setStatus('Game over. The treasure was hidden too well.');
+				setStatus('Oyun bitti. The treasure was hidden too well.');
 			}
 		}
 
@@ -230,7 +230,7 @@ document.addEventListener('DOMContentLoaded', function () {
 						return;
 					}
 
-					setStatus('You found the treasure. Next level...');
+					setStatus('Hazineyi buldun. Sonraki seviye...');
 					setTimeout(function () {
 						level += 1;
 						startLevel();
@@ -245,7 +245,7 @@ document.addEventListener('DOMContentLoaded', function () {
 					if (hearts <= 0) {
 						finishGame(false);
 					} else {
-						setStatus('That was a trap. Try another chest.');
+						setStatus('Bu bir tuzaktı. Başka sandık dene.');
 					}
 				}
 			});
@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			locked = true;
 			showTreasure();
-			setStatus('There it is. Press restart to play again.');
+			setStatus('There it is. Tekrar oynamak için yeniden başlat.');
 		});
 
 		startLevel();
@@ -290,7 +290,7 @@ if (!function_exists('zo_game_treasure_doors_render')) {
 					<div class="zo-td-stat">Hearts: <span class="zo-td-hearts-value">3</span></div>
 				</div>
 
-				<div class="zo-td-status" aria-live="polite">Find the treasure chest.</div>
+				<div class="zo-td-status" aria-live="polite">Hazine sandığını bul.</div>
 
 				<div class="zo-td-board">
 					<button type="button" class="zo-td-door">Chest 1</button>

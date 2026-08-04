@@ -263,7 +263,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			updateTargetGrid();
 			updatePlayerGrid();
 			updateStats();
-			setStatus('Copy the pattern on the right grid.');
+			setStatus('Sag tablodaki deseni kopyala.');
 		}
 
 		function markResult(correct) {
@@ -281,11 +281,11 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (correct) {
 				score += 1;
 				updateStats();
-				setStatus('Correct. Next round...');
+				setStatus('Dogru. Sonraki tur...');
 				locked = true;
 
 				if (score >= 6) {
-					setStatus('You won Pattern Copy Game.');
+					setStatus('Desen Kopyalama Oyunu oyununu kazandin.');
 					return;
 				}
 
@@ -299,11 +299,11 @@ document.addEventListener('DOMContentLoaded', function () {
 				locked = true;
 
 				if (lives <= 0) {
-					setStatus('Game over.');
+					setStatus('Oyun bitti.');
 					return;
 				}
 
-				setStatus('Not quite right. A new pattern is coming...');
+				setStatus('Tam dogru degil. Yeni desen geliyor...');
 				window.setTimeout(function () {
 					round += 1;
 					startRound();
@@ -333,7 +333,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 			playerPattern = new Array(16).fill(false);
 			updatePlayerGrid();
-			setStatus('Grid cleared. Copy the pattern again.');
+			setStatus('Tablo temizlendi. Deseni tekrar kopyala.');
 		});
 
 		restartBtn.addEventListener('click', function () {
@@ -358,7 +358,7 @@ if (!function_exists('zo_game_pattern_copy_game_render')) {
 		?>
 		<div class="zo-game-root zo-game-root--pattern-copy-game" id="<?php echo esc_attr($instance_id); ?>">
 			<div class="zo-pcg-card">
-				<h2 class="zo-pcg-title">Pattern Copy Game</h2>
+				<h2 class="zo-pcg-title">Desen Kopyalama Oyunu</h2>
 				<p class="zo-pcg-subtitle">Look at the pattern on the left and copy it on the right. Get 6 correct before you lose all 3 lives.</p>
 
 				<div class="zo-pcg-stats">
@@ -396,7 +396,7 @@ if (!function_exists('zo_game_pattern_copy_game_render')) {
 
 return array(
 	'slug'            => 'pattern-copy-game',
-	'name'            => 'Pattern Copy Game',
+	'name'            => 'Desen Kopyalama Oyunu',
 	'author'          => 'Arslan',
 	'description'     => 'A simple visual memory game where players copy a pattern from one grid to another.',
 	'render_callback' => 'zo_game_pattern_copy_game_render',

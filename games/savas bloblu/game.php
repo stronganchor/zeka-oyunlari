@@ -231,7 +231,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			},
 			leaf: {
 				key: 'leaf',
-				name: 'Leaf Beast',
+				name: 'Yaprak Canavarı',
 				cost: 40,
 				hp: 70,
 				damage: 11,
@@ -243,7 +243,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			},
 			cube: {
 				key: 'cube',
-				name: 'Cube Fighter',
+				name: 'Küp Savaşçısı',
 				cost: 30,
 				hp: 55,
 				damage: 8,
@@ -255,7 +255,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			},
 			golem: {
 				key: 'golem',
-				name: 'Block Golem',
+				name: 'Blok Golemi',
 				cost: 50,
 				hp: 95,
 				damage: 14,
@@ -475,8 +475,8 @@ document.addEventListener('DOMContentLoaded', function () {
 				state.playerBaseHp = 0;
 				state.running = false;
 				state.gameOver = true;
-				state.winner = 'Block Team';
-				setMessage('Block Team kazandı.');
+				state.winner = 'Blok Takımı';
+				setMessage('Blok Takımı kazandı.');
 			} else if (state.enemyBaseHp <= 0) {
 				state.enemyBaseHp = 0;
 				state.running = false;
@@ -568,7 +568,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				ctx.fillText('Tekrar başlat ve yeniden savaş.', WIDTH / 2, HEIGHT / 2 + 22);
 			} else {
 				ctx.font = 'bold 34px Arial';
-				ctx.fillText('Pocket Team vs Block Team', WIDTH / 2, HEIGHT / 2 - 12);
+				ctx.fillText('Cep Takımı Blok Takımına Karşı', WIDTH / 2, HEIGHT / 2 - 12);
 				ctx.font = 'bold 18px Arial';
 				ctx.fillText('Başlat ve bir savaşçı gönder.', WIDTH / 2, HEIGHT / 2 + 22);
 			}
@@ -652,7 +652,7 @@ if (!function_exists('zo_block_vs_monsters_render')) {
 		?>
 		<div class="zo-game-root zo-game-root--block-vs-monsters" id="<?php echo esc_attr($game_id); ?>">
 			<div class="zo-bvm-wrap">
-				<h2 class="zo-bvm-title">Pocket Team vs Block Team</h2>
+				<h2 class="zo-bvm-title">Cep Takımı Blok Takımına Karşı</h2>
 				<p class="zo-bvm-subtitle">Sol taraf canavar takım. Sağ taraf blok takım. Savaşçılar otomatik dövüşür.</p>
 
 				<div class="zo-bvm-topbar">
@@ -671,7 +671,7 @@ if (!function_exists('zo_block_vs_monsters_render')) {
 
 				<div class="zo-bvm-layout">
 					<div class="zo-bvm-board-wrap">
-						<canvas class="zo-bvm-canvas" width="860" height="420" aria-label="Block vs Monsters savaş alanı"></canvas>
+						<canvas class="zo-bvm-canvas" width="860" height="420" aria-label="Bloklar Canavarlara Karşı savaş alanı"></canvas>
 						<div class="zo-bvm-message">Başlat ve sol takım için savaşçı çıkar.</div>
 					</div>
 
@@ -680,9 +680,9 @@ if (!function_exists('zo_block_vs_monsters_render')) {
 
 						<div class="zo-bvm-spawn-grid">
 							<button type="button" class="zo-bvm-spawn-btn" data-unit="spark">⚡ Spark Beast - 25 enerji</button>
-							<button type="button" class="zo-bvm-spawn-btn" data-unit="leaf">🍃 Leaf Beast - 40 enerji</button>
-							<button type="button" class="zo-bvm-spawn-btn" data-unit="cube">🧱 Cube Fighter - 30 enerji</button>
-							<button type="button" class="zo-bvm-spawn-btn" data-unit="golem">⛏️ Block Golem - 50 enerji</button>
+							<button type="button" class="zo-bvm-spawn-btn" data-unit="leaf">🍃 Yaprak Canavarı - 40 enerji</button>
+							<button type="button" class="zo-bvm-spawn-btn" data-unit="cube">🧱 Küp Savaşçısı - 30 enerji</button>
+							<button type="button" class="zo-bvm-spawn-btn" data-unit="golem">⛏️ Blok Golemi - 50 enerji</button>
 						</div>
 
 						<h3 style="margin-top:16px;">Nasıl Oynanır</h3>
@@ -705,7 +705,7 @@ if (!function_exists('zo_block_vs_monsters_render')) {
 
 return array(
 	'slug'            => 'block-vs-monsters',
-	'name'            => 'Block vs Monsters',
+	'name'            => 'Bloklar Canavarlara Karşı',
 	'author'          => 'Arslan',
 	'description'     => 'Canavar takım ile blok takımın savaştığı çizgi savaş oyunu.',
 	'render_callback' => 'zo_block_vs_monsters_render',

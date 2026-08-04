@@ -161,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				status.textContent = 'Aligned! Nice!';
 				newRound();
 			} else {
-				status.textContent = 'Not aligned. Try again.';
+				status.textContent = 'Not aligned. Tekrar dene.';
 			}
 			if (!ok) {
 				movesEl.textContent = String(level);
@@ -235,7 +235,7 @@ if (!function_exists('zo_game_orbit_match_render')) {
 				<div class="zo-om-stat">Level: <span class="zo-om-level">1</span></div>
 				<div class="zo-om-stat">Moves Used: <span class="zo-om-moves">0</span></div>
 			</div>
-			<div class="zo-om-status">Press Start.</div>
+			<div class="zo-om-status">Başlat düğmesine bas.</div>
 		</div>
 		<?php
 		return ob_get_clean();

@@ -483,7 +483,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				streak += 1;
 				roundDone = true;
 				updateStats();
-				setStatus('Correct. You landed exactly on ' + targetNumber + '.', 'good');
+				setStatus('Doğru. You landed exactly on ' + targetNumber + '.', 'good');
 
 				window.setTimeout(function () {
 					if (round < totalRounds) {
@@ -523,9 +523,9 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function endGame() {
-			challengeEl.textContent = score === totalRounds ? 'Perfect Game' : 'Finished';
-			progressEl.textContent = 'Game finished';
-			setStatus('Final score: ' + score + ' / ' + totalRounds, score >= Math.ceil(totalRounds / 2) ? 'good' : '');
+			challengeEl.textContent = score === totalRounds ? 'Perfect Game' : 'Bitti';
+			progressEl.textContent = 'Oyun bitti';
+			setStatus('Son puan:' + score + ' / ' + totalRounds, score >= Math.ceil(totalRounds / 2) ? 'good' : '');
 			roundDone = true;
 		}
 
@@ -607,10 +607,10 @@ if (!function_exists('zo_game_number_line_jump_render')) {
 				<div class="nlj-actions">
 					<button type="button" class="nlj-btn nlj-btn--check">Check</button>
 					<button type="button" class="nlj-btn nlj-btn--reset">Reset Round</button>
-					<button type="button" class="nlj-btn nlj-btn--restart">Restart Game</button>
+					<button type="button" class="nlj-btn nlj-btn--restart">Oyunu Yeniden Başlat</button>
 				</div>
 
-				<div class="nlj-progress">Round 1 of 10</div>
+				<div class="nlj-progress">10 turun 1. turu</div>
 			</div>
 		</div>
 		<?php

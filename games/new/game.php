@@ -449,7 +449,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.tolerance = getModeConfig().tolerance;
 			renderAngles();
 			updateStats();
-			setStatus('Press Start Game to begin.');
+			setStatus('Başlamak için Oyunu Başlat düğmesine bas.');
 			nextBtn.disabled = true;
 		}
 
@@ -552,7 +552,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				updateModeButtons();
 				renderAngles();
 				if (!state.running) {
-					setStatus('Mode changed. Press Start Game or Next Round.');
+					setStatus('Mode changed. Oyunu Başlat düğmesine bas or Sonraki Tur.');
 				}
 			});
 		});
@@ -599,12 +599,12 @@ if (!function_exists('zo_game_angle_match_render')) {
 			</div>
 
 			<div class="am-controls">
-				<button type="button" class="am-btn am-start">Start Game</button>
+				<button type="button" class="am-btn am-start">Oyunu Başlat</button>
 				<button type="button" class="am-btn am-next">Check Angle</button>
 				<button type="button" class="am-btn am-btn--secondary am-reset">Reset</button>
 			</div>
 
-			<p class="am-status">Press Start Game to begin.</p>
+			<p class="am-status">Başlamak için Oyunu Başlat düğmesine bas.</p>
 
 			<div class="am-stage">
 				<div class="am-dials">

@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			updateHud();
 			status.textContent = 'Wrong note.';
 			if (lives <= 0) {
-				status.textContent = 'No lives. Press Start.';
+				status.textContent = 'Can yok. Başlat düğmesine bas.';
 				clearState();
 				return;
 			}
@@ -254,7 +254,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			lives = 3;
 			updateHud();
 			clearState();
-			instruction.textContent = 'Press Start.';
+			instruction.textContent = 'Başlat düğmesine bas.';
 		});
 
 		startBtn.addEventListener('click', function () {
@@ -265,7 +265,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		applyLook();
 		setButtonsEnabled(false);
 		updateHud();
-		instruction.textContent = 'Press Start.';
+		instruction.textContent = 'Başlat düğmesine bas.';
 	});
 });
 JS;
@@ -277,8 +277,8 @@ if (!function_exists('zo_game_sound_pattern_builder_render')) {
 		ob_start();
 		?>
 		<div class="zo-game-root zo-game-root--sound-pattern-builder" id="<?php echo esc_attr($instance_id); ?>">
-			<h2 class="zo-spb-title">Sound Pattern Builder</h2>
-			<p class="zo-spb-instruction">Press Start.</p>
+			<h2 class="zo-spb-title">Ses Deseni Oluşturucu</h2>
+			<p class="zo-spb-instruction">Başlat düğmesine bas.</p>
 			<div class="zo-spb-buttons">
 				<button type="button" class="zo-spb-animal" data-index="0"></button>
 				<button type="button" class="zo-spb-animal" data-index="1"></button>
@@ -295,7 +295,7 @@ if (!function_exists('zo_game_sound_pattern_builder_render')) {
 				<div class="zo-spb-stat">Lives <span class="zo-spb-lives">3</span></div>
 				<div class="zo-spb-stat">Round <span class="zo-spb-round">1</span></div>
 			</div>
-			<div class="zo-spb-status">Press Start.</div>
+			<div class="zo-spb-status">Başlat düğmesine bas.</div>
 		</div>
 		<?php
 		return ob_get_clean();
@@ -304,7 +304,7 @@ if (!function_exists('zo_game_sound_pattern_builder_render')) {
 
 return array(
 	'slug'            => 'sound-pattern-builder',
-	'name'            => 'Sound Pattern Builder',
+	'name'            => 'Ses Deseni Oluşturucu',
 	'author'          => 'Asker',
 	'description'     => 'Listen to a sound pattern and repeat it by tapping animals.',
 	'render_callback' => 'zo_game_sound_pattern_builder_render',

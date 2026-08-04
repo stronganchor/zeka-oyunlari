@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			updateHud();
 			if (lives <= 0) {
 				stopGame();
-				status.textContent = 'Out of catches. Press Start.';
+				status.textContent = 'Out of catches. Başlat düğmesine bas.';
 			}
 		}
 
@@ -230,7 +230,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 
 		updateHud();
-		status.textContent = 'Press Start.';
+		status.textContent = 'Başlat düğmesine bas.';
 	});
 });
 JS;
@@ -251,7 +251,7 @@ if (!function_exists('zo_game_rain_collector_render')) {
 				<div class="zo-rc-stat">Lives: <span class="zo-rc-lives">3</span></div>
 				<button type="button" class="zo-rc-start">Start</button>
 			</div>
-			<div class="zo-rc-status">Press Start.</div>
+			<div class="zo-rc-status">Başlat düğmesine bas.</div>
 		</div>
 		<?php
 		return ob_get_clean();

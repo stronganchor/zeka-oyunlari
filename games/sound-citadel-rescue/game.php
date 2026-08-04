@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 
 if (!defined('ABSPATH')) {
 	exit;
@@ -396,11 +396,11 @@ document.addEventListener('DOMContentLoaded', function () {
 			let best = 999999;
 			for (let i = 0; i < curses.length; i++) {
 				const c = curses[i];
-				if (c.lane !== tower.lane) {
+				if (c.lane !== kulesi.lane) {
 					continue;
 				}
 				const d = Math.abs(tower.x - c.x);
-				if (d <= tower.range && d < best) {
+				if (d <= kulesi.range && d < best) {
 					best = d;
 					nearest = c;
 				}
@@ -409,11 +409,11 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function fire(tower, target) {
-			tower.cooldown = tower.fireRate;
-			const vx = (target.x - tower.x) / 16;
+			tower.cooldown = kulesi.fireRate;
+			const vx = (target.x - kulesi.x) / 16;
 			bullets.push({
-				x: tower.x,
-				y: tower.y,
+				x: kulesi.x,
+				y: kulesi.y,
 				targetX: target.x,
 				targetY: target.y,
 				vx: vx,
@@ -423,7 +423,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				targetId: target.id
 			});
 			playTone(900 + (target.hp * 120), 0, 0.05, 0.2);
-			target.hp -= tower.damage;
+			target.hp -= kulesi.damage;
 			if (target.hp <= 0) {
 				score += 14;
 				curses = curses.filter(function (c) {
@@ -605,7 +605,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			let best = 999999;
 			for (let i = 0; i < curses.length; i++) {
 				const c = curses[i];
-				if (c.lane !== tower.lane) {
+				if (c.lane !== kulesi.lane) {
 					continue;
 				}
 				const d = Math.abs(tower.x - c.x);
@@ -811,7 +811,7 @@ if (!function_exists('zo_game_sound_citadel_rescue_render')) {
 		ob_start();
 		?>
 		<div class="zo-game-root zo-game-root--sound-citadel-rescue" id="<?php echo esc_attr($instance_id); ?>">
-			<h2 class="zo-scr-title">Sound Citadel Rescue</h2>
+			<h2 class="zo-scr-title">Ses Hisarı Kurtarma</h2>
 			<p class="zo-scr-desc">Build wards across 5 rune lanes and rescue trapped spirits. You can only rely on the sonar tones to know where curses are approaching each lane.</p>
 
 			<div class="zo-scr-grid">
@@ -844,25 +844,25 @@ if (!function_exists('zo_game_sound_citadel_rescue_render')) {
 
 			<div class="zo-scr-grid" style="margin-top:10px;">
 				<div class="zo-scr-stat">
-					<span class="zo-scr-stat-label">Lane threat (audio map)</span>
+					<span class="zo-scr-stat-label">Şerit tehdidi (ses haritası)</span>
 					<div class="zo-scr-lane-meter"><span></span></div>
 				</div>
 				<div class="zo-scr-stat">
-					<span class="zo-scr-stat-label">Lane threat (audio map)</span>
+					<span class="zo-scr-stat-label">Şerit tehdidi (ses haritası)</span>
 					<div class="zo-scr-lane-meter"><span></span></div>
 				</div>
 				<div class="zo-scr-stat">
-					<span class="zo-scr-stat-label">Lane threat (audio map)</span>
+					<span class="zo-scr-stat-label">Şerit tehdidi (ses haritası)</span>
 					<div class="zo-scr-lane-meter"><span></span></div>
 				</div>
 				<div class="zo-scr-stat">
-					<span class="zo-scr-stat-label">Lane threat (audio map)</span>
+					<span class="zo-scr-stat-label">Şerit tehdidi (ses haritası)</span>
 					<div class="zo-scr-lane-meter"><span></span></div>
 				</div>
 			</div>
 			<div class="zo-scr-grid" style="margin-top:10px;">
 				<div class="zo-scr-stat">
-					<span class="zo-scr-stat-label">Lane threat (audio map)</span>
+					<span class="zo-scr-stat-label">Şerit tehdidi (ses haritası)</span>
 					<div class="zo-scr-lane-meter"><span></span></div>
 				</div>
 			</div>
@@ -883,7 +883,7 @@ if (!function_exists('zo_game_sound_citadel_rescue_render')) {
 
 return array(
 	'slug' => 'sound-citadel-rescue',
-	'name' => 'Sound Citadel Rescue',
+	'name' => 'Ses Hisarı Kurtarma',
 	'author' => 'asker',
 	'description' => 'A castle defense concept where you rescue trapped spirits by placing sound wards across lanes. Curses move in darkness, and sound cues are your primary guide for where danger is strongest.',
 	'render_callback' => 'zo_game_sound_citadel_rescue_render',

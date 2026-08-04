@@ -222,10 +222,10 @@ document.addEventListener('DOMContentLoaded', function () {
 			centerText.hidden = false;
 
 			if (score >= targetScore) {
-				centerText.textContent = 'You found the hidden stars.';
+				centerText.textContent = 'Gizli yıldızları buldun.';
 				statusEl.textContent = 'You win.';
 			} else {
-				centerText.textContent = 'Try again and catch more stars.';
+				centerText.textContent = 'Tekrar dene ve daha fazla yıldız yakala.';
 				statusEl.textContent = 'Time is up.';
 			}
 		}
@@ -271,7 +271,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 				score += 1;
 				updatePanel();
-				statusEl.textContent = 'Nice catch.';
+				statusEl.textContent = 'Güzel yakalama.';
 				clearCurrentStar();
 				scheduleNextStar();
 			});
@@ -284,7 +284,7 @@ document.addEventListener('DOMContentLoaded', function () {
 					return;
 				}
 				clearCurrentStar();
-				statusEl.textContent = 'Too slow. Watch for the next one.';
+				statusEl.textContent = 'Çok yavaş. Sonrakini izle.';
 				scheduleNextStar();
 			}, life);
 		}
@@ -323,8 +323,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		updatePanel();
 		centerText.hidden = false;
-		centerText.textContent = 'Press Start to begin.';
-		statusEl.textContent = 'Private game. Embed directly where you want it.';
+		centerText.textContent = 'Başlamak için Başlat düğmesine bas.';
+		statusEl.textContent = 'Özel oyun. İstediğin yere doğrudan göm.';
 	});
 });
 JS;
@@ -357,7 +357,7 @@ if (!function_exists('zo_game_secret_star_sprint_render')) {
 			<p class="zo-secret-status">Catch the stars.</p>
 
 			<div class="zo-secret-arena">
-				<div class="zo-secret-center">Press Start to begin.</div>
+				<div class="zo-secret-center">Başlamak için Başlat düğmesine bas.</div>
 			</div>
 
 			<div class="zo-secret-controls">

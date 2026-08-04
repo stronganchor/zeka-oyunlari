@@ -155,10 +155,10 @@ document.addEventListener('DOMContentLoaded', function () {
 					if (i === correctIndex) {
 						tile.classList.add('correct');
 						score++;
-						statusEl.textContent = 'Correct!';
+						statusEl.textContent = 'Doğru!';
 					} else {
 						tile.classList.add('wrong');
-						statusEl.textContent = 'Wrong!';
+						statusEl.textContent = 'Yanlış!';
 					}
 
 					scoreEl.textContent = score;
@@ -174,7 +174,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				tiles.push(tile);
 			}
 
-			statusEl.textContent = 'Find the different color';
+			statusEl.textContent = 'Farklı rengi bul';
 		}
 
 		restartBtn.addEventListener('click', function () {
@@ -206,7 +206,7 @@ if (!function_exists('zo_game_odd_one_out_render')) {
 					<div class="zo-ooo-stat">Round: <span class="zo-ooo-round">1</span></div>
 				</div>
 
-				<div class="zo-ooo-status">Find the different color</div>
+				<div class="zo-ooo-status">Farklı rengi bul</div>
 				<div class="zo-ooo-grid"></div>
 
 				<div class="zo-ooo-actions">

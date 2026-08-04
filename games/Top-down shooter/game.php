@@ -351,8 +351,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			updateHud();
 			render();
 			showOverlay(
-				'Top-Down Shooter',
-				'Move with WASD or Arrow keys. Click or tap inside the board to shoot. Press Restart any time.',
+				'Üstten Görünümlü Nişancı',
+				'WASD veya ok tuşlarıyla hareket et. Ateş etmek için alana tıkla veya dokun. İstediğin zaman Yeniden Başlat düğmesine bas.',
 				true
 			);
 		}
@@ -598,7 +598,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.gameOver = true;
 			stopLoop();
 			render();
-			showOverlay('Game Over', 'Final Score: ' + state.score + '. Press Restart to play again.', false);
+			showOverlay('Oyun Bitti', 'Son Puan: ' + state.score + '. Tekrar oynamak için Yeniden Başlat düğmesine bas.', false);
 		}
 
 		function tick(timestamp) {
@@ -743,8 +743,8 @@ if (!function_exists('zo_game_top_down_shooter_render')) {
 		ob_start();
 		?>
 		<div class="zo-game-root zo-game-root--top-down-shooter" id="<?php echo esc_attr($instance_id); ?>" tabindex="0">
-			<div class="tds-title">Top-Down Shooter</div>
-			<div class="tds-instructions">Move with WASD or Arrow keys. Click or tap inside the board to shoot toward the pointer. Survive and score points.</div>
+			<div class="tds-title">Üstten Görünümlü Nişancı</div>
+			<div class="tds-instructions">WASD veya ok tuşlarıyla hareket et. İşaretçiye doğru ateş etmek için alana tıkla veya dokun. Hayatta kal ve puan topla.</div>
 
 			<div class="tds-topbar">
 				<div class="tds-stat">Score: <span data-role="score">0</span></div>
@@ -766,7 +766,7 @@ if (!function_exists('zo_game_top_down_shooter_render')) {
 
 					<div class="tds-overlay" data-role="overlay">
 						<div class="tds-panel">
-							<div class="tds-panel-title" data-role="overlay-title">Top-Down Shooter</div>
+							<div class="tds-panel-title" data-role="overlay-title">Üstten Görünümlü Nişancı</div>
 							<div class="tds-panel-text" data-role="overlay-text">Move, shoot, survive, and restart when needed.</div>
 							<div class="tds-btn-row">
 								<button type="button" class="tds-btn" data-role="start-btn">Start</button>
@@ -777,7 +777,7 @@ if (!function_exists('zo_game_top_down_shooter_render')) {
 				</div>
 			</div>
 
-			<div class="tds-controls">Move: WASD or Arrows. Shoot: Click or tap. Restart: button. The game ends when health reaches zero.</div>
+			<div class="tds-controls">Hareket: WASD veya oklar. Ateş: tıkla veya dokun. Yeniden başlat: düğme. Can sıfıra inince oyun biter.</div>
 		</div>
 		<?php
 		return ob_get_clean();
@@ -786,7 +786,7 @@ if (!function_exists('zo_game_top_down_shooter_render')) {
 
 return array(
 	'slug'            => 'top-down-shooter',
-	'name'            => 'Top-Down Shooter',
+	'name'            => 'Üstten Görünümlü Nişancı',
 	'author'          => 'Arslan',
 	'description'     => 'A browser-based top-down shooter with movement, shooting, enemies, score, health, and restart.',
 	'render_callback' => 'zo_game_top_down_shooter_render',

@@ -426,7 +426,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				setStatus('Great job. You made 128.');
 			} else if (!hasMovesLeft()) {
 				gameOver = true;
-				setStatus('Game over. No more moves.');
+				setStatus('Oyun bitti. No more moves.');
 			} else {
 				setStatus('Keep merging tiles.');
 			}

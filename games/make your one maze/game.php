@@ -430,7 +430,7 @@ if (!function_exists('zo_game_puzzle_creator_pro_render')) {
 		     data-can-manage="<?php echo $can_manage ? '1' : '0'; ?>"
 		     tabindex="0">
 
-			<h2>Puzzle Creator Pro</h2>
+			<h2>Bulmaca Yapıcı Pro</h2>
 
 			<div>
 				<button class="zo-pca-btn zo-pca-mode-wall">Wall</button>
@@ -455,7 +455,7 @@ if (!function_exists('zo_game_puzzle_creator_pro_render')) {
 
 return array(
 	'slug'            => 'puzzle-creator-pro',
-	'name'            => 'Puzzle Creator Pro',
+	'name'            => 'Bulmaca Yapıcı Pro',
 	'author'          => 'Asker',
 	'description'     => 'Create puzzles and share them system-wide from an editor account.',
 	'render_callback' => 'zo_game_puzzle_creator_pro_render',

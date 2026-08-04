@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', function () {
 						if (!display.includes('_')) {
 							if (display.join('') === currentWord) {
 								score++;
-								statusEl.textContent = 'Correct!';
+								statusEl.textContent = 'Doğru!';
 							} else {
 								statusEl.textContent = 'Wrong order!';
 							}
@@ -188,7 +188,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			});
 
 			updateDisplay();
-			statusEl.textContent = 'Build the word';
+			statusEl.textContent = 'Kelimeyi oluştur';
 		}
 
 		restartBtn.addEventListener('click', function () {
@@ -228,7 +228,7 @@ if (!function_exists('zo_game_turkish_word_builder_render')) {
 					<div class="zo-twb-stat">Round: <span class="zo-twb-round">1</span></div>
 				</div>
 
-				<div class="zo-twb-status">Build the word</div>
+				<div class="zo-twb-status">Kelimeyi oluştur</div>
 				<div class="zo-twb-word"></div>
 				<div class="zo-twb-letters"></div>
 

@@ -412,7 +412,7 @@ document.addEventListener('DOMContentLoaded', function () {
 					selectedShapeId = shape.id;
 					clearBinHighlights();
 					renderShapes();
-					setStatus('Now tap the matching bin.', '');
+					setStatus('Şimdi eşleşen kutuya dokun.', '');
 				});
 
 				shapeGrid.appendChild(btn);
@@ -456,7 +456,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			clearBinHighlights();
 
 			if (selectedShapeId === null) {
-				setStatus('Pick a shape first.', 'bad');
+				setStatus('Önce bir şekil seç.', 'bad');
 				binEl.classList.add('is-wrong');
 				return;
 			}
@@ -468,7 +468,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (!selectedShape || selectedShape.sorted) {
 				selectedShapeId = null;
 				renderShapes();
-				setStatus('Pick another shape.', 'bad');
+				setStatus('Başka bir şekil seç.', 'bad');
 				return;
 			}
 
@@ -483,16 +483,16 @@ document.addEventListener('DOMContentLoaded', function () {
 				updateStats();
 
 				if (sortedCount === currentShapes.length) {
-					setStatus('You sorted them all. Great job.', 'good');
+					setStatus('Hepsini ayırdın. Harika.', 'good');
 				} else {
-					setStatus('Correct. Pick the next shape.', 'good');
+					setStatus('Doğru. Pick the next shape.', 'good');
 				}
 			} else {
 				mistakes += 1;
 				score = Math.max(0, score - 1);
 				binEl.classList.add('is-wrong');
 				updateStats();
-				setStatus('Wrong bin. Try again.', 'bad');
+				setStatus('Wrong bin. Tekrar dene.', 'bad');
 			}
 		}
 
@@ -500,7 +500,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			selectedShapeId = null;
 			clearBinHighlights();
 			renderShapes();
-			setStatus('Selection cleared. Pick a shape.', '');
+			setStatus('Seçim temizlendi. Bir şekil seç.', '');
 		}
 
 		function restartGame() {
@@ -520,7 +520,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			renderShapes();
 			renderBins();
 			updateStats();
-			setStatus('Pick a shape, then tap the matching bin.', '');
+			setStatus('Bir şekil seç, sonra eşleşen kutuya dokun.', '');
 		}
 
 		clearBtn.addEventListener('click', clearSelection);
@@ -552,12 +552,12 @@ if (!function_exists('zo_game_shape_sorter_render')) {
 						<span class="ss-stat-value ss-sorted">0</span>
 					</div>
 					<div class="ss-stat">
-						<span class="ss-stat-label">Mistakes</span>
+						<span class="ss-stat-label">Hatalar</span>
 						<span class="ss-stat-value ss-mistakes">0</span>
 					</div>
 				</div>
 
-				<div class="ss-status" aria-live="polite">Pick a shape, then tap the matching bin.</div>
+				<div class="ss-status" aria-live="polite">Bir şekil seç, sonra eşleşen kutuya dokun.</div>
 
 				<div class="ss-layout">
 					<div class="ss-shape-panel">

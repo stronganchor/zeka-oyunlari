@@ -519,7 +519,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.currentPrompt = next;
 			iconEl.textContent = next.icon;
 			soundLabelEl.textContent = next.label;
-			soundHintEl.textContent = 'Listen in your head. What family does it belong to?';
+			soundHintEl.textContent = 'İçinden dinle. Hangi aileye ait?';
 		}
 
 		function nextRound() {
@@ -528,11 +528,11 @@ document.addEventListener('DOMContentLoaded', function () {
 			nextRule();
 
 			if (state.currentRule.key === 'previous' && !state.previousPrompt) {
-				ruleTextEl.textContent = 'First round: Tap the SAME sound family';
+				ruleTextEl.textContent = 'İlk tur: AYNI ses ailesine dokun';
 			}
 
 			if (state.currentRule.key === 'nonprevious' && !state.previousPrompt) {
-				ruleTextEl.textContent = 'First round: Tap a DIFFERENT sound family';
+				ruleTextEl.textContent = 'İlk tur: FARKLI bir ses ailesine dokun';
 			}
 
 			setFeedback('');
@@ -544,8 +544,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			clearInterval(state.timerId);
 			state.timerId = 0;
 			startBtn.disabled = false;
-			setStatus('Game over. Final score: ' + state.score);
-			setFeedback('Press Start Game to play again.');
+			setStatus('Oyun bitti. Son puan:' + state.score);
+			setFeedback('Oyunu Başlat düğmesine bas to play again.');
 		}
 
 		function startGame() {
@@ -561,7 +561,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.roundLocked = false;
 			updateStats();
 			startBtn.disabled = true;
-			setStatus('Read the rule. Then tap the correct sound family.');
+			setStatus('Kurali oku. Sonra dogru ses ailesine dokun.');
 			setFeedback('');
 			nextRound();
 
@@ -593,12 +593,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			clearInterval(state.timerId);
 			state.timerId = 0;
 			startBtn.disabled = false;
-			ruleTextEl.textContent = 'Press Start Game';
+			ruleTextEl.textContent = 'Oyunu Başlat düğmesine bas';
 			iconEl.textContent = '🔊';
-			soundLabelEl.textContent = 'Sound Rule Rush';
-			soundHintEl.textContent = 'Sort each sound into the right family.';
-			setStatus('Press Start Game to begin.');
-			setFeedback('Easy: same or different family. Medium: adds previous family. Hard: adds different from previous.');
+			soundLabelEl.textContent = 'Ses Kuralı Yarışı';
+			soundHintEl.textContent = 'Her sesi doğru aileye ayır.';
+			setStatus('Başlamak için Oyunu Başlat düğmesine bas.');
+			setFeedback('Kolay: aynı veya farklı aile. Orta: önceki aileyi ekler. Zor: öncekinden farklı aileyi ekler.');
 			updateStats();
 		}
 
@@ -628,13 +628,13 @@ document.addEventListener('DOMContentLoaded', function () {
 					state.best = state.score;
 				}
 
-				setStatus('Correct');
+				setStatus('Dogru');
 				setFeedback('Nice. ' + categoryLabel(correctValue) + ' was right.');
 				pulseBox(true);
 			} else {
 				state.streak = 0;
-				setStatus('Wrong');
-				setFeedback('Correct answer was ' + categoryLabel(correctValue) + '.');
+				setStatus('Yanlis');
+				setFeedback('Doğru cevap: ' + categoryLabel(correctValue) + '.');
 				pulseBox(false);
 			}
 
@@ -706,7 +706,7 @@ if (!function_exists('zo_game_sound_rule_rush_render')) {
 		ob_start();
 		?>
 		<div class="zo-game-root zo-game-root--sound-rule-rush" id="<?php echo esc_attr($instance_id); ?>" tabindex="0">
-			<h2 class="srr-title">Sound Rule Rush</h2>
+			<h2 class="srr-title">Ses Kuralı Yarışı</h2>
 			<p class="srr-subtitle">Think fast. A sound appears, the rule changes, and you must tap the correct sound family before time runs out.</p>
 
 			<div class="srr-panel">
@@ -735,15 +735,15 @@ if (!function_exists('zo_game_sound_rule_rush_render')) {
 			</div>
 
 			<div class="srr-controls">
-				<button type="button" class="srr-btn srr-start">Start Game</button>
+				<button type="button" class="srr-btn srr-start">Oyunu Başlat</button>
 				<button type="button" class="srr-btn srr-btn--secondary srr-reset">Reset</button>
 			</div>
 
-			<p class="srr-status">Press Start Game to begin.</p>
+			<p class="srr-status">Başlamak için Oyunu Başlat düğmesine bas.</p>
 
 			<div class="srr-stage">
 				<div class="srr-rule-banner">
-					<div class="srr-rule-text">Press Start Game</div>
+					<div class="srr-rule-text">Oyunu Başlat düğmesine bas</div>
 				</div>
 
 				<div class="srr-play-area">
@@ -751,10 +751,10 @@ if (!function_exists('zo_game_sound_rule_rush_render')) {
 						<h3 class="srr-box-title">Current Sound</h3>
 						<div class="srr-sound-card">
 							<div class="srr-icon">🔊</div>
-							<div class="srr-sound-label">Sound Rule Rush</div>
-							<div class="srr-sound-hint">Sort each sound into the right family.</div>
+							<div class="srr-sound-label">Ses Kuralı Yarışı</div>
+							<div class="srr-sound-hint">Her sesi doğru aileye ayır.</div>
 						</div>
-						<div class="srr-feedback">Easy: same or different family. Medium: adds previous family. Hard: adds different from previous.</div>
+						<div class="srr-feedback">Kolay: aynı veya farklı aile. Orta: önceki aileyi ekler. Zor: öncekinden farklı aileyi ekler.</div>
 					</div>
 
 					<div class="srr-answer-box">
@@ -790,7 +790,7 @@ if (!function_exists('zo_game_sound_rule_rush_render')) {
 
 return array(
 	'slug'            => 'sound-rule-rush',
-	'name'            => 'Sound Rule Rush',
+	'name'            => 'Ses Kuralı Yarışı',
 	'author'          => 'Asker',
 	'description'     => 'A fast reflex and thinking game where players sort sounds into the correct family as the rules change.',
 	'render_callback' => 'zo_game_sound_rule_rush_render',

@@ -273,7 +273,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				return;
 			}
 
-			messageEl.textContent = 'AI is thinking...';
+			messageEl.textContent = 'Yapay zeka düşünüyor...';
 			messageEl.className = 'tf-message tf-info';
 			aiThinking = true;
 
@@ -363,7 +363,7 @@ if (!function_exists('zo_game_territory_fill_render')) {
 		?>
 		<div class="zo-game-root zo-game-root--territory-fill" id="<?php echo esc_attr($instance_id); ?>">
 			<div class="tf-header">
-				<h2>Territory Fill</h2>
+				<h2>Bölge Doldurma</h2>
 			</div>
 
 			<div class="tf-instructions">
@@ -400,7 +400,7 @@ if (!function_exists('zo_game_territory_fill_render')) {
 
 return array(
 	'slug'            => 'territory-fill',
-	'name'            => 'Territory Fill',
+	'name'            => 'Bölge Doldurma',
 	'author'          => 'Asker',
 	'description'     => 'Grid control game. Claim the most area before moves run out.',
 	'render_callback' => 'zo_game_territory_fill_render',

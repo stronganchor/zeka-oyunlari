@@ -1479,7 +1479,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				if (userScore > aiScore) {
 					coins += 10;
 					updateHud();
-					setMessage('Blue wins. +10 coins');
+					setMessage('Mavi kazandı. +10 coins');
 				} else if (userScore < aiScore) {
 					coins += 4;
 					updateHud();
@@ -1677,7 +1677,7 @@ if (!function_exists('zo_game_soccer_match_ai_render')) {
 					</div>
 					<div class="zo-soccer-panel">
 						<strong class="zo-status-smart-level">0</strong>
-						<span>Smartness</span>
+						<span>Zekalık</span>
 					</div>
 					<div class="zo-soccer-panel">
 						<strong class="zo-status-shooting-level">0</strong>
@@ -1742,7 +1742,7 @@ if (!function_exists('zo_game_soccer_match_ai_render')) {
 								<span>Blue players run faster.</span>
 							</div>
 							<div class="zo-soccer-upgrade-card">
-								<strong>Smartness</strong>
+								<strong>Zekalık</strong>
 								<span>Better spacing and support.</span>
 							</div>
 							<div class="zo-soccer-upgrade-card">

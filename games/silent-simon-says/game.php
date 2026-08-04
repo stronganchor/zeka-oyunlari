@@ -144,7 +144,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		function newRound() {
 			if (lives <= 0) {
 				stopRound();
-				statusText.textContent = 'You are out of lives. Press Start.';
+				statusText.textContent = 'You are out of lives. Başlat düğmesine bas.';
 				return;
 			}
 			const prompt = actions[Math.floor(Math.random() * actions.length)];
@@ -159,7 +159,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			});
 			roundTimer = setTimeout(function () {
 				commandText.textContent = 'Pick the OPPOSITE.';
-				statusText.textContent = 'Choose a move.';
+				statusText.textContent = 'Bir hamle seç.';
 				responseOpen = true;
 				actionButtons.forEach(function (button) {
 					button.disabled = false;
@@ -178,14 +178,14 @@ document.addEventListener('DOMContentLoaded', function () {
 			const expected = getAction(current).opposite;
 			if (choice === expected) {
 				score += 1;
-				statusText.textContent = 'Correct!';
+				statusText.textContent = 'Doğru!';
 			} else {
 				lives -= 1;
-				statusText.textContent = 'Wrong. Opposite was "' + expected + '".';
+				statusText.textContent = 'Yanlış. Opposite was "' + expected + '".';
 				if (lives <= 0) {
 					updateHud();
 					stopRound();
-					statusText.textContent = 'Game over. Press Start.';
+					statusText.textContent = 'Oyun bitti. Başlat düğmesine bas.';
 					return;
 				}
 			}
@@ -211,7 +211,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 
 		updateHud();
-		statusText.textContent = 'Press Start.';
+		statusText.textContent = 'Başlat düğmesine bas.';
 		commandText.textContent = 'Ready.';
 		actionButtons.forEach(function (button) {
 			button.disabled = true;
@@ -244,7 +244,7 @@ if (!function_exists('zo_game_silent_simon_says_render')) {
 				<div class="zo-ss-stat">Round <span class="zo-ss-round">1</span></div>
 				<button type="button" class="zo-ss-start">Start</button>
 			</div>
-			<div class="zo-ss-status">Press Start.</div>
+			<div class="zo-ss-status">Başlat düğmesine bas.</div>
 		</div>
 		<?php
 		return ob_get_clean();

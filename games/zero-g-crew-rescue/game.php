@@ -406,7 +406,7 @@ if (!function_exists('zo_game_zero_g_crew_rescue_render')) {
 		ob_start();
 		?>
 		<div class="zo-game-root zo-game-root--zero-g-crew-rescue" id="<?php echo esc_attr($instance_id); ?>">
-			<h2 class="zo-zgc-title">Zero-G Crew Rescue</h2>
+			<h2 class="zo-zgc-title">Sıfır Yerçekimi Ekip Kurtarma</h2>
 			<p class="zo-zgc-desc">Each move sends your rescuer sliding until a wall catches them. Save the trapped crew and reach the airlock before the oxygen timer fails.</p>
 
 			<div class="zo-zgc-top">
@@ -435,7 +435,7 @@ if (!function_exists('zo_game_zero_g_crew_rescue_render')) {
 				</div>
 
 				<div class="zo-zgc-panel">
-					<h3 class="zo-zgc-subtitle">Controls</h3>
+					<h3 class="zo-zgc-subtitle">Kontroller</h3>
 					<p class="zo-zgc-status" aria-live="polite"></p>
 
 					<div class="zo-zgc-controls">
@@ -464,7 +464,7 @@ if (!function_exists('zo_game_zero_g_crew_rescue_render')) {
 
 return array(
 	'slug' => 'zero-g-crew-rescue',
-	'name' => 'Zero-G Crew Rescue',
+	'name' => 'Sıfır Yerçekimi Ekip Kurtarma',
 	'author' => 'asker',
 	'description' => 'A space rescue game where every move slides in zero gravity and you must save the crew before oxygen runs out.',
 	'render_callback' => 'zo_game_zero_g_crew_rescue_render',

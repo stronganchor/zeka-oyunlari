@@ -30,7 +30,7 @@ if (!function_exists('zo_game_sudoku_render')) {
 							<strong class="zo-sudoku__stat-value" data-role="filled">0 / 81</strong>
 						</div>
 						<div class="zo-sudoku__stat">
-							<span class="zo-sudoku__stat-label">Mistakes</span>
+							<span class="zo-sudoku__stat-label">Hatalar</span>
 							<strong class="zo-sudoku__stat-value" data-role="mistakes">0</strong>
 						</div>
 						<div class="zo-sudoku__stat">
@@ -55,7 +55,7 @@ if (!function_exists('zo_game_sudoku_render')) {
 					</label>
 
 					<div class="zo-sudoku__actions">
-						<button type="button" class="zo-sudoku__button zo-sudoku__button--primary" data-action="new">New Puzzle</button>
+						<button type="button" class="zo-sudoku__button zo-sudoku__button--primary" data-action="new">Yeni Bulmaca</button>
 						<?php if ($worksheet_url !== '') : ?>
 							<a class="zo-sudoku__button" href="<?php echo esc_url($worksheet_url); ?>" target="_blank" rel="noopener" download>Sudoku Sheets</a>
 						<?php endif; ?>

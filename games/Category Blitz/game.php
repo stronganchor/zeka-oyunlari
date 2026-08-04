@@ -325,7 +325,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (state.history.length === 0) {
 				const item = document.createElement('div');
 				item.className = 'cb-history-item';
-				item.textContent = 'No answers yet.';
+				item.textContent = 'Henüz cevap yok.';
 				els.history.appendChild(item);
 				return;
 			}
@@ -361,7 +361,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.timeLeft = roundTime;
 			els.input.value = '';
 			updateHud();
-			setStatus('Type a word that matches the category and starts with ' + state.currentLetter + '.');
+			setStatus('Kategoriye uyan ve su harfle baslayan bir kelime yaz:' + state.currentLetter + '.');
 			startTimer();
 			els.input.focus();
 		}
@@ -399,7 +399,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			const answer = normalize(raw);
 
 			if (!raw) {
-				setStatus('Type an answer first.');
+				setStatus('Once bir cevap yaz.');
 				els.input.focus();
 				return;
 			}
@@ -407,10 +407,10 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (startsWithLetter(answer, state.currentLetter)) {
 				state.score += 1;
 				recordAnswer(raw, 'correct');
-				setStatus('Correct.');
+				setStatus('Doğru.');
 			} else {
 				recordAnswer(raw, 'wrong letter');
-				setStatus('That does not start with ' + state.currentLetter + '.');
+				setStatus('Bu su harfle baslamiyor:' + state.currentLetter + '.');
 			}
 
 			state.round += 1;
@@ -434,7 +434,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				state.best = state.score;
 			}
 			updateHud();
-			setStatus('Game over. Final score: ' + state.score + ' out of ' + roundsPerGame + '.');
+			setStatus('Oyun bitti. Son puan:' + state.score + ' out of ' + roundsPerGame + '.');
 		}
 
 		function restartGame() {
@@ -483,7 +483,7 @@ if (!function_exists('zo_game_category_blitz_render')) {
 		ob_start();
 		?>
 		<div class="zo-game-root zo-game-root--category-blitz" id="<?php echo esc_attr($instance_id); ?>">
-			<div class="cb-title">Category Blitz</div>
+			<div class="cb-title">Kategori Yarışı</div>
 			<div class="cb-instructions">Each round gives you one letter and one category. Type a word that matches both before the timer runs out.</div>
 
 			<div class="cb-topbar">
@@ -522,7 +522,7 @@ if (!function_exists('zo_game_category_blitz_render')) {
 
 return array(
 	'slug'            => 'category-blitz',
-	'name'            => 'Category Blitz',
+	'name'            => 'Kategori Yarışı',
 	'author'          => 'Arslan',
 	'description'     => 'A fast category word game where players answer with the correct starting letter before time runs out.',
 	'render_callback' => 'zo_game_category_blitz_render',

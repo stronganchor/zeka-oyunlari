@@ -1073,7 +1073,7 @@ if (!function_exists('zo_game_living_world_simulation_render')) {
 			<div class="zo-lw-shell">
 				<div class="zo-lw-hero">
 					<div>
-						<h2 class="zo-lw-title">Living World Simulation</h2>
+						<h2 class="zo-lw-title">Yaşayan Dünya Simülasyonu</h2>
 						<p class="zo-lw-subtitle">Watch a procedurally generated town run itself. Sixty-four villagers decide when to sleep, work, eat, socialize, and wander while weather and time-of-day keep nudging the whole system.</p>
 					</div>
 					<div class="zo-lw-badges">
@@ -1161,7 +1161,7 @@ if (!function_exists('zo_game_living_world_simulation_render')) {
 
 return array(
 	'slug'            => 'living-world-simulation',
-	'name'            => 'Living World Simulation',
+	'name'            => 'Yaşayan Dünya Simülasyonu',
 	'author'          => 'Arslan',
 	'description'     => 'Watch dozens of autonomous villagers live inside a procedurally generated town.',
 	'render_callback' => 'zo_game_living_world_simulation_render',

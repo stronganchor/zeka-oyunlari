@@ -244,14 +244,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			if (state.distance >= goal) {
 				state.gameOver = true;
-				setStatus('The caravan reaches the city gates before the dunes close behind you.');
+				setStatus('Kervan kumullar kapanmadan sehir kapilarina ulasti.');
 				render();
 				return;
 			}
 
 			if (state.water <= 0 || state.morale <= 0) {
 				state.gameOver = true;
-				setStatus('The caravan breaks apart in the dunes. Reset and try a safer route.');
+				setStatus('Kervan kumullarda dagildi. Sifirla ve daha guvenli bir rota dene.');
 				render();
 				return;
 			}
@@ -259,13 +259,13 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.day += 1;
 			if (state.day > 9) {
 				state.gameOver = true;
-				setStatus('Time runs out before the caravan finds the city. Reset and try again.');
+				setStatus('Kervan sehri bulmadan sure bitti. Sifirla ve tekrar dene.');
 				render();
 				return;
 			}
 
 			updateOfferAndWeather();
-			setStatus('Choose the next move before the desert shifts again.');
+			setStatus('Col tekrar degismeden sonraki hamleyi sec.');
 			render();
 		}
 
@@ -389,7 +389,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			};
 
 			updateOfferAndWeather();
-			setStatus('Guide the caravan by balancing water, clues, tools, and morale.');
+			setStatus('Su, ipuclari, aletler ve morali dengeleyerek kervani yonet.');
 			render();
 		}
 

@@ -126,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			for (let i = 0; i < 3 + Math.min(4, level); i++) {
 				sequence.push(Math.floor(Math.random() * colorList.length));
 			}
-			status.textContent = 'Watch the sequence.';
+			status.textContent = 'Diziyi izle.';
 			sequence.forEach(function (idx, order) {
 				setTimeout(function () {
 					const btn = buttons[idx];
@@ -139,7 +139,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			setTimeout(function () {
 				isShowing = false;
 				inputOpen = true;
-				status.textContent = 'Now repeat.';
+				status.textContent = 'Şimdi tekrar et.';
 				buttons.forEach(function (btn) {
 					btn.disabled = false;
 				});
@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			scoreEl.textContent = '0';
 			levelEl.textContent = '1';
 			livesEl.textContent = '3';
-			status.textContent = 'Press Start.';
+			status.textContent = 'Başlat düğmesine bas.';
 			buttons.forEach(function (btn) {
 				btn.disabled = false;
 			});
@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				buttons.forEach(function (btn) {
 					btn.disabled = true;
 				});
-				status.textContent = reason + ' Game over. Press Start.';
+				status.textContent = reason + ' Oyun bitti. Başlat düğmesine bas.';
 			} else {
 				status.textContent = reason + ' Try this round again.';
 				inputOpen = false;
@@ -195,7 +195,7 @@ document.addEventListener('DOMContentLoaded', function () {
 					level += 1;
 					scoreEl.textContent = String(score);
 					levelEl.textContent = String(level);
-					status.textContent = 'Correct! Next level.';
+					status.textContent = 'Doğru! Next level.';
 					inputOpen = false;
 					buttons.forEach(function (b) {
 						b.disabled = true;
@@ -209,7 +209,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			resetGame();
 		});
 
-		status.textContent = 'Press Start.';
+		status.textContent = 'Başlat düğmesine bas.';
 		scoreEl.textContent = '0';
 		levelEl.textContent = '1';
 		livesEl.textContent = '3';
@@ -224,7 +224,7 @@ if (!function_exists('zo_game_color_code_rescue_render')) {
 		ob_start();
 		?>
 		<div class="zo-game-root zo-game-root--color-code-rescue" id="<?php echo esc_attr($instance_id); ?>">
-			<h2 class="zo-cc-title">Color Code Rescue</h2>
+			<h2 class="zo-cc-title">Renk Kodu Kurtarma</h2>
 			<div class="zo-cc-controls">
 				<div class="zo-cc-stat">Score: <span class="zo-cc-score">0</span></div>
 				<div class="zo-cc-stat">Level: <span class="zo-cc-level">1</span></div>
@@ -237,7 +237,7 @@ if (!function_exists('zo_game_color_code_rescue_render')) {
 				<button type="button" class="zo-cc-btn" data-color="green" aria-label="Green"></button>
 				<button type="button" class="zo-cc-btn" data-color="yellow" aria-label="Yellow"></button>
 			</div>
-			<div class="zo-cc-status">Press Start.</div>
+			<div class="zo-cc-status">Başlat düğmesine bas.</div>
 		</div>
 		<?php
 		return ob_get_clean();
@@ -246,7 +246,7 @@ if (!function_exists('zo_game_color_code_rescue_render')) {
 
 return array(
 	'slug'            => 'color-code-rescue',
-	'name'            => 'Color Code Rescue',
+	'name'            => 'Renk Kodu Kurtarma',
 	'author'          => 'Asker',
 	'description'     => 'Watch a color sequence and repeat it to save the code.',
 	'render_callback' => 'zo_game_color_code_rescue_render',

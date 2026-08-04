@@ -206,7 +206,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				lives -= 1;
 				status.textContent = 'Wrong order.';
 				if (lives <= 0) {
-					status.textContent = 'Game over.';
+					status.textContent = 'Oyun bitti.';
 					toolButtons.forEach(function (button) {
 						button.disabled = true;
 					});
@@ -231,8 +231,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			lives = 3;
 			growth = 0;
 			updateHud();
-			message.textContent = 'Press Start.';
-			status.textContent = 'Press Start.';
+			message.textContent = 'Başlat düğmesine bas.';
+			status.textContent = 'Başlat düğmesine bas.';
 			toolButtons.forEach(function (button) {
 				button.disabled = true;
 			});
@@ -253,8 +253,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			button.disabled = true;
 		});
 		applyBtn.disabled = true;
-		message.textContent = 'Press Start.';
-		status.textContent = 'Press Start.';
+		message.textContent = 'Başlat düğmesine bas.';
+		status.textContent = 'Başlat düğmesine bas.';
 	});
 });
 JS;
@@ -266,8 +266,8 @@ if (!function_exists('zo_game_micro_garden_render')) {
 		ob_start();
 		?>
 		<div class="zo-game-root zo-game-root--micro-garden" id="<?php echo esc_attr($instance_id); ?>">
-			<h2 class="zo-mg-title">Micro Garden</h2>
-			<div class="zo-mg-seq">Press Start.</div>
+			<h2 class="zo-mg-title">Mikro Bahçe</h2>
+			<div class="zo-mg-seq">Başlat düğmesine bas.</div>
 			<div class="zo-mg-tools">
 				<button type="button" class="zo-mg-tool" data-tool="water">Water</button>
 				<button type="button" class="zo-mg-tool" data-tool="sun">Sun</button>
@@ -289,7 +289,7 @@ if (!function_exists('zo_game_micro_garden_render')) {
 				<button type="button" class="zo-mg-clear">Clear</button>
 				<button type="button" class="zo-mg-reset">Reset</button>
 			</div>
-			<div class="zo-mg-status">Press Start.</div>
+			<div class="zo-mg-status">Başlat düğmesine bas.</div>
 		</div>
 		<?php
 		return ob_get_clean();
@@ -298,7 +298,7 @@ if (!function_exists('zo_game_micro_garden_render')) {
 
 return array(
 	'slug'            => 'micro-garden',
-	'name'            => 'Micro Garden',
+	'name'            => 'Mikro Bahçe',
 	'author'          => 'Asker',
 	'description'     => 'Read the sequence and apply Water, Sun, Compost in the right order to grow the plant.',
 	'render_callback' => 'zo_game_micro_garden_render',

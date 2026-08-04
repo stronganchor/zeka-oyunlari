@@ -165,7 +165,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		const parts = {
 			body: [
 				{ name: 'Light Frame', power: 2, speed: 3, defense: 2, intel: 1 },
-				{ name: 'Balanced Frame', power: 4, speed: 4, defense: 4, intel: 3 },
+				{ name: 'Dengeli Frame', power: 4, speed: 4, defense: 4, intel: 3 },
 				{ name: 'Heavy Armor', power: 6, speed: 2, defense: 7, intel: 2 }
 			],
 			legs: [
@@ -186,7 +186,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		function randomMission() {
 			currentMission = missions[Math.floor(Math.random() * missions.length)];
 			missionEl.textContent = currentMission.text;
-			statusEl.textContent = 'Choose parts wisely.';
+			statusEl.textContent = 'Parçaları dikkatli seç.';
 		}
 
 		function calculateStats() {
@@ -247,9 +247,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			});
 
 			if (success) {
-				statusEl.textContent = 'Mission success. Robot performed well.';
+				statusEl.textContent = 'Görev başarılı. Robot iyi çalıştı.';
 			} else {
-				statusEl.textContent = 'Mission failed. Adjust your design.';
+				statusEl.textContent = 'Görev başarısız. Tasarımını değiştir.';
 			}
 		}
 
@@ -275,7 +275,7 @@ if (!function_exists('zo_game_robot_designer_render')) {
 		ob_start();
 		?>
 		<div class="zo-game-root zo-game-root--robot-designer" id="<?php echo esc_attr($instance_id); ?>">
-			<h2>Robot Designer</h2>
+			<h2>Robot Tasarımcısı</h2>
 			<p>Select robot parts and try to complete the mission.</p>
 
 			<div class="zo-rd-mission">
@@ -318,7 +318,7 @@ if (!function_exists('zo_game_robot_designer_render')) {
 
 return array(
 	'slug'            => 'robot-designer',
-	'name'            => 'Robot Designer',
+	'name'            => 'Robot Tasarımcısı',
 	'author'          => 'Asker',
 	'description'     => 'Build a robot and match its stats to different missions.',
 	'render_callback' => 'zo_game_robot_designer_render',

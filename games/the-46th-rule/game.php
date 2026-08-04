@@ -409,7 +409,7 @@ $js = <<<'JS'
 
 			if (state.sequence.length === 0) {
 				const empty = document.createElement('span');
-				empty.textContent = 'Choose 4 to 6 tokens';
+				empty.textContent = '4 ile 6 işaret seç';
 				empty.style.color = '#9fb1aa';
 				sequenceEl.appendChild(empty);
 			} else {
@@ -500,7 +500,7 @@ $js = <<<'JS'
 				state.solved = true;
 				proofEl.classList.add('is-visible');
 				proofEl.textContent = 'Proof accepted: use A 2 C 4 E 6 or A 4 C 2 E 6. The hidden rule is: 4-6 unique tokens, no B, exactly the letters A/C/E, includes 2 and 4, alternates letter/number, and keeps letters and numbers balanced.';
-				setMessage('The 46th Rule is open. Excellent deduction.');
+				setMessage('46. Kural is open. Excellent deduction.');
 			} else {
 				proofEl.classList.add('is-visible');
 				proofEl.textContent = 'Not enough proof yet. Mention the required letters, required numbers, the forbidden symbol, alternation, balance, and no repeats.';
@@ -564,14 +564,14 @@ if (!function_exists('zo_game_the_46th_rule')) {
 		ob_start();
 		?>
 		<div class="zo-game-root zo-game-root--the-46th-rule" id="<?php echo esc_attr($instance_id); ?>">
-			<section class="zo-rule46" aria-label="The 46th Rule puzzle game">
+			<section class="zo-rule46" aria-label="46. Kural puzzle game">
 				<aside class="zo-rule46__side">
 					<p class="zo-rule46__kicker">Very hard deduction game</p>
-					<h2 class="zo-rule46__title">The 46th Rule</h2>
+					<h2 class="zo-rule46__title">46. Kural</h2>
 					<p class="zo-rule46__desc">Build symbol keys, test them against the lock, and infer the hidden law from pass/fail clues. The final answer is not a guess: it must explain the machine.</p>
 					<div class="zo-rule46__credit">
 						<span><strong>Idea asker:</strong> Asker</span>
-						<span><strong>Game author:</strong> Asker + Codex</span>
+						<span><strong>Oyun yazarı:</strong> Asker + Codex</span>
 						<span><strong>Design note:</strong> Test patterns, compare outcomes, and prove the hidden rule.</span>
 					</div>
 					<ul class="zo-rule46__rules" aria-label="Game goals">
@@ -633,7 +633,7 @@ if (!function_exists('zo_game_the_46th_rule')) {
 
 return array(
 	'slug' => 'the-46th-rule',
-	'name' => 'The 46th Rule',
+	'name' => '46. Kural',
 	'author' => 'Asker',
 	'description' => 'A very hard hidden-rule deduction game where the player tests symbol keys and proves the logic.',
 	'render_callback' => 'zo_game_the_46th_rule',

@@ -763,7 +763,7 @@ if (!function_exists('zo_game_pipe_connect_render')) {
 		ob_start();
 		?>
 		<div class="zo-game-root zo-game-root--pipe-connect" id="<?php echo esc_attr($instance_id); ?>">
-			<h2 class="zo-pc-title">Pipe Connect</h2>
+			<h2 class="zo-pc-title">Boru Bağlama</h2>
 			<p class="zo-pc-desc">Boruları çevir. Kaynaktan hedefe tam bağlantı kur. Mavi akış yıldız kutuya ulaşınca kazanırsın.</p>
 
 			<div class="zo-pc-top">
@@ -827,7 +827,7 @@ if (!function_exists('zo_game_pipe_connect_render')) {
 
 return array(
 	'slug'            => 'pipe-connect',
-	'name'            => 'Pipe Connect',
+	'name'            => 'Boru Bağlama',
 	'author'          => 'Asker',
 	'description'     => 'Kaynak ve hedef arasında boruları çevirerek bağlantı kurulan basit bir bulmaca oyunu.',
 	'render_callback' => 'zo_game_pipe_connect_render',

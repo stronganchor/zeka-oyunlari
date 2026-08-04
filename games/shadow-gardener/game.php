@@ -20,9 +20,9 @@ if(!function_exists('zo_game_shadow_gardener_render')){function zo_game_shadow_g
 <div class="sg-layout">
 <div class="sg-board" data-board></div>
 <div class="sg-side">
-<strong>How it works</strong>
+<strong>Nasıl çalışır</strong>
 <p>Each day the sun rotates. Every stone casts a 2-tile shadow in the opposite direction. Seeds grow in shade and lose progress in direct light.</p>
-<div class="sg-btns"><button class="sg-btn" data-next>Next Day</button><button class="sg-btn sg-btn--ghost" data-restart>Restart</button></div>
+<div class="sg-btns"><button class="sg-btn" data-next>Sonraki Gün</button><button class="sg-btn sg-btn--ghost" data-restart>Restart</button></div>
 <div class="sg-log" data-log></div>
 <p>Tip: build for tomorrow, not just today. A good shadow line often feeds two seeds over two different sun angles.</p>
 </div>

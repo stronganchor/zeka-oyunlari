@@ -427,7 +427,7 @@ if (!function_exists('zo_game_echo_location_render')) {
 		<div class="zo-game-root zo-game-root--echo-location" id="<?php echo esc_attr($instance_id); ?>">
 			<div class="el-head">
 				<div>
-					<h2 class="el-title">Echo-Location</h2>
+					<h2 class="el-title">Yankı Konumu</h2>
 					<p class="el-copy">Move through the dark maze. Send an echo to reveal more cells, but every pulse helps the hunter find you.</p>
 				</div>
 				<div class="el-panel">
@@ -438,12 +438,12 @@ if (!function_exists('zo_game_echo_location_render')) {
 			</div>
 			<p class="el-status" aria-live="polite"></p>
 			<div class="el-board" role="img" aria-label="Dark echo maze"></div>
-			<div class="el-controls" aria-label="Movement controls">
+			<div class="el-controls" aria-label="Hareket kontrolleri">
 				<button type="button" class="el-move" data-dir="up" aria-label="Move up">↑</button>
-				<button type="button" class="el-move" data-dir="left" aria-label="Move left">←</button>
+				<button type="button" class="el-move" data-dir="left" aria-label="Sola git">←</button>
 				<button type="button" class="el-move" data-dir="pulse" aria-label="Send echo">●</button>
-				<button type="button" class="el-move" data-dir="right" aria-label="Move right">→</button>
-				<button type="button" class="el-move" data-dir="down" aria-label="Move down">↓</button>
+				<button type="button" class="el-move" data-dir="right" aria-label="Sağa git">→</button>
+				<button type="button" class="el-move" data-dir="down" aria-label="Aşağı git">↓</button>
 			</div>
 		</div>
 		<?php
@@ -453,7 +453,7 @@ if (!function_exists('zo_game_echo_location_render')) {
 
 return array(
 	'slug' => 'echo-location',
-	'name' => 'Echo-Location',
+	'name' => 'Yankı Konumu',
 	'author' => 'Arslan',
 	'description' => 'Explore a dark maze by sending sound pulses, then escape before the hunter follows the noise.',
 	'render_callback' => 'zo_game_echo_location_render',

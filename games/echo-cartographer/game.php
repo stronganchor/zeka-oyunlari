@@ -523,13 +523,13 @@ if (!function_exists('zo_game_echo_cartographer_render')) {
 			<div class="zo-ec" data-pulse-radius="4" data-reveal-turns="2">
 				<div class="zo-ec__panel">
 					<div>
-						<p class="zo-ec__eyebrow">Echo Cartographer</p>
+						<p class="zo-ec__eyebrow">Yankı Haritacısı</p>
 						<h2 class="zo-ec__title">Map the dark. Stay quieter than the things below.</h2>
 					</div>
 					<p class="zo-ec__intro">You are a lost survey drone buried in a dead megacity. Send sonar pulses to reveal walls, traps, enemies, and hidden passages, then reach the exit before the hunters lock onto your sound.</p>
 				</div>
 
-				<div class="zo-ec__stats" aria-label="Game stats">
+				<div class="zo-ec__stats" aria-label="Oyun istatistikleri">
 					<div class="zo-ec__stat">
 						<span class="zo-ec__stat-label">Sector</span>
 						<strong class="zo-ec__level">1</strong>
@@ -550,7 +550,7 @@ if (!function_exists('zo_game_echo_cartographer_render')) {
 
 				<div class="zo-ec__layout">
 					<div class="zo-ec__board-wrap">
-						<div class="zo-ec__board" role="grid" aria-label="Echo Cartographer map"></div>
+						<div class="zo-ec__board" role="grid" aria-label="Yankı Haritacısı map"></div>
 					</div>
 
 					<div class="zo-ec__sidebar">
@@ -566,7 +566,7 @@ if (!function_exists('zo_game_echo_cartographer_render')) {
 						</div>
 
 						<div class="zo-ec__controls">
-							<div class="zo-ec__move-pad" aria-label="Movement controls">
+							<div class="zo-ec__move-pad" aria-label="Hareket kontrolleri">
 								<button type="button" class="zo-ec__move" data-move="up">Up</button>
 								<div class="zo-ec__move-row">
 									<button type="button" class="zo-ec__move" data-move="left">Left</button>
@@ -603,7 +603,7 @@ if (!function_exists('zo_game_echo_cartographer_render')) {
 
 return array(
 	'slug'            => 'echo-cartographer',
-	'name'            => 'Echo Cartographer',
+	'name'            => 'Yankı Haritacısı',
 	'author'          => 'Asker',
 	'description'     => 'A sonar-stealth maze where each scan reveals the ruins but attracts sound-hunting enemies.',
 	'render_callback' => 'zo_game_echo_cartographer_render',

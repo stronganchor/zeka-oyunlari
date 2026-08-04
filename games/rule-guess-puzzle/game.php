@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 if (!defined('ABSPATH')) {
     exit;
 }
@@ -247,14 +247,14 @@ document.addEventListener('DOMContentLoaded', function () {
         if (level === 1) {
             const sum = digitSum(number);
             correct = sum === 10;
-            message = correct ? '✓ Correct! Digit sum = 10.' : '✗ Incorrect. Digit sum = ' + sum + '.';
+            message = correct ? '✓ Doğru! Digit sum = 10.' : '✗ Incorrect. Digit sum = ' + sum + '.';
         } else if (level === 2) {
             const root = Math.sqrt(number);
             correct = root === Math.floor(root);
-            message = correct ? '✓ Correct! ' + number + ' is a perfect square.' : '✗ Incorrect. ' + number + ' is not a perfect square.';
+            message = correct ? '✓ Doğru! ' + number + ' is a perfect square.' : '✗ Incorrect. ' + number + ' is not a perfect square.';
         } else if (level === 3) {
             correct = isPrime(number);
-            message = correct ? '✓ Correct! ' + number + ' is prime.' : '✗ Incorrect. ' + number + ' is not prime.';
+            message = correct ? '✓ Doğru! ' + number + ' is prime.' : '✗ Incorrect. ' + number + ' is not prime.';
         }
 
         return { message, correct, displayValue: String(number) };
@@ -324,7 +324,7 @@ document.addEventListener('DOMContentLoaded', function () {
         askerResponse.textContent = '';
 
         const title = document.createElement('strong');
-        title.textContent = 'AI Assistant:';
+        title.textContent = 'Yapay Zeka Yardımcısı:';
         askerResponse.appendChild(title);
         askerResponse.appendChild(document.createElement('br'));
         askerResponse.appendChild(document.createTextNode(levels[currentLevel].detailedExplanation));
@@ -332,7 +332,7 @@ document.addEventListener('DOMContentLoaded', function () {
         askerResponse.appendChild(document.createElement('br'));
 
         const examplesTitle = document.createElement('strong');
-        examplesTitle.textContent = 'Try these examples:';
+        examplesTitle.textContent = 'Bu örnekleri dene:';
         askerResponse.appendChild(examplesTitle);
         askerResponse.appendChild(document.createTextNode(' ' + levels[currentLevel].examples.join(', ')));
         askerResponse.style.display = 'block';

@@ -408,11 +408,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			if (win) {
 				wins += 1;
-				setMessage((messages.win || 'You won. Word: ') + word.toUpperCase(), 'is-info');
+				setMessage((messages.win || 'Kazandın. Kelime: ') + word.toUpperCase(), 'is-info');
 			} else {
 				losses += 1;
 				wordEl.textContent = word.toUpperCase().split('').join(' ');
-				setMessage((messages.loss || 'Game over. Word: ') + word.toUpperCase(), 'is-bad');
+				setMessage((messages.loss || 'Oyun bitti. Word: ') + word.toUpperCase(), 'is-bad');
 			}
 
 			inputEl.disabled = true;
@@ -427,7 +427,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			if (guessedLetters.has(letter)) {
-				setMessage(messages.already || 'You already tried that letter.', 'is-warn');
+				setMessage(messages.already || 'Bu harfi zaten denedin.', 'is-warn');
 				return;
 			}
 
@@ -439,7 +439,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			if (word.indexOf(letter) !== -1) {
-				setMessage(messages.correct || 'Correct guess.', 'is-good');
+				setMessage(messages.correct || 'Doğru tahmin.', 'is-good');
 				updateUI();
 
 				const allFound = word.split('').every(function (ch) {
@@ -486,13 +486,13 @@ document.addEventListener('DOMContentLoaded', function () {
 			});
 
 			if (!remaining.length) {
-				setMessage(messages.noHintNeeded || 'No hint needed.', 'is-info');
+				setMessage(messages.noHintNeeded || 'İpucu gerekmez.', 'is-info');
 				updateUI();
 				return;
 			}
 
 			if (attempts <= 0 || !roundActive) {
-				setMessage(messages.hintUnavailable || 'Hint is unavailable.', 'is-bad');
+				setMessage(messages.hintUnavailable || 'İpucu kullanılamıyor.', 'is-bad');
 				updateUI();
 				return;
 			}
@@ -506,7 +506,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				keyButton.disabled = true;
 			}
 
-			setMessage((messages.hintUsed || 'Hint used. Revealed letter: ') + reveal.toUpperCase() + ' (-1)', 'is-hint');
+			setMessage((messages.hintUsed || 'İpucu kullanıldı. Açılan harf: ') + reveal.toUpperCase() + ' (-1)', 'is-hint');
 			redrawFigure();
 			updateUI();
 
@@ -613,7 +613,7 @@ if (!function_exists('zo_game_adam_asmaca_render')) {
 		);
 		$messages = array(
 			'tr' => array('win' => 'Kazandın. Kelime: ', 'loss' => 'Oyun bitti. Kelime: ', 'already' => 'Bu harfi zaten denedin.', 'correct' => 'Doğru tahmin.', 'wrong' => 'Yanlış tahmin.', 'oneLetter' => 'Tek bir harf gir.', 'noHintNeeded' => 'İpucuna gerek yok.', 'hintUnavailable' => 'İpucu kullanılamaz.', 'hintUsed' => 'İpucu kullanıldı. Açılan harf: '),
-			'en' => array('win' => 'You won. Word: ', 'loss' => 'Game over. Word: ', 'already' => 'You already tried that letter.', 'correct' => 'Correct guess.', 'wrong' => 'Wrong guess.', 'oneLetter' => 'Enter one letter.', 'noHintNeeded' => 'No hint needed.', 'hintUnavailable' => 'Hint is unavailable.', 'hintUsed' => 'Hint used. Revealed letter: '),
+			'en' => array('win' => 'Kazandın. Kelime: ', 'loss' => 'Oyun bitti. Word: ', 'already' => 'Bu harfi zaten denedin.', 'correct' => 'Doğru tahmin.', 'wrong' => 'Wrong guess.', 'oneLetter' => 'Enter one letter.', 'noHintNeeded' => 'İpucu gerekmez.', 'hintUnavailable' => 'İpucu kullanılamıyor.', 'hintUsed' => 'İpucu kullanıldı. Açılan harf: '),
 			'de' => array('win' => 'Gewonnen. Wort: ', 'loss' => 'Spiel vorbei. Wort: ', 'already' => 'Diesen Buchstaben hast du schon versucht.', 'correct' => 'Richtig geraten.', 'wrong' => 'Falsch geraten.', 'oneLetter' => 'Gib einen Buchstaben ein.', 'noHintNeeded' => 'Kein Hinweis nötig.', 'hintUnavailable' => 'Hinweis nicht verfügbar.', 'hintUsed' => 'Hinweis benutzt. Aufgedeckter Buchstabe: '),
 		);
 		$lang = isset($text[$lang]) ? $lang : 'tr';

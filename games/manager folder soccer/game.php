@@ -682,7 +682,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function initState() {
 			team = {
-				name: 'Blue Town FC',
+				name: 'Mavi Şehir FK',
 				formation: '4-4-2',
 				mentality: 'balanced',
 				style: 'short',
@@ -718,7 +718,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				fixturesDone: 0,
 				results: [],
 				teams: [
-					{ name: 'Blue Town FC', pts: 0, gf: 0, ga: 0, w: 0, d: 0, l: 0 },
+					{ name: 'Mavi Şehir FK', pts: 0, gf: 0, ga: 0, w: 0, d: 0, l: 0 },
 					{ name: 'River Adana', pts: 0, gf: 0, ga: 0, w: 0, d: 0, l: 0 },
 					{ name: 'Toros SK', pts: 0, gf: 0, ga: 0, w: 0, d: 0, l: 0 },
 					{ name: 'Cukurova Stars', pts: 0, gf: 0, ga: 0, w: 0, d: 0, l: 0 },
@@ -1251,7 +1251,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			const halfBlue = Math.min(blueGoals, Math.round(blueGoals * rand(0.3, 0.7)));
 			const halfRed = Math.min(redGoals, Math.round(redGoals * rand(0.3, 0.7)));
 			const cleanSheet = redGoals === 0 ? 'Yes' : 'No';
-			const momentum = blueGoals > redGoals ? 'Blue Town' : (blueGoals < redGoals ? opponentName : 'Balanced');
+			const momentum = blueGoals > redGoals ? 'Blue Town' : (blueGoals < redGoals ? opponentName : 'Dengeli');
 
 			const commentary = makeMinuteCommentary(opponentName, {
 				possession: possession,
@@ -1471,7 +1471,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			renderTopPanels();
 			renderFormation();
 			renderLeagueTable();
-			renderCommentary(lastStats ? [quickSummary.textContent].concat(Array.from(commentaryLog.children).map(function (n) { return n.textContent; }).slice(0, 8)) : ['No match simulated yet.']);
+			renderCommentary(lastStats ? [quickSummary.textContent].concat(Array.from(commentaryLog.children).map(function (n) { return n.textContent; }).slice(0, 8)) : ['Henüz maç simüle edilmedi.']);
 			renderResults();
 			renderMarket();
 			renderSquad();
@@ -1569,7 +1569,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		initState();
 		updateInputsFromTeam();
-		quickSummary.textContent = 'No match played yet.';
+		quickSummary.textContent = 'Henüz maç oynanmadı.';
 		statPossession.textContent = '-';
 		statShots.textContent = '-';
 		statOnTarget.textContent = '-';
@@ -1578,7 +1578,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		statFouls.textContent = '-';
 		statMomentum.textContent = '-';
 		statClean.textContent = '-';
-		renderCommentary(['No match simulated yet.']);
+		renderCommentary(['Henüz maç simüle edilmedi.']);
 		renderAll();
 	});
 });
@@ -1627,7 +1627,7 @@ if (!function_exists('zo_game_mini_manager_pro_render')) {
 							<div class="zo-mm-card">
 								<h3>Mentality</h3>
 								<div class="zo-mm-pill-row">
-									<button type="button" class="zo-mm-pill zo-mm-mentality is-active" data-mentality="balanced">Balanced</button>
+									<button type="button" class="zo-mm-pill zo-mm-mentality is-active" data-mentality="balanced">Dengeli</button>
 									<button type="button" class="zo-mm-pill zo-mm-mentality" data-mentality="attacking">Attacking</button>
 									<button type="button" class="zo-mm-pill zo-mm-mentality" data-mentality="defensive">Defensive</button>
 								</div>
@@ -1647,7 +1647,7 @@ if (!function_exists('zo_game_mini_manager_pro_render')) {
 							<div class="zo-mm-card">
 								<h3>Width</h3>
 								<div class="zo-mm-pill-row">
-									<button type="button" class="zo-mm-pill zo-mm-width is-active" data-width="balanced">Balanced</button>
+									<button type="button" class="zo-mm-pill zo-mm-width is-active" data-width="balanced">Dengeli</button>
 									<button type="button" class="zo-mm-pill zo-mm-width" data-width="wide">Wide</button>
 									<button type="button" class="zo-mm-pill zo-mm-width" data-width="narrow">Narrow</button>
 								</div>
@@ -1714,7 +1714,7 @@ if (!function_exists('zo_game_mini_manager_pro_render')) {
 						<div class="zo-mm-status">
 							<h3>Match Status</h3>
 							<div class="zo-mm-status-text">Set your tactics and simulate a match.</div>
-							<div class="zo-mm-note zo-mm-quick-summary">No match played yet.</div>
+							<div class="zo-mm-note zo-mm-quick-summary">Henüz maç oynanmadı.</div>
 						</div>
 
 						<div class="zo-mm-action-row">
@@ -1799,7 +1799,7 @@ if (!function_exists('zo_game_mini_manager_pro_render')) {
 				</div>
 
 				<div class="zo-mm-help">
-					<h3>How to Play</h3>
+					<h3>Nasıl Oynanır</h3>
 					You manage the club. Pick a formation. Set mentality, passing style, width, pressing, and marking. Adjust attack, midfield, defense, and energy. Buy players, sell players, choose a captain, grow your staff, handle injuries, and try to win the season table. This version includes a season mode, league table, transfer market, budget, wages, youth academy, weather, home and away effects, morale, suspensions, commentary, and progression.
 				</div>
 			</div>

@@ -293,7 +293,7 @@ document.addEventListener('DOMContentLoaded', function () {
 						matchedCount += 2;
 						openCards = [];
 						lockBoard = false;
-						setStatus('Great job. You found a match.', false);
+						setStatus('Harika. Bir eşleşme buldun.', false);
 
 						if (matchedCount === deck.length) {
 							stopTimer();
@@ -301,7 +301,7 @@ document.addEventListener('DOMContentLoaded', function () {
 							setStatus('You matched all pairs in ' + attempts + ' attempts over ' + finalTime + ' seconds.', true);
 						}
 					} else {
-						setStatus('Not a match. Try again.', false);
+						setStatus('Not a match. Tekrar dene.', false);
 						setTimeout(function () {
 							hideCard(first);
 							hideCard(second);
@@ -341,7 +341,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			lockBoard = false;
 			updateAttempts();
 			grid.innerHTML = '';
-			setStatus('Find all the matching animal pairs.', false);
+			setStatus('Eşleşen tüm hayvan çiftlerini bul.', false);
 
 			deck.forEach(function (cardData, index) {
 				grid.appendChild(createCard(cardData, index));
@@ -364,7 +364,7 @@ if (!function_exists('zo_game_memory_match_animals_render')) {
 		?>
 		<div class="zo-game-root zo-game-root--memory-match-animals" id="<?php echo esc_attr($instance_id); ?>">
 			<div class="zo-mma-header">
-				<h2 class="zo-mma-title">Memory Match Animals</h2>
+				<h2 class="zo-mma-title">Hayvan Eşleştirme Hafızası</h2>
 				<p class="zo-mma-instructions">Tap two cards to find matching animal pairs. Match all the cards to win.</p>
 			</div>
 
@@ -380,12 +380,12 @@ if (!function_exists('zo_game_memory_match_animals_render')) {
 				</div>
 
 				<div>
-					<button type="button" class="zo-mma-button">New Game</button>
+					<button type="button" class="zo-mma-button">Yeni Oyun</button>
 				</div>
 			</div>
 
 			<div class="zo-mma-grid" aria-live="polite"></div>
-			<div class="zo-mma-status">Find all the matching animal pairs.</div>
+			<div class="zo-mma-status">Eşleşen tüm hayvan çiftlerini bul.</div>
 		</div>
 		<?php
 		return ob_get_clean();
@@ -394,7 +394,7 @@ if (!function_exists('zo_game_memory_match_animals_render')) {
 
 return array(
 	'slug'            => 'memory-match-animals',
-	'name'            => 'Memory Match Animals',
+	'name'            => 'Hayvan Eşleştirme Hafızası',
 	'author'          => 'Asker',
 	'description'     => 'A memory matching card game for kids with animal pairs, attempts, timer, and restart.',
 	'render_callback' => 'zo_game_memory_match_animals_render',

@@ -340,10 +340,10 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			if (state.win) {
-				messageEl.textContent = 'You found all the treasure. You win.';
+				messageEl.textContent = 'Tüm hazineyi buldun. Kazandın.';
 				messageEl.className = 'th-message th-message--win';
 			} else {
-				messageEl.textContent = 'You hit a trap. Game over.';
+				messageEl.textContent = 'You hit a trap. Oyun bitti.';
 				messageEl.className = 'th-message th-message--lose';
 			}
 		}
@@ -480,9 +480,9 @@ if (!function_exists('zo_game_treasure_hunt_render')) {
 
 				<div class="th-mobile-controls">
 					<button type="button" class="th-move th-move--up" data-move="up" aria-label="Move up">↑</button>
-					<button type="button" class="th-move th-move--left" data-move="left" aria-label="Move left">←</button>
-					<button type="button" class="th-move th-move--down" data-move="down" aria-label="Move down">↓</button>
-					<button type="button" class="th-move th-move--right" data-move="right" aria-label="Move right">→</button>
+					<button type="button" class="th-move th-move--left" data-move="left" aria-label="Sola git">←</button>
+					<button type="button" class="th-move th-move--down" data-move="down" aria-label="Aşağı git">↓</button>
+					<button type="button" class="th-move th-move--right" data-move="right" aria-label="Sağa git">→</button>
 				</div>
 			</div>
 		</div>

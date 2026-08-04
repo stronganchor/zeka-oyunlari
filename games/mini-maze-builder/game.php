@@ -276,7 +276,7 @@ if (!function_exists('zo_game_mini_maze_builder_render')) {
 		ob_start();
 		?>
 		<div class="zo-game-root zo-game-root--mini-maze-builder" id="<?php echo esc_attr($instance_id); ?>">
-			<h2 class="zo-mb-title">Mini Maze Builder</h2>
+			<h2 class="zo-mb-title">Mini Labirent Yapıcı</h2>
 			<div class="zo-mb-grid"></div>
 			<div class="zo-mb-controls">
 				<button type="button" class="zo-mb-btn zo-mb-check">Check Path</button>
@@ -293,7 +293,7 @@ if (!function_exists('zo_game_mini_maze_builder_render')) {
 
 return array(
 	'slug'            => 'mini-maze-builder',
-	'name'            => 'Mini Maze Builder',
+	'name'            => 'Mini Labirent Yapıcı',
 	'author'          => 'Asker',
 	'description'     => 'Build walls and keep one valid path from start to finish.',
 	'render_callback' => 'zo_game_mini_maze_builder_render',

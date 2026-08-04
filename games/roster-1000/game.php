@@ -48,6 +48,52 @@ $css = <<<'CSS'
 	margin-bottom: 16px;
 }
 
+.zo-game-root--roster-1000 .zo-r1-account {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) auto;
+	gap: 12px;
+	align-items: end;
+	margin-bottom: 16px;
+	padding: 14px;
+	background: #ffffff;
+	border: 1px solid #dbe8f4;
+	border-radius: 18px;
+}
+
+.zo-game-root--roster-1000 .zo-r1-account-fields,
+.zo-game-root--roster-1000 .zo-r1-account-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	align-items: end;
+}
+
+.zo-game-root--roster-1000 .zo-r1-field {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+	min-width: 140px;
+}
+
+.zo-game-root--roster-1000 .zo-r1-field label {
+	font-size: 12px;
+	font-weight: 800;
+	color: #5f7690;
+	text-transform: uppercase;
+}
+
+.zo-game-root--roster-1000 .zo-r1-field .zo-r1-input {
+	width: 100%;
+}
+
+.zo-game-root--roster-1000 .zo-r1-account-status {
+	grid-column: 1 / -1;
+	min-height: 20px;
+	font-size: 13px;
+	font-weight: 700;
+	color: #0f766e;
+}
+
 .zo-game-root--roster-1000 .zo-r1-stats,
 .zo-game-root--roster-1000 .zo-r1-controls {
 	background: rgba(255, 255, 255, 0.88);
@@ -129,6 +175,12 @@ $css = <<<'CSS'
 .zo-game-root--roster-1000 .zo-r1-btn--warn {
 	background: #f97316;
 	color: #fff;
+}
+
+.zo-game-root--roster-1000 .zo-r1-btn[disabled],
+.zo-game-root--roster-1000 .zo-r1-page-btn[disabled] {
+	cursor: not-allowed;
+	opacity: 0.48;
 }
 
 .zo-game-root--roster-1000 .zo-r1-move {
@@ -328,6 +380,7 @@ $css = <<<'CSS'
 
 @media (max-width: 980px) {
 	.zo-game-root--roster-1000 .zo-r1-topbar,
+	.zo-game-root--roster-1000 .zo-r1-account,
 	.zo-game-root--roster-1000 .zo-r1-layout {
 		grid-template-columns: 1fr;
 	}
@@ -375,6 +428,12 @@ document.addEventListener('DOMContentLoaded', function () {
 		const totalEl = game.querySelector('.zo-r1-total');
 		const jumpInput = game.querySelector('.zo-r1-jump-input');
 		const jumpButton = game.querySelector('.zo-r1-jump-btn');
+		const accountNameInput = game.querySelector('.zo-r1-account-name');
+		const accountPinInput = game.querySelector('.zo-r1-account-pin');
+		const accountCreateButton = game.querySelector('.zo-r1-account-create');
+		const accountSigninButton = game.querySelector('.zo-r1-account-signin');
+		const accountSignoutButton = game.querySelector('.zo-r1-account-signout');
+		const accountStatusEl = game.querySelector('.zo-r1-account-status');
 
 		const coinsEl = game.querySelector('.zo-r1-coins');
 		const levelEl = game.querySelector('.zo-r1-level');
@@ -389,17 +448,39 @@ document.addEventListener('DOMContentLoaded', function () {
 		const PAGE_SIZE = 12;
 		const TOTAL_CHARACTERS = 1000;
 		const REWARD_PER_WIN = 50;
+		const ACCOUNT_STORE_KEY = 'zoRoster1000AccountsV1';
+		const ACCOUNT_SESSION_KEY = 'zoRoster1000CurrentAccountV1';
+		const i18nNode = game.querySelector('.zo-r1-i18n');
+		let i18n = {};
+
+		try {
+			i18n = i18nNode ? JSON.parse(i18nNode.textContent || '{}') : {};
+		} catch (error) {
+			i18n = {};
+		}
+
+		function t(key, fallback) {
+			return i18n[key] || fallback || key;
+		}
+
+		function fmt(key, fallback, values) {
+			let text = t(key, fallback);
+			Object.keys(values || {}).forEach(function (name) {
+				text = text.split('{' + name + '}').join(String(values[name]));
+			});
+			return text;
+		}
 
 		canvas.width = WIDTH;
 		canvas.height = HEIGHT;
 
 		const archetypes = [
-			{name: 'Spark', speed: 1.35, power: 0.82, rate: 1.25, aura: '#fde047', bio: 'Fast feet and quick shots.'},
-			{name: 'Shield', speed: 0.9, power: 1.05, rate: 0.86, aura: '#93c5fd', bio: 'Stays alive longer in rough waves.'},
-			{name: 'Nova', speed: 1.08, power: 1.18, rate: 0.94, aura: '#fca5a5', bio: 'Big hits with steady control.'},
-			{name: 'Echo', speed: 1.16, power: 0.94, rate: 1.12, aura: '#c4b5fd', bio: 'Balanced arena duelist.'},
-			{name: 'Bloom', speed: 1.02, power: 0.9, rate: 1.3, aura: '#86efac', bio: 'Rapid fire pressure specialist.'},
-			{name: 'Stone', speed: 0.84, power: 1.28, rate: 0.8, aura: '#fdba74', bio: 'Slow, tough, and heavy-handed.'}
+			{name: t('sparkName', 'Spark'), speed: 1.35, power: 0.82, rate: 1.25, aura: '#fde047', bio: t('sparkBio', 'Fast feet and quick shots.')},
+			{name: t('shieldName', 'Shield'), speed: 0.9, power: 1.05, rate: 0.86, aura: '#93c5fd', bio: t('shieldBio', 'Zorlu dalgalarda daha uzun dayanır.')},
+			{name: t('novaName', 'Nova'), speed: 1.08, power: 1.18, rate: 0.94, aura: '#fca5a5', bio: t('novaBio', 'Dengeli kontrolle güçlü vuruşlar.')},
+			{name: t('echoName', 'Echo'), speed: 1.16, power: 0.94, rate: 1.12, aura: '#c4b5fd', bio: t('echoBio', 'Dengeli arena duelist.')},
+			{name: t('bloomName', 'Bloom'), speed: 1.02, power: 0.9, rate: 1.3, aura: '#86efac', bio: t('bloomBio', 'Seri ateş baskısı uzmanı.')},
+			{name: t('stoneName', 'Stone'), speed: 0.84, power: 1.28, rate: 0.8, aura: '#fdba74', bio: t('stoneBio', 'Yavaş, dayanıklı ve ağır vuruşlu.')}
 		];
 
 		const state = {
@@ -425,8 +506,213 @@ document.addEventListener('DOMContentLoaded', function () {
 			spawnTimer: 0,
 			spawned: 0,
 			targetEnemyCount: 0,
-			touchTarget: null
+			touchTarget: null,
+			accountKey: ''
 		};
+
+		function storageAvailable(type) {
+			try {
+				const storage = window[type];
+				const key = '__zo_r1_storage_test__';
+				storage.setItem(key, key);
+				storage.removeItem(key);
+				return true;
+			} catch (error) {
+				return false;
+			}
+		}
+
+		const canStore = storageAvailable('localStorage');
+		const canSessionStore = storageAvailable('sessionStorage');
+
+		function readAccounts() {
+			if (!canStore) {
+				return {};
+			}
+
+			try {
+				return JSON.parse(window.localStorage.getItem(ACCOUNT_STORE_KEY) || '{}') || {};
+			} catch (error) {
+				return {};
+			}
+		}
+
+		function writeAccounts(accounts) {
+			if (!canStore) {
+				return false;
+			}
+
+			try {
+				window.localStorage.setItem(ACCOUNT_STORE_KEY, JSON.stringify(accounts));
+				return true;
+			} catch (error) {
+				return false;
+			}
+		}
+
+		function normalizeAccountName(name) {
+			return String(name || '').trim().toLowerCase().replace(/\s+/g, '-').slice(0, 32);
+		}
+
+		function cleanPin(pin) {
+			return String(pin || '').replace(/\D/g, '').slice(0, 5);
+		}
+
+		function getProgress() {
+			return {
+				coins: state.coins,
+				level: state.level,
+				wins: state.wins,
+				page: state.page,
+				selectedId: state.selectedId,
+				owned: state.owned
+			};
+		}
+
+		function applyProgress(progress) {
+			const owned = progress && progress.owned && typeof progress.owned === 'object' ? progress.owned : {1: true};
+			owned[1] = true;
+			state.coins = Math.max(0, parseInt(progress && progress.coins, 10) || 150);
+			state.level = clamp(parseInt(progress && progress.level, 10) || 1, 1, 9999);
+			state.wins = Math.max(0, parseInt(progress && progress.wins, 10) || 0);
+			state.page = clamp(parseInt(progress && progress.page, 10) || 0, 0, Math.ceil(TOTAL_CHARACTERS / PAGE_SIZE) - 1);
+			state.selectedId = clamp(parseInt(progress && progress.selectedId, 10) || 1, 1, TOTAL_CHARACTERS);
+			state.owned = owned;
+			if (!state.owned[state.selectedId]) {
+				state.selectedId = 1;
+			}
+			resetForSelectedHero(false);
+		}
+
+		function setAccountStatus(text) {
+			if (accountStatusEl) {
+				accountStatusEl.textContent = text;
+			}
+		}
+
+		function updateAccountUi() {
+			const signedIn = !!state.accountKey;
+			[startButton, restartButton, nextButton, prevPageButton, nextPageButton, jumpButton].forEach(function (button) {
+				button.disabled = !signedIn;
+			});
+			game.querySelectorAll('.zo-r1-move').forEach(function (button) {
+				button.disabled = !signedIn;
+			});
+			if (accountSignoutButton) {
+				accountSignoutButton.disabled = !signedIn;
+			}
+			if (accountCreateButton) {
+				accountCreateButton.disabled = !canStore;
+			}
+			if (accountSigninButton) {
+				accountSigninButton.disabled = !canStore;
+			}
+		}
+
+		function saveProgress() {
+			if (!state.accountKey) {
+				return;
+			}
+
+			const accounts = readAccounts();
+			if (!accounts[state.accountKey]) {
+				return;
+			}
+			accounts[state.accountKey].progress = getProgress();
+			writeAccounts(accounts);
+		}
+
+		function requireAccount() {
+			if (state.accountKey) {
+				return true;
+			}
+			setAccountStatus(t('accountRequired', 'Create an account or sign in with your PIN to play.'));
+			setStatus(t('accountRequired', 'Create an account or sign in with your PIN to play.'));
+			return false;
+		}
+
+		function signInAccount(key, account) {
+			state.accountKey = key;
+			if (canSessionStore) {
+				window.sessionStorage.setItem(ACCOUNT_SESSION_KEY, key);
+			}
+			if (accountNameInput) {
+				accountNameInput.value = account.name || key;
+			}
+			if (accountPinInput) {
+				accountPinInput.value = '';
+			}
+			applyProgress(account.progress || getProgress());
+			updateAccountUi();
+			setAccountStatus(fmt('signedInAs', 'Signed in as {name}.', {name: account.name || key}));
+			setStatus(t('pickOrBuyStatus', 'Bir karakter seÃ§ veya satÄ±n al, sonra BaÅŸlat dÃ¼ÄŸmesine bas. Temizlenen her dalga 50 coin verir.'));
+		}
+
+		function createAccount() {
+			const name = accountNameInput ? accountNameInput.value.trim() : '';
+			const key = normalizeAccountName(name);
+			const pin = cleanPin(accountPinInput ? accountPinInput.value : '');
+
+			if (!canStore) {
+				setAccountStatus(t('storageBlocked', 'This browser is blocking saved accounts.'));
+				return;
+			}
+			if (!key) {
+				setAccountStatus(t('nameRequired', 'Type an account name.'));
+				return;
+			}
+			if (pin.length !== 5) {
+				setAccountStatus(t('pinRequired', 'Make a 5-digit PIN.'));
+				return;
+			}
+
+			const accounts = readAccounts();
+			if (accounts[key]) {
+				setAccountStatus(t('accountExists', 'That account already exists. Use Sign In.'));
+				return;
+			}
+
+			accounts[key] = {
+				name: name.slice(0, 32),
+				pin: pin,
+				progress: getProgress()
+			};
+
+			if (!writeAccounts(accounts)) {
+				setAccountStatus(t('storageBlocked', 'This browser is blocking saved accounts.'));
+				return;
+			}
+
+			signInAccount(key, accounts[key]);
+		}
+
+		function signinAccount() {
+			const key = normalizeAccountName(accountNameInput ? accountNameInput.value : '');
+			const pin = cleanPin(accountPinInput ? accountPinInput.value : '');
+			const accounts = readAccounts();
+
+			if (!key || pin.length !== 5) {
+				setAccountStatus(t('signinNeeded', 'Enter your account name and 5-digit PIN.'));
+				return;
+			}
+			if (!accounts[key] || accounts[key].pin !== pin) {
+				setAccountStatus(t('badSignin', 'Account name or PIN did not match.'));
+				return;
+			}
+
+			signInAccount(key, accounts[key]);
+		}
+
+		function signoutAccount() {
+			saveProgress();
+			state.accountKey = '';
+			if (canSessionStore) {
+				window.sessionStorage.removeItem(ACCOUNT_SESSION_KEY);
+			}
+			resetForSelectedHero(true);
+			updateAccountUi();
+			setAccountStatus(t('signedOut', 'Signed out. Enter your PIN to play again.'));
+		}
 
 		function getCharacter(id) {
 			const seed = id - 1;
@@ -441,7 +727,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			return {
 				id: id,
 				name: archetype.name + ' #' + String(id),
-				tier: 'Tier ' + String(tier),
+				tier: fmt('tierLabel', 'Kademe {tier}', {tier: tier}),
 				power: power,
 				speed: speed,
 				fireRate: fireRate,
@@ -466,8 +752,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			enemiesEl.textContent = String(Math.max(0, state.enemies.length));
 			heroEl.textContent = getCharacter(state.selectedId).name;
 			winsEl.textContent = String(state.wins);
-			pageLabelEl.textContent = 'Page ' + String(state.page + 1) + ' / ' + String(Math.ceil(TOTAL_CHARACTERS / PAGE_SIZE));
-			totalEl.textContent = 'Showing heroes ' + String((state.page * PAGE_SIZE) + 1) + '-' + String(Math.min(TOTAL_CHARACTERS, ((state.page + 1) * PAGE_SIZE))) + ' of ' + String(TOTAL_CHARACTERS);
+			pageLabelEl.textContent = fmt('pageLabel', 'Sayfa {page} / {pages}', {page: state.page + 1, pages: Math.ceil(TOTAL_CHARACTERS / PAGE_SIZE)});
+			totalEl.textContent = fmt('showingHeroes', 'Kahramanlar {from}-{to} / {total}', {
+				from: (state.page * PAGE_SIZE) + 1,
+				to: Math.min(TOTAL_CHARACTERS, ((state.page + 1) * PAGE_SIZE)),
+				total: TOTAL_CHARACTERS
+			});
 		}
 
 		function createHero() {
@@ -549,11 +839,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			updateHud();
 			renderRoster();
-			setStatus('Pick or buy a character, then press Start. Each cleared wave gives 50 coins.');
+			setStatus(t('pickOrBuyStatus', 'Bir karakter seç veya satın al, sonra Başlat düğmesine bas. Temizlenen her dalga 50 coin verir.'));
 			draw();
 		}
 
 		function beginLevel() {
+			if (!requireAccount()) {
+				return;
+			}
 			if (state.gameOver) {
 				return;
 			}
@@ -561,7 +854,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.running = true;
 			state.levelActive = true;
 			state.lastTime = performance.now();
-			setStatus('Level ' + state.level + ' started. Enemies get tougher and more numerous every wave.');
+			setStatus(fmt('levelStarted', 'Seviye {level} başladı. Düşmanlar her dalgada daha güçlü ve daha kalabalık olur.', {level: state.level}));
 			window.requestAnimationFrame(loop);
 		}
 
@@ -579,7 +872,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.targetEnemyCount = enemyGoalCount(state.level);
 			updateHud();
 			renderRoster();
-			setStatus('Wave cleared. You earned 50 coins. Press Next Wave when you are ready for level ' + state.level + '.');
+			saveProgress();
+			setStatus(fmt('waveCleared', 'Dalga temizlendi. 50 coin kazandın. {level}. seviye için hazır olduğunda Sonraki Dalga düğmesine bas.', {level: state.level}));
 			draw();
 		}
 
@@ -587,24 +881,28 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.running = false;
 			state.levelActive = false;
 			state.gameOver = true;
-			setStatus('Your hero was defeated on level ' + state.level + '. Buy a stronger character or restart the run.');
+			setStatus(fmt('heroDefeated', 'Kahramanın {level}. seviyede yenildi. Daha güçlü bir karakter al veya koşuyu yeniden başlat.', {level: state.level}));
 			draw();
 		}
 
 		function tryBuyCharacter(id) {
+			if (!requireAccount()) {
+				return;
+			}
 			const character = getCharacter(id);
 			if (state.owned[id]) {
 				state.selectedId = id;
 				state.hero = createHero();
 				updateHud();
 				renderRoster();
-				setStatus(character.name + ' is now selected.');
+				saveProgress();
+				setStatus(fmt('heroSelected', '{name} is now selected.', {name: character.name}));
 				draw();
 				return;
 			}
 
 			if (state.coins < character.price) {
-				setStatus('Not enough coins for ' + character.name + '. Win more waves to earn 50 coins each time.');
+				setStatus(fmt('notEnoughCoins', '{name} için yeterli coin yok. Her seferinde 50 coin kazanmak için daha fazla dalga temizle.', {name: character.name}));
 				return;
 			}
 
@@ -614,7 +912,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.hero = createHero();
 			updateHud();
 			renderRoster();
-			setStatus('Bought ' + character.name + ' for ' + character.price + ' coins.');
+			saveProgress();
+			setStatus(fmt('boughtHero', '{name}, {price} coin karşılığında alındı.', {name: character.name, price: character.price}));
 			draw();
 		}
 
@@ -643,15 +942,15 @@ document.addEventListener('DOMContentLoaded', function () {
 					+ '<div class="zo-r1-card-badge">' + character.tier + '</div>'
 					+ '</div>'
 					+ '<div class="zo-r1-card-stats">'
-					+ '<div class="zo-r1-mini"><strong>' + character.hp + '</strong><span>HP</span></div>'
-					+ '<div class="zo-r1-mini"><strong>' + character.power + '</strong><span>Power</span></div>'
-					+ '<div class="zo-r1-mini"><strong>' + character.speed + '</strong><span>Speed</span></div>'
-					+ '<div class="zo-r1-mini"><strong>' + character.fireRate + '</strong><span>Rapid</span></div>'
+					+ '<div class="zo-r1-mini"><strong>' + character.hp + '</strong><span>' + t('hp', 'HP') + '</span></div>'
+					+ '<div class="zo-r1-mini"><strong>' + character.power + '</strong><span>' + t('power', 'Power') + '</span></div>'
+					+ '<div class="zo-r1-mini"><strong>' + character.speed + '</strong><span>' + t('speed', 'Speed') + '</span></div>'
+					+ '<div class="zo-r1-mini"><strong>' + character.fireRate + '</strong><span>' + t('rapid', 'Rapid') + '</span></div>'
 					+ '</div>'
-					+ '<p class="zo-r1-card-text">' + character.bio + ' Cost: ' + character.price + ' coins.</p>'
+					+ '<p class="zo-r1-card-text">' + character.bio + ' ' + fmt('costCoins', 'Bedel: {price} coin.', {price: character.price}) + '</p>'
 					+ '<div class="zo-r1-card-actions">'
-					+ '<button type="button" class="zo-r1-btn zo-r1-btn--secondary zo-r1-card-action" data-id="' + character.id + '">'
-					+ (owned ? (selected ? 'Selected' : 'Select') : 'Buy')
+					+ '<button type="button" class="zo-r1-btn zo-r1-btn--secondary zo-r1-card-action" data-id="' + character.id + '"' + (state.accountKey ? '' : ' disabled') + '>'
+					+ (owned ? (selected ? t('selected', 'Selected') : t('select', 'Select')) : t('buy', 'Buy'))
 					+ '</button>'
 					+ '</div>'
 					+ '</div>';
@@ -670,16 +969,20 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function jumpToHero() {
+			if (!requireAccount()) {
+				return;
+			}
 			const id = parseInt(jumpInput.value || '0', 10);
 			if (id < 1 || id > TOTAL_CHARACTERS) {
-				setStatus('Enter a hero number from 1 to 1000.');
+				setStatus(t('enterHeroNumber', '1 ile 1000 arasında bir kahraman numarası gir.'));
 				return;
 			}
 
 			state.page = Math.floor((id - 1) / PAGE_SIZE);
 			renderRoster();
 			updateHud();
-			setStatus('Jumped to hero #' + String(id) + '.');
+			saveProgress();
+			setStatus(fmt('jumpedToHero', 'Jumped to hero #{id}.', {id: id}));
 		}
 
 		function fireProjectile(from, target, damage, color, speed, friendly) {
@@ -925,16 +1228,16 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			if (state.gameOver) {
 				ctx.font = 'bold 36px Arial';
-				ctx.fillText('Run Over', WIDTH / 2, HEIGHT / 2 - 8);
+				ctx.fillText(t('runOver', 'Run Over'), WIDTH / 2, HEIGHT / 2 - 8);
 				ctx.font = '20px Arial';
-				ctx.fillText('Restart or buy a stronger fighter from the roster.', WIDTH / 2, HEIGHT / 2 + 28);
+				ctx.fillText(t('restartOrBuy', 'Yeniden başla veya kadrodan daha güçlü bir savaşçı al.'), WIDTH / 2, HEIGHT / 2 + 28);
 				return;
 			}
 
 			ctx.font = 'bold 34px Arial';
-			ctx.fillText('Roster 1000 Arena', WIDTH / 2, HEIGHT / 2 - 8);
+			ctx.fillText(t('arenaTitle', '1000 Kadro Arenası'), WIDTH / 2, HEIGHT / 2 - 8);
 			ctx.font = '20px Arial';
-			ctx.fillText(state.level === 1 ? 'Press Start to begin your run.' : 'Press Next Wave to continue to level ' + state.level + '.', WIDTH / 2, HEIGHT / 2 + 28);
+			ctx.fillText(state.level === 1 ? t('pressStartRun', 'Press Start to begin your run.') : fmt('pressNextWave', 'Press Next Wave to continue to level {level}.', {level: state.level}), WIDTH / 2, HEIGHT / 2 + 28);
 		}
 
 		function draw() {
@@ -1066,23 +1369,35 @@ document.addEventListener('DOMContentLoaded', function () {
 		});
 
 		restartButton.addEventListener('click', function () {
+			if (!requireAccount()) {
+				return;
+			}
 			state.selectedId = 1;
 			state.owned = {1: true};
 			state.page = 0;
 			resetForSelectedHero(true);
+			saveProgress();
 			game.focus();
 		});
 
 		prevPageButton.addEventListener('click', function () {
+			if (!requireAccount()) {
+				return;
+			}
 			state.page = Math.max(0, state.page - 1);
 			renderRoster();
 			updateHud();
+			saveProgress();
 		});
 
 		nextPageButton.addEventListener('click', function () {
+			if (!requireAccount()) {
+				return;
+			}
 			state.page = Math.min(Math.ceil(TOTAL_CHARACTERS / PAGE_SIZE) - 1, state.page + 1);
 			renderRoster();
 			updateHud();
+			saveProgress();
 		});
 
 		jumpButton.addEventListener('click', function () {
@@ -1096,7 +1411,33 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		});
 
+		if (accountPinInput) {
+			accountPinInput.addEventListener('input', function () {
+				accountPinInput.value = cleanPin(accountPinInput.value);
+			});
+			accountPinInput.addEventListener('keydown', function (event) {
+				if (event.key === 'Enter') {
+					event.preventDefault();
+					signinAccount();
+				}
+			});
+		}
+
+		if (accountCreateButton) {
+			accountCreateButton.addEventListener('click', createAccount);
+		}
+
+		if (accountSigninButton) {
+			accountSigninButton.addEventListener('click', signinAccount);
+		}
+
+		if (accountSignoutButton) {
+			accountSignoutButton.addEventListener('click', signoutAccount);
+		}
+
 		resetForSelectedHero(true);
+		updateAccountUi();
+		setAccountStatus(t('accountRequired', 'Create an account or sign in with your PIN to play.'));
 		game.setAttribute('tabindex', '0');
 	});
 });
@@ -1105,35 +1446,204 @@ JS;
 if (!function_exists('zo_game_roster_1000_render')) {
 	function zo_game_roster_1000_render($post_id = 0, $module = array()) {
 		$instance_id = 'zo-roster-1000-' . ($post_id ? absint($post_id) : wp_rand(1000, 999999));
+		$language    = function_exists('zo_get_current_language') ? zo_get_current_language() : 'tr';
+		$translations = array(
+			'en' => array(
+				'title' => 'Roster 1000',
+				'subtitle' => 'Fight through endless arena waves, earn 50 coins for every win, and grow your team by buying from a generated roster of 1000 heroes. Higher levels send more enemies with smarter movement and stronger attacks.',
+				'coins' => 'Coins',
+				'level' => 'Level',
+				'enemies' => 'Enemies',
+				'hero' => 'Hero',
+				'wins' => 'Wins',
+				'accountName' => 'Account',
+				'pin' => '5-digit PIN',
+				'createAccount' => 'Create Account',
+				'signIn' => 'Sign In',
+				'signOut' => 'Sign Out',
+				'accountNamePlaceholder' => 'Arslan',
+				'pinPlaceholder' => '12345',
+				'accountRequired' => 'Create an account or sign in with your PIN to play.',
+				'signedInAs' => 'Signed in as {name}.',
+				'storageBlocked' => 'This browser is blocking saved accounts.',
+				'nameRequired' => 'Type an account name.',
+				'pinRequired' => 'Make a 5-digit PIN.',
+				'accountExists' => 'That account already exists. Use Sign In.',
+				'signinNeeded' => 'Enter your account name and 5-digit PIN.',
+				'badSignin' => 'Account name or PIN did not match.',
+				'signedOut' => 'Signed out. Enter your PIN to play again.',
+				'start' => 'Start',
+				'nextWave' => 'Next Wave',
+				'restartRun' => 'Restart Run',
+				'up' => 'Up',
+				'left' => 'Left',
+				'down' => 'Down',
+				'right' => 'Right',
+				'help' => 'Use arrow keys or WASD on desktop. On mobile, tap the arena to move toward that point or use the move buttons. Clear each wave to earn 50 coins, then buy stronger characters.',
+				'pickOrBuyStatus' => 'Bir karakter seç veya satın al, sonra Başlat düğmesine bas. Temizlenen her dalga 50 coin verir.',
+				'shopTitle' => '1000 Hero Shop',
+				'prev' => 'Prev',
+				'next' => 'Next',
+				'pageLabel' => 'Sayfa {page} / {pages}',
+				'showingHeroes' => 'Kahramanlar {from}-{to} / {total}',
+				'heroPlaceholder' => 'Hero #',
+				'jumpAria' => 'Jump to hero number',
+				'go' => 'Go',
+				'canvasLabel' => 'Roster 1000 arena',
+				'hp' => 'HP',
+				'power' => 'Power',
+				'speed' => 'Speed',
+				'rapid' => 'Rapid',
+				'selected' => 'Selected',
+				'select' => 'Select',
+				'buy' => 'Buy',
+				'costCoins' => 'Bedel: {price} coin.',
+				'tierLabel' => 'Kademe {tier}',
+				'sparkName' => 'Spark',
+				'shieldName' => 'Shield',
+				'novaName' => 'Nova',
+				'echoName' => 'Echo',
+				'bloomName' => 'Bloom',
+				'stoneName' => 'Stone',
+				'sparkBio' => 'Fast feet and quick shots.',
+				'shieldBio' => 'Zorlu dalgalarda daha uzun dayanır.',
+				'novaBio' => 'Dengeli kontrolle güçlü vuruşlar.',
+				'echoBio' => 'Dengeli arena duelist.',
+				'bloomBio' => 'Seri ateş baskısı uzmanı.',
+				'stoneBio' => 'Yavaş, dayanıklı ve ağır vuruşlu.',
+				'levelStarted' => 'Seviye {level} başladı. Düşmanlar her dalgada daha güçlü ve daha kalabalık olur.',
+				'waveCleared' => 'Dalga temizlendi. 50 coin kazandın. {level}. seviye için hazır olduğunda Sonraki Dalga düğmesine bas.',
+				'heroDefeated' => 'Kahramanın {level}. seviyede yenildi. Daha güçlü bir karakter al veya koşuyu yeniden başlat.',
+				'heroSelected' => '{name} is now selected.',
+				'notEnoughCoins' => '{name} için yeterli coin yok. Her seferinde 50 coin kazanmak için daha fazla dalga temizle.',
+				'boughtHero' => '{name}, {price} coin karşılığında alındı.',
+				'enterHeroNumber' => '1 ile 1000 arasında bir kahraman numarası gir.',
+				'jumpedToHero' => 'Jumped to hero #{id}.',
+				'runOver' => 'Run Over',
+				'restartOrBuy' => 'Yeniden başla veya kadrodan daha güçlü bir savaşçı al.',
+				'arenaTitle' => '1000 Kadro Arenası',
+				'pressStartRun' => 'Press Start to begin your run.',
+				'pressNextWave' => 'Press Next Wave to continue to level {level}.',
+			),
+			'tr' => array(
+				'title' => '1000 Karakter Arenası',
+				'subtitle' => 'Sonsuz arena dalgalarında savaş, her galibiyette 50 coin kazan ve 1000 kahramanlık listeden satın alarak takımını büyüt. Yüksek seviyeler daha akıllı hareket eden ve daha güçlü saldıran daha fazla düşman gönderir.',
+				'coins' => 'Coin',
+				'level' => 'Seviye',
+				'enemies' => 'Düşmanlar',
+				'hero' => 'Kahraman',
+				'wins' => 'Galibiyet',
+				'start' => 'Başlat',
+				'nextWave' => 'Sonraki Dalga',
+				'restartRun' => 'Koşuyu Yeniden Başlat',
+				'up' => 'Yukarı',
+				'left' => 'Sol',
+				'down' => 'Aşağı',
+				'right' => 'Sağ',
+				'help' => 'Bilgisayarda ok tuşlarını veya WASD kullan. Mobilde o noktaya gitmek için arenaya dokun veya hareket düğmelerini kullan. Her dalgayı temizleyip 50 coin kazan, sonra daha güçlü karakterler satın al.',
+				'pickOrBuyStatus' => 'Bir karakter seç veya satın al, sonra Başlat’a bas. Temizlenen her dalga 50 coin verir.',
+				'shopTitle' => '1000 Kahraman Mağazası',
+				'prev' => 'Önceki',
+				'next' => 'Sonraki',
+				'pageLabel' => 'Sayfa {page} / {pages}',
+				'showingHeroes' => 'Kahramanlar {from}-{to} / {total}',
+				'heroPlaceholder' => 'Kahraman #',
+				'jumpAria' => 'Kahraman numarasına git',
+				'go' => 'Git',
+				'canvasLabel' => '1000 Karakter Arenası',
+				'hp' => 'Can',
+				'power' => 'Güç',
+				'speed' => 'Hız',
+				'rapid' => 'Seri',
+				'selected' => 'Seçili',
+				'select' => 'Seç',
+				'buy' => 'Satın Al',
+				'costCoins' => 'Bedel: {price} coin.',
+				'tierLabel' => 'Kademe {tier}',
+				'sparkName' => 'Kıvılcım',
+				'shieldName' => 'Kalkan',
+				'novaName' => 'Nova',
+				'echoName' => 'Yankı',
+				'bloomName' => 'Çiçek',
+				'stoneName' => 'Taş',
+				'sparkBio' => 'Hızlı ayaklar ve seri atışlar.',
+				'shieldBio' => 'Zorlu dalgalarda daha uzun dayanır.',
+				'novaBio' => 'Dengeli kontrolle güçlü vuruşlar yapar.',
+				'echoBio' => 'Dengeli bir arena düellocusu.',
+				'bloomBio' => 'Seri atış baskısında uzmandır.',
+				'stoneBio' => 'Yavaş, dayanıklı ve ağır vuruşludur.',
+				'levelStarted' => 'Seviye {level} başladı. Düşmanlar her dalgada daha güçlü ve daha kalabalık olur.',
+				'waveCleared' => 'Dalga temizlendi. 50 coin kazandın. {level}. seviye için hazır olduğunda Sonraki Dalga’ya bas.',
+				'heroDefeated' => 'Kahramanın {level}. seviyede yenildi. Daha güçlü bir karakter al veya koşuyu yeniden başlat.',
+				'heroSelected' => '{name} artık seçili.',
+				'notEnoughCoins' => '{name} için yeterli coin yok. Her dalgada 50 coin kazanmak için daha fazla dalga temizle.',
+				'boughtHero' => '{name}, {price} coin karşılığında alındı.',
+				'enterHeroNumber' => '1 ile 1000 arasında bir kahraman numarası gir.',
+				'jumpedToHero' => 'Kahraman #{id} bölümüne gidildi.',
+				'runOver' => 'Koşu Bitti',
+				'restartOrBuy' => 'Yeniden başla veya listeden daha güçlü bir savaşçı al.',
+				'arenaTitle' => '1000 Karakter Arenası',
+				'pressStartRun' => 'Koşuya başlamak için Başlat’a bas.',
+				'pressNextWave' => '{level}. seviyeye devam etmek için Sonraki Dalga’ya bas.',
+			),
+		);
+		$i18n = array_merge($translations['en'], isset($translations[$language]) ? $translations[$language] : array());
+		$r1 = static function ($key, $values = array()) use ($i18n) {
+			$text = isset($i18n[$key]) ? $i18n[$key] : '';
+			foreach ($values as $name => $value) {
+				$text = str_replace('{' . $name . '}', (string) $value, $text);
+			}
+			return $text;
+		};
 
 		ob_start();
 		?>
 		<div class="zo-game-root zo-game-root--roster-1000" id="<?php echo esc_attr($instance_id); ?>">
+			<script type="application/json" class="zo-r1-i18n"><?php echo wp_json_encode($i18n); ?></script>
 			<div class="zo-r1-shell">
-				<h2 class="zo-r1-title">Roster 1000</h2>
-				<p class="zo-r1-subtitle">Fight through endless arena waves, earn 50 coins for every win, and grow your team by buying from a generated roster of 1000 heroes. Higher levels send more enemies with smarter movement and stronger attacks.</p>
+				<h2 class="zo-r1-title"><?php echo esc_html($r1('title')); ?></h2>
+				<p class="zo-r1-subtitle"><?php echo esc_html($r1('subtitle')); ?></p>
+
+				<div class="zo-r1-account">
+					<div class="zo-r1-account-fields">
+						<div class="zo-r1-field">
+							<label for="<?php echo esc_attr($instance_id); ?>-account"><?php echo esc_html($r1('accountName')); ?></label>
+							<input type="text" class="zo-r1-input zo-r1-account-name" id="<?php echo esc_attr($instance_id); ?>-account" maxlength="32" autocomplete="username" placeholder="<?php echo esc_attr($r1('accountNamePlaceholder')); ?>">
+						</div>
+						<div class="zo-r1-field">
+							<label for="<?php echo esc_attr($instance_id); ?>-pin"><?php echo esc_html($r1('pin')); ?></label>
+							<input type="password" class="zo-r1-input zo-r1-account-pin" id="<?php echo esc_attr($instance_id); ?>-pin" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" autocomplete="current-password" placeholder="<?php echo esc_attr($r1('pinPlaceholder')); ?>">
+						</div>
+					</div>
+					<div class="zo-r1-account-actions">
+						<button type="button" class="zo-r1-btn zo-r1-btn--primary zo-r1-account-create"><?php echo esc_html($r1('createAccount')); ?></button>
+						<button type="button" class="zo-r1-btn zo-r1-btn--secondary zo-r1-account-signin"><?php echo esc_html($r1('signIn')); ?></button>
+						<button type="button" class="zo-r1-btn zo-r1-btn--warn zo-r1-account-signout"><?php echo esc_html($r1('signOut')); ?></button>
+					</div>
+					<div class="zo-r1-account-status" aria-live="polite"><?php echo esc_html($r1('accountRequired')); ?></div>
+				</div>
 
 				<div class="zo-r1-topbar">
 					<div class="zo-r1-stats">
 						<div class="zo-r1-stat-grid">
 							<div class="zo-r1-stat">
-								<span class="zo-r1-stat-label">Coins</span>
+								<span class="zo-r1-stat-label"><?php echo esc_html($r1('coins')); ?></span>
 								<span class="zo-r1-stat-value zo-r1-coins">150</span>
 							</div>
 							<div class="zo-r1-stat">
-								<span class="zo-r1-stat-label">Level</span>
+								<span class="zo-r1-stat-label"><?php echo esc_html($r1('level')); ?></span>
 								<span class="zo-r1-stat-value zo-r1-level">1</span>
 							</div>
 							<div class="zo-r1-stat">
-								<span class="zo-r1-stat-label">Enemies</span>
+								<span class="zo-r1-stat-label"><?php echo esc_html($r1('enemies')); ?></span>
 								<span class="zo-r1-stat-value zo-r1-enemies">0</span>
 							</div>
 							<div class="zo-r1-stat">
-								<span class="zo-r1-stat-label">Hero</span>
-								<span class="zo-r1-stat-value zo-r1-stat-value--hero zo-r1-hero">Spark #1</span>
+								<span class="zo-r1-stat-label"><?php echo esc_html($r1('hero')); ?></span>
+								<span class="zo-r1-stat-value zo-r1-stat-value--hero zo-r1-hero"><?php echo esc_html($r1('sparkName')); ?> #1</span>
 							</div>
 							<div class="zo-r1-stat">
-								<span class="zo-r1-stat-label">Wins</span>
+								<span class="zo-r1-stat-label"><?php echo esc_html($r1('wins')); ?></span>
 								<span class="zo-r1-stat-value zo-r1-wins">0</span>
 							</div>
 						</div>
@@ -1141,41 +1651,41 @@ if (!function_exists('zo_game_roster_1000_render')) {
 
 					<div class="zo-r1-controls">
 						<div class="zo-r1-button-row">
-							<button type="button" class="zo-r1-btn zo-r1-btn--primary zo-r1-start">Start</button>
-							<button type="button" class="zo-r1-btn zo-r1-btn--secondary zo-r1-next">Next Wave</button>
-							<button type="button" class="zo-r1-btn zo-r1-btn--warn zo-r1-restart">Restart Run</button>
+							<button type="button" class="zo-r1-btn zo-r1-btn--primary zo-r1-start"><?php echo esc_html($r1('start')); ?></button>
+							<button type="button" class="zo-r1-btn zo-r1-btn--secondary zo-r1-next"><?php echo esc_html($r1('nextWave')); ?></button>
+							<button type="button" class="zo-r1-btn zo-r1-btn--warn zo-r1-restart"><?php echo esc_html($r1('restartRun')); ?></button>
 						</div>
 						<div class="zo-r1-pad">
-							<button type="button" class="zo-r1-btn zo-r1-move" data-dir="up">Up</button>
-							<button type="button" class="zo-r1-btn zo-r1-move" data-dir="left">Left</button>
-							<button type="button" class="zo-r1-btn zo-r1-move" data-dir="down">Down</button>
-							<button type="button" class="zo-r1-btn zo-r1-move" data-dir="right">Right</button>
+							<button type="button" class="zo-r1-btn zo-r1-move" data-dir="up"><?php echo esc_html($r1('up')); ?></button>
+							<button type="button" class="zo-r1-btn zo-r1-move" data-dir="left"><?php echo esc_html($r1('left')); ?></button>
+							<button type="button" class="zo-r1-btn zo-r1-move" data-dir="down"><?php echo esc_html($r1('down')); ?></button>
+							<button type="button" class="zo-r1-btn zo-r1-move" data-dir="right"><?php echo esc_html($r1('right')); ?></button>
 						</div>
-						<div class="zo-r1-help">Use arrow keys or WASD on desktop. On mobile, tap the arena to move toward that point or use the move buttons. Clear each wave to earn 50 coins, then buy stronger characters.</div>
+						<div class="zo-r1-help"><?php echo esc_html($r1('help')); ?></div>
 					</div>
 				</div>
 
 				<div class="zo-r1-layout">
 					<div class="zo-r1-arena-wrap">
-						<canvas class="zo-r1-canvas" width="760" height="520" aria-label="Roster 1000 arena"></canvas>
-						<div class="zo-r1-status" aria-live="polite">Pick or buy a character, then press Start. Each cleared wave gives 50 coins.</div>
+						<canvas class="zo-r1-canvas" width="760" height="520" aria-label="<?php echo esc_attr($r1('canvasLabel')); ?>"></canvas>
+						<div class="zo-r1-status" aria-live="polite"><?php echo esc_html($r1('pickOrBuyStatus')); ?></div>
 					</div>
 
 					<div class="zo-r1-side">
 						<div class="zo-r1-side-head">
-							<h3 class="zo-r1-side-title">1000 Hero Shop</h3>
+							<h3 class="zo-r1-side-title"><?php echo esc_html($r1('shopTitle')); ?></h3>
 							<div class="zo-r1-button-row">
-								<button type="button" class="zo-r1-page-btn zo-r1-prev-page">Prev</button>
-								<span class="zo-r1-page-label">Page 1 / 84</span>
-								<button type="button" class="zo-r1-page-btn zo-r1-next-page">Next</button>
+								<button type="button" class="zo-r1-page-btn zo-r1-prev-page"><?php echo esc_html($r1('prev')); ?></button>
+								<span class="zo-r1-page-label"><?php echo esc_html($r1('pageLabel', array('page' => 1, 'pages' => 84))); ?></span>
+								<button type="button" class="zo-r1-page-btn zo-r1-next-page"><?php echo esc_html($r1('next')); ?></button>
 							</div>
 						</div>
 
 						<div class="zo-r1-shop-meta">
-							<div class="zo-r1-total">Showing heroes 1-12 of 1000</div>
+							<div class="zo-r1-total"><?php echo esc_html($r1('showingHeroes', array('from' => 1, 'to' => 12, 'total' => 1000))); ?></div>
 							<div class="zo-r1-jump">
-								<input type="number" min="1" max="1000" step="1" class="zo-r1-input zo-r1-jump-input" placeholder="Hero #" aria-label="Jump to hero number">
-								<button type="button" class="zo-r1-btn zo-r1-btn--secondary zo-r1-jump-btn">Go</button>
+								<input type="number" min="1" max="1000" step="1" class="zo-r1-input zo-r1-jump-input" placeholder="<?php echo esc_attr($r1('heroPlaceholder')); ?>" aria-label="<?php echo esc_attr($r1('jumpAria')); ?>">
+								<button type="button" class="zo-r1-btn zo-r1-btn--secondary zo-r1-jump-btn"><?php echo esc_html($r1('go')); ?></button>
 							</div>
 						</div>
 
@@ -1191,9 +1701,9 @@ if (!function_exists('zo_game_roster_1000_render')) {
 
 return array(
 	'slug'            => 'roster-1000',
-	'name'            => 'Roster 1000',
+	'name'            => 'TR: 1000 Karakter Arenası | EN: Roster 1000 | DE: Roster 1000 | FR: Roster 1000 | ES-MX: Roster 1000 | ES-ES: Roster 1000',
 	'author'          => 'Asker',
-	'description'     => 'An endless arena game with 1000 buyable characters, harder AI every level, more enemies per wave, and 50 coins for every win.',
+	'description'     => 'TR: 1000 satın alınabilir karakter, her seviyede zorlaşan yapay zeka, her dalgada daha fazla düşman ve her galibiyette 50 coin sunan sonsuz bir arena oyunu. | EN: An endless arena game with 1000 buyable characters, harder AI every level, more enemies per wave, and 50 coins for every win. | DE: Ein endloses Arena-Spiel mit 1000 kaufbaren Figuren, schwierigerer KI pro Level, mehr Gegnern pro Welle und 50 Münzen für jeden Sieg. | FR: Un jeu d’arène sans fin avec 1000 personnages à acheter, une IA plus difficile à chaque niveau, plus d’ennemis par vague et 50 pièces par victoire. | ES-MX: Un juego de arena sin fin con 1000 personajes comprables, IA más difícil en cada nivel, más enemigos por oleada y 50 monedas por victoria. | ES-ES: Un juego de arena sin fin con 1000 personajes comprables, IA más difícil en cada nivel, más enemigos por oleada y 50 monedas por victoria.',
 	'render_callback' => 'zo_game_roster_1000_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,

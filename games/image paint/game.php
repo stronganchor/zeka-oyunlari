@@ -349,7 +349,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			ctx.fillRect(0, 0, canvas.width, canvas.height);
 			clearOverlay();
 			saveHistoryState();
-			setStatus('Ready to draw');
+			setStatus('Cizmeye hazir');
 		}
 
 		function clearOverlay() {
@@ -393,7 +393,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				}
 				historyIndex = history.length - 1;
 			} catch (err) {
-				setStatus('Could not save drawing state');
+				setStatus('Cizim durumu kaydedilemedi');
 			}
 		}
 
@@ -420,7 +420,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (historyIndex > 0) {
 				historyIndex -= 1;
 				restoreHistory(historyIndex);
-				setStatus('Undo');
+				setStatus('Geri al');
 			}
 		}
 
@@ -428,7 +428,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (historyIndex < history.length - 1) {
 				historyIndex += 1;
 				restoreHistory(historyIndex);
-				setStatus('Redo');
+				setStatus('Ileri al');
 			}
 		}
 
@@ -666,7 +666,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		function placeText(x, y) {
 			const text = textInput ? textInput.value.trim() : '';
 			if (!text) {
-				setStatus('Type some text first');
+				setStatus('Once biraz metin yaz');
 				return;
 			}
 
@@ -684,7 +684,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			ctx.restore();
 			saveHistoryState();
-			setStatus('Text added');
+			setStatus('Metin eklendi');
 		}
 
 		function drawSticker(type, x, y) {
@@ -736,7 +736,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			ctx.restore();
 			saveHistoryState();
-			setStatus('Sticker added');
+			setStatus('Cikartma eklendi');
 		}
 
 		function placeEmoji(x, y) {
@@ -747,13 +747,13 @@ document.addEventListener('DOMContentLoaded', function () {
 			ctx.fillText(emoji, x, y);
 			ctx.restore();
 			saveHistoryState();
-			setStatus('Emoji added');
+			setStatus('Emoji eklendi');
 		}
 
 		function applyFrame() {
 			const frameType = frameSelect ? frameSelect.value : 'none';
 			if (frameType === 'none') {
-				setStatus('Choose a frame first');
+				setStatus('Once bir cerceve sec');
 				return;
 			}
 
@@ -788,7 +788,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			ctx.restore();
 			saveHistoryState();
-			setStatus('Frame applied');
+			setStatus('Cerceve uygulandi');
 		}
 
 		function commitSelectionMove() {
@@ -899,7 +899,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				ctx.fillRect(0, 0, canvas.width, canvas.height);
 			}
 			saveHistoryState();
-			setStatus('Canvas cleared');
+			setStatus('Tuval temizlendi');
 		}
 
 		function saveImage(type) {
@@ -964,7 +964,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 					ctx.drawImage(img, drawX, drawY, drawWidth, drawHeight);
 					saveHistoryState();
-					setStatus('Image loaded');
+					setStatus('Gorsel yuklendi');
 				};
 				img.src = loadEvent.target.result;
 			};
@@ -1151,7 +1151,7 @@ document.addEventListener('DOMContentLoaded', function () {
 					);
 					selectionImage = temp;
 					drawSelectionOverlay();
-					setStatus('Selection ready. Drag it to move.');
+					setStatus('Secim hazir. Tasimak icin surukle.');
 				} else if (movingSelection) {
 					commitSelectionMove();
 					setStatus('Selection moved');
@@ -1426,7 +1426,7 @@ if (!function_exists('zo_game_mini_paint_render')) {
 		<div class="zo-game-root zo-game-root--mini-paint" id="<?php echo esc_attr($instance_id); ?>">
 			<div class="mini-paint">
 				<div class="mini-paint__top">
-					<h2 class="mini-paint__title">Mini Paint Studio</h2>
+					<h2 class="mini-paint__title">Mini Boyama Stüdyosu</h2>
 					<div class="mini-paint__help">
 						Paint style editor with drawing, text, stickers, emoji, selection, crop, flip, rotate, and frames.
 					</div>
@@ -1473,7 +1473,7 @@ if (!function_exists('zo_game_mini_paint_render')) {
 
 					<div class="mini-paint__group">
 						<span class="mini-paint__label">Text</span>
-						<input type="text" class="mini-paint__text-input" placeholder="Type text here" aria-label="Text input">
+						<input type="text" class="mini-paint__text-input" placeholder="Metni buraya yaz" aria-label="Text input">
 						<input type="range" class="mini-paint__range mini-paint__text-size" min="8" max="120" value="32" aria-label="Text size">
 						<span class="mini-paint__value mini-paint__text-size-value">32px</span>
 						<select class="mini-paint__select mini-paint__font-select" aria-label="Font picker">
@@ -1576,7 +1576,7 @@ if (!function_exists('zo_game_mini_paint_render')) {
 
 return array(
 	'slug'            => 'mini-paint',
-	'name'            => 'Mini Paint Studio',
+	'name'            => 'Mini Boyama Stüdyosu',
 	'author'          => 'Asker',
 	'description'     => 'A simple Paint-style image editor with shapes, text, selection, crop, stickers, emoji, frames, flip, rotate, and keyboard shortcuts.',
 	'render_callback' => 'zo_game_mini_paint_render',

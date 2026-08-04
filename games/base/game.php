@@ -371,7 +371,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.winner = '';
 			prepareWave(state.wave);
 			updateStats();
-			setMessage('Press Start. Place towers on the gray pads.');
+			setMessage('Başlat düğmesine bas. Place towers on the gray pads.');
 			draw();
 		}
 
@@ -493,12 +493,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			for (let i = 0; i < state.enemies.length; i++) {
 				const enemy = state.enemies[i];
-				if (enemy.lane !== tower.lane || enemy.hp <= 0) {
+				if (enemy.lane !== kulesi.lane || enemy.hp <= 0) {
 					continue;
 				}
 
-				const dx = enemy.x - tower.x;
-				const dy = enemy.y - tower.y;
+				const dx = enemy.x - kulesi.x;
+				const dy = enemy.y - kulesi.y;
 				const dist = Math.sqrt((dx * dx) + (dy * dy));
 
 				if (dist <= def.range) {
@@ -526,8 +526,8 @@ document.addEventListener('DOMContentLoaded', function () {
 				}
 
 				const target = findTargetForTower(tower, def);
-				if (target && tower.cooldown <= 0) {
-					createProjectile(tower.x, tower.y, target, def);
+				if (target && kulesi.cooldown <= 0) {
+					createProjectile(tower.x, kulesi.y, target, def);
 					tower.cooldown = def.cooldownMax;
 				}
 			}
@@ -698,7 +698,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			for (let i = 0; i < buildSpots.length; i++) {
 				const spot = buildSpots[i];
 				const occupied = state.towers.some(function (tower) {
-					return tower.spotIndex === i;
+					return kulesi.spotIndex === i;
 				});
 
 				ctx.beginPath();
@@ -721,15 +721,15 @@ document.addEventListener('DOMContentLoaded', function () {
 				const def = towerDefs[tower.typeKey];
 
 				ctx.fillStyle = def.color;
-				ctx.fillRect(tower.x - 16, tower.y - 16, 32, 32);
+				ctx.fillRect(tower.x - 16, kulesi.y - 16, 32, 32);
 				ctx.strokeStyle = '#0f172a';
 				ctx.lineWidth = 2;
-				ctx.strokeRect(tower.x - 16, tower.y - 16, 32, 32);
+				ctx.strokeRect(tower.x - 16, kulesi.y - 16, 32, 32);
 
 				ctx.fillStyle = '#ffffff';
 				ctx.font = 'bold 12px Arial';
 				ctx.textAlign = 'center';
-				ctx.fillText(def.key === 'arrow' ? 'A' : (def.key === 'cannon' ? 'C' : 'F'), tower.x, tower.y + 4);
+				ctx.fillText(def.key === 'arrow' ? 'A' : (def.key === 'cannon' ? 'C' : 'F'), kulesi.x, kulesi.y + 4);
 			}
 
 			ctx.restore();
@@ -797,12 +797,12 @@ document.addEventListener('DOMContentLoaded', function () {
 				ctx.font = 'bold 36px Arial';
 				ctx.fillText(state.winner === 'Player' ? 'Victory' : 'Defeat', WIDTH / 2, HEIGHT / 2 - 10);
 				ctx.font = 'bold 18px Arial';
-				ctx.fillText('Press Restart to play again.', WIDTH / 2, HEIGHT / 2 + 28);
+				ctx.fillText('Tekrar oynamak için Yeniden Başlat düğmesine bas.', WIDTH / 2, HEIGHT / 2 + 28);
 			} else {
 				ctx.font = 'bold 34px Arial';
-				ctx.fillText('Base Defense', WIDTH / 2, HEIGHT / 2 - 10);
+				ctx.fillText('Üs Savunması', WIDTH / 2, HEIGHT / 2 - 10);
 				ctx.font = 'bold 18px Arial';
-				ctx.fillText('Place towers, then press Start.', WIDTH / 2, HEIGHT / 2 + 28);
+				ctx.fillText('Kuleleri yerleştir, sonra Başlat düğmesine bas.', WIDTH / 2, HEIGHT / 2 + 28);
 			}
 
 			ctx.restore();
@@ -872,7 +872,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				if (towerDefs[key]) {
 					state.selectedTower = key;
 					updateStats();
-					setMessage('Selected: ' + towerDefs[key].name);
+					setMessage('Seçili: ' + towerDefs[key].name);
 				}
 			});
 		});
@@ -894,7 +894,7 @@ if (!function_exists('zo_base_defense_render')) {
 		?>
 		<div class="zo-game-root zo-game-root--base-defense" id="<?php echo esc_attr($game_id); ?>">
 			<div class="zo-bd-wrap">
-				<h2 class="zo-bd-title">Base Defense</h2>
+				<h2 class="zo-bd-title">Üs Savunması</h2>
 				<p class="zo-bd-subtitle">Tower defense with bases. Build towers on the pads, stop enemy waves, and wear down the enemy base.</p>
 
 				<div class="zo-bd-topbar">
@@ -903,7 +903,7 @@ if (!function_exists('zo_base_defense_render')) {
 						<div class="zo-bd-stat">Wave: <span class="zo-bd-wave">1</span></div>
 						<div class="zo-bd-stat">Your Base: <span class="zo-bd-player-base">240</span></div>
 						<div class="zo-bd-stat">Enemy Base: <span class="zo-bd-enemy-base">240</span></div>
-						<div class="zo-bd-stat">Selected: <span class="zo-bd-selected-tower">Arrow Tower</span></div>
+						<div class="zo-bd-stat">Seçili: <span class="zo-bd-selected-tower">Arrow Tower</span></div>
 					</div>
 
 					<div class="zo-bd-controls">
@@ -919,8 +919,8 @@ if (!function_exists('zo_base_defense_render')) {
 
 				<div class="zo-bd-layout">
 					<div class="zo-bd-board-wrap">
-						<canvas class="zo-bd-canvas" width="860" height="460" aria-label="Base defense battlefield"></canvas>
-						<div class="zo-bd-message">Press Start. Place towers on the gray pads.</div>
+						<canvas class="zo-bd-canvas" width="860" height="460" aria-label="Üs savunma savaş alanı"></canvas>
+						<div class="zo-bd-message">Başlat düğmesine bas. Place towers on the gray pads.</div>
 					</div>
 
 					<div class="zo-bd-side">
@@ -946,7 +946,7 @@ if (!function_exists('zo_base_defense_render')) {
 							</div>
 						</div>
 
-						<h3>How to Play</h3>
+						<h3>Nasıl Oynanır</h3>
 						<ul>
 							<li>Click a tower type.</li>
 							<li>Click a gray build pad to place it.</li>
@@ -968,7 +968,7 @@ if (!function_exists('zo_base_defense_render')) {
 
 return array(
 	'slug'            => 'base-defense',
-	'name'            => 'Base Defense',
+	'name'            => 'Üs Savunması',
 	'author'          => 'Arslan',
 	'description'     => 'A tower defense game with bases on both sides.',
 	'render_callback' => 'zo_base_defense_render',

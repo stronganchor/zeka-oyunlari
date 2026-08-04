@@ -395,7 +395,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				selected: null,
 				legalMoves: [],
 				lastMove: null,
-				status: 'Pick a piece to move.',
+				status: 'Hamle yapmak için bir taş seç.',
 				thinking: false,
 				gameOver: false,
 				winner: null,
@@ -500,7 +500,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			state = initialState();
 			state.human = sideEl.value === 'black' ? 'b' : 'w';
 			state.ai = opposite(state.human);
-			state.status = 'Pick a piece to move.';
+			state.status = 'Hamle yapmak için bir taş seç.';
 			render();
 
 			if (state.turn === state.ai) {
@@ -593,15 +593,15 @@ document.addEventListener('DOMContentLoaded', function () {
 			statusEl.textContent = state.status;
 			turnEl.textContent = 'Turn: ' + whoseTurn + ' | You: ' + yourSide;
 			aiStatusEl.textContent = state.gameOver
-				? 'Game finished.'
-				: (state.thinking ? 'AI is thinking...' : 'AI difficulty: ' + difficultyEl.options[difficultyEl.selectedIndex].text);
+				? 'Oyun bitti.'
+				: (state.thinking ? 'Yapay zeka düşünüyor...' : 'AI difficulty: ' + difficultyEl.options[difficultyEl.selectedIndex].text);
 		}
 
 		function renderMoves() {
 			movesEl.innerHTML = '';
 
 			if (!state.moveHistory.length) {
-				movesEl.textContent = 'No moves yet.';
+				movesEl.textContent = 'Henüz hamle yok.';
 				return;
 			}
 
@@ -707,7 +707,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			state.thinking = true;
-			state.status = 'AI is thinking...';
+			state.status = 'Yapay zeka düşünüyor...';
 			render();
 
 			const settings = getCurrentDifficulty();
@@ -737,11 +737,11 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (isKingInCheck(state, color)) {
 				state.gameOver = true;
 				state.winner = opposite(color);
-				state.status = (state.winner === state.human ? 'Checkmate. You win.' : 'Checkmate. AI wins.');
+				state.status = (state.winner === state.human ? 'Checkmate. You win.' : 'Mat. Yapay zeka kazandı.');
 			} else {
 				state.gameOver = true;
 				state.winner = 'draw';
-				state.status = 'Stalemate. Draw game.';
+				state.status = 'Pat. Draw game.';
 			}
 		}
 
@@ -752,11 +752,11 @@ document.addEventListener('DOMContentLoaded', function () {
 				if (isKingInCheck(state, state.turn)) {
 					state.gameOver = true;
 					state.winner = opposite(state.turn);
-					state.status = state.winner === state.human ? 'Checkmate. You win.' : 'Checkmate. AI wins.';
+					state.status = state.winner === state.human ? 'Checkmate. You win.' : 'Mat. Yapay zeka kazandı.';
 				} else {
 					state.gameOver = true;
 					state.winner = 'draw';
-					state.status = 'Stalemate. Draw game.';
+					state.status = 'Pat. Draw game.';
 				}
 				return;
 			}
@@ -1428,7 +1428,7 @@ if (!function_exists('zo_game_chess_ai_render')) {
 				</div>
 
 				<div class="zo-chess-panel">
-					<h2 class="zo-chess-title">Chess vs AI</h2>
+					<h2 class="zo-chess-title">Yapay Zekaya Karşı Satranç</h2>
 					<p class="zo-chess-instructions">
 						Play chess against the computer. Choose your side and AI level. Tap or click a piece, then tap a highlighted square to move.
 					</p>
@@ -1437,11 +1437,11 @@ if (!function_exists('zo_game_chess_ai_render')) {
 						<div class="zo-chess-field">
 							<label for="<?php echo esc_attr($instance_id); ?>-difficulty">AI difficulty</label>
 							<select class="zo-chess-select zo-chess-difficulty" id="<?php echo esc_attr($instance_id); ?>-difficulty">
-								<option value="veryeasy">Very Easy AI</option>
-								<option value="easy">Easy AI</option>
-								<option value="medium" selected>Medium AI</option>
-								<option value="hard">Hard AI</option>
-								<option value="veryhard">Very Hard AI</option>
+								<option value="veryeasy">Very Kolay Yapay Zeka</option>
+								<option value="easy">Kolay Yapay Zeka</option>
+								<option value="medium" selected>Orta Yapay Zeka</option>
+								<option value="hard">Zor Yapay Zeka</option>
+								<option value="veryhard">Very Zor Yapay Zeka</option>
 							</select>
 						</div>
 
@@ -1454,18 +1454,18 @@ if (!function_exists('zo_game_chess_ai_render')) {
 						</div>
 
 						<div class="zo-chess-button-row">
-							<button type="button" class="zo-chess-button zo-chess-restart">New Game</button>
+							<button type="button" class="zo-chess-button zo-chess-restart">Yeni Oyun</button>
 							<button type="button" class="zo-chess-button zo-chess-button--secondary zo-chess-undo">Undo</button>
 						</div>
 					</div>
 
-					<p class="zo-chess-status">Pick a piece to move.</p>
+					<p class="zo-chess-status">Hamle yapmak için bir taş seç.</p>
 					<p class="zo-chess-turn">Turn: White | You: White</p>
-					<p class="zo-chess-ai-status">AI difficulty: Medium AI</p>
+					<p class="zo-chess-ai-status">AI difficulty: Orta Yapay Zeka</p>
 
 					<div class="zo-chess-moves">
 						<h3>Move List</h3>
-						<div class="zo-chess-move-list">No moves yet.</div>
+						<div class="zo-chess-move-list">Henüz hamle yok.</div>
 					</div>
 
 					<div class="zo-chess-footer">
@@ -1481,7 +1481,7 @@ if (!function_exists('zo_game_chess_ai_render')) {
 
 return array(
 	'slug'            => 'chess-ai',
-	'name'            => 'Chess vs AI',
+	'name'            => 'Yapay Zekaya Karşı Satranç',
 	'author'          => 'Asker',
 	'description'     => 'Play chess against computer opponents from very easy to very hard.',
 	'render_callback' => 'zo_game_chess_ai_render',

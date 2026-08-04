@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function () {
 							switchMode('future');
 							completed = 0;
 						} else {
-							alert('🎉 You solved all puzzles! Total Score: ' + score);
+							alert('🎉 Tüm bulmacaları çözdün! Toplam puan: ' + score);
 						}
 					}, 500);
 				}
@@ -226,7 +226,7 @@ if (!function_exists('zo_game_time_traveler_puzzle_render')) {
 			<div class="puzzle-grid"></div>
 			
 			<div class="score">Score: 0</div>
-			<button class="restart">Restart Game</button>
+			<button class="restart">Oyunu Yeniden Başlat</button>
 		</div>
 		<?php
 		return ob_get_clean();

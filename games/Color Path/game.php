@@ -234,16 +234,16 @@ document.addEventListener('DOMContentLoaded', function () {
 						locked = true;
 
 						if (score >= 8) {
-							setStatus('You won Color Path.');
+							setStatus('Color Path oyununu kazandin.');
 							return;
 						}
 
-						setStatus('Correct. Next round...');
+						setStatus('Dogru. Sonraki tur...');
 						window.setTimeout(function () {
 							round += 1;
 							updateStats();
 							buildRound();
-							setStatus('Match the target color.');
+							setStatus('Hedef rengi eslestir.');
 						}, 700);
 					} else {
 						tile.classList.add('is-wrong');
@@ -254,9 +254,9 @@ document.addEventListener('DOMContentLoaded', function () {
 						if (lives <= 0) {
 							locked = true;
 							tiles[correctIndex].classList.add('is-correct');
-							setStatus('Game over.');
+							setStatus('Oyun bitti.');
 						} else {
-							setStatus('Wrong color. Try again.');
+							setStatus('Yanlis renk. Tekrar dene.');
 						}
 					}
 				});
@@ -272,7 +272,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			lives = 3;
 			updateStats();
 			buildRound();
-			setStatus('Match the target color.');
+			setStatus('Hedef rengi eslestir.');
 		}
 
 		restartBtn.addEventListener('click', function () {
@@ -301,7 +301,7 @@ if (!function_exists('zo_game_color_path_render')) {
 					<div class="zo-cp-stat">Lives: <span class="zo-cp-lives-value">3</span></div>
 				</div>
 
-				<div class="zo-cp-status" aria-live="polite">Match the target color.</div>
+				<div class="zo-cp-status" aria-live="polite">Hedef rengi eşleştir.</div>
 
 				<div class="zo-cp-target-wrap">
 					<div class="zo-cp-target-label">Target Color</div>

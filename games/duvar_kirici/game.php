@@ -438,7 +438,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 				if (state.lives <= 0) {
 					stopLoop();
-					showOverlay('Game Over', 'Final Score: ' + state.score, false);
+					showOverlay('Oyun Bitti', 'Son Puan: ' + state.score, false);
 					return;
 				}
 
@@ -447,7 +447,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			if (state.bricks.length === 0) {
 				stopLoop();
-				showOverlay('You Win', 'Final Score: ' + state.score, false);
+				showOverlay('You Win', 'Son Puan: ' + state.score, false);
 			}
 		}
 

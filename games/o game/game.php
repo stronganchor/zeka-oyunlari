@@ -358,7 +358,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			const finalScore = scoreDisplayValue();
 			state.bestScore = Math.max(state.bestScore, finalScore);
 			updateHud();
-			showOverlay('Game Over — Score: ' + finalScore, 'Press Space, Enter, or Restart to play again.', false);
+			showOverlay('Oyun Bitti — Score: ' + finalScore, 'Press Space, Enter, or Restart to play again.', false);
 		}
 
 		function showOverlay(title, text, showStart) {
@@ -550,7 +550,7 @@ if (!function_exists('zo_game_dodge_the_blocks_render')) {
 		?>
 		<div class="zo-game-root zo-game-root--dodge-the-blocks" id="<?php echo esc_attr($instance_id); ?>" tabindex="0">
 			<div class="dtb-title">Dodge The Blocks</div>
-			<div class="dtb-instructions">Move left and right to avoid falling red blocks. Use Arrow keys or A and D. Press Space or Enter to start and restart.</div>
+			<div class="dtb-instructions">Sola git and right to avoid falling red blocks. Use Arrow keys or A and D. Press Space or Enter to start and restart.</div>
 
 			<div class="dtb-topbar">
 				<div class="dtb-stat">Score: <span data-role="score">0</span></div>

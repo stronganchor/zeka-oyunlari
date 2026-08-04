@@ -584,7 +584,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				if (enemyInCheck) {
 					state.status = (state.currentPlayer === 'w' ? 'White' : 'Black') + ' wins by checkmate.';
 				} else {
-					state.status = 'Stalemate.';
+					state.status = 'Pat.';
 				}
 				return;
 			}
@@ -623,7 +623,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				if (state.legalMoves.length) {
 					state.status = coordToName(r, c) + ' selected.';
 				} else {
-					state.status = 'That piece has no legal move.';
+					state.status = 'Bu taşın yasal hamlesi yok.';
 				}
 				renderBoard();
 				return;

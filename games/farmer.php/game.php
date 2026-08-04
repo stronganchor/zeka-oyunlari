@@ -267,7 +267,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			seeds: 10,
 			crops: 0,
 			money: 20,
-			msg: 'Use tools 1-4. Plant -> Water -> Harvest -> Sell (E).',
+			msg: '1-4 araçlarını kullan. Ekle -> Sula -> Hasat -> Sat (E).',
 			lastTime: 0,
 			running: true
 		};
@@ -296,7 +296,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.seeds = 10;
 			state.crops = 0;
 			state.money = 20;
-			state.msg = 'Use tools 1-4. Plant -> Water -> Harvest -> Sell (E).';
+			state.msg = '1-4 araçlarını kullan. Ekle -> Sula -> Hasat -> Sat (E).';
 			state.lastTime = 0;
 			render();
 		}

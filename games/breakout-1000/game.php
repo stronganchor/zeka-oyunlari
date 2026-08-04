@@ -326,7 +326,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			wonAll = false;
 			leftDown = false;
 			rightDown = false;
-			statusEl.textContent = 'Level 1 ready. Press Space or Launch.';
+			statusEl.textContent = 'Seviye 1 hazır. Boşluk veya Fırlat düğmesine bas.';
 			updateHud();
 		}
 
@@ -334,7 +334,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			level += 1;
 			if (level > MAX_LEVELS) {
 				wonAll = true;
-				statusEl.textContent = 'You beat all 1000 levels!';
+				statusEl.textContent = '1000 seviyenin hepsini geçtin!';
 				return;
 			}
 			bricks = generateLevel(level);
@@ -348,7 +348,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		function launch() {
 			if (!gameOver && !wonAll) {
 				ball.stuck = false;
-				statusEl.textContent = 'Break every brick.';
+				statusEl.textContent = 'Her tuğlayı kır.';
 			}
 		}
 
@@ -464,10 +464,10 @@ document.addEventListener('DOMContentLoaded', function () {
 				lives -= 1;
 				if (lives <= 0) {
 					gameOver = true;
-					statusEl.textContent = 'Game over. Press R or Restart.';
+					statusEl.textContent = 'Oyun bitti. Press R or Restart.';
 				} else {
 					resetBall();
-					statusEl.textContent = 'Life lost. Launch again.';
+					statusEl.textContent = 'Can gitti. Tekrar fırlat.';
 				}
 			}
 
@@ -664,10 +664,10 @@ if (!function_exists('zo_game_breakout_1000_render')) {
 		<div class="zo-game-root zo-game-root--breakout-1000" id="<?php echo esc_attr($instance_id); ?>">
 			<div class="zo-b1000-head">
 				<div>
-					<h2 class="zo-b1000-title">Breakout - 1000 Levels</h2>
+					<h2 class="zo-b1000-title">Breakout - 1000 Seviye</h2>
 					<p class="zo-b1000-subtitle">A browser PHP version of Arslan's pygame Breakout: deterministic levels, special bricks, shrinking paddle, faster ball, pause, restart, and 1000 levels.</p>
 				</div>
-				<div class="zo-b1000-stats" aria-label="Game stats">
+				<div class="zo-b1000-stats" aria-label="Oyun istatistikleri">
 					<div class="zo-b1000-stat">Level <span data-level>1 / 1000</span></div>
 					<div class="zo-b1000-stat">Score <span data-score>0</span></div>
 					<div class="zo-b1000-stat">Lives <span data-lives>3</span></div>
@@ -684,7 +684,7 @@ if (!function_exists('zo_game_breakout_1000_render')) {
 				<button type="button" class="zo-b1000-button zo-b1000-button--restart" data-restart>Restart</button>
 				<button type="button" class="zo-b1000-button zo-b1000-button--move" data-right>Right</button>
 			</div>
-			<div class="zo-b1000-status" aria-live="polite">Level 1 ready. Press Space or Launch.</div>
+			<div class="zo-b1000-status" aria-live="polite">Seviye 1 hazır. Boşluk veya Fırlat düğmesine bas.</div>
 			<div class="zo-b1000-help">Move with A/D, arrow keys, mouse, touch, or the Left/Right buttons. Launch with Space. Pause with P. Restart with R.</div>
 		</div>
 		<?php
@@ -694,7 +694,7 @@ if (!function_exists('zo_game_breakout_1000_render')) {
 
 return array(
 	'slug'            => 'breakout-1000',
-	'name'            => 'Breakout - 1000 Levels',
+	'name'            => 'Breakout - 1000 Seviye',
 	'author'          => 'Arslan',
 	'description'     => 'A PHP browser version of Arslan\'s pygame Breakout with 1000 deterministic levels, special bricks, 3 lives, pause, restart, and mobile controls.',
 	'render_callback' => 'zo_game_breakout_1000_render',

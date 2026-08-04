@@ -259,8 +259,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			aiSpecialUsed = false;
 			specialBtn.classList.remove('disabled');
 			specialBtn.disabled = false;
-			specialBtn.textContent = 'Use Reinforce';
-			messageElement.textContent = 'Choose a cell to expand or attack.';
+			specialBtn.textContent = 'Takviye Kullan';
+			messageElement.textContent = 'Genişlemek veya saldırmak için bir hücre seç.';
 
 			boardElement.className = 'territory-board' + (boardSize === 8 ? ' board-8' : '');
 			boardElement.style.gridTemplateColumns = `repeat(${boardSize}, 1fr)`;
@@ -375,13 +375,13 @@ document.addEventListener('DOMContentLoaded', function () {
 				if (success) {
 					messageElement.textContent = action === 'expanded' ? 'You claimed a new border cell.' : 'Attack success! You captured enemy territory.';
 				} else {
-					messageElement.textContent = 'Attack failed. The enemy held strong.';
+					messageElement.textContent = 'Saldırı başarısız. Düşman dayandı.';
 				}
 			} else {
 				if (success) {
-					messageElement.textContent = 'AI captured territory this turn.';
+					messageElement.textContent = 'Yapay zeka bu tur bölge ele geçirdi.';
 				} else {
-					messageElement.textContent = 'AI attack failed. Your border remains intact.';
+					messageElement.textContent = 'Yapay zeka saldırısı başarısız. Sınırın sağlam kaldı.';
 				}
 			}
 		}
@@ -408,7 +408,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				const choice = reinforceTargets[Math.floor(Math.random() * reinforceTargets.length)];
 				board[choice[0]][choice[1]] = 'ai';
 				aiSpecialUsed = true;
-				messageElement.textContent = 'AI used reinforce and claimed a neutral border cell.';
+				messageElement.textContent = 'Yapay zeka takviye kullandı ve tarafsız sınır karesi aldı.';
 				renderBoard();
 				updateInfo();
 				checkGameOver();
@@ -470,9 +470,9 @@ document.addEventListener('DOMContentLoaded', function () {
 				}
 			}
 
-			turnElement.textContent = gameOver ? 'Game over' : currentPlayer === 'player' ? 'Your turn' : 'AI turn';
+			turnElement.textContent = gameOver ? 'Oyun bitti' : currentPlayer === 'player' ? 'Your turn' : 'AI turn';
 			scoreElement.textContent = `You: ${playerCount} | AI: ${aiCount}`;
-			specialInfo.textContent = playerSpecialUsed ? 'Reinforce used' : 'Reinforce available';
+			specialInfo.textContent = playerSpecialUsed ? 'Reinforce used' : 'Takviye hazır';
 			specialBtn.disabled = gameOver || playerSpecialUsed;
 			if (playerSpecialUsed) {
 				specialBtn.classList.add('disabled');
@@ -494,7 +494,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			if (!playerCanPlay && aiCanPlay && currentPlayer === 'player') {
 				currentPlayer = 'ai';
-				messageElement.textContent = 'No player moves left. AI continues.';
+				messageElement.textContent = 'Oyuncu hamlesi kalmadı. Yapay zeka devam ediyor.';
 				updateInfo();
 				setTimeout(aiMove, 800);
 				return;
@@ -502,7 +502,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			if (!aiCanPlay && playerCanPlay && currentPlayer === 'ai') {
 				currentPlayer = 'player';
-				messageElement.textContent = 'AI cannot move. Your turn.';
+				messageElement.textContent = 'Yapay zeka hamle yapamıyor. Sıra sende.';
 				updateInfo();
 				return;
 			}
@@ -522,9 +522,9 @@ document.addEventListener('DOMContentLoaded', function () {
 				}
 
 				if (playerCount > aiCount) {
-					messageElement.textContent = 'You win! Great territory control.';
+					messageElement.textContent = 'Kazandın! Harika bölge kontrolü.';
 				} else if (aiCount > playerCount) {
-					messageElement.textContent = 'AI wins! Try a different strategy.';
+					messageElement.textContent = 'Yapay zeka kazandı! Farklı bir strateji dene.';
 				} else {
 					messageElement.textContent = 'It\'s a tie! A balanced battle.';
 				}
@@ -538,7 +538,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			const reinforceCells = getAllNeutralAdjacentTo('player');
 			if (reinforceCells.length === 0) {
-				messageElement.textContent = 'No neutral border cell available to reinforce.';
+				messageElement.textContent = 'Takviye için uygun tarafsız sınır karesi yok.';
 				return;
 			}
 
@@ -547,7 +547,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			playerSpecialUsed = true;
 			specialBtn.classList.add('disabled');
 			specialBtn.disabled = true;
-			messageElement.textContent = 'Reinforce used! You claimed a border space.';
+			messageElement.textContent = 'Takviye kullanıldı! Bir sınır alanı aldın.';
 			renderBoard();
 			updateInfo();
 			checkGameOver();
@@ -584,7 +584,7 @@ if (!function_exists('zo_game_territory_capture_render')) {
 		ob_start();
 		?>
 		<div class="zo-game-root zo-game-root--territory-capture" id="<?php echo esc_attr($instance_id); ?>">
-			<h2>Territory Capture</h2>
+			<h2>Bölge Ele Geçirme</h2>
 			<div class="game-setup">
 				<label>Board Size: <select class="size-select">
 					<option value="6">6x6</option>
@@ -595,7 +595,7 @@ if (!function_exists('zo_game_territory_capture_render')) {
 					<option value="medium">Medium</option>
 					<option value="hard">Hard</option>
 				</select></label>
-				<button class="start-btn">Start New Game</button>
+				<button class="start-btn">Start Yeni Oyun</button>
 			</div>
 			<p>Click on cells adjacent to your green territory to expand. Attack red cells to try to capture them!</p>
 			<div class="game-info">
@@ -603,18 +603,18 @@ if (!function_exists('zo_game_territory_capture_render')) {
 					<div class="turn-info">Your turn</div>
 					<div class="score-info">You: 1 | AI: 1</div>
 				</div>
-				<div class="message">Choose a cell to expand or attack.</div>
+				<div class="message">Genişlemek veya saldırmak için bir hücre seç.</div>
 				<div class="legend">
 					<span><span class="legend-dot player"></span>You</span>
 					<span><span class="legend-dot ai"></span>AI</span>
 					<span><span class="legend-dot neutral"></span>Neutral</span>
 				</div>
-				<div class="special-info">Reinforce available</div>
+				<div class="special-info">Takviye hazır</div>
 			</div>
 			<div class="territory-board"></div>
 			<div class="controls">
-				<button class="special-btn">Use Reinforce</button>
-				<button class="restart-btn">Restart Game</button>
+				<button class="special-btn">Takviye Kullan</button>
+				<button class="restart-btn">Oyunu Yeniden Başlat</button>
 		</div>
 		</div>
 		<?php
@@ -624,7 +624,7 @@ if (!function_exists('zo_game_territory_capture_render')) {
 
 return array(
 	'slug'            => 'territory-capture',
-	'name'            => 'Territory Capture',
+	'name'            => 'Bölge Ele Geçirme',
 	'author'          => 'Asker',
 	'description'     => 'A turn-based strategy game where you compete with AI to control the most territory on a grid. Choose difficulty and board size, expand your territory, and use special reinforce actions.',
 	'render_callback' => 'zo_game_territory_capture_render',

@@ -13,7 +13,7 @@ if (!function_exists('zo_game_dama_ai_render')) {
 		<div class="zo-game-root zo-game-root--dama-ai" id="<?php echo esc_attr($instance_id); ?>" data-game="dama-ai">
 			<div class="zo-dama-ai">
 				<div class="zo-dama-ai__header">
-					<h3 class="zo-dama-ai__title">Dama vs AI</h3>
+					<h3 class="zo-dama-ai__title">Yapay Zekaya Karşı Dama</h3>
 					<p class="zo-dama-ai__instructions">
 						You are White. Tap one of your pieces, then tap a highlighted square to move.
 						Captures are required. Reach the far side to become a king. Beat the black AI.
@@ -25,7 +25,7 @@ if (!function_exists('zo_game_dama_ai_render')) {
 						<div class="zo-dama-ai__turn" data-role="turn">Turn: White</div>
 						<div class="zo-dama-ai__status" data-role="status">Select a white piece to begin.</div>
 					</div>
-					<button type="button" class="zo-dama-ai__restart" data-action="restart">Restart Game</button>
+					<button type="button" class="zo-dama-ai__restart" data-action="restart">Oyunu Yeniden Başlat</button>
 				</div>
 
 				<div class="zo-dama-ai__board-wrap">
@@ -46,7 +46,7 @@ if (!function_exists('zo_game_dama_ai_render')) {
 
 return array(
 	'slug'            => 'dama-ai',
-	'name'            => 'Dama vs AI',
+	'name'            => 'Yapay Zekaya Karşı Dama',
 	'author'          => 'Asker',
 	'description'     => 'A kid-friendly Dama board game where you play white against a simple AI.',
 	'render_callback' => 'zo_game_dama_ai_render',

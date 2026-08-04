@@ -399,7 +399,7 @@ if (!function_exists('zo_game_duck_box_hunt_render')) {
 		?>
 		<div class="zo-game-root zo-game-root--duck-box-hunt" id="<?php echo esc_attr($instance_id); ?>">
 			<div class="zo-dbh-shell">
-				<h2 class="zo-dbh-title">Duck Box Hunt</h2>
+				<h2 class="zo-dbh-title">Kutu Altında Ördek Avı</h2>
 				<p class="zo-dbh-subtitle">Check 5 boxes, find the hidden duck, and earn 5 coins for every correct pick until you discover all 30 ducks.</p>
 
 				<div class="zo-dbh-topbar">
@@ -475,7 +475,7 @@ if (!function_exists('zo_game_duck_box_hunt_render')) {
 
 return array(
 	'slug'            => 'duck-box-hunt',
-	'name'            => 'Duck Box Hunt',
+	'name'            => 'Kutu Altında Ördek Avı',
 	'author'          => 'Arslan',
 	'description'     => 'A standalone five-box duck hunt game where players earn coins by finding the hidden duck across 30 rounds.',
 	'render_callback' => 'zo_game_duck_box_hunt_render',

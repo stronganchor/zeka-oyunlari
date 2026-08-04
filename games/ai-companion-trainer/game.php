@@ -697,7 +697,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			if (!state.history.length) {
 				const item = document.createElement('li');
-				item.textContent = 'Your robot helper is waiting for its first lesson.';
+				item.textContent = 'Robot yardımcın ilk dersini bekliyor.';
 				logEl.appendChild(item);
 				return;
 			}
@@ -753,7 +753,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				tagsEl.appendChild(span);
 			});
 
-			statusEl.textContent = 'Choose the best move for this round.';
+			statusEl.textContent = 'Bu tur için en iyi hamleyi seç.';
 			updateMeters();
 		}
 
@@ -820,11 +820,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			if (wasCorrect) {
 				state.streak += 1;
-				statusEl.textContent = 'Nice coaching. ' + currentScenario.why;
+				statusEl.textContent = 'Güzel koçluk. ' + currentScenario.why;
 			} else {
 				state.streak = 0;
 				state.alignment = clamp(state.alignment - 4);
-				statusEl.textContent = 'That choice teaches a risky habit. ' + currentScenario.why;
+				statusEl.textContent = 'Bu seçim riskli bir alışkanlık öğretiyor. ' + currentScenario.why;
 				state.history.push('A mistake slipped into training, so the robot learned a shaky pattern.');
 			}
 
@@ -857,8 +857,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			summaryTitleEl.textContent = headline;
-			summaryTextEl.textContent = 'Final alignment: ' + state.alignment + '%. Trust: ' + state.trust + '%. Corrections made: ' + state.corrections + '. The big lesson: your robot copies both your good habits and your mistakes.';
-			statusEl.textContent = 'Training finished. Review the summary and restart for a new run.';
+			summaryTextEl.textContent = 'Son uyum: ' + state.alignment + '%. Güven: ' + state.trust + '%. Düzeltmeler: ' + state.corrections + '. Büyük ders: robotun iyi alışkanlıklarını da hatalarını da kopyalar.';
+			statusEl.textContent = 'Eğitim bitti. Özeti incele ve yeni tur için yeniden başlat.';
 			currentConfidence = state.accuracy;
 			updateMeters();
 		}

@@ -224,8 +224,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function setIdleView() {
 			clearPlayClasses();
-			playText.textContent = 'Tap Start';
-			setStatus('Press Start, then wait for green.', '');
+			playText.textContent = 'Başlat düğmesine dokun';
+			setStatus('Baslat dugmesine bas, sonra yesili bekle.', '');
 		}
 
 		function beginRound() {
@@ -238,7 +238,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			clearPlayClasses();
 			playArea.classList.add('is-waiting');
 			playText.textContent = 'Wait...';
-			setStatus('Do not click yet.', '');
+			setStatus('Henuz tiklama.', '');
 
 			const delay = Math.floor(Math.random() * 2500) + 1200;
 
@@ -248,7 +248,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				clearPlayClasses();
 				playArea.classList.add('is-ready');
 				playText.textContent = 'CLICK NOW';
-				setStatus('Click as fast as you can.', 'good');
+				setStatus('Olabildigince hizli tikla.', 'good');
 				timeoutId = null;
 			}, delay);
 		}
@@ -268,7 +268,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				clearPlayClasses();
 				playArea.classList.add('is-too-soon');
 				playText.textContent = 'Too Soon';
-				setStatus('You clicked too early. Try again.', 'bad');
+				setStatus('Cok erken tikladin. Tekrar dene.', 'bad');
 				currentTime = 0;
 				updateStats();
 
@@ -293,7 +293,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				state = 'idle';
 				clearPlayClasses();
 				playText.textContent = reaction + ' ms';
-				setStatus('Nice. Press Start for another round.', 'good');
+				setStatus('Guzel. Yeni tur icin Baslat dugmesine bas.', 'good');
 				updateStats();
 			}
 		}
@@ -336,8 +336,8 @@ if (!function_exists('zo_game_reaction_speed_clicker_render')) {
 		?>
 		<div class="zo-game-root zo-game-root--reaction-speed-clicker" id="<?php echo esc_attr($instance_id); ?>">
 			<div class="rsc-card">
-				<h2 class="rsc-title">Reaction Speed Clicker</h2>
-				<p class="rsc-instructions">Press Start. Wait until the big box turns green. Then click as fast as you can. If you click too early, that round fails.</p>
+				<h2 class="rsc-title">Tepki Hızı Tıklayıcı</h2>
+				<p class="rsc-instructions">Başlat düğmesine bas. Wait until the big box turns green. Then click as fast as you can. If you click too early, that round fails.</p>
 
 				<div class="rsc-stats">
 					<div class="rsc-stat">
@@ -357,7 +357,7 @@ if (!function_exists('zo_game_reaction_speed_clicker_render')) {
 				<div class="rsc-status" aria-live="polite">Press Start, then wait for green.</div>
 
 				<div class="rsc-play-area" role="button" aria-label="Reaction play area">
-					<div class="rsc-play-text">Tap Start</div>
+					<div class="rsc-play-text">Başlat düğmesine dokun</div>
 				</div>
 
 				<div class="rsc-actions">
@@ -375,7 +375,7 @@ if (!function_exists('zo_game_reaction_speed_clicker_render')) {
 
 return array(
 	'slug'            => 'reaction-speed-clicker',
-	'name'            => 'Reaction Speed Clicker',
+	'name'            => 'Tepki Hızı Tıklayıcı',
 	'author'          => 'Arslan',
 	'description'     => 'Test how fast you can click when the box turns green.',
 	'render_callback' => 'zo_game_reaction_speed_clicker_render',
