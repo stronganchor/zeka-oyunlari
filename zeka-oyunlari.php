@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-define('ZO_PLUGIN_VERSION', '1.5.54.asker.arslan');
+define('ZO_PLUGIN_VERSION', '1.5.60.asker.arslan');
 define('ZO_PLUGIN_FILE', __FILE__);
 define('ZO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('ZO_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -12494,29 +12494,132 @@ function zo_game_report_shortcode($atts = array()) {
 add_shortcode('zeka_game_report', 'zo_game_report_shortcode');
 
 function zo_get_codex_report_mirror_dir() {
-	return trailingslashit(plugin_dir_path(__FILE__)) . 'codex-reports';
-}
+	$wordpress_root = untrailingslashit(wp_normalize_path(ABSPATH));
+	$default_dir = trailingslashit(dirname($wordpress_root)) . '.private/zeka-oyunlari/codex-reports';
+	$configured_dir = defined('ZO_CODEX_REPORT_MIRROR_DIR') ? ZO_CODEX_REPORT_MIRROR_DIR : $default_dir;
+	$dir = apply_filters('zo_codex_report_mirror_dir', $configured_dir);
 
-function zo_prepare_codex_report_mirror_dir() {
-	$dir = zo_get_codex_report_mirror_dir();
-	if (!wp_mkdir_p($dir)) {
-		return new WP_Error('zo_report_mirror_dir', 'Could not create codex report mirror folder.');
+	if (!is_string($dir)) {
+		return '';
 	}
 
-	$protect_files = array(
-		'.htaccess' => "Require all denied\nDeny from all\n",
-		'web.config' => "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<configuration><system.webServer><security><authorization><remove users=\"*\" roles=\"\" verbs=\"\" /><add accessType=\"Deny\" users=\"*\" /></authorization></security></system.webServer></configuration>\n",
-		'index.html' => '',
-	);
+	$dir = untrailingslashit(wp_normalize_path(trim($dir)));
+	if ($dir === '' || !wp_is_absolute_path($dir) || preg_match('#(^|/)\.\.(/|$)#', $dir)) {
+		return '';
+	}
 
-	foreach ($protect_files as $file => $contents) {
-		$path = trailingslashit($dir) . $file;
-		if (!file_exists($path) && @file_put_contents($path, $contents, LOCK_EX) === false) {
-			return new WP_Error('zo_report_mirror_protect', 'Could not write codex report protection files.');
+	foreach (zo_get_public_report_mirror_roots() as $public_root) {
+		if (zo_report_mirror_path_is_within($dir, $public_root)) {
+			return '';
 		}
 	}
 
 	return $dir;
+}
+
+function zo_get_public_report_mirror_roots() {
+	$roots = array(ABSPATH, plugin_dir_path(__FILE__));
+
+	foreach (array('WP_CONTENT_DIR', 'WP_PLUGIN_DIR', 'WPMU_PLUGIN_DIR') as $constant) {
+		if (defined($constant) && is_string(constant($constant))) {
+			$roots[] = constant($constant);
+		}
+	}
+
+	if (!empty($_SERVER['DOCUMENT_ROOT']) && is_string($_SERVER['DOCUMENT_ROOT'])) {
+		$roots[] = $_SERVER['DOCUMENT_ROOT'];
+	}
+
+	$clean = array();
+	foreach ($roots as $root) {
+		$root = untrailingslashit(wp_normalize_path((string) $root));
+		if ($root !== '' && wp_is_absolute_path($root)) {
+			$clean[] = $root;
+		}
+	}
+
+	return array_values(array_unique($clean));
+}
+
+function zo_report_mirror_path_is_within($path, $root) {
+	$path = untrailingslashit(wp_normalize_path((string) $path));
+	$root = untrailingslashit(wp_normalize_path((string) $root));
+
+	if ($path === '' || $root === '') {
+		return false;
+	}
+
+	return strcasecmp($path, $root) === 0 || stripos($path, $root . '/') === 0;
+}
+
+function zo_remove_legacy_public_report_mirror() {
+	$legacy_dir = trailingslashit(plugin_dir_path(__FILE__)) . 'codex-reports';
+	$known_files = array(
+		'game-reports.local.json',
+		'game-reports.local.jsonl',
+		'.htaccess',
+		'web.config',
+		'index.html',
+	);
+
+	foreach ($known_files as $file) {
+		$path = trailingslashit($legacy_dir) . $file;
+		if (is_file($path) && !is_link($path)) {
+			@unlink($path);
+		}
+	}
+
+	if (is_dir($legacy_dir) && !is_link($legacy_dir)) {
+		@rmdir($legacy_dir);
+	}
+}
+add_action('init', 'zo_remove_legacy_public_report_mirror', 1);
+
+function zo_prepare_codex_report_mirror_dir() {
+	$dir = zo_get_codex_report_mirror_dir();
+	if ($dir === '') {
+		return new WP_Error(
+			'zo_report_mirror_private_path',
+			'Configure ZO_CODEX_REPORT_MIRROR_DIR to an absolute directory outside every public web root.'
+		);
+	}
+
+	if (!wp_mkdir_p($dir)) {
+		return new WP_Error('zo_report_mirror_dir', 'Could not create codex report mirror folder.');
+	}
+
+	$real_dir = realpath($dir);
+	if ($real_dir === false || is_link($dir)) {
+		return new WP_Error('zo_report_mirror_realpath', 'Could not verify the private codex report mirror folder.');
+	}
+
+	$real_dir = untrailingslashit(wp_normalize_path($real_dir));
+	foreach (zo_get_public_report_mirror_roots() as $public_root) {
+		$real_public_root = realpath($public_root);
+		$verified_root = $real_public_root !== false ? $real_public_root : $public_root;
+		if (zo_report_mirror_path_is_within($real_dir, $verified_root)) {
+			return new WP_Error('zo_report_mirror_public_path', 'The codex report mirror folder must remain outside every public web root.');
+		}
+	}
+
+	@chmod($real_dir, 0700);
+	zo_remove_legacy_public_report_mirror();
+
+	return $real_dir;
+}
+
+function zo_write_private_report_mirror_file($path, $contents) {
+	if (is_link($path)) {
+		return false;
+	}
+
+	$written = @file_put_contents($path, $contents, LOCK_EX);
+	if ($written === false || $written !== strlen($contents)) {
+		return false;
+	}
+
+	@chmod($path, 0600);
+	return true;
 }
 
 function zo_format_game_report_for_codex($post_id) {
@@ -12585,13 +12688,21 @@ function zo_write_codex_game_report_snapshot($limit = 50) {
 		'note' => 'Local Codex mirror. Email, IP, and user-agent are intentionally omitted.',
 		'reports' => $reports,
 	);
-	$written = @file_put_contents($path, wp_json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), LOCK_EX);
+	$json = wp_json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+	$jsonl_rows = array();
+	foreach ($reports as $report) {
+		$jsonl_rows[] = wp_json_encode($report, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+	}
+	$jsonl = empty($jsonl_rows) ? '' : implode("\n", $jsonl_rows) . "\n";
+	$jsonl_path = trailingslashit($dir) . 'game-reports.local.jsonl';
 
-	if ($written === false) {
+	if (!is_string($json) ||
+		!zo_write_private_report_mirror_file($path, $json) ||
+		!zo_write_private_report_mirror_file($jsonl_path, $jsonl)) {
 		return array(
 			'path' => '',
 			'count' => count($reports),
-			'error' => 'Could not write game-reports.local.json.',
+			'error' => 'Could not write the bounded private game-report mirror.',
 		);
 	}
 
@@ -12603,18 +12714,52 @@ function zo_write_codex_game_report_snapshot($limit = 50) {
 }
 
 function zo_append_codex_game_report_mirror($post_id) {
-	$dir = zo_prepare_codex_report_mirror_dir();
-	if (is_wp_error($dir)) {
-		return;
-	}
-
 	$report = zo_format_game_report_for_codex($post_id);
 	if (!$report) {
 		return;
 	}
 
-	@file_put_contents(trailingslashit($dir) . 'game-reports.local.jsonl', wp_json_encode($report, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n", FILE_APPEND | LOCK_EX);
 	zo_write_codex_game_report_snapshot(50);
+}
+
+function zo_game_report_global_rate_limit() {
+	$limit = apply_filters('zo_game_report_global_rate_limit', 30);
+	return max(5, min(200, is_numeric($limit) ? (int) $limit : 30));
+}
+
+function zo_game_report_global_rate_window() {
+	$window = apply_filters('zo_game_report_global_rate_window', HOUR_IN_SECONDS);
+	return max(15 * MINUTE_IN_SECONDS, min(DAY_IN_SECONDS, is_numeric($window) ? (int) $window : HOUR_IN_SECONDS));
+}
+
+function zo_game_report_global_rate_allowed() {
+	$count = get_transient('zo_game_report_global_rate');
+	return max(0, (int) $count) < zo_game_report_global_rate_limit();
+}
+
+function zo_increment_game_report_global_rate() {
+	$count = max(0, (int) get_transient('zo_game_report_global_rate')) + 1;
+	set_transient('zo_game_report_global_rate', $count, zo_game_report_global_rate_window());
+	return $count;
+}
+
+function zo_game_report_storage_cap() {
+	$cap = apply_filters('zo_game_report_storage_cap', 1000);
+	return max(100, min(10000, is_numeric($cap) ? (int) $cap : 1000));
+}
+
+function zo_game_report_storage_available() {
+	$counts = wp_count_posts('zo_game_report');
+	if (!is_object($counts)) {
+		return false;
+	}
+
+	$total = 0;
+	foreach (get_object_vars($counts) as $count) {
+		$total += max(0, (int) $count);
+	}
+
+	return $total < zo_game_report_storage_cap();
 }
 
 function zo_handle_game_report_submission() {
@@ -12629,6 +12774,11 @@ function zo_handle_game_report_submission() {
 
 	if (!empty($_POST['zo_website'])) {
 		wp_safe_redirect(add_query_arg('sent', '1', $report_url));
+		exit;
+	}
+
+	if (!zo_game_report_global_rate_allowed() || !zo_game_report_storage_available()) {
+		wp_safe_redirect(add_query_arg('report_error', 'rate', $report_url));
 		exit;
 	}
 
@@ -12708,6 +12858,7 @@ function zo_handle_game_report_submission() {
 		wp_safe_redirect(add_query_arg(array('report_error' => 'save', 'game' => $slug), $report_url));
 		exit;
 	}
+	zo_increment_game_report_global_rate();
 
 	$meta = array(
 		'_zo_report_game_slug'    => $slug,
