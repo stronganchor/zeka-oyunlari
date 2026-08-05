@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.61.asker.arslan
+ * Version: 1.5.62.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-define('ZO_PLUGIN_VERSION', '1.5.61.asker.arslan');
+define('ZO_PLUGIN_VERSION', '1.5.62.asker.arslan');
 define('ZO_PLUGIN_FILE', __FILE__);
 define('ZO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('ZO_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -253,6 +253,13 @@ function zo_bootstrap_update_checker() {
 
 	$update_checker->setBranch(zo_get_update_branch());
 
+	add_filter(
+		$update_checker->getUniqueName('vcs_update_detection_strategies'),
+		'zo_use_branch_update_detection_strategy',
+		10,
+		2
+	);
+
 	foreach (array('ZEKA_OYUNLARI_GITHUB_TOKEN', 'STRONGANCHOR_GITHUB_TOKEN', 'ANCHOR_GITHUB_TOKEN') as $constant_name) {
 		if (!defined($constant_name) || !is_string(constant($constant_name))) {
 			continue;
@@ -267,6 +274,14 @@ function zo_bootstrap_update_checker() {
 }
 
 zo_bootstrap_update_checker();
+
+function zo_use_branch_update_detection_strategy($strategies, $slug) {
+	if (!is_array($strategies) || empty($strategies['branch'])) {
+		return $strategies;
+	}
+
+	return array('branch' => $strategies['branch']);
+}
 
 register_activation_hook(__FILE__, 'zo_plugin_activate');
 register_deactivation_hook(__FILE__, 'zo_plugin_deactivate');
