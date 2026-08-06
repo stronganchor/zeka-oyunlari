@@ -4091,14 +4091,6 @@ function zo_get_interface_text($key, $lang = '') {
 			'fr' => 'Listes de jeux',
 			'de' => 'Spiellisten',
 		),
-		'owner_counts_label' => array(
-			'tr' => 'Oyun sayıları',
-			'en' => 'Game counts',
-			'es-mx' => 'Conteo de juegos',
-			'es-es' => 'Recuento de juegos',
-			'fr' => 'Nombre de jeux',
-			'de' => 'Spielanzahl',
-		),
 		'search_label' => array(
 			'tr' => 'Oyun ara',
 			'en' => 'Search games',
@@ -4178,14 +4170,6 @@ function zo_get_interface_text($key, $lang = '') {
 			'es-es' => 'Cerrar',
 			'fr' => 'Fermer',
 			'de' => 'Schliessen',
-		),
-		'new_this_week' => array(
-			'tr' => 'Son güncellenenler',
-			'en' => 'Recently updated',
-			'es-mx' => 'Actualizados recientemente',
-			'es-es' => 'Actualizados recientemente',
-			'fr' => 'Mis à jour récemment',
-			'de' => 'Kürzlich aktualisiert',
 		),
 		'recently_played' => array(
 			'tr' => 'Son oynananlar',
@@ -15670,31 +15654,8 @@ function zo_games_grid_shortcode($atts = array()) {
 	$home_url      = home_url('/');
 	$archive_url   = get_post_type_archive_link('zeka_oyunu');
 	$filters_id    = 'zo-games-grid-filters-' . wp_rand(1000, 999999);
-	$owner_counts  = array(
-		'asker' => 0,
-		'arslan' => 0,
-	);
-
 	if (!is_string($archive_url) || $archive_url === '') {
 		$archive_url = home_url('/oyunlar/');
-	}
-
-	foreach ($modules as $slug => $module) {
-		if (!zo_is_game_available_for_language($slug, $language)) {
-			continue;
-		}
-
-		$post         = $posts_by_slug[$slug] ?? null;
-		$owner        = $post instanceof WP_Post ? zo_get_game_owner_for_post($post->ID) : '';
-		$module_owner = zo_get_game_owner_for_module($module);
-
-		if ($owner === '') {
-			$owner = $module_owner;
-		}
-
-		if (isset($owner_counts[$owner])) {
-			$owner_counts[$owner]++;
-		}
 	}
 
 	if (!is_front_page() && !is_home() && is_string($home_url) && $home_url !== '') {
@@ -15744,11 +15705,6 @@ function zo_games_grid_shortcode($atts = array()) {
 		echo '<a class="' . esc_attr($class) . '" href="' . esc_url($tab['url']) . '" data-zo-games-tab="' . esc_attr($tab['key']) . '"' . ($tab['active'] ? ' aria-current="page"' : '') . '>' . esc_html($tab['label']) . '</a>';
 	}
 	echo '</nav>';
-	echo '<div class="zo-games-grid__owner-counts" aria-label="' . esc_attr(zo_get_interface_text('owner_counts_label', $language)) . '">';
-	echo '<span><span class="zo-games-grid__owner-counts-owner">Asker</span>: ' . esc_html((string) $owner_counts['asker']) . '</span>';
-	echo '<span class="zo-games-grid__owner-counts-separator" aria-hidden="true"></span>';
-	echo '<span><span class="zo-games-grid__owner-counts-owner zo-games-grid__owner-counts-owner--arslan">Arslan</span>: ' . esc_html((string) $owner_counts['arslan']) . '</span>';
-	echo '</div>';
 	echo '<script>(function(){var script=document.currentScript;var nav=script&&script.previousElementSibling;if(nav&&!nav.matches("[data-zo-games-tabs]")){nav=nav.previousElementSibling;}if(!nav||!nav.matches("[data-zo-games-tabs]")){return;}var tabs=Array.prototype.slice.call(nav.querySelectorAll("[data-zo-games-tab]"));var keys=["all","asker","arslan"];var pointerId=null;var startX=0;var startKey="all";var liveKey="all";var moved=false;var suppressClick=false;function getActiveKey(){var active=nav.querySelector("[data-zo-games-tab].is-active");return active?active.getAttribute("data-zo-games-tab")||"all":"all";}function setActive(key,offset){nav.classList.remove("zo-games-grid__tabs--all","zo-games-grid__tabs--asker","zo-games-grid__tabs--arslan");nav.classList.add("zo-games-grid__tabs--"+key);if(offset){nav.style.setProperty("--zo-tab-offset",offset);}else{nav.style.removeProperty("--zo-tab-offset");}tabs.forEach(function(tab){var active=tab.getAttribute("data-zo-games-tab")===key;tab.classList.toggle("is-active",active);if(active){tab.setAttribute("aria-current","page");}else{tab.removeAttribute("aria-current");}});}function metrics(){var rect=nav.getBoundingClientRect();var width=(rect.width-8)/3;return {left:rect.left,width:width,max:width*2};}function keyFromPoint(clientX,moveThumb){var m=metrics();var offset=Math.max(0,Math.min(m.max,clientX-m.left-4-(m.width/2)));var index=Math.max(0,Math.min(2,Math.round(offset/m.width)));var key=keys[index];if(moveThumb){setActive(key,offset+"px");}return key;}function navigateTo(key){var tab=nav.querySelector("[data-zo-games-tab=\""+key+"\"]");if(tab&&tab.href){window.location.href=tab.href;}}nav.addEventListener("pointerdown",function(event){if(event.button!==0){return;}pointerId=event.pointerId;startX=event.clientX;startKey=getActiveKey();liveKey=startKey;moved=false;nav.classList.add("is-dragging");try{nav.setPointerCapture(pointerId);}catch(error){}});nav.addEventListener("pointermove",function(event){if(pointerId!==event.pointerId){return;}if(Math.abs(event.clientX-startX)>6){moved=true;}if(moved){event.preventDefault();liveKey=keyFromPoint(event.clientX,true);}});function finish(event,cancelled){if(pointerId!==event.pointerId){return;}try{nav.releasePointerCapture(event.pointerId);}catch(error){}pointerId=null;nav.classList.remove("is-dragging");if(cancelled){setActive(startKey);return;}if(!moved){return;}event.preventDefault();suppressClick=true;window.setTimeout(function(){suppressClick=false;},260);var targetKey=liveKey;setActive(targetKey);if(targetKey!==startKey){window.setTimeout(function(){navigateTo(targetKey);},210);}}nav.addEventListener("pointerup",function(event){finish(event,false);});nav.addEventListener("pointercancel",function(event){finish(event,true);});tabs.forEach(function(tab){tab.addEventListener("click",function(event){if(suppressClick){event.preventDefault();return;}if(event.defaultPrevented||event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey){return;}var key=tab.getAttribute("data-zo-games-tab");if(!key||tab.classList.contains("is-active")){return;}event.preventDefault();setActive(key);window.setTimeout(function(){window.location.href=tab.href;},210);});tab.addEventListener("dragstart",function(event){event.preventDefault();});});})();</script>';
 
 	echo '<div class="zo-games-grid__toolbar">';
@@ -15816,7 +15772,6 @@ function zo_games_grid_shortcode($atts = array()) {
 	echo '<p class="zo-games-grid__intro">' . esc_html(zo_get_interface_text('intro', $language)) . '</p>';
 
 	$game_items = array();
-	$new_this_week_items = array();
 
 	foreach ($modules as $slug => $module) {
 		if (!zo_is_game_available_for_language($slug, $language)) {
@@ -15911,22 +15866,6 @@ function zo_games_grid_shortcode($atts = array()) {
 	);
 
 	$game_items = zo_dedupe_game_items_by_similarity($game_items);
-	$new_this_week_items = array();
-
-	foreach ($game_items as $item) {
-		if ((int) $item['updated_timestamp'] > 0) {
-			$new_this_week_items[] = $item;
-		}
-	}
-
-	usort(
-		$new_this_week_items,
-		function ($a, $b) {
-			return (int) $b['updated_timestamp'] <=> (int) $a['updated_timestamp'];
-		}
-	);
-
-	$new_this_week_items = array_slice($new_this_week_items, 0, 4);
 
 	if ($limit > 0) {
 		$game_items = array_slice($game_items, 0, $limit);
@@ -15936,26 +15875,6 @@ function zo_games_grid_shortcode($atts = array()) {
 	$has_results = $shown > 0;
 
 	echo '<p class="zo-games-grid__count" data-zo-games-count data-count-template="' . esc_attr(zo_get_interface_text('results_count', $language)) . '">' . esc_html(sprintf(zo_get_interface_text('results_count', $language), $shown)) . '</p>';
-
-	if (!empty($new_this_week_items)) {
-		echo '<section class="zo-games-grid__feature-section" aria-label="' . esc_attr(zo_get_interface_text('new_this_week', $language)) . '">';
-		echo '<h2 class="zo-games-grid__feature-title">' . esc_html(zo_get_interface_text('new_this_week', $language)) . '</h2>';
-		echo '<div class="zo-games-grid__mini-row">';
-
-		foreach ($new_this_week_items as $item) {
-			echo '<a class="zo-games-grid__mini-card" href="' . esc_url($item['url']) . '">';
-			if (!empty($item['thumbnail_url'])) {
-				echo '<img class="zo-games-grid__mini-thumb" src="' . esc_url($item['thumbnail_url']) . '" alt="" loading="lazy">';
-			} else {
-				echo '<span class="zo-games-grid__mini-thumb" aria-hidden="true"></span>';
-			}
-			echo '<span class="zo-games-grid__mini-title">' . esc_html($item['title']) . '</span>';
-			echo '</a>';
-		}
-
-		echo '</div>';
-		echo '</section>';
-	}
 
 	echo '<section class="zo-games-grid__feature-section" data-zo-recent-section hidden aria-label="' . esc_attr(zo_get_interface_text('recently_played', $language)) . '">';
 	echo '<h2 class="zo-games-grid__feature-title">' . esc_html(zo_get_interface_text('recently_played', $language)) . '</h2>';
