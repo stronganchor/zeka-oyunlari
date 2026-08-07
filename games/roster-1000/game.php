@@ -555,7 +555,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function cleanPin(pin) {
-			return String(pin || '').replace(/\D/g, '').slice(0, 5);
+			return String(pin || '').replace(/\D/g, '').slice(0, 9);
 		}
 
 		function getProgress() {
@@ -661,8 +661,8 @@ document.addEventListener('DOMContentLoaded', function () {
 				setAccountStatus(t('nameRequired', 'Type an account name.'));
 				return;
 			}
-			if (pin.length !== 5) {
-				setAccountStatus(t('pinRequired', 'Make a 5-digit PIN.'));
+			if (pin.length < 4 || pin.length > 9) {
+				setAccountStatus(t('pinRequired', 'Make a PIN with 4 to 9 digits.'));
 				return;
 			}
 
@@ -691,8 +691,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			const pin = cleanPin(accountPinInput ? accountPinInput.value : '');
 			const accounts = readAccounts();
 
-			if (!key || pin.length !== 5) {
-				setAccountStatus(t('signinNeeded', 'Enter your account name and 5-digit PIN.'));
+			if (!key || pin.length < 4 || pin.length > 9) {
+				setAccountStatus(t('signinNeeded', 'Enter your account name and a 4 to 9 digit PIN.'));
 				return;
 			}
 			if (!accounts[key] || accounts[key].pin !== pin) {
@@ -712,6 +712,26 @@ document.addEventListener('DOMContentLoaded', function () {
 			resetForSelectedHero(true);
 			updateAccountUi();
 			setAccountStatus(t('signedOut', 'Signed out. Enter your PIN to play again.'));
+		}
+
+		function restoreAccountSession() {
+			if (!canSessionStore) {
+				return false;
+			}
+
+			const key = window.sessionStorage.getItem(ACCOUNT_SESSION_KEY) || '';
+			if (!key) {
+				return false;
+			}
+
+			const accounts = readAccounts();
+			if (!accounts[key]) {
+				window.sessionStorage.removeItem(ACCOUNT_SESSION_KEY);
+				return false;
+			}
+
+			signInAccount(key, accounts[key]);
+			return true;
 		}
 
 		function getCharacter(id) {
@@ -1435,9 +1455,11 @@ document.addEventListener('DOMContentLoaded', function () {
 			accountSignoutButton.addEventListener('click', signoutAccount);
 		}
 
-		resetForSelectedHero(true);
-		updateAccountUi();
-		setAccountStatus(t('accountRequired', 'Create an account or sign in with your PIN to play.'));
+		if (!restoreAccountSession()) {
+			resetForSelectedHero(true);
+			updateAccountUi();
+			setAccountStatus(t('accountRequired', 'Create an account or sign in with your PIN to play.'));
+		}
 		game.setAttribute('tabindex', '0');
 	});
 });
@@ -1457,19 +1479,19 @@ if (!function_exists('zo_game_roster_1000_render')) {
 				'hero' => 'Hero',
 				'wins' => 'Wins',
 				'accountName' => 'Account',
-				'pin' => '5-digit PIN',
+				'pin' => 'PIN (4-9 digits)',
 				'createAccount' => 'Create Account',
 				'signIn' => 'Sign In',
 				'signOut' => 'Sign Out',
 				'accountNamePlaceholder' => 'Arslan',
-				'pinPlaceholder' => '12345',
+				'pinPlaceholder' => '1234',
 				'accountRequired' => 'Create an account or sign in with your PIN to play.',
 				'signedInAs' => 'Signed in as {name}.',
 				'storageBlocked' => 'This browser is blocking saved accounts.',
 				'nameRequired' => 'Type an account name.',
-				'pinRequired' => 'Make a 5-digit PIN.',
+				'pinRequired' => 'Make a PIN with 4 to 9 digits.',
 				'accountExists' => 'That account already exists. Use Sign In.',
-				'signinNeeded' => 'Enter your account name and 5-digit PIN.',
+				'signinNeeded' => 'Enter your account name and a 4 to 9 digit PIN.',
 				'badSignin' => 'Account name or PIN did not match.',
 				'signedOut' => 'Signed out. Enter your PIN to play again.',
 				'start' => 'Start',
@@ -1533,6 +1555,22 @@ if (!function_exists('zo_game_roster_1000_render')) {
 				'enemies' => 'Düşmanlar',
 				'hero' => 'Kahraman',
 				'wins' => 'Galibiyet',
+				'accountName' => 'Hesap',
+				'pin' => 'PIN (4-9 hane)',
+				'createAccount' => 'Hesap Oluştur',
+				'signIn' => 'Giriş Yap',
+				'signOut' => 'Çıkış',
+				'accountNamePlaceholder' => 'Arslan',
+				'pinPlaceholder' => '1234',
+				'accountRequired' => 'Oynamak için hesap oluştur veya PIN ile giriş yap.',
+				'signedInAs' => '{name} olarak giriş yapıldı.',
+				'storageBlocked' => 'Bu tarayıcı kayıtlı hesapları engelliyor.',
+				'nameRequired' => 'Bir hesap adı yaz.',
+				'pinRequired' => '4-9 haneli bir PIN yap.',
+				'accountExists' => 'Bu hesap zaten var. Giriş Yap kullan.',
+				'signinNeeded' => 'Hesap adını ve 4-9 haneli PIN gir.',
+				'badSignin' => 'Hesap adı veya PIN eşleşmedi.',
+				'signedOut' => 'Çıkış yapıldı. Tekrar oynamak için PIN gir.',
 				'start' => 'Başlat',
 				'nextWave' => 'Sonraki Dalga',
 				'restartRun' => 'Koşuyu Yeniden Başlat',
@@ -1612,7 +1650,7 @@ if (!function_exists('zo_game_roster_1000_render')) {
 						</div>
 						<div class="zo-r1-field">
 							<label for="<?php echo esc_attr($instance_id); ?>-pin"><?php echo esc_html($r1('pin')); ?></label>
-							<input type="password" class="zo-r1-input zo-r1-account-pin" id="<?php echo esc_attr($instance_id); ?>-pin" inputmode="numeric" pattern="[0-9]{5}" maxlength="5" autocomplete="current-password" placeholder="<?php echo esc_attr($r1('pinPlaceholder')); ?>">
+							<input type="password" class="zo-r1-input zo-r1-account-pin" id="<?php echo esc_attr($instance_id); ?>-pin" inputmode="numeric" pattern="[0-9]{4,9}" minlength="4" maxlength="9" autocomplete="current-password" placeholder="<?php echo esc_attr($r1('pinPlaceholder')); ?>">
 						</div>
 					</div>
 					<div class="zo-r1-account-actions">

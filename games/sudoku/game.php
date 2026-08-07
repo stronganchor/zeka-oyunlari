@@ -10,6 +10,7 @@ if (!function_exists('zo_game_sudoku_render')) {
 	function zo_game_sudoku_render($post_id = 0, $module = array()) {
 		$instance_id = 'zo-sudoku-' . ($post_id ? absint($post_id) : wp_rand(1000, 999999));
 		$worksheet_url = !empty($module['url']) ? trailingslashit($module['url']) . 'sudoku_60_worksheets.pdf' : '';
+		$very_easy_worksheet_url = !empty($module['url']) ? trailingslashit($module['url']) . '25_very_easy_sudoku_sheets.pdf' : '';
 
 		ob_start();
 		?>
@@ -48,6 +49,7 @@ if (!function_exists('zo_game_sudoku_render')) {
 					<label class="zo-sudoku__difficulty-label">
 						<span>Difficulty</span>
 						<select class="zo-sudoku__difficulty" data-role="difficulty">
+							<option value="very-easy">Very Easy</option>
 							<option value="easy">Easy</option>
 							<option value="medium">Middle</option>
 							<option value="hard">Hard</option>
@@ -56,6 +58,9 @@ if (!function_exists('zo_game_sudoku_render')) {
 
 					<div class="zo-sudoku__actions">
 						<button type="button" class="zo-sudoku__button zo-sudoku__button--primary" data-action="new">Yeni Bulmaca</button>
+						<?php if ($very_easy_worksheet_url !== '') : ?>
+							<a class="zo-sudoku__button" href="<?php echo esc_url($very_easy_worksheet_url); ?>" target="_blank" rel="noopener" download>Very Easy Sheets</a>
+						<?php endif; ?>
 						<?php if ($worksheet_url !== '') : ?>
 							<a class="zo-sudoku__button" href="<?php echo esc_url($worksheet_url); ?>" target="_blank" rel="noopener" download>Sudoku Sheets</a>
 						<?php endif; ?>
@@ -123,7 +128,7 @@ return array(
 	'name'            => 'Sudoku',
 	'owner'           => 'arslan',
 	'author'          => 'Arslan',
-	'description'     => 'A classic 9x9 Sudoku puzzle with easy, middle, and hard boards.',
+	'description'     => 'A classic 9x9 Sudoku puzzle with very easy, easy, middle, and hard boards.',
 	'render_callback' => 'zo_game_sudoku_render',
 );
 
