@@ -392,6 +392,31 @@ $css = <<<'CSS'
 	display: block;
 }
 
+.zo-soccer-tactics {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: center;
+	justify-content: center;
+	margin: 12px 0;
+	padding: 10px;
+	background: #eef5ff;
+	border: 1px solid #c8dbf7;
+	border-radius: 12px;
+}
+
+.zo-soccer-tactics-label { font-weight: 700; color: #17365d; }
+.zo-soccer-tactic {
+	border: 1px solid #9bb8dd;
+	border-radius: 999px;
+	padding: 7px 11px;
+	background: #fff;
+	color: #17365d;
+	font-weight: 700;
+	cursor: pointer;
+}
+.zo-soccer-tactic.is-active { background: #1565c0; border-color: #1565c0; color: #fff; }
+
 .zo-soccer-upgrades-title {
 	font-size: 16px;
 	font-weight: 700;
@@ -479,6 +504,8 @@ document.addEventListener('DOMContentLoaded', function () {
 		const shootingLevelEl = game.querySelector('.zo-status-shooting-level');
 		const passingLevelEl = game.querySelector('.zo-status-passing-level');
 		const defenseLevelEl = game.querySelector('.zo-status-defense-level');
+		const tacticEl = game.querySelector('.zo-status-tactic');
+		const autoModeBtn = game.querySelector('.zo-soccer-auto');
 		const restartBtn = game.querySelector('.zo-soccer-restart');
 		const startBtn = game.querySelector('.zo-soccer-start');
 		const buySpeedBtn = game.querySelector('.zo-buy-speed');
@@ -490,6 +517,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		const passLineEl = game.querySelector('.zo-soccer-pass-line');
 		const decisionBox = game.querySelector('.zo-soccer-decision');
 		const decisionText = game.querySelector('.zo-soccer-decision-text');
+		const tacticButtons = game.querySelectorAll('.zo-soccer-tactic');
 
 		const FIELD_W = 1120;
 		const FIELD_H = 630;
@@ -505,6 +533,11 @@ document.addEventListener('DOMContentLoaded', function () {
 		const BASE_RED_PASS_POWER = 220;
 		const BASE_RED_SHOT_POWER = 250;
 		const BASE_KICK_LOCK = 0.35;
+		const TACTICS = {
+			balanced: { width: 1, line: 1, press: 1, risk: 1 },
+			press: { width: 0.95, line: 1.18, press: 1.35, risk: 1.1 },
+			counter: { width: 0.82, line: 0.82, press: 0.88, risk: 0.72 }
+		};
 
 		let animationId = null;
 		let lastTime = 0;
@@ -526,6 +559,31 @@ document.addEventListener('DOMContentLoaded', function () {
 		let decisionPlayer = null;
 		let decisionTarget = null;
 		let decisionContext = 'normal';
+		let activeTactic = 'balanced';
+		let redTactic = 'balanced';
+		let lastRedDecision = 0;
+		let autoMode = false;
+		let autoDecisionTimer = null;
+		let lastOwnerTeam = null;
+		let lastTouchTeam = null;
+		let transitionTeam = null;
+		let transitionTimer = 0;
+
+		function getTactic(team) {
+			return TACTICS[team === 'blue' ? activeTactic : redTactic];
+		}
+
+		function isWideChannel(y) {
+			return y < 125 || y > FIELD_H - 125;
+		}
+
+		function isPressingTrigger(owner) {
+			if (!owner) {
+				return false;
+			}
+			// Touchline receptions and central-midfield receptions are common pressing cues.
+			return owner.position === 'wing' || owner.position === 'midfielder' || isWideChannel(state.ball.y);
+		}
 
 		function getBlueSpeedMultiplier() {
 			return 1 + (speedLevel * 0.12);
@@ -696,6 +754,13 @@ document.addEventListener('DOMContentLoaded', function () {
 			shootingLevelEl.textContent = String(shootingLevel);
 			passingLevelEl.textContent = String(passingLevel);
 			defenseLevelEl.textContent = String(defenseLevel);
+			if (tacticEl) {
+				tacticEl.textContent = TACTICS[activeTactic].label;
+			}
+			if (autoModeBtn) {
+				autoModeBtn.textContent = 'Auto Mode: ' + (autoMode ? 'On' : 'Off');
+				autoModeBtn.classList.toggle('is-active', autoMode);
+			}
 
 			buySpeedBtn.textContent = 'Speed (' + getSpeedUpgradeCost() + ')';
 			buySmartBtn.textContent = 'Smart (' + getSmartUpgradeCost() + ')';
@@ -741,6 +806,10 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function clearDecisionState() {
+			if (autoDecisionTimer) {
+				window.clearTimeout(autoDecisionTimer);
+				autoDecisionTimer = null;
+			}
 			decisionMode = false;
 			decisionPlayer = null;
 			decisionTarget = null;
@@ -769,6 +838,11 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.ball.vy = 0;
 			state.ball.kick_lock_timer = 0;
 			state.ball.kick_ignore_player = null;
+			lastTouchTeam = null;
+			lastOwnerTeam = null;
+			lastTouchTeam = null;
+			transitionTeam = null;
+			transitionTimer = 0;
 			restartType = null;
 			restartTeam = null;
 			restartSpot = null;
@@ -831,12 +905,15 @@ document.addEventListener('DOMContentLoaded', function () {
 			render();
 		}
 
-		function kickBallToward(targetX, targetY, power) {
+		function kickBallToward(targetX, targetY, power, team) {
 			const dx = targetX - state.ball.x;
 			const dy = targetY - state.ball.y;
 			const dist = Math.sqrt(dx * dx + dy * dy) || 1;
 			state.ball.vx = (dx / dist) * power;
 			state.ball.vy = (dy / dist) * power;
+			if (team) {
+				lastTouchTeam = team;
+			}
 		}
 
 		function findBestPassTarget(player) {
@@ -850,13 +927,21 @@ document.addEventListener('DOMContentLoaded', function () {
 			teammates.forEach(function (mate) {
 				const forwardScore = player.team === 'blue' ? (mate.x - player.x) : (player.x - mate.x);
 				const spacingScore = 160 - Math.abs(mate.y - player.y);
+				const switchScore = isWideChannel(player.y) && Math.abs(mate.y - player.y) > 240 ? 52 : 0;
+				let nearestOpponent = Infinity;
+				state.players.forEach(function (opponent) {
+					if (opponent.team !== player.team) {
+						nearestOpponent = Math.min(nearestOpponent, distance(mate, opponent));
+					}
+				});
+				const safetyScore = clamp(nearestOpponent - 70, -30, 80);
 				const roleBonus =
 					(mate.position === 'forward' ? 38 : 0) +
 					(mate.position === 'wing' ? 20 : 0) +
 					(mate.position === 'midfielder' ? 12 : 0);
 
 				const smartBonus = player.team === 'blue' ? (smartLevel * 10 + passingLevel * 8) : 0;
-				const total = forwardScore + spacingScore + roleBonus + smartBonus;
+				const total = forwardScore + spacingScore + switchScore + safetyScore + roleBonus + smartBonus;
 
 				if (total > bestScore) {
 					bestScore = total;
@@ -883,6 +968,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			});
 
 			return best;
+		}
+
+		function getGoalkeeper(team) {
+			return state.players.find(function (player) {
+				return player.team === team && player.isGoalie;
+			});
 		}
 
 		function setupBlueCornerPositions() {
@@ -963,10 +1054,18 @@ document.addEventListener('DOMContentLoaded', function () {
 					x: FIELD_W - 170,
 					y: FIELD_H / 2
 				};
+			} else if (decisionContext === 'goal-kick') {
+				decisionTarget = {
+					x: player.team === 'blue' ? player.x + 190 : player.x - 190,
+					y: player.y
+				};
 			} else {
 				const best = findBestPassTarget(player);
 				if (best) {
 					decisionTarget = { x: best.x, y: best.y };
+				}
+				if (autoMode && player.team === 'blue' && player.x > FIELD_W * 0.72) {
+					decisionTarget = { x: FIELD_W - 10, y: GOAL_TOP + (Math.random() * (GOAL_BOTTOM - GOAL_TOP)) };
 				}
 			}
 
@@ -978,12 +1077,26 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (decisionContext === 'corner') {
 				decisionText.textContent = 'Blue korner. Click or tap where you want the korner kick to go. You can aim at goal.';
 				setMessage('Choose korner kick');
+			} else if (decisionContext === 'goal-kick') {
+				decisionText.textContent = 'Goal kick. Start the build-up with a pass into space or toward a teammate.';
+				setMessage('Choose goal-kick direction');
 			} else {
-				decisionText.textContent = 'Your teammate has the ball. Click or tap where to kick. Click at the goal to shoot.';
-				setMessage('Choose pass or shot');
+				const nearGoal = player.team === 'blue' && player.x > FIELD_W * 0.72;
+				decisionText.textContent = nearGoal
+					? 'Final third decision: shoot at the goal or slip a pass into space.'
+					: 'Build-up decision: use the highlighted teammate or switch the play into space.';
+				setMessage(nearGoal ? 'Final third: choose shot or final pass' : 'Build-up: choose the best passing lane');
 			}
 			updateHud();
 			render();
+
+			if (autoMode && player.team === 'blue') {
+				autoDecisionTimer = window.setTimeout(function () {
+					if (decisionMode && decisionPlayer === player && decisionTarget) {
+						endDecisionModeAndKick(decisionTarget.x, decisionTarget.y);
+					}
+				}, 360);
+			}
 		}
 
 		function finishDecisionKick() {
@@ -1018,10 +1131,25 @@ document.addEventListener('DOMContentLoaded', function () {
 				state.ball.vy = ny * cornerPower;
 				state.ball.kick_lock_timer = getKickLockTime();
 				state.ball.kick_ignore_player = decisionPlayer;
+				lastTouchTeam = decisionPlayer.team;
 				restartType = null;
 				restartTeam = null;
 				restartSpot = null;
 				setMessage(aimedAtRightGoal ? 'Korner shot' : 'Korner taken');
+				finishDecisionKick();
+				return;
+			}
+
+			if (decisionContext === 'goal-kick') {
+				state.ball.vx = nx * getDecisionPassPower(len);
+				state.ball.vy = ny * getDecisionPassPower(len);
+				state.ball.kick_lock_timer = getKickLockTime();
+				state.ball.kick_ignore_player = decisionPlayer;
+				lastTouchTeam = decisionPlayer.team;
+				restartType = null;
+				restartTeam = null;
+				restartSpot = null;
+				setMessage('Goal kick played out');
 				finishDecisionKick();
 				return;
 			}
@@ -1037,6 +1165,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			state.ball.vy = ny * power;
 			state.ball.kick_lock_timer = getKickLockTime();
 			state.ball.kick_ignore_player = decisionPlayer;
+			lastTouchTeam = decisionPlayer.team;
 
 			coins += 51;
 			setMessage(isShot ? 'Shot taken. +51 coins' : 'Pass made. +51 coins');
@@ -1044,29 +1173,39 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function getRoleHomeShift(player, ball) {
+			const tactic = getTactic(player.team);
+			const attacking = player.team === 'blue' ? ball.x > FIELD_W / 2 : ball.x < FIELD_W / 2;
 			const sideFactor = player.team === 'blue'
 				? clamp((ball.x - FIELD_W / 2) / 2.8, -90, 140)
 				: clamp((FIELD_W / 2 - ball.x) / 2.8, -90, 140);
 
 			if (player.position === 'defender') {
 				return {
-					x: player.baseHomeX + (player.team === 'blue' ? sideFactor * 0.18 : -sideFactor * 0.18),
+					x: player.baseHomeX + (player.team === 'blue' ? sideFactor * 0.18 * tactic.line : -sideFactor * 0.18 * tactic.line),
 					y: player.baseHomeY + (ball.y - player.baseHomeY) * 0.08
 				};
 			}
 
 			if (player.position === 'wing') {
 				const topWing = player.baseHomeY < FIELD_H / 2;
+				const sameSide = topWing ? ball.y < FIELD_H / 2 : ball.y >= FIELD_H / 2;
+				const overload = attacking && sameSide && (player.team === 'blue' ? player.baseHomeX < FIELD_W * 0.6 : player.baseHomeX > FIELD_W * 0.4);
 				return {
 					x: player.baseHomeX + (player.team === 'blue' ? sideFactor * 0.34 : -sideFactor * 0.34),
-					y: topWing ? clamp(ball.y - 90, 70, 230) : clamp(ball.y + 90, FIELD_H - 230, FIELD_H - 70)
+					y: overload
+						? (topWing ? clamp(ball.y - 32, 45, 210) : clamp(ball.y + 32, FIELD_H - 210, FIELD_H - 45))
+						: (topWing ? clamp(ball.y - (90 * tactic.width), 55, 250) : clamp(ball.y + (90 * tactic.width), FIELD_H - 250, FIELD_H - 55))
 				};
 			}
 
 			if (player.position === 'midfielder') {
+				const sameSide = player.baseHomeY < FIELD_H / 2 ? ball.y < FIELD_H / 2 : ball.y >= FIELD_H / 2;
+				const supportWide = attacking && sameSide && isWideChannel(ball.y);
 				return {
 					x: player.baseHomeX + (player.team === 'blue' ? sideFactor * 0.42 : -sideFactor * 0.42),
-					y: player.baseHomeY + (ball.y - player.baseHomeY) * 0.22
+					y: supportWide
+						? player.baseHomeY + (ball.y - player.baseHomeY) * 0.48
+						: player.baseHomeY + (ball.y - player.baseHomeY) * (attacking ? 0.28 : 0.18)
 				};
 			}
 
@@ -1084,7 +1223,8 @@ document.addEventListener('DOMContentLoaded', function () {
 				if (player.team !== team || player.isGoalie) {
 					return;
 				}
-				const d = distance(player, state.ball);
+				const roleWeight = player.position === 'midfielder' ? 0.92 : player.position === 'forward' ? 0.96 : 1.08;
+				const d = distance(player, state.ball) * roleWeight / getTactic(team).press;
 				if (d < bestDist) {
 					bestDist = d;
 					best = player;
@@ -1097,7 +1237,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		function getSupportChaser(team, primary) {
 			let best = null;
 			let bestDist = Infinity;
-			const interceptRadius = team === 'blue' ? getBlueInterceptRadius() : BASE_INTERCEPT_RADIUS;
+			const interceptRadius = (team === 'blue' ? getBlueInterceptRadius() : BASE_INTERCEPT_RADIUS) * getTactic(team).press;
 
 			state.players.forEach(function (player) {
 				if (player.team !== team || player.isGoalie || player === primary) {
@@ -1125,15 +1265,27 @@ document.addEventListener('DOMContentLoaded', function () {
 			const primaryRed = getNearestChaser('red');
 			const supportBlue = getSupportChaser('blue', primaryBlue);
 			const supportRed = getSupportChaser('red', primaryRed);
-			const interceptRadius = player.team === 'blue' ? getBlueInterceptRadius() : BASE_INTERCEPT_RADIUS;
-			const chaseRadius = player.team === 'blue' ? getBlueChaseRadius() : BASE_CHASE_RADIUS;
+			const tactic = getTactic(player.team);
+			const owner = getBallOwner();
+			const pressingTrigger = owner && owner.team !== player.team && isPressingTrigger(owner);
+			const counterPress = transitionTimer > 0 && transitionTeam === player.team;
+			const pressBoost = counterPress ? 1.45 : (pressingTrigger ? 1.22 : 1);
+			const interceptRadius = (player.team === 'blue' ? getBlueInterceptRadius() : BASE_INTERCEPT_RADIUS) * tactic.press * pressBoost;
+			const chaseRadius = (player.team === 'blue' ? getBlueChaseRadius() : BASE_CHASE_RADIUS) * tactic.press * pressBoost;
 
 			if (restartType) {
 				if (restartType === 'corner' && restartTeam === 'blue') {
 					return;
 				}
-
-				if (restartTeam === player.team) {
+				if (restartType === 'goal-kick' && restartTeam === player.team) {
+					if (player.isGoalie) {
+						targetX = restartSpot.x;
+						targetY = restartSpot.y;
+					} else {
+						targetX = player.baseHomeX + (player.team === 'blue' ? 35 : -35);
+						targetY = player.baseHomeY;
+					}
+				} else if (restartTeam === player.team) {
 					if (restartType === 'corner') {
 						if (player.isGoalie) {
 							targetX = player.team === 'blue' ? 86 : 1034;
@@ -1177,6 +1329,20 @@ document.addEventListener('DOMContentLoaded', function () {
 				} else if (player === support && ballDist <= interceptRadius) {
 					targetX = ball.x + (player.team === 'blue' ? -28 : 28);
 					targetY = ball.y + (player.baseHomeY < FIELD_H / 2 ? -26 : 26);
+				} else if (counterPress && player.position !== 'defender' && ballDist <= chaseRadius) {
+					// After losing the ball, nearby players hunt for a few seconds before recovering shape.
+					targetX = ball.x + (player.team === 'blue' ? -8 : 8);
+					targetY = ball.y;
+				} else if (player.position === 'defender' && ballDist < chaseRadius * 0.7 && player !== primary && player !== support) {
+					// One defender presses; the other protects the space behind the press.
+					targetX = player.team === 'blue' ? Math.max(player.baseHomeX - 18, ball.x - 95) : Math.min(player.baseHomeX + 18, ball.x + 95);
+					targetY = player.baseHomeY + (ball.y - player.baseHomeY) * 0.32;
+				} else if (player.position === 'forward' && tactic === TACTICS.counter) {
+					// Counter-attacking forwards stay high for the first forward pass.
+					targetX = player.team === 'blue'
+						? Math.max(player.baseHomeX, FIELD_W * 0.62)
+						: Math.min(player.baseHomeX, FIELD_W * 0.38);
+					targetY = player.baseHomeY;
 				} else if (ballDist <= chaseRadius && player.position !== 'defender') {
 					targetX = ball.x + (player.team === 'blue' ? -18 : 18);
 					targetY = ball.y;
@@ -1270,10 +1436,12 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 
 			const towardLeft = player.team === 'red';
+			const tactic = getTactic(player.team);
 			const closeToGoal = towardLeft ? state.ball.x < 210 : state.ball.x > FIELD_W - 210;
+			const centralLane = state.ball.y > 180 && state.ball.y < 450;
 
-			if (closeToGoal || (player.position === 'forward' && Math.random() > 0.55)) {
-				kickBallToward(towardLeft ? -24 : FIELD_W + 24, FIELD_H / 2 + (Math.random() * 130 - 65), getRedShotPower());
+			if (closeToGoal || (player.position === 'forward' && centralLane && Math.random() > (0.58 / tactic.risk))) {
+				kickBallToward(towardLeft ? -24 : FIELD_W + 24, FIELD_H / 2 + (Math.random() * 130 - 65), getRedShotPower(), player.team);
 				state.ball.kick_lock_timer = 0.22;
 				state.ball.kick_ignore_player = player;
 				return;
@@ -1282,13 +1450,17 @@ document.addEventListener('DOMContentLoaded', function () {
 			const best = findBestPassTarget(player);
 
 			if (best) {
-				kickBallToward(best.x, best.y, getRedPassPower());
+				kickBallToward(best.x, best.y, getRedPassPower(), player.team);
 			} else {
-				kickBallToward(towardLeft ? 120 : FIELD_W - 120, FIELD_H / 2, getRedPassPower() + 10);
+				kickBallToward(towardLeft ? 120 : FIELD_W - 120, FIELD_H / 2, getRedPassPower() + 10, player.team);
 			}
 
 			state.ball.kick_lock_timer = 0.22;
 			state.ball.kick_ignore_player = player;
+			if (player.team === 'red' && Date.now() - lastRedDecision > 9000) {
+				lastRedDecision = Date.now();
+				redTactic = aiScore < userScore ? 'press' : (aiScore > userScore ? 'counter' : 'balanced');
+			}
 		}
 
 		function pushBallFromPlayers() {
@@ -1303,6 +1475,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				const minDist = PLAYER_RADIUS + BALL_R;
 
 				if (dist > 0 && dist < minDist) {
+					lastTouchTeam = player.team;
 					const nx = dx / dist;
 					const ny = dy / dist;
 					const overlap = minDist - dist;
@@ -1351,6 +1524,45 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 		}
 
+		function setupGoalKick(team, side, y) {
+			restartType = 'goal-kick';
+			restartTeam = team;
+			restartSpot = {
+				x: team === 'blue' ? 86 : FIELD_W - 86,
+				y: clamp(y, GOAL_TOP + 20, GOAL_BOTTOM - 20)
+			};
+			state.ball.x = restartSpot.x;
+			state.ball.y = restartSpot.y;
+			state.ball.vx = 0;
+			state.ball.vy = 0;
+			state.ball.kick_lock_timer = 0;
+			state.ball.kick_ignore_player = null;
+			lastTouchTeam = null;
+			lastTouchTeam = null;
+
+			if (team === 'blue') {
+				const goalkeeper = getGoalkeeper('blue');
+				if (goalkeeper) {
+					startDecisionMode(goalkeeper, 'goal-kick');
+				}
+				setMessage('Blue goal kick');
+			} else {
+				setMessage('Red goal kick');
+			}
+		}
+
+		function resolveGoalLineRestart(side, vertical) {
+			const attackingTeam = side === 'right' ? 'blue' : 'red';
+			const defendingTeam = attackingTeam === 'blue' ? 'red' : 'blue';
+			const wasAttackerLast = lastTouchTeam === attackingTeam;
+
+			if (wasAttackerLast) {
+				setupGoalKick(defendingTeam, side, state.ball.y);
+			} else {
+				setupCorner(attackingTeam, side, vertical);
+			}
+		}
+
 		function handleRestartKick(team) {
 			if (!restartType || !restartSpot) {
 				return;
@@ -1360,10 +1572,18 @@ document.addEventListener('DOMContentLoaded', function () {
 				const targetX = team === 'blue' ? FIELD_W - 220 : 220;
 				const targetY = FIELD_H / 2 + (Math.random() * 140 - 70);
 				const power = team === 'blue' ? getDecisionCornerPower() : 230;
-				kickBallToward(targetX, targetY, power);
+				kickBallToward(targetX, targetY, power, team);
 				state.ball.kick_lock_timer = team === 'blue' ? getKickLockTime() : 0.22;
 				state.ball.kick_ignore_player = null;
 				setMessage((team === 'blue' ? 'Blue' : 'Red') + ' korner kick');
+			} else if (restartType === 'goal-kick') {
+				const target = findBestPassTarget(getGoalkeeper(team));
+				const targetX = target ? target.x : (team === 'blue' ? FIELD_W * 0.38 : FIELD_W * 0.62);
+				const targetY = target ? target.y : FIELD_H / 2;
+				kickBallToward(targetX, targetY, getRedPassPower(), team);
+				state.ball.kick_lock_timer = 0.22;
+				state.ball.kick_ignore_player = getGoalkeeper(team);
+				setMessage((team === 'blue' ? 'Blue' : 'Red') + ' goal kick played');
 			}
 
 			restartType = null;
@@ -1398,11 +1618,11 @@ document.addEventListener('DOMContentLoaded', function () {
 			const inGoalOpening = state.ball.y >= GOAL_TOP && state.ball.y <= GOAL_BOTTOM;
 
 			if (!inGoalOpening) {
-				if (state.ball.x <= BALL_R && state.ball.y > 28 && state.ball.y < FIELD_H - 28) {
+				if (state.ball.x >= 0 && state.ball.x <= BALL_R && state.ball.y > 28 && state.ball.y < FIELD_H - 28) {
 					state.ball.x = BALL_R;
 					state.ball.vx *= -0.84;
 				}
-				if (state.ball.x >= FIELD_W - BALL_R && state.ball.y > 28 && state.ball.y < FIELD_H - 28) {
+				if (state.ball.x <= FIELD_W && state.ball.x >= FIELD_W - BALL_R && state.ball.y > 28 && state.ball.y < FIELD_H - 28) {
 					state.ball.x = FIELD_W - BALL_R;
 					state.ball.vx *= -0.84;
 				}
@@ -1426,19 +1646,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
 			if (!inGoalOpening) {
 				if (state.ball.x < 0 && state.ball.y < 55) {
-					setupCorner('red', 'left', 'top');
+					resolveGoalLineRestart('left', 'top');
 					return;
 				}
 				if (state.ball.x < 0 && state.ball.y > FIELD_H - 55) {
-					setupCorner('red', 'left', 'bottom');
+					resolveGoalLineRestart('left', 'bottom');
 					return;
 				}
 				if (state.ball.x > FIELD_W && state.ball.y < 55) {
-					setupCorner('blue', 'right', 'top');
+					resolveGoalLineRestart('right', 'top');
 					return;
 				}
 				if (state.ball.x > FIELD_W && state.ball.y > FIELD_H - 55) {
-					setupCorner('blue', 'right', 'bottom');
+					resolveGoalLineRestart('right', 'bottom');
+					return;
+				}
+				if (state.ball.x < 0) {
+					resolveGoalLineRestart('left', state.ball.y < FIELD_H / 2 ? 'top' : 'bottom');
+					return;
+				}
+				if (state.ball.x > FIELD_W) {
+					resolveGoalLineRestart('right', state.ball.y < FIELD_H / 2 ? 'top' : 'bottom');
 					return;
 				}
 			}
@@ -1497,6 +1725,15 @@ document.addEventListener('DOMContentLoaded', function () {
 			updateBall(dt);
 
 			const owner = getBallOwner();
+			if (owner) {
+				if (lastOwnerTeam && owner.team !== lastOwnerTeam) {
+					transitionTeam = lastOwnerTeam;
+					transitionTimer = 2.4;
+				}
+				lastOwnerTeam = owner.team;
+			} else if (transitionTimer > 0) {
+				transitionTimer = Math.max(0, transitionTimer - dt);
+			}
 			if (owner && !decisionMode) {
 				maybeAiPassOrShoot(owner);
 			}
@@ -1583,6 +1820,17 @@ document.addEventListener('DOMContentLoaded', function () {
 			field.focus();
 		});
 
+		autoModeBtn.addEventListener('click', function () {
+			autoMode = !autoMode;
+			updateHud();
+			setMessage(autoMode ? 'Auto Mode on: both teams play; restarts follow last touch' : 'Auto Mode off: you choose Blue decisions');
+			if (autoMode && decisionMode && decisionTarget) {
+				endDecisionModeAndKick(decisionTarget.x, decisionTarget.y);
+			} else if (autoMode && !running) {
+				startMatch();
+			}
+		});
+
 		buySpeedBtn.addEventListener('click', function () {
 			const cost = getSpeedUpgradeCost();
 			if (coins < cost) {
@@ -1639,6 +1887,18 @@ document.addEventListener('DOMContentLoaded', function () {
 			setMessage('Blue defense upgraded');
 		});
 
+		tacticButtons.forEach(function (button) {
+			button.addEventListener('click', function () {
+				activeTactic = button.getAttribute('data-tactic') || 'balanced';
+				tacticButtons.forEach(function (item) {
+					item.classList.toggle('is-active', item === button);
+				});
+				setMessage('Tactic set: ' + (button.textContent || 'Balanced'));
+				updateHud();
+				render();
+			});
+		});
+
 		buildEntities();
 		applyBlueUpgrades();
 		resetMatch();
@@ -1692,6 +1952,10 @@ if (!function_exists('zo_game_soccer_match_ai_render')) {
 						<span>Defense</span>
 					</div>
 					<div class="zo-soccer-panel">
+						<strong class="zo-status-tactic">Balanced 4-3-3</strong>
+						<span>Team Tactic</span>
+					</div>
+					<div class="zo-soccer-panel">
 						<strong class="zo-status-mode">Stopped</strong>
 						<span>Game Mode</span>
 					</div>
@@ -1723,6 +1987,7 @@ if (!function_exists('zo_game_soccer_match_ai_render')) {
 					<div class="zo-soccer-buttons">
 						<button type="button" class="zo-soccer-btn zo-soccer-start">Start Match</button>
 						<button type="button" class="zo-soccer-btn zo-soccer-restart">Restart</button>
+						<button type="button" class="zo-soccer-btn zo-soccer-auto">Auto Mode: Off</button>
 						<button type="button" class="zo-soccer-btn zo-buy-speed">Speed (6)</button>
 						<button type="button" class="zo-soccer-btn zo-buy-smart">Smart (8)</button>
 						<button type="button" class="zo-soccer-btn zo-buy-shooting">Shooting (10)</button>
@@ -1730,8 +1995,15 @@ if (!function_exists('zo_game_soccer_match_ai_render')) {
 						<button type="button" class="zo-soccer-btn zo-buy-defense">Defense (7)</button>
 					</div>
 
+					<div class="zo-soccer-tactics" aria-label="Team tactics">
+						<span class="zo-soccer-tactics-label">Tactic:</span>
+						<button type="button" class="zo-soccer-tactic is-active" data-tactic="balanced">Balanced 4-3-3</button>
+						<button type="button" class="zo-soccer-tactic" data-tactic="press">High Press</button>
+						<button type="button" class="zo-soccer-tactic" data-tactic="counter">Counter 4-4-2</button>
+					</div>
+
 					<div class="zo-soccer-help">
-						You can now use blue corner kicks and also shoot directly at goal. When decision mode opens, click inside the right goal mouth to shoot. When a blue corner happens, click where the corner kick should go, including directly at goal.
+						Choose a real team plan: Balanced keeps shape, High Press squeezes the pitch and counter-presses, while Counter 4-4-2 stays compact and attacks the space behind the defence. Teammates now keep width, cover the pressing player and make forward runs. Set pieces follow the rules: last defender touch = corner, last attacker touch = goal kick.
 					</div>
 
 					<div class="zo-soccer-upgrades">
