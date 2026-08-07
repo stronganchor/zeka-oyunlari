@@ -555,6 +555,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		let restartType = null;
 		let restartTeam = null;
 		let restartSpot = null;
+		let restartKicker = null;
 		let decisionMode = false;
 		let decisionPlayer = null;
 		let decisionTarget = null;
@@ -846,6 +847,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			restartType = null;
 			restartTeam = null;
 			restartSpot = null;
+			restartKicker = null;
 			clearDecisionState();
 		}
 
@@ -1033,6 +1035,46 @@ document.addEventListener('DOMContentLoaded', function () {
 					player.y = player.baseHomeY;
 				} else {
 					player.x = FIELD_W - 235;
+					player.y = player.baseHomeY;
+				}
+			});
+		}
+
+		function setupRedCornerPositions() {
+			const isTop = restartSpot.y < FIELD_H / 2;
+
+			state.players.forEach(function (player) {
+				if (player.team === 'red') {
+					if (player.isGoalie) {
+						player.x = 1034;
+						player.y = 315;
+					} else if (player === restartKicker) {
+						player.x = restartSpot.x + 18;
+						player.y = restartSpot.y;
+					} else if (player.position === 'forward') {
+						player.x = 185;
+						player.y = player.label === 'LF' ? 280 : (player.label === 'RF' ? 355 : 315);
+					} else if (player.position === 'midfielder') {
+						player.x = 260;
+						player.y = isTop ? 220 : 410;
+					} else if (player.position === 'wing') {
+						player.x = 320;
+						player.y = isTop ? 155 : 475;
+					} else {
+						player.x = 410;
+						player.y = player.baseHomeY;
+					}
+				} else if (player.isGoalie) {
+					player.x = 86;
+					player.y = 315;
+				} else if (player.position === 'defender') {
+					player.x = 115;
+					player.y = player.baseHomeY;
+				} else if (player.position === 'midfielder') {
+					player.x = 165;
+					player.y = player.baseHomeY;
+				} else {
+					player.x = 235;
 					player.y = player.baseHomeY;
 				}
 			});
@@ -1277,6 +1319,10 @@ document.addEventListener('DOMContentLoaded', function () {
 				if (restartType === 'corner' && restartTeam === 'blue') {
 					return;
 				}
+				if (restartType === 'corner' && restartTeam === player.team && player === restartKicker) {
+					targetX = restartSpot.x + (player.team === 'blue' ? -18 : 18);
+					targetY = restartSpot.y;
+				} else
 				if (restartType === 'goal-kick' && restartTeam === player.team) {
 					if (player.isGoalie) {
 						targetX = restartSpot.x;
@@ -1424,7 +1470,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				if (restartType === 'corner' && restartTeam === 'blue') {
 					return;
 				}
-				if (player.team === restartTeam && distance(player, state.ball) < 24) {
+				if (player.team === restartTeam && player === restartKicker && distance(player, state.ball) < 30) {
 					handleRestartKick(player.team);
 				}
 				return;
@@ -1506,6 +1552,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			const x = side === 'left' ? 20 : FIELD_W - 20;
 			const y = vertical === 'top' ? 20 : FIELD_H - 20;
 			restartSpot = { x: x, y: y };
+			restartKicker = getCornerKicker(team);
 			state.ball.x = x;
 			state.ball.y = y;
 			state.ball.vx = 0;
@@ -1520,6 +1567,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				}
 				setMessage('Blue korner');
 			} else {
+				setupRedCornerPositions();
 				setMessage('Red korner');
 			}
 		}
