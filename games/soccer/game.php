@@ -536,8 +536,13 @@ document.addEventListener('DOMContentLoaded', function () {
 		const TACTICS = {
 			balanced: { width: 1, line: 1, press: 1, risk: 1 },
 			press: { width: 0.95, line: 1.18, press: 1.35, risk: 1.1 },
-			counter: { width: 0.82, line: 0.82, press: 0.88, risk: 0.72 }
+			counter: { width: 0.82, line: 0.82, press: 0.88, risk: 0.72 },
+			offensive: { label: 'Offensive 4-3-3', width: 1.12, line: 1.14, press: 1.18, risk: 1.35 },
+			defensive: { label: 'Defensive 5-3-2', width: 0.72, line: 0.68, press: 0.72, risk: 0.45 }
 		};
+		TACTICS.balanced.label = 'Balanced 4-3-3';
+		TACTICS.press.label = 'High Press 4-3-3';
+		TACTICS.counter.label = 'Counter 4-4-2';
 
 		let animationId = null;
 		let lastTime = 0;
@@ -1225,6 +1230,20 @@ document.addEventListener('DOMContentLoaded', function () {
 				return {
 					x: player.baseHomeX + (player.team === 'blue' ? sideFactor * 0.18 * tactic.line : -sideFactor * 0.18 * tactic.line),
 					y: player.baseHomeY + (ball.y - player.baseHomeY) * 0.08
+				};
+			}
+
+			if (tactic === TACTICS.defensive && player.position === 'wing') {
+				return {
+					x: player.baseHomeX + (player.team === 'blue' ? -70 : 70),
+					y: player.baseHomeY
+				};
+			}
+
+			if (tactic === TACTICS.offensive && player.position === 'forward') {
+				return {
+					x: player.baseHomeX + (player.team === 'blue' ? 65 : -65),
+					y: player.baseHomeY + (ball.y - player.baseHomeY) * 0.22
 				};
 			}
 
@@ -2048,6 +2067,8 @@ if (!function_exists('zo_game_soccer_match_ai_render')) {
 						<button type="button" class="zo-soccer-tactic is-active" data-tactic="balanced">Balanced 4-3-3</button>
 						<button type="button" class="zo-soccer-tactic" data-tactic="press">High Press</button>
 						<button type="button" class="zo-soccer-tactic" data-tactic="counter">Counter 4-4-2</button>
+						<button type="button" class="zo-soccer-tactic" data-tactic="offensive">Offensive</button>
+						<button type="button" class="zo-soccer-tactic" data-tactic="defensive">Defensive</button>
 					</div>
 
 					<div class="zo-soccer-help">
