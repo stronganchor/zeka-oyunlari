@@ -545,6 +545,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		TACTICS.counter.label = 'Counter 4-4-2';
 
 		let animationId = null;
+		let simulationTimerId = null;
 		let lastTime = 0;
 		let running = false;
 		let started = false;
@@ -751,8 +752,9 @@ document.addEventListener('DOMContentLoaded', function () {
 		function updateHud() {
 			scoreUserEl.textContent = String(userScore);
 			scoreAiEl.textContent = String(aiScore);
-			const mins = Math.floor(remaining / 60);
-			const secs = Math.max(0, Math.ceil(remaining % 60));
+			const totalSeconds = Math.max(0, Math.ceil(remaining));
+			const mins = Math.floor(totalSeconds / 60);
+			const secs = totalSeconds % 60;
 			timerEl.textContent = mins + ':' + String(secs).padStart(2, '0');
 			coinsEl.textContent = String(coins);
 			speedLevelEl.textContent = String(speedLevel);
@@ -908,6 +910,10 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (animationId) {
 				cancelAnimationFrame(animationId);
 				animationId = null;
+			}
+			if (simulationTimerId) {
+				window.clearInterval(simulationTimerId);
+				simulationTimerId = null;
 			}
 			render();
 		}
@@ -1150,7 +1156,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			clearDecisionState();
 			running = true;
 			updateHud();
-			animationId = requestAnimationFrame(loop);
 		}
 
 		function endDecisionModeAndKick(targetX, targetY) {
@@ -1768,6 +1773,10 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (remaining <= 0) {
 				remaining = 0;
 				running = false;
+				if (simulationTimerId) {
+					window.clearInterval(simulationTimerId);
+					simulationTimerId = null;
+				}
 				updateHud();
 				render();
 
@@ -1808,9 +1817,6 @@ document.addEventListener('DOMContentLoaded', function () {
 			updateHud();
 			render();
 
-			if (running && !decisionMode) {
-				animationId = requestAnimationFrame(loop);
-			}
 		}
 
 		function startMatch() {
@@ -1827,10 +1833,16 @@ document.addEventListener('DOMContentLoaded', function () {
 			applyBlueUpgrades();
 			running = true;
 			lastTime = 0;
+			if (simulationTimerId) {
+				window.clearInterval(simulationTimerId);
+			}
 			setMessage('Match in progress');
 			updateHud();
 			field.focus();
-			animationId = requestAnimationFrame(loop);
+			simulationTimerId = window.setInterval(function () {
+				loop(Date.now());
+			}, 50);
+			loop(Date.now());
 		}
 
 		function fieldPointFromEvent(event) {
