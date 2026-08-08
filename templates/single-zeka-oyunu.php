@@ -79,6 +79,7 @@ if ($game_owner === '' && function_exists('zo_get_game_owner_for_module')) {
 	$game_owner = zo_get_game_owner_for_module($module);
 }
 $games_url  = $game_owner !== '' && function_exists('zo_get_owner_games_url') ? zo_get_owner_games_url($game_owner, $language) : $back_url;
+$show_account_button = $slug === 'roster-1000';
 
 if ($module_description !== '') {
 	$seo_description = trim($page_title . ' ' . $play_suffix . '. ' . $module_description . ' ' . $seo_keywords);
@@ -136,6 +137,7 @@ if (function_exists('zo_get_game_difficulty_label')) {
 		.zo-game-page__header {
 			display: flex;
 			align-items: center;
+			gap: 10px;
 			padding: 18px 20px;
 		}
 
@@ -155,6 +157,25 @@ if (function_exists('zo_get_game_difficulty_label')) {
 		.zo-game-page__back:hover,
 		.zo-game-page__back:focus {
 			background: #115e59;
+			color: #fff;
+			text-decoration: none;
+		}
+
+		.zo-game-page__account {
+			display: inline-flex;
+			align-items: center;
+			padding: 10px 16px;
+			border-radius: 999px;
+			background: rgba(30, 64, 175, 0.95);
+			color: #fff;
+			font-weight: 600;
+			text-decoration: none;
+			box-shadow: 0 10px 30px rgba(15, 23, 42, 0.22);
+		}
+
+		.zo-game-page__account:hover,
+		.zo-game-page__account:focus {
+			background: #1d4ed8;
 			color: #fff;
 			text-decoration: none;
 		}
@@ -416,6 +437,12 @@ if (function_exists('zo_get_game_difficulty_label')) {
 				font-size: 0.9rem;
 			}
 
+			.zo-game-page__account {
+				min-height: 38px;
+				padding: 0 12px;
+				font-size: 0.9rem;
+			}
+
 			.zo-game-page__main {
 				padding: 0 10px 22px;
 			}
@@ -526,6 +553,9 @@ if (function_exists('zo_get_game_difficulty_label')) {
 	<div class="zo-game-page">
 		<header class="zo-game-page__header">
 			<a class="zo-game-page__back" href="<?php echo esc_url($back_url); ?>"><?php echo esc_html(function_exists('zo_get_interface_text') ? zo_get_interface_text('home', $language) : 'Geri Dön'); ?></a>
+			<?php if ($show_account_button) : ?>
+			<a class="zo-game-page__account" href="#zo-roster-account"><?php echo esc_html(function_exists('zo_get_interface_text') ? zo_get_interface_text('sign_in', $language) : 'Sign In'); ?></a>
+			<?php endif; ?>
 		</header>
 		<main class="zo-game-page__main">
 			<div class="zo-game-page__meta">

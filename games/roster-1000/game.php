@@ -1642,7 +1642,7 @@ if (!function_exists('zo_game_roster_1000_render')) {
 				<h2 class="zo-r1-title"><?php echo esc_html($r1('title')); ?></h2>
 				<p class="zo-r1-subtitle"><?php echo esc_html($r1('subtitle')); ?></p>
 
-				<div class="zo-r1-account">
+				<div class="zo-r1-account" id="zo-roster-account">
 					<div class="zo-r1-account-fields">
 						<div class="zo-r1-field">
 							<label for="<?php echo esc_attr($instance_id); ?>-account"><?php echo esc_html($r1('accountName')); ?></label>
