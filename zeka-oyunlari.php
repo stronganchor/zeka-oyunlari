@@ -15724,6 +15724,14 @@ function zo_games_grid_shortcode($atts = array()) {
 		echo '<a class="zo-games-grid__home" href="' . esc_url(add_query_arg('zo_lang', $language, $home_url)) . '">' . esc_html(zo_get_interface_text('home', $language)) . '</a>';
 	}
 
+	if (in_array($author_filter, array('asker', 'arslan'), true)) {
+		$account_url = zo_get_game_module_fallback_url('roster-1000');
+		if ($account_url !== '') {
+			$account_url .= '#zo-roster-account';
+			echo '<a class="zo-games-grid__home zo-games-grid__account" href="' . esc_url($account_url) . '">' . esc_html(zo_get_interface_text('sign_in', $language)) . '</a>';
+		}
+	}
+
 	$language_options = zo_get_language_options();
 	$current_language_label = isset($language_options[$language]) ? $language_options[$language] : strtoupper($language);
 
