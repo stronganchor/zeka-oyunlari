@@ -565,7 +565,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		let decisionPlayer = null;
 		let decisionTarget = null;
 		let decisionContext = 'normal';
-		let activeTactic = 'balanced';
+		let activeTactic = 'offensive';
 		let redTactic = 'balanced';
 		let lastRedDecision = 0;
 		let autoMode = false;
@@ -2064,10 +2064,7 @@ if (!function_exists('zo_game_soccer_match_ai_render')) {
 
 					<div class="zo-soccer-tactics" aria-label="Team tactics">
 						<span class="zo-soccer-tactics-label">Tactic:</span>
-						<button type="button" class="zo-soccer-tactic is-active" data-tactic="balanced">Balanced 4-3-3</button>
-						<button type="button" class="zo-soccer-tactic" data-tactic="press">High Press</button>
-						<button type="button" class="zo-soccer-tactic" data-tactic="counter">Counter 4-4-2</button>
-						<button type="button" class="zo-soccer-tactic" data-tactic="offensive">Offensive</button>
+						<button type="button" class="zo-soccer-tactic is-active" data-tactic="offensive">Offensive</button>
 						<button type="button" class="zo-soccer-tactic" data-tactic="defensive">Defensive</button>
 					</div>
 
