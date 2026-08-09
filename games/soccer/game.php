@@ -17,26 +17,28 @@ $css = <<<'CSS'
 }
 
 .zo-soccer-wrap {
-	background: #f4f7f2;
-	border: 2px solid #d7e0d0;
-	border-radius: 18px;
-	padding: 14px;
+	background: #f8fafc;
+	border: 1px solid #dbe3ec;
+	border-radius: 20px;
+	padding: 16px;
+	box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
 }
 
 .zo-soccer-topbar {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 10px;
-	justify-content: center;
-	margin-bottom: 12px;
+	display: grid;
+	grid-template-columns: repeat(4, minmax(120px, 1fr));
+	gap: 8px;
+	max-width: 1120px;
+	margin: 0 auto 14px;
 }
 
 .zo-soccer-panel {
 	background: #fff;
-	border: 2px solid #dfe7d8;
+	border: 1px solid #e2e8f0;
 	border-radius: 12px;
-	padding: 10px 14px;
-	min-width: 130px;
+	padding: 9px 12px;
+	min-width: 0;
+	box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
 }
 
 .zo-soccer-panel strong {
@@ -52,6 +54,13 @@ $css = <<<'CSS'
 	margin-top: 4px;
 }
 
+.zo-soccer-panel:nth-child(1) strong { color: #1565c0; }
+.zo-soccer-panel:nth-child(2) strong { color: #d32f2f; }
+.zo-soccer-panel:nth-child(3) { background: #172033; border-color: #172033; }
+.zo-soccer-panel:nth-child(3) strong,
+.zo-soccer-panel:nth-child(3) span { color: #fff; }
+.zo-soccer-panel:nth-child(10) { background: #eef5ff; border-color: #c8dbf7; }
+
 .zo-soccer-btn {
 	border: none;
 	border-radius: 10px;
@@ -61,11 +70,24 @@ $css = <<<'CSS'
 	cursor: pointer;
 	background: #1d2a1d;
 	color: #fff;
+	transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
 }
 
 .zo-soccer-btn:hover {
 	opacity: 0.92;
+	transform: translateY(-1px);
+	box-shadow: 0 4px 10px rgba(15, 23, 42, 0.12);
 }
+
+.zo-soccer-buttons .zo-soccer-btn:nth-child(1) { background: #1565c0; }
+.zo-soccer-buttons .zo-soccer-btn:nth-child(2) { background: #475569; }
+.zo-soccer-buttons .zo-soccer-btn:nth-child(3) { background: #0f766e; }
+.zo-soccer-buttons .zo-soccer-btn:nth-child(n+4) {
+	background: #fff;
+	border: 1px solid #cbd5e1;
+	color: #334155;
+}
+.zo-soccer-auto.is-active { background: #0f766e; color: #fff; }
 
 .zo-soccer-btn[disabled] {
 	opacity: 0.45;
@@ -104,6 +126,7 @@ $css = <<<'CSS'
 		);
 	border: 4px solid #fff;
 	border-radius: 18px;
+	box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16);
 	overflow: hidden;
 	outline: none;
 	user-select: none;
@@ -374,12 +397,13 @@ $css = <<<'CSS'
 .zo-soccer-decision,
 .zo-soccer-upgrades {
 	background: #fff;
-	border: 2px solid #dfe7d8;
+	border: 1px solid #e2e8f0;
 	border-radius: 12px;
 	padding: 10px 14px;
 	font-size: 14px;
 	line-height: 1.45;
-	color: #334233;
+	color: #475569;
+	box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
 	max-width: 1120px;
 	width: 100%;
 }
@@ -398,10 +422,10 @@ $css = <<<'CSS'
 	gap: 8px;
 	align-items: center;
 	justify-content: center;
-	margin: 12px 0;
+	margin: 4px 0 2px;
 	padding: 10px;
 	background: #eef5ff;
-	border: 1px solid #c8dbf7;
+	border: 1px solid #d7e5f7;
 	border-radius: 12px;
 }
 
@@ -433,7 +457,7 @@ $css = <<<'CSS'
 
 .zo-soccer-upgrade-card {
 	background: #f8faf7;
-	border: 2px solid #dfe7d8;
+	border: 1px solid #e2e8f0;
 	border-radius: 12px;
 	padding: 10px;
 	min-width: 160px;
@@ -460,6 +484,10 @@ $css = <<<'CSS'
 }
 
 @media (max-width: 700px) {
+	.zo-soccer-topbar {
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+	}
+
 	.zo-soccer-field {
 		height: 450px;
 	}
@@ -475,7 +503,7 @@ $css = <<<'CSS'
 	}
 
 	.zo-soccer-panel {
-		min-width: 104px;
+		min-width: 0;
 		padding: 8px 10px;
 	}
 
