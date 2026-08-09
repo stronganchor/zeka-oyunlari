@@ -2081,7 +2081,7 @@ if (!function_exists('zo_game_soccer_match_ai_render')) {
 					</div>
 
 					<div class="zo-soccer-help">
-						Choose a real team plan: Balanced keeps shape, High Press squeezes the pitch and counter-presses, while Counter 4-4-2 stays compact and attacks the space behind the defence. Teammates now keep width, cover the pressing player and make forward runs. Set pieces follow the rules: last defender touch = corner, last attacker touch = goal kick.
+						Choose a team plan: Offensive 4-3-3 pushes forwards and presses more aggressively, while Defensive 5-3-2 protects the centre and attacks with less risk. Switch the plan during the match. Set pieces follow the rules: last defender touch = corner, last attacker touch = goal kick.
 					</div>
 
 					<div class="zo-soccer-upgrades">
