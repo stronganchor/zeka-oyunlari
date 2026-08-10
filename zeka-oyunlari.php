@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.72.asker.arslan
+ * Version: 1.5.74.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-define('ZO_PLUGIN_VERSION', '1.5.72.asker.arslan');
+define('ZO_PLUGIN_VERSION', '1.5.74.asker.arslan');
 define('ZO_PLUGIN_FILE', __FILE__);
 define('ZO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('ZO_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -15337,6 +15337,91 @@ function zo_game_shortcode($atts = array()) {
 }
 add_shortcode('zeka_oyunu', 'zo_game_shortcode');
 
+/** Front-end account block. Add [zeka_account] to a WordPress page. */
+function zo_account_shortcode($atts = array()) {
+	$atts = shortcode_atts(array('username' => 'arslan'), $atts, 'zeka_account');
+	$default_username = sanitize_user((string) $atts['username'], true) ?: 'arslan';
+	$message = '';
+	$message_type = 'info';
+
+	if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['zo_account_action'])) {
+		$action = sanitize_key(wp_unslash($_POST['zo_account_action']));
+		$nonce = isset($_POST['zo_account_nonce']) ? sanitize_text_field(wp_unslash($_POST['zo_account_nonce'])) : '';
+		$username = isset($_POST['zo_account_username']) ? sanitize_user(wp_unslash($_POST['zo_account_username']), true) : $default_username;
+		$pin = isset($_POST['zo_account_pin']) ? (string) wp_unslash($_POST['zo_account_pin']) : '';
+
+		if (!wp_verify_nonce($nonce, 'zo_account_action')) {
+			$message = 'This form expired. Please try again.';
+			$message_type = 'error';
+		} elseif ($username === '' || !preg_match('/^[a-zA-Z0-9_-]{2,60}$/', $username)) {
+			$message = 'Use a username with 2–60 letters, numbers, underscores, or hyphens.';
+			$message_type = 'error';
+		} elseif (!preg_match('/^[0-9]{4,9}$/', $pin)) {
+			$message = 'Your PIN must contain only 4–9 digits.';
+			$message_type = 'error';
+		} elseif ($action === 'register') {
+			if (username_exists($username)) {
+				$message = 'That username already exists. Try signing in instead.';
+				$message_type = 'error';
+			} else {
+				$user_id = wp_insert_user(array('user_login' => $username, 'user_pass' => $pin, 'role' => 'subscriber'));
+				if (is_wp_error($user_id)) {
+					$message = $user_id->get_error_message();
+					$message_type = 'error';
+				} else {
+					wp_set_auth_cookie($user_id, true);
+					$message = 'Your account is ready. You are now signed in as ' . $username . '.';
+					$message_type = 'success';
+				}
+			}
+		} elseif ($action === 'login') {
+			$user = wp_signon(array('user_login' => $username, 'user_password' => $pin, 'remember' => true), is_ssl());
+			if (is_wp_error($user)) {
+				$message = 'The username or PIN is not correct.';
+				$message_type = 'error';
+			} else {
+				$message = 'Welcome back, ' . $username . '!';
+				$message_type = 'success';
+			}
+		}
+	}
+
+	if (is_user_logged_in()) {
+		$user = wp_get_current_user();
+		$name = $user->display_name ?: $user->user_login;
+		return '<div class="zo-account zo-account--signed-in"><h2>Your zekâ account</h2><p>You are signed in as <strong>' . esc_html($name) . '</strong>.</p><a class="zo-account__button" href="' . esc_url(wp_logout_url(get_permalink())) . '">Sign out</a></div>';
+	}
+
+	$message_html = $message !== '' ? '<p class="zo-account__message zo-account__message--' . esc_attr($message_type) . '" role="status">' . esc_html($message) . '</p>' : '';
+	return '<div class="zo-account"><h2>Make your account</h2><p class="zo-account__hint">Choose a username and a PIN of 4–9 digits.</p>' . $message_html
+		. '<form method="post" class="zo-account__form">' . wp_nonce_field('zo_account_action', 'zo_account_nonce', true, false)
+		. '<label>Username<input type="text" name="zo_account_username" value="' . esc_attr($default_username) . '" autocomplete="username" required></label>'
+		. '<label>4–9 digit PIN<input type="password" name="zo_account_pin" inputmode="numeric" pattern="[0-9]{4,9}" minlength="4" maxlength="9" autocomplete="new-password" required></label>'
+		. '<div class="zo-account__actions"><button type="submit" name="zo_account_action" value="register">Create account</button><button type="submit" name="zo_account_action" value="login" class="zo-account__secondary">Sign in</button></div></form></div>';
+}
+add_shortcode('zeka_account', 'zo_account_shortcode');
+
+function zo_account_url() {
+	return add_query_arg('zo_account', '1', home_url('/')) . '#zo-account';
+}
+
+function zo_account_query_content($content) {
+	if (is_front_page() && isset($_GET['zo_account']) && sanitize_key(wp_unslash($_GET['zo_account'])) === '1') {
+		return '<div id="zo-account">' . zo_account_shortcode() . '</div>' . $content;
+	}
+	return $content;
+}
+add_filter('the_content', 'zo_account_query_content', 12);
+
+function zo_account_shortcode_styles() {
+	$account_query = isset($_GET['zo_account']) && sanitize_key(wp_unslash($_GET['zo_account'])) === '1';
+	if (!is_singular() || (!$account_query && !has_shortcode((string) get_post_field('post_content', get_queried_object_id()), 'zeka_account'))) return;
+	wp_register_style('zo-account', false, array(), ZO_PLUGIN_VERSION);
+	wp_enqueue_style('zo-account');
+	wp_add_inline_style('zo-account', '.zo-account{max-width:460px;margin:24px auto;padding:28px;border-radius:18px;background:#fff;box-shadow:0 10px 30px rgba(15,23,42,.12)}.zo-account h2{margin:0 0 8px}.zo-account__hint{color:#64748b}.zo-account__form label{display:block;margin:16px 0;font-weight:600}.zo-account__form input{display:block;width:100%;box-sizing:border-box;margin-top:7px;padding:12px;border:1px solid #cbd5e1;border-radius:10px;font:inherit}.zo-account__actions{display:flex;gap:10px;flex-wrap:wrap}.zo-account button,.zo-account__button{display:inline-block;padding:11px 16px;border:0;border-radius:10px;background:#2563eb;color:#fff;text-decoration:none;font-weight:700;cursor:pointer}.zo-account__secondary{background:#475569!important}.zo-account__message{padding:10px 12px;border-radius:10px}.zo-account__message--error{background:#fee2e2;color:#991b1b}.zo-account__message--success{background:#dcfce7;color:#166534}');
+}
+add_action('wp_enqueue_scripts', 'zo_account_shortcode_styles');
+
 function zo_get_asker_about_content($lang = '') {
 	$content = array(
 		'tr' => array(
@@ -15724,13 +15809,8 @@ function zo_games_grid_shortcode($atts = array()) {
 		echo '<a class="zo-games-grid__home" href="' . esc_url(add_query_arg('zo_lang', $language, $home_url)) . '">' . esc_html(zo_get_interface_text('home', $language)) . '</a>';
 	}
 
-	if (in_array($author_filter, array('asker', 'arslan'), true)) {
-		$account_url = zo_get_game_module_fallback_url('roster-1000');
-		if ($account_url !== '') {
-			$account_url .= '#zo-roster-account';
-			echo '<a class="zo-games-grid__home zo-games-grid__account" href="' . esc_url($account_url) . '">' . esc_html(zo_get_interface_text('sign_in', $language)) . '</a>';
-		}
-	}
+
+	echo '<a class="zo-games-grid__home zo-games-grid__account" href="' . esc_url(zo_account_url()) . '">' . esc_html(zo_get_interface_text('sign_in', $language)) . '</a>';
 
 	$language_options = zo_get_language_options();
 	$current_language_label = isset($language_options[$language]) ? $language_options[$language] : strtoupper($language);
