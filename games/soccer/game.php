@@ -416,6 +416,38 @@ $css = <<<'CSS'
 	display: block;
 }
 
+.zo-soccer-events {
+	width: 100%;
+	max-width: 1120px;
+	padding: 9px 12px;
+	background: #f8fafc;
+	border: 1px solid #e2e8f0;
+	border-radius: 12px;
+	text-align: left;
+	color: #475569;
+	font-size: 13px;
+}
+
+.zo-soccer-events-title {
+	display: block;
+	margin-bottom: 5px;
+	font-weight: 700;
+	color: #1e293b;
+}
+
+.zo-soccer-events-list {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+
+.zo-soccer-event {
+	padding: 4px 8px;
+	background: #fff;
+	border: 1px solid #e2e8f0;
+	border-radius: 999px;
+}
+
 .zo-soccer-tactics {
 	display: flex;
 	flex-wrap: wrap;
@@ -545,6 +577,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		const passLineEl = game.querySelector('.zo-soccer-pass-line');
 		const decisionBox = game.querySelector('.zo-soccer-decision');
 		const decisionText = game.querySelector('.zo-soccer-decision-text');
+		const eventsList = game.querySelector('.zo-soccer-events-list');
 		const tacticButtons = game.querySelectorAll('.zo-soccer-tactic');
 
 		const FIELD_W = 1120;
@@ -594,6 +627,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		let decisionPlayer = null;
 		let decisionTarget = null;
 		let decisionContext = 'normal';
+		let eventLog = [];
 		let activeTactic = 'offensive';
 		let redTactic = 'balanced';
 		let lastRedDecision = 0;
@@ -775,6 +809,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function setMessage(text) {
 			messageEl.textContent = text;
+			if (!eventsList || eventLog[0] === text) {
+				return;
+			}
+			eventLog.unshift(text);
+			eventLog = eventLog.slice(0, 5);
+			eventsList.innerHTML = eventLog.map(function (eventText) {
+				return '<span class="zo-soccer-event">' + eventText + '</span>';
+			}).join('');
 		}
 
 		function updateHud() {
@@ -935,6 +977,10 @@ document.addEventListener('DOMContentLoaded', function () {
 			applyBlueUpgrades();
 			updateHud();
 			setMessage('Press Start Match');
+			eventLog = [];
+			if (eventsList) {
+				eventsList.innerHTML = '';
+			}
 			if (animationId) {
 				cancelAnimationFrame(animationId);
 				animationId = null;
@@ -2140,6 +2186,11 @@ if (!function_exists('zo_game_soccer_match_ai_render')) {
 
 					<div class="zo-soccer-decision">
 						<div class="zo-soccer-decision-text">Click or tap where to kick. Click inside the goal to shoot.</div>
+					</div>
+
+					<div class="zo-soccer-events" aria-live="polite">
+						<span class="zo-soccer-events-title">Recent events</span>
+						<div class="zo-soccer-events-list"></div>
 					</div>
 				</div>
 			</div>
