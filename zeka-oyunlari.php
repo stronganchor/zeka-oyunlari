@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.74.asker.arslan
+ * Version: 1.5.75.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-define('ZO_PLUGIN_VERSION', '1.5.74.asker.arslan');
+define('ZO_PLUGIN_VERSION', '1.5.75.asker.arslan');
 define('ZO_PLUGIN_FILE', __FILE__);
 define('ZO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('ZO_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -15396,7 +15396,7 @@ function zo_account_shortcode($atts = array()) {
 	return '<div class="zo-account"><h2>Make your account</h2><p class="zo-account__hint">Choose a username and a PIN of 4–9 digits.</p>' . $message_html
 		. '<form method="post" class="zo-account__form">' . wp_nonce_field('zo_account_action', 'zo_account_nonce', true, false)
 		. '<label>Username<input type="text" name="zo_account_username" value="' . esc_attr($default_username) . '" autocomplete="username" required></label>'
-		. '<label>4–9 digit PIN<input type="password" name="zo_account_pin" inputmode="numeric" pattern="[0-9]{4,9}" minlength="4" maxlength="9" autocomplete="new-password" required></label>'
+		. '<label>4–9 digit PIN<input type="password" name="zo_account_pin" inputmode="numeric" maxlength="9" autocomplete="new-password" required data-zo-pin></label>'
 		. '<div class="zo-account__actions"><button type="submit" name="zo_account_action" value="register">Create account</button><button type="submit" name="zo_account_action" value="login" class="zo-account__secondary">Sign in</button></div></form></div>';
 }
 add_shortcode('zeka_account', 'zo_account_shortcode');
@@ -15418,7 +15418,10 @@ function zo_account_shortcode_styles() {
 	if (!is_singular() || (!$account_query && !has_shortcode((string) get_post_field('post_content', get_queried_object_id()), 'zeka_account'))) return;
 	wp_register_style('zo-account', false, array(), ZO_PLUGIN_VERSION);
 	wp_enqueue_style('zo-account');
+	wp_register_script('zo-account', false, array(), ZO_PLUGIN_VERSION, true);
+	wp_enqueue_script('zo-account');
 	wp_add_inline_style('zo-account', '.zo-account{max-width:460px;margin:24px auto;padding:28px;border-radius:18px;background:#fff;box-shadow:0 10px 30px rgba(15,23,42,.12)}.zo-account h2{margin:0 0 8px}.zo-account__hint{color:#64748b}.zo-account__form label{display:block;margin:16px 0;font-weight:600}.zo-account__form input{display:block;width:100%;box-sizing:border-box;margin-top:7px;padding:12px;border:1px solid #cbd5e1;border-radius:10px;font:inherit}.zo-account__actions{display:flex;gap:10px;flex-wrap:wrap}.zo-account button,.zo-account__button{display:inline-block;padding:11px 16px;border:0;border-radius:10px;background:#2563eb;color:#fff;text-decoration:none;font-weight:700;cursor:pointer}.zo-account__secondary{background:#475569!important}.zo-account__message{padding:10px 12px;border-radius:10px}.zo-account__message--error{background:#fee2e2;color:#991b1b}.zo-account__message--success{background:#dcfce7;color:#166534}');
+	wp_add_inline_script('zo-account', '(function(){document.querySelectorAll("[data-zo-pin]").forEach(function(input){input.addEventListener("input",function(){input.value=input.value.replace(/\\D/g,"").slice(0,9);});});})();');
 }
 add_action('wp_enqueue_scripts', 'zo_account_shortcode_styles');
 
