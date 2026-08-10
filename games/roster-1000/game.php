@@ -4,6 +4,55 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
+function zo_roster_1000_clean_progress($progress) {
+	if (!is_array($progress)) {
+		return array();
+	}
+	$owned = array();
+	if (!empty($progress['owned']) && is_array($progress['owned'])) {
+		foreach ($progress['owned'] as $hero_id => $is_owned) {
+			$hero_id = absint($hero_id);
+			if ($hero_id >= 1 && $hero_id <= 1000 && $is_owned) {
+				$owned[(string) $hero_id] = true;
+			}
+		}
+	}
+	$owned['1'] = true;
+	return array(
+		'coins' => min(1000000000, max(0, absint($progress['coins'] ?? 150))),
+		'level' => min(9999, max(1, absint($progress['level'] ?? 1))),
+		'wins' => min(1000000000, max(0, absint($progress['wins'] ?? 0))),
+		'page' => min(83, max(0, absint($progress['page'] ?? 0))),
+		'selectedId' => min(1000, max(1, absint($progress['selectedId'] ?? 1))),
+		'owned' => $owned,
+	);
+}
+
+function zo_roster_1000_ajax_load_progress() {
+	check_ajax_referer('zo_roster_1000_progress', 'nonce');
+	if (!is_user_logged_in()) {
+		wp_send_json_error(array('message' => 'Sign in to load progress.'), 401);
+	}
+	$progress = get_user_meta(get_current_user_id(), '_zo_roster_1000_progress', true);
+	wp_send_json_success(array('progress' => $progress ? zo_roster_1000_clean_progress($progress) : null));
+}
+add_action('wp_ajax_zo_roster_1000_load_progress', 'zo_roster_1000_ajax_load_progress');
+
+function zo_roster_1000_ajax_save_progress() {
+	check_ajax_referer('zo_roster_1000_progress', 'nonce');
+	if (!is_user_logged_in()) {
+		wp_send_json_error(array('message' => 'Sign in to save progress.'), 401);
+	}
+	$raw = isset($_POST['progress']) ? wp_unslash($_POST['progress']) : '';
+	$progress = json_decode($raw, true);
+	if (!is_array($progress)) {
+		wp_send_json_error(array('message' => 'Invalid progress data.'), 400);
+	}
+	update_user_meta(get_current_user_id(), '_zo_roster_1000_progress', zo_roster_1000_clean_progress($progress));
+	wp_send_json_success();
+}
+add_action('wp_ajax_zo_roster_1000_save_progress', 'zo_roster_1000_ajax_save_progress');
+
 $css = <<<'CSS'
 .zo-game-root--roster-1000 {
 	max-width: 1120px;
@@ -450,6 +499,9 @@ document.addEventListener('DOMContentLoaded', function () {
 		const REWARD_PER_WIN = 50;
 		const ACCOUNT_STORE_KEY = 'zoRoster1000AccountsV1';
 		const ACCOUNT_SESSION_KEY = 'zoRoster1000CurrentAccountV1';
+		const progressAjaxUrl = game.getAttribute('data-zo-progress-ajax') || '';
+		const progressNonce = game.getAttribute('data-zo-progress-nonce') || '';
+		const wpUsername = game.getAttribute('data-zo-wp-user') || '';
 		const i18nNode = game.querySelector('.zo-r1-i18n');
 		let i18n = {};
 
@@ -620,6 +672,37 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 			accounts[state.accountKey].progress = getProgress();
 			writeAccounts(accounts);
+			saveServerProgress(accounts[state.accountKey].progress);
+		}
+
+		function saveServerProgress(progress) {
+			if (!progressAjaxUrl || !progressNonce || !window.fetch) {
+				return;
+			}
+			const body = new URLSearchParams();
+			body.set('action', 'zo_roster_1000_save_progress');
+			body.set('nonce', progressNonce);
+			body.set('progress', JSON.stringify(progress));
+			window.fetch(progressAjaxUrl, {method: 'POST', credentials: 'same-origin', headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}, body: body.toString()}).catch(function () {});
+		}
+
+		function loadServerProgress(key, account) {
+			if (!progressAjaxUrl || !progressNonce || !window.fetch) {
+				return;
+			}
+			const body = new URLSearchParams();
+			body.set('action', 'zo_roster_1000_load_progress');
+			body.set('nonce', progressNonce);
+			window.fetch(progressAjaxUrl, {method: 'POST', credentials: 'same-origin', headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}, body: body.toString()}).then(function (response) { return response.json(); }).then(function (payload) {
+				if (!payload || !payload.success || !payload.data || !payload.data.progress || state.accountKey !== key) {
+					return;
+				}
+				account.progress = payload.data.progress;
+				const accounts = readAccounts();
+				accounts[key] = account;
+				writeAccounts(accounts);
+				applyProgress(account.progress);
+			}).catch(function () {});
 		}
 
 		function requireAccount() {
@@ -643,6 +726,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				accountPinInput.value = '';
 			}
 			applyProgress(account.progress || getProgress());
+			loadServerProgress(key, account);
 			updateAccountUi();
 			setAccountStatus(fmt('signedInAs', 'Signed in as {name}.', {name: account.name || key}));
 			setStatus(t('pickOrBuyStatus', 'Bir karakter seÃ§ veya satÄ±n al, sonra BaÅŸlat dÃ¼ÄŸmesine bas. Temizlenen her dalga 50 coin verir.'));
@@ -715,6 +799,16 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function restoreAccountSession() {
+			if (wpUsername && progressAjaxUrl) {
+				const key = normalizeAccountName(wpUsername);
+				const accounts = readAccounts();
+				if (!accounts[key]) {
+					accounts[key] = {name: wpUsername, pin: '', progress: getProgress()};
+					writeAccounts(accounts);
+				}
+				signInAccount(key, accounts[key]);
+				return true;
+			}
 			if (!canSessionStore) {
 				return false;
 			}
@@ -1633,10 +1727,14 @@ if (!function_exists('zo_game_roster_1000_render')) {
 			}
 			return $text;
 		};
+		$account_progress_enabled = is_page('arslanin-oyunlari') && is_user_logged_in();
+		$progress_ajax_url = $account_progress_enabled ? admin_url('admin-ajax.php') : '';
+		$progress_nonce = $account_progress_enabled ? wp_create_nonce('zo_roster_1000_progress') : '';
+		$wp_user_login = $account_progress_enabled ? wp_get_current_user()->user_login : '';
 
 		ob_start();
 		?>
-		<div class="zo-game-root zo-game-root--roster-1000" id="<?php echo esc_attr($instance_id); ?>">
+		<div class="zo-game-root zo-game-root--roster-1000" id="<?php echo esc_attr($instance_id); ?>" data-zo-progress-ajax="<?php echo esc_url($progress_ajax_url); ?>" data-zo-progress-nonce="<?php echo esc_attr($progress_nonce); ?>" data-zo-wp-user="<?php echo esc_attr($wp_user_login); ?>">
 			<script type="application/json" class="zo-r1-i18n"><?php echo wp_json_encode($i18n); ?></script>
 			<div class="zo-r1-shell">
 				<h2 class="zo-r1-title"><?php echo esc_html($r1('title')); ?></h2>

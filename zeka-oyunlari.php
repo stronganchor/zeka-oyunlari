@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.75.asker.arslan
+ * Version: 1.5.76.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-define('ZO_PLUGIN_VERSION', '1.5.75.asker.arslan');
+define('ZO_PLUGIN_VERSION', '1.5.76.asker.arslan');
 define('ZO_PLUGIN_FILE', __FILE__);
 define('ZO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('ZO_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -15338,7 +15338,14 @@ function zo_game_shortcode($atts = array()) {
 add_shortcode('zeka_oyunu', 'zo_game_shortcode');
 
 /** Front-end account block. Add [zeka_account] to a WordPress page. */
+function zo_is_arslan_account_page() {
+	return is_page('arslanin-oyunlari') || (isset($_GET['zo_account']) && sanitize_key(wp_unslash($_GET['zo_account'])) === '1' && is_page('arslanin-oyunlari'));
+}
+
 function zo_account_shortcode($atts = array()) {
+	if (!zo_is_arslan_account_page()) {
+		return '';
+	}
 	$atts = shortcode_atts(array('username' => 'arslan'), $atts, 'zeka_account');
 	$default_username = sanitize_user((string) $atts['username'], true) ?: 'arslan';
 	$message = '';
@@ -15402,11 +15409,13 @@ function zo_account_shortcode($atts = array()) {
 add_shortcode('zeka_account', 'zo_account_shortcode');
 
 function zo_account_url() {
-	return add_query_arg('zo_account', '1', home_url('/')) . '#zo-account';
+	$page = get_page_by_path('arslanin-oyunlari');
+	$url = $page ? get_permalink($page) : home_url('/arslanin-oyunlari/');
+	return add_query_arg('zo_account', '1', $url) . '#zo-account';
 }
 
 function zo_account_query_content($content) {
-	if (is_front_page() && isset($_GET['zo_account']) && sanitize_key(wp_unslash($_GET['zo_account'])) === '1') {
+	if (zo_is_arslan_account_page() && isset($_GET['zo_account']) && sanitize_key(wp_unslash($_GET['zo_account'])) === '1') {
 		return '<div id="zo-account">' . zo_account_shortcode() . '</div>' . $content;
 	}
 	return $content;
@@ -15415,7 +15424,7 @@ add_filter('the_content', 'zo_account_query_content', 12);
 
 function zo_account_shortcode_styles() {
 	$account_query = isset($_GET['zo_account']) && sanitize_key(wp_unslash($_GET['zo_account'])) === '1';
-	if (!is_singular() || (!$account_query && !has_shortcode((string) get_post_field('post_content', get_queried_object_id()), 'zeka_account'))) return;
+	if (!zo_is_arslan_account_page() || (!$account_query && !has_shortcode((string) get_post_field('post_content', get_queried_object_id()), 'zeka_account'))) return;
 	wp_register_style('zo-account', false, array(), ZO_PLUGIN_VERSION);
 	wp_enqueue_style('zo-account');
 	wp_register_script('zo-account', false, array(), ZO_PLUGIN_VERSION, true);
@@ -15812,8 +15821,9 @@ function zo_games_grid_shortcode($atts = array()) {
 		echo '<a class="zo-games-grid__home" href="' . esc_url(add_query_arg('zo_lang', $language, $home_url)) . '">' . esc_html(zo_get_interface_text('home', $language)) . '</a>';
 	}
 
-
-	echo '<a class="zo-games-grid__home zo-games-grid__account" href="' . esc_url(zo_account_url()) . '">' . esc_html(zo_get_interface_text('sign_in', $language)) . '</a>';
+	if ($author_filter === 'arslan' && zo_is_arslan_account_page()) {
+		echo '<a class="zo-games-grid__home zo-games-grid__account" href="' . esc_url(zo_account_url()) . '">' . esc_html(zo_get_interface_text('sign_in', $language)) . '</a>';
+	}
 
 	$language_options = zo_get_language_options();
 	$current_language_label = isset($language_options[$language]) ? $language_options[$language] : strtoupper($language);
