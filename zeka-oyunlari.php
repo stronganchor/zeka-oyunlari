@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.78.asker.arslan
+ * Version: 1.5.79.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-define('ZO_PLUGIN_VERSION', '1.5.78.asker.arslan');
+define('ZO_PLUGIN_VERSION', '1.5.79.asker.arslan');
 define('ZO_PLUGIN_FILE', __FILE__);
 define('ZO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('ZO_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -15348,6 +15348,7 @@ function zo_account_shortcode($atts = array()) {
 	}
 	$atts = shortcode_atts(array('username' => 'arslan'), $atts, 'zeka_account');
 	$default_username = sanitize_user((string) $atts['username'], true) ?: 'arslan';
+	return '<div class="zo-account"><h2>Make your game account</h2><p class="zo-account__hint">This account is only for Arslan games on this device. Choose a username and a PIN of 4-9 digits.</p><p class="zo-account__message" data-zo-account-status role="status"></p><form class="zo-account__form" data-zo-account-form><label>Username<input type="text" name="zo_account_username" value="' . esc_attr($default_username) . '" autocomplete="username" required></label><label>4-9 digit PIN<input type="password" name="zo_account_pin" inputmode="numeric" maxlength="9" autocomplete="new-password" required data-zo-pin></label><div class="zo-account__actions"><button type="button" class="zo-account__create" data-zo-account-create>Create account</button><button type="button" class="zo-account__secondary" data-zo-account-signin>Sign in</button><button type="button" class="zo-account__secondary" data-zo-account-signout hidden>Sign out</button></div></form></div>';
 	$message = '';
 	$message_type = 'info';
 
@@ -15431,6 +15432,7 @@ function zo_account_shortcode_styles() {
 	wp_enqueue_script('zo-account');
 	wp_add_inline_style('zo-account', '.zo-account{max-width:460px;margin:24px auto;padding:28px;border-radius:18px;background:#fff;box-shadow:0 10px 30px rgba(15,23,42,.12)}.zo-account h2{margin:0 0 8px}.zo-account__hint{color:#64748b}.zo-account__form label{display:block;margin:16px 0;font-weight:600}.zo-account__form input{display:block;width:100%;box-sizing:border-box;margin-top:7px;padding:12px;border:1px solid #cbd5e1;border-radius:10px;font:inherit}.zo-account__actions{display:flex;gap:10px;flex-wrap:wrap}.zo-account button,.zo-account__button{display:inline-block;padding:11px 16px;border:0;border-radius:10px;background:#2563eb;color:#fff;text-decoration:none;font-weight:700;cursor:pointer}.zo-account__create{background:#16a34a!important}.zo-account__create:hover,.zo-account__create:focus{background:#15803d!important}.zo-account__secondary{background:#475569!important}.zo-account__message{padding:10px 12px;border-radius:10px}.zo-account__message--error{background:#fee2e2;color:#991b1b}.zo-account__message--success{background:#dcfce7;color:#166534}');
 	wp_add_inline_script('zo-account', '(function(){document.querySelectorAll("[data-zo-pin]").forEach(function(input){input.addEventListener("input",function(){input.value=input.value.replace(/\\D/g,"").slice(0,9);});});})();');
+	wp_add_inline_script('zo-account', '(function(){document.querySelectorAll("[data-zo-account-form]").forEach(function(form){var storeKey="zoArslanGameAccountsV1",currentKey="zoArslanCurrentAccountV1",nameInput=form.querySelector("[name=zo_account_username]"),pinInput=form.querySelector("[name=zo_account_pin]"),status=form.querySelector("[data-zo-account-status]"),create=form.querySelector("[data-zo-account-create]"),signin=form.querySelector("[data-zo-account-signin]"),signout=form.querySelector("[data-zo-account-signout]");function read(){try{return JSON.parse(localStorage.getItem(storeKey)||"{}");}catch(error){return {};}}function key(){return String(nameInput.value||"").trim().toLowerCase().replace(/\\s+/g,"-").slice(0,32);}function pin(){return String(pinInput.value||"").replace(/\\D/g,"").slice(0,9);}function say(text,ok){status.textContent=text;status.className="zo-account__message "+(ok?"zo-account__message--success":"zo-account__message--error");}function refresh(){var current=localStorage.getItem(currentKey)||"";signout.hidden=!current;create.disabled=!!current;signin.disabled=!!current;if(current){nameInput.value=current;say("Signed in as "+current+".",true);}}function signIn(){var k=key(),p=pin(),accounts=read();if(!k||p.length<4||p.length>9){say("Enter a username and a 4-9 digit PIN.");return;}if(!accounts[k]||accounts[k].pin!==p){say("Username or PIN did not match.");return;}localStorage.setItem(currentKey,k);say("Signed in as "+(accounts[k].name||k)+".",true);window.dispatchEvent(new CustomEvent("zoArslanAccountChanged"));refresh();}create.addEventListener("click",function(){var k=key(),p=pin(),accounts=read();if(!k||p.length<4||p.length>9){say("Use a username and a 4-9 digit PIN.");return;}if(accounts[k]){say("That account already exists. Use Sign in.");return;}accounts[k]={name:nameInput.value.trim().slice(0,32),pin:p};localStorage.setItem(storeKey,JSON.stringify(accounts));localStorage.setItem(currentKey,k);say("Account created. Progress will be saved on this device.",true);window.dispatchEvent(new CustomEvent("zoArslanAccountChanged"));refresh();});signin.addEventListener("click",signIn);signout.addEventListener("click",function(){localStorage.removeItem(currentKey);say("Signed out.",true);window.dispatchEvent(new CustomEvent("zoArslanAccountChanged"));refresh();});pinInput.addEventListener("input",function(){pinInput.value=pin();});refresh();});})();');
 }
 add_action('wp_enqueue_scripts', 'zo_account_shortcode_styles');
 

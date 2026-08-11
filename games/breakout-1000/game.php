@@ -221,6 +221,8 @@ document.addEventListener('DOMContentLoaded', function () {
 		const BRICK_COLORS = ['#dc3c3c', '#f08c2d', '#f0d246', '#46d26e', '#5096f0', '#aa64f0', '#f064b4', '#50dcdc'];
 		const progressAjaxUrl = root.getAttribute('data-zo-progress-ajax') || '';
 		const progressNonce = root.getAttribute('data-zo-progress-nonce') || '';
+		const localAccountsKey = 'zoArslanGameAccountsV1';
+		const localCurrentAccountKey = 'zoArslanCurrentAccountV1';
 
 		canvas.width = WIDTH;
 		canvas.height = HEIGHT;
@@ -368,6 +370,15 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function saveProgress() {
+			const currentAccount = localStorage.getItem(localCurrentAccountKey) || '';
+			if (currentAccount) {
+				try {
+					const accounts = JSON.parse(localStorage.getItem(localAccountsKey) || '{}');
+					accounts[currentAccount] = accounts[currentAccount] || {name: currentAccount};
+					accounts[currentAccount].breakout1000 = {level: level, score: score};
+					localStorage.setItem(localAccountsKey, JSON.stringify(accounts));
+				} catch (error) {}
+			}
 			if (!progressAjaxUrl || !progressNonce || !window.fetch) {
 				return;
 			}
@@ -400,6 +411,15 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function loadProgress() {
+			const currentAccount = localStorage.getItem(localCurrentAccountKey) || '';
+			if (currentAccount) {
+				try {
+					const accounts = JSON.parse(localStorage.getItem(localAccountsKey) || '{}');
+					if (accounts[currentAccount] && accounts[currentAccount].breakout1000) {
+						restoreProgress(accounts[currentAccount].breakout1000);
+					}
+				} catch (error) {}
+			}
 			if (!progressAjaxUrl || !progressNonce || !window.fetch) {
 				return;
 			}
@@ -412,6 +432,8 @@ document.addEventListener('DOMContentLoaded', function () {
 				}
 			}).catch(function () {});
 		}
+
+		window.addEventListener('zoArslanAccountChanged', loadProgress);
 
 		function nextLevel() {
 			level += 1;
