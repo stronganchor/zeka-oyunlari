@@ -108,18 +108,20 @@ $css = <<<'CSS'
 	display: grid;
 	grid-template-columns: repeat(40, 20px);
 	grid-template-rows: repeat(24, 20px);
-	gap: 2px;
+	gap: 0;
 	justify-content: start;
 	min-width: max-content;
+	border-radius: 12px;
+	overflow: hidden;
 }
 
 .zo-game-root--tower-defense-paths .tdp-cell {
 	position: relative;
 	width: 20px;
 	height: 20px;
-	border-radius: 4px;
+	border-radius: 0;
 	background: #86c56d;
-	border: 1px solid rgba(0, 0, 0, 0.08);
+	border: 0;
 	cursor: pointer;
 	overflow: hidden;
 	padding: 0;
@@ -493,7 +495,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			let income = 0;
 			towers.forEach(function (tower) {
 				if (tower.type === 'bank') {
-					income += kulesi.income;
+					income += tower.income;
 				}
 			});
 			return income;
@@ -564,7 +566,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		function towerAt(x, y) {
 			return towers.find(function (tower) {
-				return kulesi.x === x && kulesi.y === y;
+				return tower.x === x && tower.y === y;
 			});
 		}
 
@@ -603,8 +605,8 @@ document.addEventListener('DOMContentLoaded', function () {
 				const tower = towerAt(x, y);
 				if (tower) {
 					const towerEl = document.createElement('div');
-					towerEl.className = 'tdp-tower tdp-tower--' + kulesi.type;
-					towerEl.textContent = kulesi.label;
+					towerEl.className = 'tdp-tower tdp-tower--' + tower.type;
+					towerEl.textContent = tower.label;
 					cell.appendChild(towerEl);
 				}
 
@@ -736,19 +738,19 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function getEnemyDistance(tower, enemy) {
-			return Math.hypot(enemy.displayX - kulesi.x, enemy.displayY - kulesi.y);
+			return Math.hypot(enemy.displayX - tower.x, enemy.displayY - tower.y);
 		}
 
 		function applyTowerAttack(tower, enemy) {
 			if (tower.type === 'freeze') {
-				enemy.hp -= kulesi.damage;
+				enemy.hp -= tower.damage;
 				enemy.slowTicks = Math.max(enemy.slowTicks, 6);
 			} else if (tower.type === 'poison') {
-				enemy.hp -= kulesi.damage;
+				enemy.hp -= tower.damage;
 				enemy.poisonTicks = Math.max(enemy.poisonTicks, 10);
 				enemy.poisonDamage = Math.max(enemy.poisonDamage, 4);
 			} else {
-				enemy.hp -= kulesi.damage;
+				enemy.hp -= tower.damage;
 			}
 
 			if (enemy.hp <= 0) {
@@ -813,7 +815,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 				enemies.forEach(function (enemy) {
 					const dist = getEnemyDistance(tower, enemy);
-					if (dist <= kulesi.range) {
+					if (dist <= tower.range) {
 						if (enemy.step > bestStep) {
 							bestStep = enemy.step;
 							target = enemy;
@@ -823,7 +825,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 				if (target) {
 					applyTowerAttack(tower, target);
-					tower.cooldown = kulesi.fireDelay;
+					tower.cooldown = tower.fireDelay;
 				}
 			});
 		}
@@ -1084,7 +1086,7 @@ if (!function_exists('zo_game_tower_defense_paths_render')) {
 		<div class="zo-game-root zo-game-root--tower-defense-paths" id="<?php echo esc_attr($instance_id); ?>">
 			<div class="tdp-card">
 				<h2 class="tdp-title">Tower Defense Paths</h2>
-				<p class="tdp-instructions">This version has a map that is 4 times bigger, smaller squares, automatic enemy spawning every 5 seconds, More Enemies adds 2 enemies, and Banka kuleleri artık 110 dolar.</p>
+				<p class="tdp-instructions">This version has a bigger normal map, automatic enemy spawning every 5 seconds, More Enemies adds 2 enemies, and Banka kuleleri artık 110 dolar.</p>
 
 				<div class="tdp-topbar">
 					<div class="tdp-stat">
@@ -1198,7 +1200,7 @@ return array(
 	'slug'            => 'tower-defense-paths',
 	'name'            => 'Tower Defense Paths',
 	'author'          => 'Arslan',
-	'description'     => 'A much bigger tower defense map with smaller squares, automatic enemy spawning, and Bank towers costing $110.',
+	'description'     => 'A bigger tower defense map with automatic enemy spawning and Bank towers costing $110.',
 	'render_callback' => 'zo_game_tower_defense_paths_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,

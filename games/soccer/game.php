@@ -61,6 +61,23 @@ $css = <<<'CSS'
 .zo-soccer-panel:nth-child(3) span { color: #fff; }
 .zo-soccer-panel:nth-child(10) { background: #eef5ff; border-color: #c8dbf7; }
 
+.zo-soccer-progress {
+	height: 5px;
+	margin-top: 7px;
+	background: rgba(255,255,255,0.24);
+	border-radius: 999px;
+	overflow: hidden;
+}
+
+.zo-soccer-progress-bar {
+	display: block;
+	width: 100%;
+	height: 100%;
+	background: #7dd3fc;
+	border-radius: inherit;
+	transition: width 0.2s linear;
+}
+
 .zo-soccer-btn {
 	border: none;
 	border-radius: 10px;
@@ -556,6 +573,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		const scoreUserEl = game.querySelector('.zo-score-user');
 		const scoreAiEl = game.querySelector('.zo-score-ai');
 		const timerEl = game.querySelector('.zo-status-timer');
+		const progressEl = game.querySelector('.zo-soccer-progress-bar');
 		const messageEl = game.querySelector('.zo-status-message');
 		const modeEl = game.querySelector('.zo-status-mode');
 		const coinsEl = game.querySelector('.zo-status-coins');
@@ -826,6 +844,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			const mins = Math.floor(totalSeconds / 60);
 			const secs = totalSeconds % 60;
 			timerEl.textContent = mins + ':' + String(secs).padStart(2, '0');
+			if (progressEl) {
+				progressEl.style.width = ((remaining / MATCH_TIME) * 100) + '%';
+			}
 			coinsEl.textContent = String(coins);
 			speedLevelEl.textContent = String(speedLevel);
 			smartLevelEl.textContent = String(smartLevel);
@@ -2079,6 +2100,7 @@ if (!function_exists('zo_game_soccer_match_ai_render')) {
 					<div class="zo-soccer-panel">
 						<strong class="zo-status-timer">5:00</strong>
 						<span>Match Time</span>
+						<div class="zo-soccer-progress" aria-hidden="true"><span class="zo-soccer-progress-bar"></span></div>
 					</div>
 					<div class="zo-soccer-panel">
 						<strong class="zo-status-coins">0</strong>
