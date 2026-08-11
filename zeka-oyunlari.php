@@ -14402,6 +14402,14 @@ function zo_enqueue_grid_styles() {
 	line-height: 1.6;
 	text-align: center;
 }
+.zo-games-grid__page-title {
+	margin: 22px auto 0;
+	max-width: 920px;
+	color: #173b67;
+	font-size: clamp(28px, 4vw, 42px);
+	line-height: 1.1;
+	text-align: center;
+}
 .zo-games-grid__intro strong {
 	color: #111827;
 	font-weight: 700;
@@ -15850,6 +15858,11 @@ function zo_games_grid_shortcode($atts = array()) {
 	echo '</details>';
 	echo '</div>';
 	echo '</div>';
+
+	if ($author_filter === 'asker' || $author_filter === 'arslan') {
+		$page_title_key = $author_filter === 'asker' ? 'asker_games_title' : 'arslan_games_title';
+		echo '<h1 class="zo-games-grid__page-title">' . esc_html(zo_get_interface_text($page_title_key, $language)) . '</h1>';
+	}
 
 	$filter_action = remove_query_arg(array('zo_game_search', 'zo_game_category', 'zo_game_sort', 'zo_lang', 'paged'));
 	echo '<form id="' . esc_attr($filters_id) . '" class="zo-games-grid__filters" method="get" action="' . esc_url($filter_action) . '"' . ($filters_open ? '' : ' hidden') . ' data-zo-games-search-panel>';
