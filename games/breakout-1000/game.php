@@ -4,6 +4,41 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
+function zo_breakout_1000_clean_progress($progress) {
+	if (!is_array($progress)) {
+		return array('level' => 1, 'score' => 0);
+	}
+	return array(
+		'level' => min(1000, max(1, absint($progress['level'] ?? 1))),
+		'score' => min(1000000000, max(0, absint($progress['score'] ?? 0))),
+	);
+}
+
+function zo_breakout_1000_ajax_load_progress() {
+	check_ajax_referer('zo_breakout_1000_progress', 'nonce');
+	if (!is_user_logged_in()) {
+		wp_send_json_error(array('message' => 'Sign in to load progress.'), 401);
+	}
+	$progress = get_user_meta(get_current_user_id(), '_zo_breakout_1000_progress', true);
+	wp_send_json_success(array('progress' => $progress ? zo_breakout_1000_clean_progress($progress) : null));
+}
+add_action('wp_ajax_zo_breakout_1000_load_progress', 'zo_breakout_1000_ajax_load_progress');
+
+function zo_breakout_1000_ajax_save_progress() {
+	check_ajax_referer('zo_breakout_1000_progress', 'nonce');
+	if (!is_user_logged_in()) {
+		wp_send_json_error(array('message' => 'Sign in to save progress.'), 401);
+	}
+	$raw = isset($_POST['progress']) ? wp_unslash($_POST['progress']) : '';
+	$progress = json_decode($raw, true);
+	if (!is_array($progress)) {
+		wp_send_json_error(array('message' => 'Invalid progress data.'), 400);
+	}
+	update_user_meta(get_current_user_id(), '_zo_breakout_1000_progress', zo_breakout_1000_clean_progress($progress));
+	wp_send_json_success();
+}
+add_action('wp_ajax_zo_breakout_1000_save_progress', 'zo_breakout_1000_ajax_save_progress');
+
 $css = <<<'CSS'
 .zo-game-root.zo-game-root--breakout-1000 {
 	width: min(100%, 1040px);
@@ -184,6 +219,8 @@ document.addEventListener('DOMContentLoaded', function () {
 		const BRICK_HEIGHT = 24;
 		const MAX_LEVELS = 1000;
 		const BRICK_COLORS = ['#dc3c3c', '#f08c2d', '#f0d246', '#46d26e', '#5096f0', '#aa64f0', '#f064b4', '#50dcdc'];
+		const progressAjaxUrl = root.getAttribute('data-zo-progress-ajax') || '';
+		const progressNonce = root.getAttribute('data-zo-progress-nonce') || '';
 
 		canvas.width = WIDTH;
 		canvas.height = HEIGHT;
@@ -330,8 +367,55 @@ document.addEventListener('DOMContentLoaded', function () {
 			updateHud();
 		}
 
+		function saveProgress() {
+			if (!progressAjaxUrl || !progressNonce || !window.fetch) {
+				return;
+			}
+			const body = new URLSearchParams();
+			body.set('action', 'zo_breakout_1000_save_progress');
+			body.set('nonce', progressNonce);
+			body.set('progress', JSON.stringify({level: level, score: score}));
+			window.fetch(progressAjaxUrl, {method: 'POST', credentials: 'same-origin', headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}, body: body.toString()}).catch(function () {});
+		}
+
+		function restoreProgress(progress) {
+			if (!progress || !progress.level) {
+				return;
+			}
+			level = Math.max(1, Math.min(MAX_LEVELS, parseInt(progress.level, 10) || 1));
+			score = Math.max(0, parseInt(progress.score, 10) || 0);
+			lives = START_LIVES;
+			paddle = makePaddle();
+			const shrink = Math.min(60, Math.floor(level / 20));
+			paddle.w = PADDLE_WIDTH - shrink;
+			paddle.x = WIDTH / 2 - paddle.w / 2;
+			resetBall();
+			bricks = generateLevel(level);
+			texts = [];
+			paused = false;
+			gameOver = false;
+			wonAll = false;
+			statusEl.textContent = 'Level ' + level + ' restored. Launch the ball.';
+			updateHud();
+		}
+
+		function loadProgress() {
+			if (!progressAjaxUrl || !progressNonce || !window.fetch) {
+				return;
+			}
+			const body = new URLSearchParams();
+			body.set('action', 'zo_breakout_1000_load_progress');
+			body.set('nonce', progressNonce);
+			window.fetch(progressAjaxUrl, {method: 'POST', credentials: 'same-origin', headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}, body: body.toString()}).then(function (response) { return response.json(); }).then(function (payload) {
+				if (payload && payload.success && payload.data && payload.data.progress) {
+					restoreProgress(payload.data.progress);
+				}
+			}).catch(function () {});
+		}
+
 		function nextLevel() {
 			level += 1;
+			saveProgress();
 			if (level > MAX_LEVELS) {
 				wonAll = true;
 				statusEl.textContent = '1000 seviyenin hepsini geçtin!';
@@ -464,6 +548,7 @@ document.addEventListener('DOMContentLoaded', function () {
 				lives -= 1;
 				if (lives <= 0) {
 					gameOver = true;
+					saveProgress();
 					statusEl.textContent = 'Oyun bitti. Press R or Restart.';
 				} else {
 					resetBall();
@@ -650,6 +735,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		buttons.right.addEventListener('pointerleave', function () { rightDown = false; });
 
 		resetGame();
+		loadProgress();
 		requestAnimationFrame(loop);
 	});
 });
@@ -658,10 +744,13 @@ JS;
 if (!function_exists('zo_game_breakout_1000_render')) {
 	function zo_game_breakout_1000_render($post_id = 0, $module = array()) {
 		$instance_id = 'zo-breakout-1000-' . ($post_id ? absint($post_id) : wp_rand(1000, 999999));
+		$account_progress_enabled = is_page('arslanin-oyunlari') && is_user_logged_in();
+		$progress_ajax_url = $account_progress_enabled ? admin_url('admin-ajax.php') : '';
+		$progress_nonce = $account_progress_enabled ? wp_create_nonce('zo_breakout_1000_progress') : '';
 
 		ob_start();
 		?>
-		<div class="zo-game-root zo-game-root--breakout-1000" id="<?php echo esc_attr($instance_id); ?>">
+		<div class="zo-game-root zo-game-root--breakout-1000" id="<?php echo esc_attr($instance_id); ?>" data-zo-progress-ajax="<?php echo esc_url($progress_ajax_url); ?>" data-zo-progress-nonce="<?php echo esc_attr($progress_nonce); ?>">
 			<div class="zo-b1000-head">
 				<div>
 					<h2 class="zo-b1000-title">Breakout - 1000 Seviye</h2>
