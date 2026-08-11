@@ -28,30 +28,120 @@ function zo_roster_1000_clean_progress($progress) {
 	);
 }
 
-function zo_roster_1000_ajax_load_progress() {
-	check_ajax_referer('zo_roster_1000_progress', 'nonce');
-	if (!is_user_logged_in()) {
-		wp_send_json_error(array('message' => 'Sign in to load progress.'), 401);
-	}
-	$progress = get_user_meta(get_current_user_id(), '_zo_roster_1000_progress', true);
-	wp_send_json_success(array('progress' => $progress ? zo_roster_1000_clean_progress($progress) : null));
-}
-add_action('wp_ajax_zo_roster_1000_load_progress', 'zo_roster_1000_ajax_load_progress');
+function zo_roster_1000_accounts_table() {
+	global $wpdb;
 
-function zo_roster_1000_ajax_save_progress() {
+	return $wpdb->prefix . 'zo_roster_accounts';
+}
+
+function zo_roster_1000_ensure_accounts_table() {
+	global $wpdb;
+
+	$table = zo_roster_1000_accounts_table();
+	$charset_collate = $wpdb->get_charset_collate();
+
+	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+	dbDelta("CREATE TABLE {$table} (
+		id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+		nickname_key varchar(64) NOT NULL,
+		nickname varchar(32) NOT NULL,
+		pin_hash varchar(255) NOT NULL,
+		progress longtext NULL,
+		created_at datetime NOT NULL,
+		updated_at datetime NOT NULL,
+		PRIMARY KEY  (id),
+		UNIQUE KEY nickname_key (nickname_key)
+	) {$charset_collate};");
+
+	return $table;
+}
+
+function zo_roster_1000_normalize_nickname($nickname) {
+	$nickname = sanitize_text_field(wp_unslash((string) $nickname));
+	$nickname = trim(preg_replace('/\s+/', '-', $nickname));
+	return function_exists('mb_strtolower') ? mb_strtolower(substr($nickname, 0, 32), 'UTF-8') : strtolower(substr($nickname, 0, 32));
+}
+
+function zo_roster_1000_account_request() {
 	check_ajax_referer('zo_roster_1000_progress', 'nonce');
-	if (!is_user_logged_in()) {
-		wp_send_json_error(array('message' => 'Sign in to save progress.'), 401);
+
+	global $wpdb;
+	$table = zo_roster_1000_ensure_accounts_table();
+	$nickname = isset($_POST['nickname']) ? zo_roster_1000_normalize_nickname($_POST['nickname']) : '';
+	$pin = isset($_POST['pin']) ? preg_replace('/\D+/', '', (string) wp_unslash($_POST['pin'])) : '';
+	$mode = isset($_POST['mode']) ? sanitize_key(wp_unslash($_POST['mode'])) : '';
+
+	if ($nickname === '' || strlen($pin) < 4 || strlen($pin) > 9) {
+		wp_send_json_error(array('message' => 'Enter a nickname and a 4 to 9 digit PIN.'), 400);
 	}
-	$raw = isset($_POST['progress']) ? wp_unslash($_POST['progress']) : '';
-	$progress = json_decode($raw, true);
-	if (!is_array($progress)) {
-		wp_send_json_error(array('message' => 'Invalid progress data.'), 400);
+
+	$key = md5($nickname);
+	$account = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$table} WHERE nickname_key = %s LIMIT 1", $key), ARRAY_A);
+
+	if ($mode === 'register') {
+		if ($account) {
+			wp_send_json_error(array('message' => 'That nickname already exists. Use Sign In.'), 409);
+		}
+
+		$progress = isset($_POST['progress']) ? json_decode(wp_unslash($_POST['progress']), true) : array();
+		$progress = zo_roster_1000_clean_progress($progress);
+		$now = current_time('mysql', true);
+		$inserted = $wpdb->insert(
+			$table,
+			array(
+				'nickname_key' => $key,
+				'nickname' => $nickname,
+				'pin_hash' => wp_hash_password($pin),
+				'progress' => wp_json_encode($progress),
+				'created_at' => $now,
+				'updated_at' => $now,
+			),
+			array('%s', '%s', '%s', '%s', '%s', '%s')
+		);
+
+		if (!$inserted) {
+			wp_send_json_error(array('message' => 'The account could not be created.'), 500);
+		}
+
+		wp_send_json_success(array('nickname' => $nickname, 'progress' => $progress));
 	}
-	update_user_meta(get_current_user_id(), '_zo_roster_1000_progress', zo_roster_1000_clean_progress($progress));
+
+	if (!$account || !wp_check_password($pin, $account['pin_hash'])) {
+		wp_send_json_error(array('message' => 'Nickname or PIN did not match.'), 401);
+	}
+
+	$progress = !empty($account['progress']) ? json_decode($account['progress'], true) : array();
+	wp_send_json_success(array('nickname' => $account['nickname'], 'progress' => zo_roster_1000_clean_progress($progress)));
+}
+add_action('wp_ajax_nopriv_zo_roster_1000_account', 'zo_roster_1000_account_request');
+add_action('wp_ajax_zo_roster_1000_account', 'zo_roster_1000_account_request');
+
+function zo_roster_1000_save_account_progress() {
+	check_ajax_referer('zo_roster_1000_progress', 'nonce');
+
+	global $wpdb;
+	$table = zo_roster_1000_ensure_accounts_table();
+	$nickname = isset($_POST['nickname']) ? zo_roster_1000_normalize_nickname($_POST['nickname']) : '';
+	$pin = isset($_POST['pin']) ? preg_replace('/\D+/', '', (string) wp_unslash($_POST['pin'])) : '';
+	$progress = isset($_POST['progress']) ? json_decode(wp_unslash($_POST['progress']), true) : array();
+	$key = md5($nickname);
+	$account = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$table} WHERE nickname_key = %s LIMIT 1", $key), ARRAY_A);
+
+	if (!$account || strlen($pin) < 4 || !wp_check_password($pin, $account['pin_hash'])) {
+		wp_send_json_error(array('message' => 'Account verification failed.'), 401);
+	}
+
+	$wpdb->update(
+		$table,
+		array('progress' => wp_json_encode(zo_roster_1000_clean_progress($progress)), 'updated_at' => current_time('mysql', true)),
+		array('id' => (int) $account['id']),
+		array('%s', '%s'),
+		array('%d')
+	);
 	wp_send_json_success();
 }
-add_action('wp_ajax_zo_roster_1000_save_progress', 'zo_roster_1000_ajax_save_progress');
+add_action('wp_ajax_nopriv_zo_roster_1000_save_progress', 'zo_roster_1000_save_account_progress');
+add_action('wp_ajax_zo_roster_1000_save_progress', 'zo_roster_1000_save_account_progress');
 
 $css = <<<'CSS'
 .zo-game-root--roster-1000 {
@@ -88,13 +178,6 @@ $css = <<<'CSS'
 	font-size: 15px;
 	line-height: 1.55;
 	color: #47607d;
-}
-
-.zo-game-root--roster-1000 .zo-r1-topbar {
-	display: grid;
-	grid-template-columns: 1.4fr 1fr;
-	gap: 16px;
-	margin-bottom: 16px;
 }
 
 .zo-game-root--roster-1000 .zo-r1-account {
@@ -141,6 +224,13 @@ $css = <<<'CSS'
 	font-size: 13px;
 	font-weight: 700;
 	color: #0f766e;
+}
+
+.zo-game-root--roster-1000 .zo-r1-topbar {
+	display: grid;
+	grid-template-columns: 1.4fr 1fr;
+	gap: 16px;
+	margin-bottom: 16px;
 }
 
 .zo-game-root--roster-1000 .zo-r1-stats,
@@ -501,7 +591,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		const ACCOUNT_SESSION_KEY = 'zoRoster1000CurrentAccountV1';
 		const progressAjaxUrl = game.getAttribute('data-zo-progress-ajax') || '';
 		const progressNonce = game.getAttribute('data-zo-progress-nonce') || '';
-		const wpUsername = game.getAttribute('data-zo-wp-user') || '';
 		const i18nNode = game.querySelector('.zo-r1-i18n');
 		let i18n = {};
 
@@ -559,7 +648,8 @@ document.addEventListener('DOMContentLoaded', function () {
 			spawned: 0,
 			targetEnemyCount: 0,
 			touchTarget: null,
-			accountKey: ''
+			accountKey: '',
+			accountPin: ''
 		};
 
 		function storageAvailable(type) {
@@ -662,7 +752,7 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function saveProgress() {
-			if (!state.accountKey) {
+			if (!state.accountKey || !canStore) {
 				return;
 			}
 
@@ -675,34 +765,43 @@ document.addEventListener('DOMContentLoaded', function () {
 			saveServerProgress(accounts[state.accountKey].progress);
 		}
 
-		function saveServerProgress(progress) {
+		function requestAccount(mode, nickname, pin, progress, onSuccess, onError) {
 			if (!progressAjaxUrl || !progressNonce || !window.fetch) {
+				onError(t('accountServerUnavailable', 'Account service is unavailable right now.'));
+				return;
+			}
+			const body = new URLSearchParams();
+			body.set('action', 'zo_roster_1000_account');
+			body.set('mode', mode);
+			body.set('nonce', progressNonce);
+			body.set('nickname', nickname);
+			body.set('pin', pin);
+			if (progress) {
+				body.set('progress', JSON.stringify(progress));
+			}
+			window.fetch(progressAjaxUrl, {method: 'POST', credentials: 'same-origin', headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}, body: body.toString()}).then(function (response) {
+				return response.json().then(function (payload) {
+					if (!response.ok || !payload || !payload.success) {
+						throw new Error(payload && payload.data && payload.data.message ? payload.data.message : 'Account request failed.');
+					}
+					return payload.data || {};
+				});
+			}).then(onSuccess).catch(function (error) {
+				onError(error && error.message ? error.message : t('accountServerUnavailable', 'Account service is unavailable right now.'));
+			});
+		}
+
+		function saveServerProgress(progress) {
+			if (!state.accountKey || !state.accountPin || !progressAjaxUrl || !progressNonce || !window.fetch) {
 				return;
 			}
 			const body = new URLSearchParams();
 			body.set('action', 'zo_roster_1000_save_progress');
 			body.set('nonce', progressNonce);
+			body.set('nickname', state.accountKey);
+			body.set('pin', state.accountPin);
 			body.set('progress', JSON.stringify(progress));
 			window.fetch(progressAjaxUrl, {method: 'POST', credentials: 'same-origin', headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}, body: body.toString()}).catch(function () {});
-		}
-
-		function loadServerProgress(key, account) {
-			if (!progressAjaxUrl || !progressNonce || !window.fetch) {
-				return;
-			}
-			const body = new URLSearchParams();
-			body.set('action', 'zo_roster_1000_load_progress');
-			body.set('nonce', progressNonce);
-			window.fetch(progressAjaxUrl, {method: 'POST', credentials: 'same-origin', headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}, body: body.toString()}).then(function (response) { return response.json(); }).then(function (payload) {
-				if (!payload || !payload.success || !payload.data || !payload.data.progress || state.accountKey !== key) {
-					return;
-				}
-				account.progress = payload.data.progress;
-				const accounts = readAccounts();
-				accounts[key] = account;
-				writeAccounts(accounts);
-				applyProgress(account.progress);
-			}).catch(function () {});
 		}
 
 		function requireAccount() {
@@ -714,8 +813,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			return false;
 		}
 
-		function signInAccount(key, account) {
+		function signInAccount(key, account, serverProgress) {
 			state.accountKey = key;
+			state.accountPin = account.pin || '';
 			if (canSessionStore) {
 				window.sessionStorage.setItem(ACCOUNT_SESSION_KEY, key);
 			}
@@ -725,8 +825,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (accountPinInput) {
 				accountPinInput.value = '';
 			}
-			applyProgress(account.progress || getProgress());
-			loadServerProgress(key, account);
+			applyProgress(serverProgress || account.progress || getProgress());
 			updateAccountUi();
 			setAccountStatus(fmt('signedInAs', 'Signed in as {name}.', {name: account.name || key}));
 			setStatus(t('pickOrBuyStatus', 'Bir karakter seÃ§ veya satÄ±n al, sonra BaÅŸlat dÃ¼ÄŸmesine bas. Temizlenen her dalga 50 coin verir.'));
@@ -750,46 +849,35 @@ document.addEventListener('DOMContentLoaded', function () {
 				return;
 			}
 
-			const accounts = readAccounts();
-			if (accounts[key]) {
-				setAccountStatus(t('accountExists', 'That account already exists. Use Sign In.'));
-				return;
-			}
-
-			accounts[key] = {
-				name: name.slice(0, 32),
-				pin: pin,
-				progress: getProgress()
-			};
-
-			if (!writeAccounts(accounts)) {
-				setAccountStatus(t('storageBlocked', 'This browser is blocking saved accounts.'));
-				return;
-			}
-
-			signInAccount(key, accounts[key]);
+			setAccountStatus(t('accountCreating', 'Creating account...'));
+			requestAccount('register', name, pin, getProgress(), function (data) {
+				const accounts = readAccounts();
+				accounts[key] = {name: name.slice(0, 32), pin: pin, progress: data.progress || getProgress()};
+				writeAccounts(accounts);
+				signInAccount(key, accounts[key], data.progress);
+			}, setAccountStatus);
 		}
 
 		function signinAccount() {
 			const key = normalizeAccountName(accountNameInput ? accountNameInput.value : '');
 			const pin = cleanPin(accountPinInput ? accountPinInput.value : '');
-			const accounts = readAccounts();
-
 			if (!key || pin.length < 4 || pin.length > 9) {
 				setAccountStatus(t('signinNeeded', 'Enter your account name and a 4 to 9 digit PIN.'));
 				return;
 			}
-			if (!accounts[key] || accounts[key].pin !== pin) {
-				setAccountStatus(t('badSignin', 'Account name or PIN did not match.'));
-				return;
-			}
-
-			signInAccount(key, accounts[key]);
+			setAccountStatus(t('accountSigningIn', 'Signing in...'));
+			requestAccount('login', key, pin, null, function (data) {
+				const accounts = readAccounts();
+				accounts[key] = {name: data.nickname || key, pin: pin, progress: data.progress || getProgress()};
+				writeAccounts(accounts);
+				signInAccount(key, accounts[key], data.progress);
+			}, setAccountStatus);
 		}
 
 		function signoutAccount() {
 			saveProgress();
 			state.accountKey = '';
+			state.accountPin = '';
 			if (canSessionStore) {
 				window.sessionStorage.removeItem(ACCOUNT_SESSION_KEY);
 			}
@@ -799,16 +887,6 @@ document.addEventListener('DOMContentLoaded', function () {
 		}
 
 		function restoreAccountSession() {
-			if (wpUsername && progressAjaxUrl) {
-				const key = normalizeAccountName(wpUsername);
-				const accounts = readAccounts();
-				if (!accounts[key]) {
-					accounts[key] = {name: wpUsername, pin: '', progress: getProgress()};
-					writeAccounts(accounts);
-				}
-				signInAccount(key, accounts[key]);
-				return true;
-			}
 			if (!canSessionStore) {
 				return false;
 			}
@@ -1063,7 +1141,7 @@ document.addEventListener('DOMContentLoaded', function () {
 					+ '</div>'
 					+ '<p class="zo-r1-card-text">' + character.bio + ' ' + fmt('costCoins', 'Bedel: {price} coin.', {price: character.price}) + '</p>'
 					+ '<div class="zo-r1-card-actions">'
-					+ '<button type="button" class="zo-r1-btn zo-r1-btn--secondary zo-r1-card-action" data-id="' + character.id + '"' + (state.accountKey ? '' : ' disabled') + '>'
+					+ '<button type="button" class="zo-r1-btn zo-r1-btn--secondary zo-r1-card-action" data-id="' + character.id + '">'
 					+ (owned ? (selected ? t('selected', 'Selected') : t('select', 'Select')) : t('buy', 'Buy'))
 					+ '</button>'
 					+ '</div>'
@@ -1727,14 +1805,12 @@ if (!function_exists('zo_game_roster_1000_render')) {
 			}
 			return $text;
 		};
-		$account_progress_enabled = is_page('arslanin-oyunlari') && is_user_logged_in();
-		$progress_ajax_url = $account_progress_enabled ? admin_url('admin-ajax.php') : '';
-		$progress_nonce = $account_progress_enabled ? wp_create_nonce('zo_roster_1000_progress') : '';
-		$wp_user_login = $account_progress_enabled ? wp_get_current_user()->user_login : '';
+		$progress_ajax_url = admin_url('admin-ajax.php');
+		$progress_nonce = wp_create_nonce('zo_roster_1000_progress');
 
 		ob_start();
 		?>
-		<div class="zo-game-root zo-game-root--roster-1000" id="<?php echo esc_attr($instance_id); ?>" data-zo-progress-ajax="<?php echo esc_url($progress_ajax_url); ?>" data-zo-progress-nonce="<?php echo esc_attr($progress_nonce); ?>" data-zo-wp-user="<?php echo esc_attr($wp_user_login); ?>">
+		<div class="zo-game-root zo-game-root--roster-1000" id="<?php echo esc_attr($instance_id); ?>" data-zo-progress-ajax="<?php echo esc_url($progress_ajax_url); ?>" data-zo-progress-nonce="<?php echo esc_attr($progress_nonce); ?>">
 			<script type="application/json" class="zo-r1-i18n"><?php echo wp_json_encode($i18n); ?></script>
 			<div class="zo-r1-shell">
 				<h2 class="zo-r1-title"><?php echo esc_html($r1('title')); ?></h2>
