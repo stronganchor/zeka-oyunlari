@@ -1,15 +1,12 @@
 <?php
 /**
- * Plugin Name: ZekÃ¢ OyunlarÄ±
+ * Plugin Name: ZekÃƒÂ¢ OyunlarÃ„Â±
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekÃ¢.com so kids can publish WordPress-based games and share them with friends.
-<<<<<<< HEAD
+ * Description: Simple modular game framework for zekÃƒÂ¢.com so kids can publish WordPress-based games and share them with friends.
  * Version: 1.5.83.asker.arslan
-=======
- * Version: 1.5.82.asker.arslan
->>>>>>> c9b2ffd55d47ebaff3f72acc62b462cd6b9c957c
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
- * Author: Anadolu TasarÄ±m
+ * Author: Anadolu TasarÃ„Â±m
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
  * Text Domain: zeka-oyunlari
  * Requires at least: 6.0
@@ -20,11 +17,7 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-<<<<<<< HEAD
 define('ZO_PLUGIN_VERSION', '1.5.83.asker.arslan');
-=======
-define('ZO_PLUGIN_VERSION', '1.5.82.asker.arslan');
->>>>>>> c9b2ffd55d47ebaff3f72acc62b462cd6b9c957c
 define('ZO_PLUGIN_FILE', __FILE__);
 define('ZO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('ZO_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -306,8 +299,8 @@ function zo_plugin_deactivate() {
 
 function zo_register_admin_health_page() {
 	add_menu_page(
-		'ZekÃ¢ content look up',
-		'ZekÃ¢ content look up',
+		'ZekÃƒÂ¢ content look up',
+		'ZekÃƒÂ¢ content look up',
 		'manage_options',
 		'zeka-content-look-up',
 		'zo_render_admin_health_page',
@@ -683,7 +676,8 @@ function zo_admin_get_site_kit_info() {
 			'label' => 'Site Kit saved bilgi',
 			'status' => $has_settings ? 'good' : 'warn',
 			'priority' => $has_settings ? 'info' : 'warning',
-			'message' => $has_settings ? count($option_names) . ' Site Kit opt…170766 tokens truncated…(normalize(b.getAttribute("data-title")));}if(sortValue==="category"){return normalize(a.getAttribute("data-category-label")).localeCompare(normalize(b.getAttribute("data-category-label")))||normalize(a.getAttribute("data-title")).localeCompare(normalize(b.getAttribute("data-title")));}return normalize(a.getAttribute("data-title")).localeCompare(normalize(b.getAttribute("data-title")));});visible.forEach(function(card){grid.appendChild(card);});updateCount(visible.length);if(empty){empty.hidden=visible.length!==0;}}button.addEventListener("click",function(){if(panel.hasAttribute("hidden")){openPanel(true);}else{closePanel();}});if(close){close.addEventListener("click",closePanel);}if(input){input.addEventListener("input",applyFilters);}if(category){category.addEventListener("change",applyFilters);}if(sort){sort.addEventListener("change",applyFilters);}if(reset){reset.addEventListener("click",function(event){event.preventDefault();if(input){input.value="";}if(category){category.value="all";}if(sort){sort.value="title";}applyFilters();openPanel(true);});}applyFilters();})();</script>';
+			'message' => $has_settings ? count($option_names) . ' Site Kit option(s) were found in WordPress.' : 'No Site Kit options were foun…171055 tokens truncated…(b.getAttribute("data-title")));}if(sortValue==="category"){return normalize(a.getAttribute("data-category-label")).localeCompare(normalize(b.getAttribute("data-category-label")))||normalize(a.getAttribute("data-title")).localeCompare(normalize(b.getAttribute("data-title")));}return normalize(a.getAttribute("data-title")).localeCompare(normalize(b.getAttribute("data-title")));});visible.forEach(function(card){grid.appendChild(card);});updateCount(visible.length);if(empty){empty.hidden=visible.length!==0;}}button.addEventListener("click",function(){if(panel.hasAttribute("hidden")){openPanel(true);}else{closePanel();}});if(close){close.addEventListener("click",closePanel);}if(input){input.addEventListener("input",applyFilters);}if(category){category.addEventListener("change",applyFilters);}if(sort){sort.addEventListener("change",applyFilters);}if(reset){reset.addEventListener("click",function(event){event.preventDefault();if(input){input.value="";}if(category){category.value="all";}if(sort){sort.value="title";}applyFilters();openPanel(true);});}applyFilters();})();</script>';
+*/
 
 	echo '<p class="zo-games-grid__intro">' . esc_html(zo_get_interface_text('intro', $language)) . '</p>';
 
@@ -883,7 +877,7 @@ function zo_admin_get_site_kit_info() {
 	if (!$has_results) {
 		echo '<p class="zo-games-grid__empty">' . esc_html(zo_get_interface_text('no_live_results', $language)) . '</p>';
 		echo '<p><a class="zo-games-grid__reset" href="' . esc_url(add_query_arg('zo_lang', $language, remove_query_arg(array('zo_game_search', 'zo_game_category', 'zo_game_sort', 'zo_lang', 'paged')))) . '">' . esc_html(zo_get_interface_text('filter_reset', $language)) . '</a></p>';
-		echo '<p class="zo-games-grid__empty">Filtreye uyan oyun bulunamadÄ±.</p>';
+		echo '<p class="zo-games-grid__empty">Filtreye uyan oyun bulunamadÃ„Â±.</p>';
 	}
 
 	if ($author_filter === 'asker') {
@@ -1002,4 +996,5 @@ function zo_append_game_to_content($content) {
 	return $content . "\n\n" . zo_render_game($slug, $post_id);
 }
 add_filter('the_content', 'zo_append_game_to_content');
+
 
