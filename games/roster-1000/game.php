@@ -31,7 +31,7 @@ function zo_roster_1000_clean_progress($progress) {
 function zo_roster_1000_accounts_table() {
 	global $wpdb;
 
-	return $wpdb->prefix . 'zo_roster_accounts';
+	return $wpdb->prefix . 'zo_player_accounts';
 }
 
 function zo_roster_1000_ensure_accounts_table() {
@@ -617,11 +617,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		const archetypes = [
 			{name: t('sparkName', 'Spark'), speed: 1.35, power: 0.82, rate: 1.25, aura: '#fde047', bio: t('sparkBio', 'Fast feet and quick shots.')},
-			{name: t('shieldName', 'Shield'), speed: 0.9, power: 1.05, rate: 0.86, aura: '#93c5fd', bio: t('shieldBio', 'Zorlu dalgalarda daha uzun dayanÄ±r.')},
-			{name: t('novaName', 'Nova'), speed: 1.08, power: 1.18, rate: 0.94, aura: '#fca5a5', bio: t('novaBio', 'Dengeli kontrolle gÃ¼Ã§lÃ¼ vuruÅŸlar.')},
+			{name: t('shieldName', 'Shield'), speed: 0.9, power: 1.05, rate: 0.86, aura: '#93c5fd', bio: t('shieldBio', 'Zorlu dalgalarda daha uzun dayanÃ„Â±r.')},
+			{name: t('novaName', 'Nova'), speed: 1.08, power: 1.18, rate: 0.94, aura: '#fca5a5', bio: t('novaBio', 'Dengeli kontrolle gÃƒÂ¼ÃƒÂ§lÃƒÂ¼ vuruÃ…Å¸lar.')},
 			{name: t('echoName', 'Echo'), speed: 1.16, power: 0.94, rate: 1.12, aura: '#c4b5fd', bio: t('echoBio', 'Dengeli arena duelist.')},
-			{name: t('bloomName', 'Bloom'), speed: 1.02, power: 0.9, rate: 1.3, aura: '#86efac', bio: t('bloomBio', 'Seri ateÅŸ baskÄ±sÄ± uzmanÄ±.')},
-			{name: t('stoneName', 'Stone'), speed: 0.84, power: 1.28, rate: 0.8, aura: '#fdba74', bio: t('stoneBio', 'YavaÅŸ, dayanÄ±klÄ± ve aÄŸÄ±r vuruÅŸlu.')}
+			{name: t('bloomName', 'Bloom'), speed: 1.02, power: 0.9, rate: 1.3, aura: '#86efac', bio: t('bloomBio', 'Seri ateÃ…Å¸ baskÃ„Â±sÃ„Â± uzmanÃ„Â±.')},
+			{name: t('stoneName', 'Stone'), speed: 0.84, power: 1.28, rate: 0.8, aura: '#fdba74', bio: t('stoneBio', 'YavaÃ…Å¸, dayanÃ„Â±klÃ„Â± ve aÃ„Å¸Ã„Â±r vuruÃ…Å¸lu.')}
 		];
 
 		const state = {
@@ -760,52 +760,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			if (!accounts[state.accountKey]) {
 				return;
 			}
-			accounts[state.accountKey].progress = getProgress();
-			writeAccounts(accounts);
-			saveServerProgress(accounts[stat…5549 tokens truncated…== 'S') {
-				state.keys.down = isDown;
-			}
-			if (key === 'ArrowLeft' || key === 'a' || key === 'A') {
-				state.keys.left = isDown;
-			}
-			if (key === 'ArrowRight' || key === 'd' || key === 'D') {
-				state.keys.right = isDown;
-			}
-		}
-
-		game.addEventListener('keydown', function (event) {
-			updateKeyState(true, event.key);
-			if (/Arrow|w|a|s|d|W|A|S|D/.test(event.key)) {
-				event.preventDefault();
-			}
-		});
-
-		game.addEventListener('keyup', function (event) {
-			updateKeyState(false, event.key);
-		});
-
-		canvas.addEventListener('pointerdown', function (event) {
-			const rect = canvas.getBoundingClientRect();
-			state.touchTarget = {
-				x: (event.clientX - rect.left) * (WIDTH / rect.width),
-				y: (event.clientY - rect.top) * (HEIGHT / rect.height)
-			};
-			game.focus();
-		});
-
-		canvas.addEventListener('pointermove', function (event) {
-			if (!state.touchTarget) {
-				return;
-			}
-			const rect = canvas.getBoundingClientRect();
-			state.touchTarget = {
-				x: (event.clientX - rect.left) * (WIDTH / rect.width),
-				y: (event.clientY - rect.top) * (HEIGHT / rect.height)
-			};
-		});
-
-		canvas.addEventListener('pointerup', function () {
-			state.touchTarget = null;
+			accounts[state.accountKey].progress = getPro…323 tokens truncated…= null;
 		});
 
 		canvas.addEventListener('pointerleave', function () {
@@ -954,7 +909,7 @@ if (!function_exists('zo_game_roster_1000_render')) {
 				'down' => 'Down',
 				'right' => 'Right',
 				'help' => 'Use arrow keys or WASD on desktop. On mobile, tap the arena to move toward that point or use the move buttons. Clear each wave to earn 50 coins, then buy stronger characters.',
-				'pickOrBuyStatus' => 'Bir karakter seÃ§ veya satÄ±n al, sonra BaÅŸlat dÃ¼ÄŸmesine bas. Temizlenen her dalga 50 coin verir.',
+				'pickOrBuyStatus' => 'Bir karakter seÃƒÂ§ veya satÃ„Â±n al, sonra BaÃ…Å¸lat dÃƒÂ¼Ã„Å¸mesine bas. Temizlenen her dalga 50 coin verir.',
 				'shopTitle' => '1000 Hero Shop',
 				'prev' => 'Prev',
 				'next' => 'Next',
@@ -980,101 +935,101 @@ if (!function_exists('zo_game_roster_1000_render')) {
 				'bloomName' => 'Bloom',
 				'stoneName' => 'Stone',
 				'sparkBio' => 'Fast feet and quick shots.',
-				'shieldBio' => 'Zorlu dalgalarda daha uzun dayanÄ±r.',
-				'novaBio' => 'Dengeli kontrolle gÃ¼Ã§lÃ¼ vuruÅŸlar.',
+				'shieldBio' => 'Zorlu dalgalarda daha uzun dayanÃ„Â±r.',
+				'novaBio' => 'Dengeli kontrolle gÃƒÂ¼ÃƒÂ§lÃƒÂ¼ vuruÃ…Å¸lar.',
 				'echoBio' => 'Dengeli arena duelist.',
-				'bloomBio' => 'Seri ateÅŸ baskÄ±sÄ± uzmanÄ±.',
-				'stoneBio' => 'YavaÅŸ, dayanÄ±klÄ± ve aÄŸÄ±r vuruÅŸlu.',
-				'levelStarted' => 'Seviye {level} baÅŸladÄ±. DÃ¼ÅŸmanlar her dalgada daha gÃ¼Ã§lÃ¼ ve daha kalabalÄ±k olur.',
-				'waveCleared' => 'Dalga temizlendi. 50 coin kazandÄ±n. {level}. seviye iÃ§in hazÄ±r olduÄŸunda Sonraki Dalga dÃ¼ÄŸmesine bas.',
-				'heroDefeated' => 'KahramanÄ±n {level}. seviyede yenildi. Daha gÃ¼Ã§lÃ¼ bir karakter al veya koÅŸuyu yeniden baÅŸlat.',
+				'bloomBio' => 'Seri ateÃ…Å¸ baskÃ„Â±sÃ„Â± uzmanÃ„Â±.',
+				'stoneBio' => 'YavaÃ…Å¸, dayanÃ„Â±klÃ„Â± ve aÃ„Å¸Ã„Â±r vuruÃ…Å¸lu.',
+				'levelStarted' => 'Seviye {level} baÃ…Å¸ladÃ„Â±. DÃƒÂ¼Ã…Å¸manlar her dalgada daha gÃƒÂ¼ÃƒÂ§lÃƒÂ¼ ve daha kalabalÃ„Â±k olur.',
+				'waveCleared' => 'Dalga temizlendi. 50 coin kazandÃ„Â±n. {level}. seviye iÃƒÂ§in hazÃ„Â±r olduÃ„Å¸unda Sonraki Dalga dÃƒÂ¼Ã„Å¸mesine bas.',
+				'heroDefeated' => 'KahramanÃ„Â±n {level}. seviyede yenildi. Daha gÃƒÂ¼ÃƒÂ§lÃƒÂ¼ bir karakter al veya koÃ…Å¸uyu yeniden baÃ…Å¸lat.',
 				'heroSelected' => '{name} is now selected.',
-				'notEnoughCoins' => '{name} iÃ§in yeterli coin yok. Her seferinde 50 coin kazanmak iÃ§in daha fazla dalga temizle.',
-				'boughtHero' => '{name}, {price} coin karÅŸÄ±lÄ±ÄŸÄ±nda alÄ±ndÄ±.',
-				'enterHeroNumber' => '1 ile 1000 arasÄ±nda bir kahraman numarasÄ± gir.',
+				'notEnoughCoins' => '{name} iÃƒÂ§in yeterli coin yok. Her seferinde 50 coin kazanmak iÃƒÂ§in daha fazla dalga temizle.',
+				'boughtHero' => '{name}, {price} coin karÃ…Å¸Ã„Â±lÃ„Â±Ã„Å¸Ã„Â±nda alÃ„Â±ndÃ„Â±.',
+				'enterHeroNumber' => '1 ile 1000 arasÃ„Â±nda bir kahraman numarasÃ„Â± gir.',
 				'jumpedToHero' => 'Jumped to hero #{id}.',
 				'runOver' => 'Run Over',
-				'restartOrBuy' => 'Yeniden baÅŸla veya kadrodan daha gÃ¼Ã§lÃ¼ bir savaÅŸÃ§Ä± al.',
-				'arenaTitle' => '1000 Kadro ArenasÄ±',
+				'restartOrBuy' => 'Yeniden baÃ…Å¸la veya kadrodan daha gÃƒÂ¼ÃƒÂ§lÃƒÂ¼ bir savaÃ…Å¸ÃƒÂ§Ã„Â± al.',
+				'arenaTitle' => '1000 Kadro ArenasÃ„Â±',
 				'pressStartRun' => 'Press Start to begin your run.',
 				'pressNextWave' => 'Press Next Wave to continue to level {level}.',
 			),
 			'tr' => array(
-				'title' => '1000 Karakter ArenasÄ±',
-				'subtitle' => 'Sonsuz arena dalgalarÄ±nda savaÅŸ, her galibiyette 50 coin kazan ve 1000 kahramanlÄ±k listeden satÄ±n alarak takÄ±mÄ±nÄ± bÃ¼yÃ¼t. YÃ¼ksek seviyeler daha akÄ±llÄ± hareket eden ve daha gÃ¼Ã§lÃ¼ saldÄ±ran daha fazla dÃ¼ÅŸman gÃ¶nderir.',
+				'title' => '1000 Karakter ArenasÃ„Â±',
+				'subtitle' => 'Sonsuz arena dalgalarÃ„Â±nda savaÃ…Å¸, her galibiyette 50 coin kazan ve 1000 kahramanlÃ„Â±k listeden satÃ„Â±n alarak takÃ„Â±mÃ„Â±nÃ„Â± bÃƒÂ¼yÃƒÂ¼t. YÃƒÂ¼ksek seviyeler daha akÃ„Â±llÃ„Â± hareket eden ve daha gÃƒÂ¼ÃƒÂ§lÃƒÂ¼ saldÃ„Â±ran daha fazla dÃƒÂ¼Ã…Å¸man gÃƒÂ¶nderir.',
 				'coins' => 'Coin',
 				'level' => 'Seviye',
-				'enemies' => 'DÃ¼ÅŸmanlar',
+				'enemies' => 'DÃƒÂ¼Ã…Å¸manlar',
 				'hero' => 'Kahraman',
 				'wins' => 'Galibiyet',
 				'accountName' => 'Hesap',
 				'pin' => 'PIN (4-9 hane)',
-				'createAccount' => 'Hesap OluÅŸtur',
-				'signIn' => 'GiriÅŸ Yap',
-				'signOut' => 'Ã‡Ä±kÄ±ÅŸ',
+				'createAccount' => 'Hesap OluÃ…Å¸tur',
+				'signIn' => 'GiriÃ…Å¸ Yap',
+				'signOut' => 'Ãƒâ€¡Ã„Â±kÃ„Â±Ã…Å¸',
 				'accountNamePlaceholder' => 'Arslan',
 				'pinPlaceholder' => '1234',
-				'accountRequired' => 'Oynamak iÃ§in hesap oluÅŸtur veya PIN ile giriÅŸ yap.',
-				'signedInAs' => '{name} olarak giriÅŸ yapÄ±ldÄ±.',
-				'storageBlocked' => 'Bu tarayÄ±cÄ± kayÄ±tlÄ± hesaplarÄ± engelliyor.',
-				'nameRequired' => 'Bir hesap adÄ± yaz.',
+				'accountRequired' => 'Oynamak iÃƒÂ§in hesap oluÃ…Å¸tur veya PIN ile giriÃ…Å¸ yap.',
+				'signedInAs' => '{name} olarak giriÃ…Å¸ yapÃ„Â±ldÃ„Â±.',
+				'storageBlocked' => 'Bu tarayÃ„Â±cÃ„Â± kayÃ„Â±tlÃ„Â± hesaplarÃ„Â± engelliyor.',
+				'nameRequired' => 'Bir hesap adÃ„Â± yaz.',
 				'pinRequired' => '4-9 haneli bir PIN yap.',
-				'accountExists' => 'Bu hesap zaten var. GiriÅŸ Yap kullan.',
-				'signinNeeded' => 'Hesap adÄ±nÄ± ve 4-9 haneli PIN gir.',
-				'badSignin' => 'Hesap adÄ± veya PIN eÅŸleÅŸmedi.',
-				'signedOut' => 'Ã‡Ä±kÄ±ÅŸ yapÄ±ldÄ±. Tekrar oynamak iÃ§in PIN gir.',
-				'start' => 'BaÅŸlat',
+				'accountExists' => 'Bu hesap zaten var. GiriÃ…Å¸ Yap kullan.',
+				'signinNeeded' => 'Hesap adÃ„Â±nÃ„Â± ve 4-9 haneli PIN gir.',
+				'badSignin' => 'Hesap adÃ„Â± veya PIN eÃ…Å¸leÃ…Å¸medi.',
+				'signedOut' => 'Ãƒâ€¡Ã„Â±kÃ„Â±Ã…Å¸ yapÃ„Â±ldÃ„Â±. Tekrar oynamak iÃƒÂ§in PIN gir.',
+				'start' => 'BaÃ…Å¸lat',
 				'nextWave' => 'Sonraki Dalga',
-				'restartRun' => 'KoÅŸuyu Yeniden BaÅŸlat',
-				'up' => 'YukarÄ±',
+				'restartRun' => 'KoÃ…Å¸uyu Yeniden BaÃ…Å¸lat',
+				'up' => 'YukarÃ„Â±',
 				'left' => 'Sol',
-				'down' => 'AÅŸaÄŸÄ±',
-				'right' => 'SaÄŸ',
-				'help' => 'Bilgisayarda ok tuÅŸlarÄ±nÄ± veya WASD kullan. Mobilde o noktaya gitmek iÃ§in arenaya dokun veya hareket dÃ¼ÄŸmelerini kullan. Her dalgayÄ± temizleyip 50 coin kazan, sonra daha gÃ¼Ã§lÃ¼ karakterler satÄ±n al.',
-				'pickOrBuyStatus' => 'Bir karakter seÃ§ veya satÄ±n al, sonra BaÅŸlatâ€™a bas. Temizlenen her dalga 50 coin verir.',
-				'shopTitle' => '1000 Kahraman MaÄŸazasÄ±',
-				'prev' => 'Ã–nceki',
+				'down' => 'AÃ…Å¸aÃ„Å¸Ã„Â±',
+				'right' => 'SaÃ„Å¸',
+				'help' => 'Bilgisayarda ok tuÃ…Å¸larÃ„Â±nÃ„Â± veya WASD kullan. Mobilde o noktaya gitmek iÃƒÂ§in arenaya dokun veya hareket dÃƒÂ¼Ã„Å¸melerini kullan. Her dalgayÃ„Â± temizleyip 50 coin kazan, sonra daha gÃƒÂ¼ÃƒÂ§lÃƒÂ¼ karakterler satÃ„Â±n al.',
+				'pickOrBuyStatus' => 'Bir karakter seÃƒÂ§ veya satÃ„Â±n al, sonra BaÃ…Å¸latÃ¢â‚¬â„¢a bas. Temizlenen her dalga 50 coin verir.',
+				'shopTitle' => '1000 Kahraman MaÃ„Å¸azasÃ„Â±',
+				'prev' => 'Ãƒâ€“nceki',
 				'next' => 'Sonraki',
 				'pageLabel' => 'Sayfa {page} / {pages}',
 				'showingHeroes' => 'Kahramanlar {from}-{to} / {total}',
 				'heroPlaceholder' => 'Kahraman #',
-				'jumpAria' => 'Kahraman numarasÄ±na git',
+				'jumpAria' => 'Kahraman numarasÃ„Â±na git',
 				'go' => 'Git',
-				'canvasLabel' => '1000 Karakter ArenasÄ±',
+				'canvasLabel' => '1000 Karakter ArenasÃ„Â±',
 				'hp' => 'Can',
-				'power' => 'GÃ¼Ã§',
-				'speed' => 'HÄ±z',
+				'power' => 'GÃƒÂ¼ÃƒÂ§',
+				'speed' => 'HÃ„Â±z',
 				'rapid' => 'Seri',
-				'selected' => 'SeÃ§ili',
-				'select' => 'SeÃ§',
-				'buy' => 'SatÄ±n Al',
+				'selected' => 'SeÃƒÂ§ili',
+				'select' => 'SeÃƒÂ§',
+				'buy' => 'SatÃ„Â±n Al',
 				'costCoins' => 'Bedel: {price} coin.',
 				'tierLabel' => 'Kademe {tier}',
-				'sparkName' => 'KÄ±vÄ±lcÄ±m',
+				'sparkName' => 'KÃ„Â±vÃ„Â±lcÃ„Â±m',
 				'shieldName' => 'Kalkan',
 				'novaName' => 'Nova',
-				'echoName' => 'YankÄ±',
-				'bloomName' => 'Ã‡iÃ§ek',
-				'stoneName' => 'TaÅŸ',
-				'sparkBio' => 'HÄ±zlÄ± ayaklar ve seri atÄ±ÅŸlar.',
-				'shieldBio' => 'Zorlu dalgalarda daha uzun dayanÄ±r.',
-				'novaBio' => 'Dengeli kontrolle gÃ¼Ã§lÃ¼ vuruÅŸlar yapar.',
-				'echoBio' => 'Dengeli bir arena dÃ¼ellocusu.',
-				'bloomBio' => 'Seri atÄ±ÅŸ baskÄ±sÄ±nda uzmandÄ±r.',
-				'stoneBio' => 'YavaÅŸ, dayanÄ±klÄ± ve aÄŸÄ±r vuruÅŸludur.',
-				'levelStarted' => 'Seviye {level} baÅŸladÄ±. DÃ¼ÅŸmanlar her dalgada daha gÃ¼Ã§lÃ¼ ve daha kalabalÄ±k olur.',
-				'waveCleared' => 'Dalga temizlendi. 50 coin kazandÄ±n. {level}. seviye iÃ§in hazÄ±r olduÄŸunda Sonraki Dalgaâ€™ya bas.',
-				'heroDefeated' => 'KahramanÄ±n {level}. seviyede yenildi. Daha gÃ¼Ã§lÃ¼ bir karakter al veya koÅŸuyu yeniden baÅŸlat.',
-				'heroSelected' => '{name} artÄ±k seÃ§ili.',
-				'notEnoughCoins' => '{name} iÃ§in yeterli coin yok. Her dalgada 50 coin kazanmak iÃ§in daha fazla dalga temizle.',
-				'boughtHero' => '{name}, {price} coin karÅŸÄ±lÄ±ÄŸÄ±nda alÄ±ndÄ±.',
-				'enterHeroNumber' => '1 ile 1000 arasÄ±nda bir kahraman numarasÄ± gir.',
-				'jumpedToHero' => 'Kahraman #{id} bÃ¶lÃ¼mÃ¼ne gidildi.',
-				'runOver' => 'KoÅŸu Bitti',
-				'restartOrBuy' => 'Yeniden baÅŸla veya listeden daha gÃ¼Ã§lÃ¼ bir savaÅŸÃ§Ä± al.',
-				'arenaTitle' => '1000 Karakter ArenasÄ±',
-				'pressStartRun' => 'KoÅŸuya baÅŸlamak iÃ§in BaÅŸlatâ€™a bas.',
-				'pressNextWave' => '{level}. seviyeye devam etmek iÃ§in Sonraki Dalgaâ€™ya bas.',
+				'echoName' => 'YankÃ„Â±',
+				'bloomName' => 'Ãƒâ€¡iÃƒÂ§ek',
+				'stoneName' => 'TaÃ…Å¸',
+				'sparkBio' => 'HÃ„Â±zlÃ„Â± ayaklar ve seri atÃ„Â±Ã…Å¸lar.',
+				'shieldBio' => 'Zorlu dalgalarda daha uzun dayanÃ„Â±r.',
+				'novaBio' => 'Dengeli kontrolle gÃƒÂ¼ÃƒÂ§lÃƒÂ¼ vuruÃ…Å¸lar yapar.',
+				'echoBio' => 'Dengeli bir arena dÃƒÂ¼ellocusu.',
+				'bloomBio' => 'Seri atÃ„Â±Ã…Å¸ baskÃ„Â±sÃ„Â±nda uzmandÃ„Â±r.',
+				'stoneBio' => 'YavaÃ…Å¸, dayanÃ„Â±klÃ„Â± ve aÃ„Å¸Ã„Â±r vuruÃ…Å¸ludur.',
+				'levelStarted' => 'Seviye {level} baÃ…Å¸ladÃ„Â±. DÃƒÂ¼Ã…Å¸manlar her dalgada daha gÃƒÂ¼ÃƒÂ§lÃƒÂ¼ ve daha kalabalÃ„Â±k olur.',
+				'waveCleared' => 'Dalga temizlendi. 50 coin kazandÃ„Â±n. {level}. seviye iÃƒÂ§in hazÃ„Â±r olduÃ„Å¸unda Sonraki DalgaÃ¢â‚¬â„¢ya bas.',
+				'heroDefeated' => 'KahramanÃ„Â±n {level}. seviyede yenildi. Daha gÃƒÂ¼ÃƒÂ§lÃƒÂ¼ bir karakter al veya koÃ…Å¸uyu yeniden baÃ…Å¸lat.',
+				'heroSelected' => '{name} artÃ„Â±k seÃƒÂ§ili.',
+				'notEnoughCoins' => '{name} iÃƒÂ§in yeterli coin yok. Her dalgada 50 coin kazanmak iÃƒÂ§in daha fazla dalga temizle.',
+				'boughtHero' => '{name}, {price} coin karÃ…Å¸Ã„Â±lÃ„Â±Ã„Å¸Ã„Â±nda alÃ„Â±ndÃ„Â±.',
+				'enterHeroNumber' => '1 ile 1000 arasÃ„Â±nda bir kahraman numarasÃ„Â± gir.',
+				'jumpedToHero' => 'Kahraman #{id} bÃƒÂ¶lÃƒÂ¼mÃƒÂ¼ne gidildi.',
+				'runOver' => 'KoÃ…Å¸u Bitti',
+				'restartOrBuy' => 'Yeniden baÃ…Å¸la veya listeden daha gÃƒÂ¼ÃƒÂ§lÃƒÂ¼ bir savaÃ…Å¸ÃƒÂ§Ã„Â± al.',
+				'arenaTitle' => '1000 Karakter ArenasÃ„Â±',
+				'pressStartRun' => 'KoÃ…Å¸uya baÃ…Å¸lamak iÃƒÂ§in BaÃ…Å¸latÃ¢â‚¬â„¢a bas.',
+				'pressNextWave' => '{level}. seviyeye devam etmek iÃƒÂ§in Sonraki DalgaÃ¢â‚¬â„¢ya bas.',
 			),
 		);
 		$i18n = array_merge($translations['en'], isset($translations[$language]) ? $translations[$language] : array());
@@ -1193,11 +1148,12 @@ if (!function_exists('zo_game_roster_1000_render')) {
 
 return array(
 	'slug'            => 'roster-1000',
-	'name'            => 'TR: 1000 Karakter ArenasÄ± | EN: Roster 1000 | DE: Roster 1000 | FR: Roster 1000 | ES-MX: Roster 1000 | ES-ES: Roster 1000',
+	'name'            => 'TR: 1000 Karakter ArenasÃ„Â± | EN: Roster 1000 | DE: Roster 1000 | FR: Roster 1000 | ES-MX: Roster 1000 | ES-ES: Roster 1000',
 	'author'          => 'Asker',
-	'description'     => 'TR: 1000 satÄ±n alÄ±nabilir karakter, her seviyede zorlaÅŸan yapay zeka, her dalgada daha fazla dÃ¼ÅŸman ve her galibiyette 50 coin sunan sonsuz bir arena oyunu. | EN: An endless arena game with 1000 buyable characters, harder AI every level, more enemies per wave, and 50 coins for every win. | DE: Ein endloses Arena-Spiel mit 1000 kaufbaren Figuren, schwierigerer KI pro Level, mehr Gegnern pro Welle und 50 MÃ¼nzen fÃ¼r jeden Sieg. | FR: Un jeu dâ€™arÃ¨ne sans fin avec 1000 personnages Ã  acheter, une IA plus difficile Ã  chaque niveau, plus dâ€™ennemis par vague et 50 piÃ¨ces par victoire. | ES-MX: Un juego de arena sin fin con 1000 personajes comprables, IA mÃ¡s difÃ­cil en cada nivel, mÃ¡s enemigos por oleada y 50 monedas por victoria. | ES-ES: Un juego de arena sin fin con 1000 personajes comprables, IA mÃ¡s difÃ­cil en cada nivel, mÃ¡s enemigos por oleada y 50 monedas por victoria.',
+	'description'     => 'TR: 1000 satÃ„Â±n alÃ„Â±nabilir karakter, her seviyede zorlaÃ…Å¸an yapay zeka, her dalgada daha fazla dÃƒÂ¼Ã…Å¸man ve her galibiyette 50 coin sunan sonsuz bir arena oyunu. | EN: An endless arena game with 1000 buyable characters, harder AI every level, more enemies per wave, and 50 coins for every win. | DE: Ein endloses Arena-Spiel mit 1000 kaufbaren Figuren, schwierigerer KI pro Level, mehr Gegnern pro Welle und 50 MÃƒÂ¼nzen fÃƒÂ¼r jeden Sieg. | FR: Un jeu dÃ¢â‚¬â„¢arÃƒÂ¨ne sans fin avec 1000 personnages ÃƒÂ  acheter, une IA plus difficile ÃƒÂ  chaque niveau, plus dÃ¢â‚¬â„¢ennemis par vague et 50 piÃƒÂ¨ces par victoire. | ES-MX: Un juego de arena sin fin con 1000 personajes comprables, IA mÃƒÂ¡s difÃƒÂ­cil en cada nivel, mÃƒÂ¡s enemigos por oleada y 50 monedas por victoria. | ES-ES: Un juego de arena sin fin con 1000 personajes comprables, IA mÃƒÂ¡s difÃƒÂ­cil en cada nivel, mÃƒÂ¡s enemigos por oleada y 50 monedas por victoria.',
 	'render_callback' => 'zo_game_roster_1000_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,
 );
+
 
