@@ -617,11 +617,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		const archetypes = [
 			{name: t('sparkName', 'Spark'), speed: 1.35, power: 0.82, rate: 1.25, aura: '#fde047', bio: t('sparkBio', 'Fast feet and quick shots.')},
-			{name: t('shieldName', 'Shield'), speed: 0.9, power: 1.05, rate: 0.86, aura: '#93c5fd', bio: t('shieldBio', 'Zorlu dalgalarda daha uzun dayanır.')},
-			{name: t('novaName', 'Nova'), speed: 1.08, power: 1.18, rate: 0.94, aura: '#fca5a5', bio: t('novaBio', 'Dengeli kontrolle güçlü vuruşlar.')},
+			{name: t('shieldName', 'Shield'), speed: 0.9, power: 1.05, rate: 0.86, aura: '#93c5fd', bio: t('shieldBio', 'Zorlu dalgalarda daha uzun dayanÄ±r.')},
+			{name: t('novaName', 'Nova'), speed: 1.08, power: 1.18, rate: 0.94, aura: '#fca5a5', bio: t('novaBio', 'Dengeli kontrolle gÃ¼Ã§lÃ¼ vuruÅŸlar.')},
 			{name: t('echoName', 'Echo'), speed: 1.16, power: 0.94, rate: 1.12, aura: '#c4b5fd', bio: t('echoBio', 'Dengeli arena duelist.')},
-			{name: t('bloomName', 'Bloom'), speed: 1.02, power: 0.9, rate: 1.3, aura: '#86efac', bio: t('bloomBio', 'Seri ateş baskısı uzmanı.')},
-			{name: t('stoneName', 'Stone'), speed: 0.84, power: 1.28, rate: 0.8, aura: '#fdba74', bio: t('stoneBio', 'Yavaş, dayanıklı ve ağır vuruşlu.')}
+			{name: t('bloomName', 'Bloom'), speed: 1.02, power: 0.9, rate: 1.3, aura: '#86efac', bio: t('bloomBio', 'Seri ateÅŸ baskÄ±sÄ± uzmanÄ±.')},
+			{name: t('stoneName', 'Stone'), speed: 0.84, power: 1.28, rate: 0.8, aura: '#fdba74', bio: t('stoneBio', 'YavaÅŸ, dayanÄ±klÄ± ve aÄŸÄ±r vuruÅŸlu.')}
 		];
 
 		const state = {
@@ -762,727 +762,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			}
 			accounts[state.accountKey].progress = getProgress();
 			writeAccounts(accounts);
-			saveServerProgress(accounts[state.accountKey].progress);
-		}
-
-		function requestAccount(mode, nickname, pin, progress, onSuccess, onError) {
-			if (!progressAjaxUrl || !progressNonce || !window.fetch) {
-				onError(t('accountServerUnavailable', 'Account service is unavailable right now.'));
-				return;
-			}
-			const body = new URLSearchParams();
-			body.set('action', 'zo_roster_1000_account');
-			body.set('mode', mode);
-			body.set('nonce', progressNonce);
-			body.set('nickname', nickname);
-			body.set('pin', pin);
-			if (progress) {
-				body.set('progress', JSON.stringify(progress));
-			}
-			window.fetch(progressAjaxUrl, {method: 'POST', credentials: 'same-origin', headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}, body: body.toString()}).then(function (response) {
-				return response.json().then(function (payload) {
-					if (!response.ok || !payload || !payload.success) {
-						throw new Error(payload && payload.data && payload.data.message ? payload.data.message : 'Account request failed.');
-					}
-					return payload.data || {};
-				});
-			}).then(onSuccess).catch(function (error) {
-				onError(error && error.message ? error.message : t('accountServerUnavailable', 'Account service is unavailable right now.'));
-			});
-		}
-
-		function saveServerProgress(progress) {
-			if (!state.accountKey || !state.accountPin || !progressAjaxUrl || !progressNonce || !window.fetch) {
-				return;
-			}
-			const body = new URLSearchParams();
-			body.set('action', 'zo_roster_1000_save_progress');
-			body.set('nonce', progressNonce);
-			body.set('nickname', state.accountKey);
-			body.set('pin', state.accountPin);
-			body.set('progress', JSON.stringify(progress));
-			window.fetch(progressAjaxUrl, {method: 'POST', credentials: 'same-origin', headers: {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'}, body: body.toString()}).catch(function () {});
-		}
-
-		function requireAccount() {
-			if (state.accountKey) {
-				return true;
-			}
-			setAccountStatus(t('accountRequired', 'Create an account or sign in with your PIN to play.'));
-			setStatus(t('accountRequired', 'Create an account or sign in with your PIN to play.'));
-			return false;
-		}
-
-		function signInAccount(key, account, serverProgress) {
-			state.accountKey = key;
-			state.accountPin = account.pin || '';
-			if (canSessionStore) {
-				window.sessionStorage.setItem(ACCOUNT_SESSION_KEY, key);
-			}
-			if (accountNameInput) {
-				accountNameInput.value = account.name || key;
-			}
-			if (accountPinInput) {
-				accountPinInput.value = '';
-			}
-			applyProgress(serverProgress || account.progress || getProgress());
-			updateAccountUi();
-			setAccountStatus(fmt('signedInAs', 'Signed in as {name}.', {name: account.name || key}));
-			setStatus(t('pickOrBuyStatus', 'Bir karakter seÃ§ veya satÄ±n al, sonra BaÅŸlat dÃ¼ÄŸmesine bas. Temizlenen her dalga 50 coin verir.'));
-		}
-
-		function createAccount() {
-			const name = accountNameInput ? accountNameInput.value.trim() : '';
-			const key = normalizeAccountName(name);
-			const pin = cleanPin(accountPinInput ? accountPinInput.value : '');
-
-			if (!canStore) {
-				setAccountStatus(t('storageBlocked', 'This browser is blocking saved accounts.'));
-				return;
-			}
-			if (!key) {
-				setAccountStatus(t('nameRequired', 'Type an account name.'));
-				return;
-			}
-			if (pin.length < 4 || pin.length > 9) {
-				setAccountStatus(t('pinRequired', 'Make a PIN with 4 to 9 digits.'));
-				return;
-			}
-
-			setAccountStatus(t('accountCreating', 'Creating account...'));
-			requestAccount('register', name, pin, getProgress(), function (data) {
-				const accounts = readAccounts();
-				accounts[key] = {name: name.slice(0, 32), pin: pin, progress: data.progress || getProgress()};
-				writeAccounts(accounts);
-				signInAccount(key, accounts[key], data.progress);
-			}, setAccountStatus);
-		}
-
-		function signinAccount() {
-			const key = normalizeAccountName(accountNameInput ? accountNameInput.value : '');
-			const pin = cleanPin(accountPinInput ? accountPinInput.value : '');
-			if (!key || pin.length < 4 || pin.length > 9) {
-				setAccountStatus(t('signinNeeded', 'Enter your account name and a 4 to 9 digit PIN.'));
-				return;
-			}
-			setAccountStatus(t('accountSigningIn', 'Signing in...'));
-			requestAccount('login', key, pin, null, function (data) {
-				const accounts = readAccounts();
-				accounts[key] = {name: data.nickname || key, pin: pin, progress: data.progress || getProgress()};
-				writeAccounts(accounts);
-				signInAccount(key, accounts[key], data.progress);
-			}, setAccountStatus);
-		}
-
-		function signoutAccount() {
-			saveProgress();
-			state.accountKey = '';
-			state.accountPin = '';
-			if (canSessionStore) {
-				window.sessionStorage.removeItem(ACCOUNT_SESSION_KEY);
-			}
-			resetForSelectedHero(true);
-			updateAccountUi();
-			setAccountStatus(t('signedOut', 'Signed out. Enter your PIN to play again.'));
-		}
-
-		function restoreAccountSession() {
-			if (!canSessionStore) {
-				return false;
-			}
-
-			const key = window.sessionStorage.getItem(ACCOUNT_SESSION_KEY) || '';
-			if (!key) {
-				return false;
-			}
-
-			const accounts = readAccounts();
-			if (!accounts[key]) {
-				window.sessionStorage.removeItem(ACCOUNT_SESSION_KEY);
-				return false;
-			}
-
-			signInAccount(key, accounts[key]);
-			return true;
-		}
-
-		function getCharacter(id) {
-			const seed = id - 1;
-			const archetype = archetypes[seed % archetypes.length];
-			const tier = Math.floor(seed / 200) + 1;
-			const tierBoost = tier * 0.12;
-			const power = +(8 + ((seed % 9) * 1.2) + (tierBoost * 4) + (archetype.power * 4)).toFixed(1);
-			const speed = +(2.1 + ((seed % 7) * 0.12) + (archetype.speed * 0.85)).toFixed(2);
-			const fireRate = +(0.45 + ((seed % 5) * 0.06) + (archetype.rate * 0.3)).toFixed(2);
-			const hp = Math.round(90 + ((seed % 11) * 8) + (tierBoost * 55) + (archetype.power * 18));
-			const price = id === 1 ? 0 : Math.round(90 + (tier * 55) + ((seed % 25) * 13) + (id * 0.8));
-			return {
-				id: id,
-				name: archetype.name + ' #' + String(id),
-				tier: fmt('tierLabel', 'Kademe {tier}', {tier: tier}),
-				power: power,
-				speed: speed,
-				fireRate: fireRate,
-				hp: hp,
-				price: price,
-				color: archetype.aura,
-				bio: archetype.bio
-			};
-		}
-
-		function setStatus(text) {
-			statusEl.textContent = text;
-		}
-
-		function clamp(value, min, max) {
-			return Math.max(min, Math.min(max, value));
-		}
-
-		function updateHud() {
-			coinsEl.textContent = String(state.coins);
-			levelEl.textContent = String(state.level);
-			enemiesEl.textContent = String(Math.max(0, state.enemies.length));
-			heroEl.textContent = getCharacter(state.selectedId).name;
-			winsEl.textContent = String(state.wins);
-			pageLabelEl.textContent = fmt('pageLabel', 'Sayfa {page} / {pages}', {page: state.page + 1, pages: Math.ceil(TOTAL_CHARACTERS / PAGE_SIZE)});
-			totalEl.textContent = fmt('showingHeroes', 'Kahramanlar {from}-{to} / {total}', {
-				from: (state.page * PAGE_SIZE) + 1,
-				to: Math.min(TOTAL_CHARACTERS, ((state.page + 1) * PAGE_SIZE)),
-				total: TOTAL_CHARACTERS
-			});
-		}
-
-		function createHero() {
-			const character = getCharacter(state.selectedId);
-			return {
-				x: WIDTH / 2,
-				y: HEIGHT / 2,
-				radius: HERO_RADIUS,
-				speed: character.speed * 2.2,
-				maxHp: character.hp,
-				hp: character.hp,
-				damage: character.power,
-				fireInterval: Math.max(0.18, 1.4 - (character.fireRate * 0.38)),
-				cooldown: 0,
-				color: character.color
-			};
-		}
-
-		function enemyGoalCount(level) {
-			return 3 + level;
-		}
-
-		function createEnemy(index) {
-			const side = Math.floor(Math.random() * 4);
-			let x = 0;
-			let y = 0;
-
-			if (side === 0) {
-				x = 18;
-				y = Math.random() * HEIGHT;
-			} else if (side === 1) {
-				x = WIDTH - 18;
-				y = Math.random() * HEIGHT;
-			} else if (side === 2) {
-				x = Math.random() * WIDTH;
-				y = 18;
-			} else {
-				x = Math.random() * WIDTH;
-				y = HEIGHT - 18;
-			}
-
-			const base = 28 + (state.level * 7);
-			const variance = (index % 5) * 4;
-			const aiLevel = 1 + (state.level * 0.03);
-			return {
-				x: x,
-				y: y,
-				radius: ENEMY_RADIUS + ((state.level % 4 === 0 && index % 3 === 0) ? 3 : 0),
-				hp: base + variance,
-				maxHp: base + variance,
-				speed: 0.72 + (state.level * 0.028) + ((index % 4) * 0.05),
-				damage: 9 + Math.floor(state.level * 0.45),
-				cooldown: Math.max(0.55, 1.9 - (state.level * 0.014)),
-				reload: Math.max(0.55, 1.9 - (state.level * 0.014)),
-				strafe: ((index % 2 === 0) ? 1 : -1) * aiLevel,
-				color: state.level % 2 === 0 ? '#fb7185' : '#f97316'
-			};
-		}
-
-		function resetForSelectedHero(fullReset) {
-			state.running = false;
-			state.levelActive = false;
-			state.gameOver = false;
-			state.lastTime = 0;
-			state.hero = createHero();
-			state.enemies = [];
-			state.projectiles = [];
-			state.spawnTimer = 0;
-			state.spawned = 0;
-			state.targetEnemyCount = enemyGoalCount(state.level);
-			state.touchTarget = null;
-
-			if (fullReset) {
-				state.level = 1;
-				state.wins = 0;
-				state.coins = 150;
-				state.targetEnemyCount = enemyGoalCount(state.level);
-			}
-
-			updateHud();
-			renderRoster();
-			setStatus(t('pickOrBuyStatus', 'Bir karakter seç veya satın al, sonra Başlat düğmesine bas. Temizlenen her dalga 50 coin verir.'));
-			draw();
-		}
-
-		function beginLevel() {
-			if (!requireAccount()) {
-				return;
-			}
-			if (state.gameOver) {
-				return;
-			}
-
-			state.running = true;
-			state.levelActive = true;
-			state.lastTime = performance.now();
-			setStatus(fmt('levelStarted', 'Seviye {level} başladı. Düşmanlar her dalgada daha güçlü ve daha kalabalık olur.', {level: state.level}));
-			window.requestAnimationFrame(loop);
-		}
-
-		function nextLevel() {
-			state.running = false;
-			state.levelActive = false;
-			state.level += 1;
-			state.wins += 1;
-			state.coins += REWARD_PER_WIN;
-			state.hero = createHero();
-			state.enemies = [];
-			state.projectiles = [];
-			state.spawnTimer = 0;
-			state.spawned = 0;
-			state.targetEnemyCount = enemyGoalCount(state.level);
-			updateHud();
-			renderRoster();
-			saveProgress();
-			setStatus(fmt('waveCleared', 'Dalga temizlendi. 50 coin kazandın. {level}. seviye için hazır olduğunda Sonraki Dalga düğmesine bas.', {level: state.level}));
-			draw();
-		}
-
-		function loseGame() {
-			state.running = false;
-			state.levelActive = false;
-			state.gameOver = true;
-			setStatus(fmt('heroDefeated', 'Kahramanın {level}. seviyede yenildi. Daha güçlü bir karakter al veya koşuyu yeniden başlat.', {level: state.level}));
-			draw();
-		}
-
-		function tryBuyCharacter(id) {
-			if (!requireAccount()) {
-				return;
-			}
-			const character = getCharacter(id);
-			if (state.owned[id]) {
-				state.selectedId = id;
-				state.hero = createHero();
-				updateHud();
-				renderRoster();
-				saveProgress();
-				setStatus(fmt('heroSelected', '{name} is now selected.', {name: character.name}));
-				draw();
-				return;
-			}
-
-			if (state.coins < character.price) {
-				setStatus(fmt('notEnoughCoins', '{name} için yeterli coin yok. Her seferinde 50 coin kazanmak için daha fazla dalga temizle.', {name: character.name}));
-				return;
-			}
-
-			state.coins -= character.price;
-			state.owned[id] = true;
-			state.selectedId = id;
-			state.hero = createHero();
-			updateHud();
-			renderRoster();
-			saveProgress();
-			setStatus(fmt('boughtHero', '{name}, {price} coin karşılığında alındı.', {name: character.name, price: character.price}));
-			draw();
-		}
-
-		function renderRoster() {
-			const start = state.page * PAGE_SIZE;
-			const end = Math.min(TOTAL_CHARACTERS, start + PAGE_SIZE);
-			let html = '';
-
-			for (let i = start + 1; i <= end; i++) {
-				const character = getCharacter(i);
-				const owned = !!state.owned[i];
-				const selected = state.selectedId === i;
-				const classes = ['zo-r1-card'];
-
-				if (owned) {
-					classes.push('is-owned');
-				}
-				if (selected) {
-					classes.push('is-selected');
-				}
-
-				html += ''
-					+ '<div class="' + classes.join(' ') + '">'
-					+ '<div class="zo-r1-card-top">'
-					+ '<div class="zo-r1-card-name">' + character.name + '</div>'
-					+ '<div class="zo-r1-card-badge">' + character.tier + '</div>'
-					+ '</div>'
-					+ '<div class="zo-r1-card-stats">'
-					+ '<div class="zo-r1-mini"><strong>' + character.hp + '</strong><span>' + t('hp', 'HP') + '</span></div>'
-					+ '<div class="zo-r1-mini"><strong>' + character.power + '</strong><span>' + t('power', 'Power') + '</span></div>'
-					+ '<div class="zo-r1-mini"><strong>' + character.speed + '</strong><span>' + t('speed', 'Speed') + '</span></div>'
-					+ '<div class="zo-r1-mini"><strong>' + character.fireRate + '</strong><span>' + t('rapid', 'Rapid') + '</span></div>'
-					+ '</div>'
-					+ '<p class="zo-r1-card-text">' + character.bio + ' ' + fmt('costCoins', 'Bedel: {price} coin.', {price: character.price}) + '</p>'
-					+ '<div class="zo-r1-card-actions">'
-					+ '<button type="button" class="zo-r1-btn zo-r1-btn--secondary zo-r1-card-action" data-id="' + character.id + '">'
-					+ (owned ? (selected ? t('selected', 'Selected') : t('select', 'Select')) : t('buy', 'Buy'))
-					+ '</button>'
-					+ '</div>'
-					+ '</div>';
-			}
-
-			rosterEl.innerHTML = html;
-
-			rosterEl.querySelectorAll('.zo-r1-card-action').forEach(function (button) {
-				button.addEventListener('click', function () {
-					const id = parseInt(button.getAttribute('data-id') || '0', 10);
-					if (id > 0) {
-						tryBuyCharacter(id);
-					}
-				});
-			});
-		}
-
-		function jumpToHero() {
-			if (!requireAccount()) {
-				return;
-			}
-			const id = parseInt(jumpInput.value || '0', 10);
-			if (id < 1 || id > TOTAL_CHARACTERS) {
-				setStatus(t('enterHeroNumber', '1 ile 1000 arasında bir kahraman numarası gir.'));
-				return;
-			}
-
-			state.page = Math.floor((id - 1) / PAGE_SIZE);
-			renderRoster();
-			updateHud();
-			saveProgress();
-			setStatus(fmt('jumpedToHero', 'Jumped to hero #{id}.', {id: id}));
-		}
-
-		function fireProjectile(from, target, damage, color, speed, friendly) {
-			const dx = target.x - from.x;
-			const dy = target.y - from.y;
-			const distance = Math.max(1, Math.sqrt((dx * dx) + (dy * dy)));
-			state.projectiles.push({
-				x: from.x,
-				y: from.y,
-				vx: (dx / distance) * speed,
-				vy: (dy / distance) * speed,
-				damage: damage,
-				color: color,
-				friendly: friendly,
-				life: 1.6
-			});
-		}
-
-		function nearestEnemy() {
-			let best = null;
-			let bestDistance = Infinity;
-
-			state.enemies.forEach(function (enemy) {
-				const dx = enemy.x - state.hero.x;
-				const dy = enemy.y - state.hero.y;
-				const distance = Math.sqrt((dx * dx) + (dy * dy));
-				if (distance < bestDistance) {
-					best = enemy;
-					bestDistance = distance;
-				}
-			});
-
-			return best;
-		}
-
-		function updateHero(delta) {
-			let moveX = 0;
-			let moveY = 0;
-
-			if (state.keys.left) {
-				moveX -= 1;
-			}
-			if (state.keys.right) {
-				moveX += 1;
-			}
-			if (state.keys.up) {
-				moveY -= 1;
-			}
-			if (state.keys.down) {
-				moveY += 1;
-			}
-
-			if (state.touchTarget) {
-				const dx = state.touchTarget.x - state.hero.x;
-				const dy = state.touchTarget.y - state.hero.y;
-				const distance = Math.sqrt((dx * dx) + (dy * dy));
-				if (distance > 10) {
-					moveX += dx / distance;
-					moveY += dy / distance;
-				}
-			}
-
-			if (moveX !== 0 || moveY !== 0) {
-				const norm = Math.sqrt((moveX * moveX) + (moveY * moveY));
-				state.hero.x += (moveX / norm) * state.hero.speed * 60 * delta;
-				state.hero.y += (moveY / norm) * state.hero.speed * 60 * delta;
-			}
-
-			state.hero.x = clamp(state.hero.x, state.hero.radius, WIDTH - state.hero.radius);
-			state.hero.y = clamp(state.hero.y, state.hero.radius, HEIGHT - state.hero.radius);
-
-			state.hero.cooldown -= delta;
-			const target = nearestEnemy();
-			if (target && state.hero.cooldown <= 0) {
-				fireProjectile(state.hero, target, state.hero.damage, state.hero.color, 6.4, true);
-				state.hero.cooldown = state.hero.fireInterval;
-			}
-		}
-
-		function updateEnemySpawns(delta) {
-			if (state.spawned >= state.targetEnemyCount) {
-				return;
-			}
-
-			state.spawnTimer -= delta;
-			if (state.spawnTimer > 0) {
-				return;
-			}
-
-			state.enemies.push(createEnemy(state.spawned));
-			state.spawned += 1;
-			state.spawnTimer = Math.max(0.18, 0.8 - (state.level * 0.012));
-		}
-
-		function updateEnemies(delta) {
-			for (let i = state.enemies.length - 1; i >= 0; i--) {
-				const enemy = state.enemies[i];
-				const dx = state.hero.x - enemy.x;
-				const dy = state.hero.y - enemy.y;
-				const distance = Math.max(1, Math.sqrt((dx * dx) + (dy * dy)));
-				const orbitX = -dy / distance;
-				const orbitY = dx / distance;
-
-				enemy.x += ((dx / distance) * enemy.speed + (orbitX * 0.22 * enemy.strafe)) * 60 * delta;
-				enemy.y += ((dy / distance) * enemy.speed + (orbitY * 0.22 * enemy.strafe)) * 60 * delta;
-
-				enemy.x = clamp(enemy.x, enemy.radius, WIDTH - enemy.radius);
-				enemy.y = clamp(enemy.y, enemy.radius, HEIGHT - enemy.radius);
-
-				enemy.cooldown -= delta;
-				if (distance < 140 && enemy.cooldown <= 0) {
-					fireProjectile(enemy, state.hero, enemy.damage, '#fecaca', 4.8 + (state.level * 0.03), false);
-					enemy.cooldown = enemy.reload;
-				}
-
-				if (distance < enemy.radius + state.hero.radius + 4) {
-					state.hero.hp -= enemy.damage * 0.35 * delta * 60;
-				}
-
-				if (enemy.hp <= 0) {
-					state.enemies.splice(i, 1);
-				}
-			}
-		}
-
-		function updateProjectiles(delta) {
-			for (let i = state.projectiles.length - 1; i >= 0; i--) {
-				const projectile = state.projectiles[i];
-				projectile.x += projectile.vx * 60 * delta;
-				projectile.y += projectile.vy * 60 * delta;
-				projectile.life -= delta;
-
-				if (projectile.life <= 0 || projectile.x < -20 || projectile.x > WIDTH + 20 || projectile.y < -20 || projectile.y > HEIGHT + 20) {
-					state.projectiles.splice(i, 1);
-					continue;
-				}
-
-				if (projectile.friendly) {
-					let hitEnemy = null;
-					for (let j = 0; j < state.enemies.length; j++) {
-						const enemy = state.enemies[j];
-						const dx = projectile.x - enemy.x;
-						const dy = projectile.y - enemy.y;
-						if ((dx * dx) + (dy * dy) <= Math.pow(enemy.radius + 4, 2)) {
-							hitEnemy = enemy;
-							break;
-						}
-					}
-
-					if (hitEnemy) {
-						hitEnemy.hp -= projectile.damage;
-						state.projectiles.splice(i, 1);
-						continue;
-					}
-				} else {
-					const hx = projectile.x - state.hero.x;
-					const hy = projectile.y - state.hero.y;
-					if ((hx * hx) + (hy * hy) <= Math.pow(state.hero.radius + 4, 2)) {
-						state.hero.hp -= projectile.damage;
-						state.projectiles.splice(i, 1);
-					}
-				}
-			}
-		}
-
-		function drawArenaBackground() {
-			ctx.clearRect(0, 0, WIDTH, HEIGHT);
-
-			const gridSize = 38;
-			ctx.fillStyle = '#10233d';
-			ctx.fillRect(0, 0, WIDTH, HEIGHT);
-			ctx.strokeStyle = 'rgba(147, 197, 253, 0.08)';
-			ctx.lineWidth = 1;
-
-			for (let x = 0; x < WIDTH; x += gridSize) {
-				ctx.beginPath();
-				ctx.moveTo(x, 0);
-				ctx.lineTo(x, HEIGHT);
-				ctx.stroke();
-			}
-
-			for (let y = 0; y < HEIGHT; y += gridSize) {
-				ctx.beginPath();
-				ctx.moveTo(0, y);
-				ctx.lineTo(WIDTH, y);
-				ctx.stroke();
-			}
-		}
-
-		function drawHero() {
-			const hero = state.hero;
-			ctx.beginPath();
-			ctx.fillStyle = hero.color;
-			ctx.arc(hero.x, hero.y, hero.radius, 0, Math.PI * 2);
-			ctx.fill();
-
-			ctx.strokeStyle = '#ffffff';
-			ctx.lineWidth = 2;
-			ctx.stroke();
-
-			ctx.fillStyle = '#ffffff';
-			ctx.fillRect(hero.x - 22, hero.y - 28, 44, 6);
-			ctx.fillStyle = '#22c55e';
-			ctx.fillRect(hero.x - 22, hero.y - 28, 44 * Math.max(0, hero.hp / hero.maxHp), 6);
-		}
-
-		function drawEnemies() {
-			state.enemies.forEach(function (enemy) {
-				ctx.beginPath();
-				ctx.fillStyle = enemy.color;
-				ctx.arc(enemy.x, enemy.y, enemy.radius, 0, Math.PI * 2);
-				ctx.fill();
-
-				ctx.strokeStyle = '#fff7ed';
-				ctx.lineWidth = 2;
-				ctx.stroke();
-
-				ctx.fillStyle = '#ffffff';
-				ctx.fillRect(enemy.x - 18, enemy.y - 24, 36, 5);
-				ctx.fillStyle = '#fb7185';
-				ctx.fillRect(enemy.x - 18, enemy.y - 24, 36 * Math.max(0, enemy.hp / enemy.maxHp), 5);
-			});
-		}
-
-		function drawProjectiles() {
-			state.projectiles.forEach(function (projectile) {
-				ctx.beginPath();
-				ctx.fillStyle = projectile.color;
-				ctx.arc(projectile.x, projectile.y, projectile.friendly ? 4 : 5, 0, Math.PI * 2);
-				ctx.fill();
-			});
-		}
-
-		function drawOverlay() {
-			if (state.running) {
-				return;
-			}
-
-			ctx.fillStyle = 'rgba(7, 16, 28, 0.28)';
-			ctx.fillRect(0, 0, WIDTH, HEIGHT);
-			ctx.fillStyle = '#ffffff';
-			ctx.textAlign = 'center';
-
-			if (state.gameOver) {
-				ctx.font = 'bold 36px Arial';
-				ctx.fillText(t('runOver', 'Run Over'), WIDTH / 2, HEIGHT / 2 - 8);
-				ctx.font = '20px Arial';
-				ctx.fillText(t('restartOrBuy', 'Yeniden başla veya kadrodan daha güçlü bir savaşçı al.'), WIDTH / 2, HEIGHT / 2 + 28);
-				return;
-			}
-
-			ctx.font = 'bold 34px Arial';
-			ctx.fillText(t('arenaTitle', '1000 Kadro Arenası'), WIDTH / 2, HEIGHT / 2 - 8);
-			ctx.font = '20px Arial';
-			ctx.fillText(state.level === 1 ? t('pressStartRun', 'Press Start to begin your run.') : fmt('pressNextWave', 'Press Next Wave to continue to level {level}.', {level: state.level}), WIDTH / 2, HEIGHT / 2 + 28);
-		}
-
-		function draw() {
-			drawArenaBackground();
-			drawProjectiles();
-			drawEnemies();
-			drawHero();
-			drawOverlay();
-		}
-
-		function update(delta) {
-			updateHero(delta);
-			updateEnemySpawns(delta);
-			updateEnemies(delta);
-			updateProjectiles(delta);
-
-			if (state.hero.hp <= 0) {
-				state.hero.hp = 0;
-				updateHud();
-				loseGame();
-				return;
-			}
-
-			if (state.spawned >= state.targetEnemyCount && state.enemies.length === 0) {
-				updateHud();
-				nextLevel();
-				return;
-			}
-
-			updateHud();
-		}
-
-		function loop(timestamp) {
-			if (!state.running) {
-				draw();
-				return;
-			}
-
-			const delta = Math.min(0.033, (timestamp - state.lastTime) / 1000);
-			state.lastTime = timestamp;
-			update(delta);
-			draw();
-
-			if (state.running) {
-				window.requestAnimationFrame(loop);
-			}
-		}
-
-		function updateKeyState(isDown, key) {
-			if (key === 'ArrowUp' || key === 'w' || key === 'W') {
-				state.keys.up = isDown;
-			}
-			if (key === 'ArrowDown' || key === 's' || key === 'S') {
+			saveServerProgress(accounts[stat…5549 tokens truncated…== 'S') {
 				state.keys.down = isDown;
 			}
 			if (key === 'ArrowLeft' || key === 'a' || key === 'A') {
@@ -1674,7 +954,7 @@ if (!function_exists('zo_game_roster_1000_render')) {
 				'down' => 'Down',
 				'right' => 'Right',
 				'help' => 'Use arrow keys or WASD on desktop. On mobile, tap the arena to move toward that point or use the move buttons. Clear each wave to earn 50 coins, then buy stronger characters.',
-				'pickOrBuyStatus' => 'Bir karakter seç veya satın al, sonra Başlat düğmesine bas. Temizlenen her dalga 50 coin verir.',
+				'pickOrBuyStatus' => 'Bir karakter seÃ§ veya satÄ±n al, sonra BaÅŸlat dÃ¼ÄŸmesine bas. Temizlenen her dalga 50 coin verir.',
 				'shopTitle' => '1000 Hero Shop',
 				'prev' => 'Prev',
 				'next' => 'Next',
@@ -1700,101 +980,101 @@ if (!function_exists('zo_game_roster_1000_render')) {
 				'bloomName' => 'Bloom',
 				'stoneName' => 'Stone',
 				'sparkBio' => 'Fast feet and quick shots.',
-				'shieldBio' => 'Zorlu dalgalarda daha uzun dayanır.',
-				'novaBio' => 'Dengeli kontrolle güçlü vuruşlar.',
+				'shieldBio' => 'Zorlu dalgalarda daha uzun dayanÄ±r.',
+				'novaBio' => 'Dengeli kontrolle gÃ¼Ã§lÃ¼ vuruÅŸlar.',
 				'echoBio' => 'Dengeli arena duelist.',
-				'bloomBio' => 'Seri ateş baskısı uzmanı.',
-				'stoneBio' => 'Yavaş, dayanıklı ve ağır vuruşlu.',
-				'levelStarted' => 'Seviye {level} başladı. Düşmanlar her dalgada daha güçlü ve daha kalabalık olur.',
-				'waveCleared' => 'Dalga temizlendi. 50 coin kazandın. {level}. seviye için hazır olduğunda Sonraki Dalga düğmesine bas.',
-				'heroDefeated' => 'Kahramanın {level}. seviyede yenildi. Daha güçlü bir karakter al veya koşuyu yeniden başlat.',
+				'bloomBio' => 'Seri ateÅŸ baskÄ±sÄ± uzmanÄ±.',
+				'stoneBio' => 'YavaÅŸ, dayanÄ±klÄ± ve aÄŸÄ±r vuruÅŸlu.',
+				'levelStarted' => 'Seviye {level} baÅŸladÄ±. DÃ¼ÅŸmanlar her dalgada daha gÃ¼Ã§lÃ¼ ve daha kalabalÄ±k olur.',
+				'waveCleared' => 'Dalga temizlendi. 50 coin kazandÄ±n. {level}. seviye iÃ§in hazÄ±r olduÄŸunda Sonraki Dalga dÃ¼ÄŸmesine bas.',
+				'heroDefeated' => 'KahramanÄ±n {level}. seviyede yenildi. Daha gÃ¼Ã§lÃ¼ bir karakter al veya koÅŸuyu yeniden baÅŸlat.',
 				'heroSelected' => '{name} is now selected.',
-				'notEnoughCoins' => '{name} için yeterli coin yok. Her seferinde 50 coin kazanmak için daha fazla dalga temizle.',
-				'boughtHero' => '{name}, {price} coin karşılığında alındı.',
-				'enterHeroNumber' => '1 ile 1000 arasında bir kahraman numarası gir.',
+				'notEnoughCoins' => '{name} iÃ§in yeterli coin yok. Her seferinde 50 coin kazanmak iÃ§in daha fazla dalga temizle.',
+				'boughtHero' => '{name}, {price} coin karÅŸÄ±lÄ±ÄŸÄ±nda alÄ±ndÄ±.',
+				'enterHeroNumber' => '1 ile 1000 arasÄ±nda bir kahraman numarasÄ± gir.',
 				'jumpedToHero' => 'Jumped to hero #{id}.',
 				'runOver' => 'Run Over',
-				'restartOrBuy' => 'Yeniden başla veya kadrodan daha güçlü bir savaşçı al.',
-				'arenaTitle' => '1000 Kadro Arenası',
+				'restartOrBuy' => 'Yeniden baÅŸla veya kadrodan daha gÃ¼Ã§lÃ¼ bir savaÅŸÃ§Ä± al.',
+				'arenaTitle' => '1000 Kadro ArenasÄ±',
 				'pressStartRun' => 'Press Start to begin your run.',
 				'pressNextWave' => 'Press Next Wave to continue to level {level}.',
 			),
 			'tr' => array(
-				'title' => '1000 Karakter Arenası',
-				'subtitle' => 'Sonsuz arena dalgalarında savaş, her galibiyette 50 coin kazan ve 1000 kahramanlık listeden satın alarak takımını büyüt. Yüksek seviyeler daha akıllı hareket eden ve daha güçlü saldıran daha fazla düşman gönderir.',
+				'title' => '1000 Karakter ArenasÄ±',
+				'subtitle' => 'Sonsuz arena dalgalarÄ±nda savaÅŸ, her galibiyette 50 coin kazan ve 1000 kahramanlÄ±k listeden satÄ±n alarak takÄ±mÄ±nÄ± bÃ¼yÃ¼t. YÃ¼ksek seviyeler daha akÄ±llÄ± hareket eden ve daha gÃ¼Ã§lÃ¼ saldÄ±ran daha fazla dÃ¼ÅŸman gÃ¶nderir.',
 				'coins' => 'Coin',
 				'level' => 'Seviye',
-				'enemies' => 'Düşmanlar',
+				'enemies' => 'DÃ¼ÅŸmanlar',
 				'hero' => 'Kahraman',
 				'wins' => 'Galibiyet',
 				'accountName' => 'Hesap',
 				'pin' => 'PIN (4-9 hane)',
-				'createAccount' => 'Hesap Oluştur',
-				'signIn' => 'Giriş Yap',
-				'signOut' => 'Çıkış',
+				'createAccount' => 'Hesap OluÅŸtur',
+				'signIn' => 'GiriÅŸ Yap',
+				'signOut' => 'Ã‡Ä±kÄ±ÅŸ',
 				'accountNamePlaceholder' => 'Arslan',
 				'pinPlaceholder' => '1234',
-				'accountRequired' => 'Oynamak için hesap oluştur veya PIN ile giriş yap.',
-				'signedInAs' => '{name} olarak giriş yapıldı.',
-				'storageBlocked' => 'Bu tarayıcı kayıtlı hesapları engelliyor.',
-				'nameRequired' => 'Bir hesap adı yaz.',
+				'accountRequired' => 'Oynamak iÃ§in hesap oluÅŸtur veya PIN ile giriÅŸ yap.',
+				'signedInAs' => '{name} olarak giriÅŸ yapÄ±ldÄ±.',
+				'storageBlocked' => 'Bu tarayÄ±cÄ± kayÄ±tlÄ± hesaplarÄ± engelliyor.',
+				'nameRequired' => 'Bir hesap adÄ± yaz.',
 				'pinRequired' => '4-9 haneli bir PIN yap.',
-				'accountExists' => 'Bu hesap zaten var. Giriş Yap kullan.',
-				'signinNeeded' => 'Hesap adını ve 4-9 haneli PIN gir.',
-				'badSignin' => 'Hesap adı veya PIN eşleşmedi.',
-				'signedOut' => 'Çıkış yapıldı. Tekrar oynamak için PIN gir.',
-				'start' => 'Başlat',
+				'accountExists' => 'Bu hesap zaten var. GiriÅŸ Yap kullan.',
+				'signinNeeded' => 'Hesap adÄ±nÄ± ve 4-9 haneli PIN gir.',
+				'badSignin' => 'Hesap adÄ± veya PIN eÅŸleÅŸmedi.',
+				'signedOut' => 'Ã‡Ä±kÄ±ÅŸ yapÄ±ldÄ±. Tekrar oynamak iÃ§in PIN gir.',
+				'start' => 'BaÅŸlat',
 				'nextWave' => 'Sonraki Dalga',
-				'restartRun' => 'Koşuyu Yeniden Başlat',
-				'up' => 'Yukarı',
+				'restartRun' => 'KoÅŸuyu Yeniden BaÅŸlat',
+				'up' => 'YukarÄ±',
 				'left' => 'Sol',
-				'down' => 'Aşağı',
-				'right' => 'Sağ',
-				'help' => 'Bilgisayarda ok tuşlarını veya WASD kullan. Mobilde o noktaya gitmek için arenaya dokun veya hareket düğmelerini kullan. Her dalgayı temizleyip 50 coin kazan, sonra daha güçlü karakterler satın al.',
-				'pickOrBuyStatus' => 'Bir karakter seç veya satın al, sonra Başlat’a bas. Temizlenen her dalga 50 coin verir.',
-				'shopTitle' => '1000 Kahraman Mağazası',
-				'prev' => 'Önceki',
+				'down' => 'AÅŸaÄŸÄ±',
+				'right' => 'SaÄŸ',
+				'help' => 'Bilgisayarda ok tuÅŸlarÄ±nÄ± veya WASD kullan. Mobilde o noktaya gitmek iÃ§in arenaya dokun veya hareket dÃ¼ÄŸmelerini kullan. Her dalgayÄ± temizleyip 50 coin kazan, sonra daha gÃ¼Ã§lÃ¼ karakterler satÄ±n al.',
+				'pickOrBuyStatus' => 'Bir karakter seÃ§ veya satÄ±n al, sonra BaÅŸlatâ€™a bas. Temizlenen her dalga 50 coin verir.',
+				'shopTitle' => '1000 Kahraman MaÄŸazasÄ±',
+				'prev' => 'Ã–nceki',
 				'next' => 'Sonraki',
 				'pageLabel' => 'Sayfa {page} / {pages}',
 				'showingHeroes' => 'Kahramanlar {from}-{to} / {total}',
 				'heroPlaceholder' => 'Kahraman #',
-				'jumpAria' => 'Kahraman numarasına git',
+				'jumpAria' => 'Kahraman numarasÄ±na git',
 				'go' => 'Git',
-				'canvasLabel' => '1000 Karakter Arenası',
+				'canvasLabel' => '1000 Karakter ArenasÄ±',
 				'hp' => 'Can',
-				'power' => 'Güç',
-				'speed' => 'Hız',
+				'power' => 'GÃ¼Ã§',
+				'speed' => 'HÄ±z',
 				'rapid' => 'Seri',
-				'selected' => 'Seçili',
-				'select' => 'Seç',
-				'buy' => 'Satın Al',
+				'selected' => 'SeÃ§ili',
+				'select' => 'SeÃ§',
+				'buy' => 'SatÄ±n Al',
 				'costCoins' => 'Bedel: {price} coin.',
 				'tierLabel' => 'Kademe {tier}',
-				'sparkName' => 'Kıvılcım',
+				'sparkName' => 'KÄ±vÄ±lcÄ±m',
 				'shieldName' => 'Kalkan',
 				'novaName' => 'Nova',
-				'echoName' => 'Yankı',
-				'bloomName' => 'Çiçek',
-				'stoneName' => 'Taş',
-				'sparkBio' => 'Hızlı ayaklar ve seri atışlar.',
-				'shieldBio' => 'Zorlu dalgalarda daha uzun dayanır.',
-				'novaBio' => 'Dengeli kontrolle güçlü vuruşlar yapar.',
-				'echoBio' => 'Dengeli bir arena düellocusu.',
-				'bloomBio' => 'Seri atış baskısında uzmandır.',
-				'stoneBio' => 'Yavaş, dayanıklı ve ağır vuruşludur.',
-				'levelStarted' => 'Seviye {level} başladı. Düşmanlar her dalgada daha güçlü ve daha kalabalık olur.',
-				'waveCleared' => 'Dalga temizlendi. 50 coin kazandın. {level}. seviye için hazır olduğunda Sonraki Dalga’ya bas.',
-				'heroDefeated' => 'Kahramanın {level}. seviyede yenildi. Daha güçlü bir karakter al veya koşuyu yeniden başlat.',
-				'heroSelected' => '{name} artık seçili.',
-				'notEnoughCoins' => '{name} için yeterli coin yok. Her dalgada 50 coin kazanmak için daha fazla dalga temizle.',
-				'boughtHero' => '{name}, {price} coin karşılığında alındı.',
-				'enterHeroNumber' => '1 ile 1000 arasında bir kahraman numarası gir.',
-				'jumpedToHero' => 'Kahraman #{id} bölümüne gidildi.',
-				'runOver' => 'Koşu Bitti',
-				'restartOrBuy' => 'Yeniden başla veya listeden daha güçlü bir savaşçı al.',
-				'arenaTitle' => '1000 Karakter Arenası',
-				'pressStartRun' => 'Koşuya başlamak için Başlat’a bas.',
-				'pressNextWave' => '{level}. seviyeye devam etmek için Sonraki Dalga’ya bas.',
+				'echoName' => 'YankÄ±',
+				'bloomName' => 'Ã‡iÃ§ek',
+				'stoneName' => 'TaÅŸ',
+				'sparkBio' => 'HÄ±zlÄ± ayaklar ve seri atÄ±ÅŸlar.',
+				'shieldBio' => 'Zorlu dalgalarda daha uzun dayanÄ±r.',
+				'novaBio' => 'Dengeli kontrolle gÃ¼Ã§lÃ¼ vuruÅŸlar yapar.',
+				'echoBio' => 'Dengeli bir arena dÃ¼ellocusu.',
+				'bloomBio' => 'Seri atÄ±ÅŸ baskÄ±sÄ±nda uzmandÄ±r.',
+				'stoneBio' => 'YavaÅŸ, dayanÄ±klÄ± ve aÄŸÄ±r vuruÅŸludur.',
+				'levelStarted' => 'Seviye {level} baÅŸladÄ±. DÃ¼ÅŸmanlar her dalgada daha gÃ¼Ã§lÃ¼ ve daha kalabalÄ±k olur.',
+				'waveCleared' => 'Dalga temizlendi. 50 coin kazandÄ±n. {level}. seviye iÃ§in hazÄ±r olduÄŸunda Sonraki Dalgaâ€™ya bas.',
+				'heroDefeated' => 'KahramanÄ±n {level}. seviyede yenildi. Daha gÃ¼Ã§lÃ¼ bir karakter al veya koÅŸuyu yeniden baÅŸlat.',
+				'heroSelected' => '{name} artÄ±k seÃ§ili.',
+				'notEnoughCoins' => '{name} iÃ§in yeterli coin yok. Her dalgada 50 coin kazanmak iÃ§in daha fazla dalga temizle.',
+				'boughtHero' => '{name}, {price} coin karÅŸÄ±lÄ±ÄŸÄ±nda alÄ±ndÄ±.',
+				'enterHeroNumber' => '1 ile 1000 arasÄ±nda bir kahraman numarasÄ± gir.',
+				'jumpedToHero' => 'Kahraman #{id} bÃ¶lÃ¼mÃ¼ne gidildi.',
+				'runOver' => 'KoÅŸu Bitti',
+				'restartOrBuy' => 'Yeniden baÅŸla veya listeden daha gÃ¼Ã§lÃ¼ bir savaÅŸÃ§Ä± al.',
+				'arenaTitle' => '1000 Karakter ArenasÄ±',
+				'pressStartRun' => 'KoÅŸuya baÅŸlamak iÃ§in BaÅŸlatâ€™a bas.',
+				'pressNextWave' => '{level}. seviyeye devam etmek iÃ§in Sonraki Dalgaâ€™ya bas.',
 			),
 		);
 		$i18n = array_merge($translations['en'], isset($translations[$language]) ? $translations[$language] : array());
@@ -1913,10 +1193,11 @@ if (!function_exists('zo_game_roster_1000_render')) {
 
 return array(
 	'slug'            => 'roster-1000',
-	'name'            => 'TR: 1000 Karakter Arenası | EN: Roster 1000 | DE: Roster 1000 | FR: Roster 1000 | ES-MX: Roster 1000 | ES-ES: Roster 1000',
+	'name'            => 'TR: 1000 Karakter ArenasÄ± | EN: Roster 1000 | DE: Roster 1000 | FR: Roster 1000 | ES-MX: Roster 1000 | ES-ES: Roster 1000',
 	'author'          => 'Asker',
-	'description'     => 'TR: 1000 satın alınabilir karakter, her seviyede zorlaşan yapay zeka, her dalgada daha fazla düşman ve her galibiyette 50 coin sunan sonsuz bir arena oyunu. | EN: An endless arena game with 1000 buyable characters, harder AI every level, more enemies per wave, and 50 coins for every win. | DE: Ein endloses Arena-Spiel mit 1000 kaufbaren Figuren, schwierigerer KI pro Level, mehr Gegnern pro Welle und 50 Münzen für jeden Sieg. | FR: Un jeu d’arène sans fin avec 1000 personnages à acheter, une IA plus difficile à chaque niveau, plus d’ennemis par vague et 50 pièces par victoire. | ES-MX: Un juego de arena sin fin con 1000 personajes comprables, IA más difícil en cada nivel, más enemigos por oleada y 50 monedas por victoria. | ES-ES: Un juego de arena sin fin con 1000 personajes comprables, IA más difícil en cada nivel, más enemigos por oleada y 50 monedas por victoria.',
+	'description'     => 'TR: 1000 satÄ±n alÄ±nabilir karakter, her seviyede zorlaÅŸan yapay zeka, her dalgada daha fazla dÃ¼ÅŸman ve her galibiyette 50 coin sunan sonsuz bir arena oyunu. | EN: An endless arena game with 1000 buyable characters, harder AI every level, more enemies per wave, and 50 coins for every win. | DE: Ein endloses Arena-Spiel mit 1000 kaufbaren Figuren, schwierigerer KI pro Level, mehr Gegnern pro Welle und 50 MÃ¼nzen fÃ¼r jeden Sieg. | FR: Un jeu dâ€™arÃ¨ne sans fin avec 1000 personnages Ã  acheter, une IA plus difficile Ã  chaque niveau, plus dâ€™ennemis par vague et 50 piÃ¨ces par victoire. | ES-MX: Un juego de arena sin fin con 1000 personajes comprables, IA mÃ¡s difÃ­cil en cada nivel, mÃ¡s enemigos por oleada y 50 monedas por victoria. | ES-ES: Un juego de arena sin fin con 1000 personajes comprables, IA mÃ¡s difÃ­cil en cada nivel, mÃ¡s enemigos por oleada y 50 monedas por victoria.',
 	'render_callback' => 'zo_game_roster_1000_render',
 	'inline_style'    => $css,
 	'inline_script'   => $js,
 );
+
