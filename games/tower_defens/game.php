@@ -411,6 +411,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
 		const width = 40;
 		const height = 24;
+		const automaticEnemiesPerSpawn = 2;
+		const highWaveStart = 5;
+		const highWaveEnemiesPerSpawn = 5;
+		const extraEnemiesPerWave = 5;
 
 		const topPath = [
 			[0,18],[1,18],[2,18],[3,18],[4,18],[5,18],[6,18],[6,17],[6,16],[6,15],[6,14],
@@ -508,7 +512,9 @@ document.addEventListener('DOMContentLoaded', function () {
 			scoreEl.textContent = String(score);
 			towersEl.textContent = String(towers.length);
 			incomeEl.textContent = String(getPassiveIncome());
-			progressEl.textContent = 'Her 5 saniyede oyun 1 düşman gönderir. Daha Fazla Düşman 2 gönderir.';
+			progressEl.textContent = wave >= highWaveStart
+				? 'Wave 5+: Her 3 saniyede 5 düşman gönderir. Daha Fazla Düşman her tıklamada 5 ekler.'
+				: 'Her 5 saniyede oyun 2 düşman gönderir. Daha Fazla Düşman her tıklamada 5 ekler.';
 		}
 
 		function isTopPathCell(x, y) {
@@ -921,19 +927,25 @@ document.addEventListener('DOMContentLoaded', function () {
 				return;
 			}
 
-			spawnQueue += 2;
-			setStatus('Daha Fazla Düşman 2 düşman ekledi.', 'good');
+			spawnQueue += extraEnemiesPerWave;
+			setStatus('Daha Fazla Düşman 5 düşman ekledi.', 'good');
 		}
 
 		function maybeSpawn() {
-			if (tick % 20 !== 0) {
+			const spawnInterval = wave >= highWaveStart ? 12 : 20;
+			if (tick % spawnInterval !== 0) {
 				return;
 			}
 
+			let enemiesToSpawn = wave >= highWaveStart
+				? highWaveEnemiesPerSpawn
+				: automaticEnemiesPerSpawn;
 			if (spawnQueue > 0) {
-				spawnEnemy(chooseEnemyType());
+				enemiesToSpawn += 1;
 				spawnQueue -= 1;
-			} else {
+			}
+
+			for (let i = 0; i < enemiesToSpawn; i++) {
 				spawnEnemy(chooseEnemyType());
 			}
 		}
@@ -1086,7 +1098,7 @@ if (!function_exists('zo_game_tower_defense_paths_render')) {
 		<div class="zo-game-root zo-game-root--tower-defense-paths" id="<?php echo esc_attr($instance_id); ?>">
 			<div class="tdp-card">
 				<h2 class="tdp-title">Tower Defense Paths</h2>
-				<p class="tdp-instructions">This version has a bigger normal map, automatic enemy spawning every 5 seconds, More Enemies adds 2 enemies, and Banka kuleleri artık 110 dolar.</p>
+				<p class="tdp-instructions">This version has a bigger normal map. Before wave 5, 2 enemies arrive every 5 seconds; from wave 5, 5 enemies arrive every 3 seconds. More Enemies adds 5 enemies every time you click it.</p>
 
 				<div class="tdp-topbar">
 					<div class="tdp-stat">
@@ -1188,7 +1200,7 @@ if (!function_exists('zo_game_tower_defense_paths_render')) {
 					</div>
 				</div>
 
-				<div class="tdp-progress">Her 5 saniyede oyun 1 düşman gönderir. Daha Fazla Düşman 2 gönderir.</div>
+				<div class="tdp-progress">Her 5 saniyede oyun 2 düşman gönderir. Daha Fazla Düşman her tıklamada 5 ekler.</div>
 			</div>
 		</div>
 		<?php
