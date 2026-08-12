@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.84.asker.arslan
+ * Version: 1.5.85.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-define('ZO_PLUGIN_VERSION', '1.5.84.asker.arslan');
+define('ZO_PLUGIN_VERSION', '1.5.85.asker.arslan');
 define('ZO_PLUGIN_FILE', __FILE__);
 define('ZO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('ZO_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -15345,7 +15345,16 @@ function zo_game_shortcode($atts = array()) {
 }
 add_shortcode('zeka_oyunu', 'zo_game_shortcode');
 
-/** Front-end account block. Add [zeka_account] to a WordPress page. */
+/**
+ * SECURITY HARD-DISABLE (2026-08-12): front-end game accounts are retired.
+ *
+ * A child-authored account experiment used 4-9 digit PINs, stored those PINs
+ * in browser localStorage, and briefly introduced anonymous account endpoints
+ * without sufficient abuse controls. A WordPress nonce is not authentication,
+ * a rate limit, or a storage cap. Do not restore account inputs or account
+ * creation here without an adult maintainer's approval and a security review.
+ * See SECURITY.md and AGENTS.md for the mandatory design requirements.
+ */
 function zo_is_arslan_account_page() {
 	return is_page('arslanin-oyunlari') || (isset($_GET['zo_account']) && sanitize_key(wp_unslash($_GET['zo_account'])) === '1' && is_page('arslanin-oyunlari'));
 }
@@ -15356,7 +15365,7 @@ function zo_account_shortcode($atts = array()) {
 	}
 	$atts = shortcode_atts(array('username' => 'arslan'), $atts, 'zeka_account');
 	$default_username = sanitize_user((string) $atts['username'], true) ?: 'arslan';
-	return '<div class="zo-account"><h2>Make your game account</h2><p class="zo-account__hint">This account is only for Arslan games on this device. Choose a username and a PIN of 4-9 digits.</p><p class="zo-account__message" data-zo-account-status role="status"></p><form class="zo-account__form" data-zo-account-form><label>Username<input type="text" name="zo_account_username" value="' . esc_attr($default_username) . '" autocomplete="username" required></label><label>4-9 digit PIN<input type="password" name="zo_account_pin" inputmode="numeric" maxlength="9" autocomplete="new-password" required data-zo-pin></label><div class="zo-account__actions"><button type="button" class="zo-account__create" data-zo-account-create>Create account</button><button type="button" class="zo-account__secondary" data-zo-account-signin>Sign in</button><button type="button" class="zo-account__secondary" data-zo-account-signout hidden>Sign out</button></div></form></div>';
+	return '<div class="zo-account zo-account--disabled" role="status"><h2>Game accounts are temporarily disabled</h2><p class="zo-account__hint">The previous account feature did not protect PINs safely. It will remain unavailable until an adult maintainer approves a security-reviewed replacement.</p></div>';
 	$message = '';
 	$message_type = 'info';
 
@@ -15434,6 +15443,17 @@ add_filter('the_content', 'zo_account_query_content', 12);
 function zo_account_shortcode_styles() {
 	$account_query = isset($_GET['zo_account']) && sanitize_key(wp_unslash($_GET['zo_account'])) === '1';
 	if (!zo_is_arslan_account_page() || (!$account_query && !has_shortcode((string) get_post_field('post_content', get_queried_object_id()), 'zeka_account'))) return;
+
+	// SECURITY: render only the disabled notice and remove known plaintext-PIN stores.
+	// Do not remove this hard stop merely to make the legacy form appear again.
+	wp_register_style('zo-account-security-disabled', false, array(), ZO_PLUGIN_VERSION);
+	wp_enqueue_style('zo-account-security-disabled');
+	wp_add_inline_style('zo-account-security-disabled', '.zo-account{max-width:620px;margin:24px auto;padding:28px;border:2px solid #b45309;border-radius:18px;background:#fff7ed;color:#7c2d12}.zo-account h2{margin:0 0 8px}.zo-account__hint{margin:0;color:#7c2d12}');
+	wp_register_script('zo-account-security-cleanup', false, array(), ZO_PLUGIN_VERSION, true);
+	wp_enqueue_script('zo-account-security-cleanup');
+	wp_add_inline_script('zo-account-security-cleanup', '(function(){try{localStorage.removeItem("zoArslanGameAccountsV1");localStorage.removeItem("zoArslanCurrentAccountV1");localStorage.removeItem("zoRoster1000AccountsV1");localStorage.removeItem("zoRoster1000CurrentAccountV1");}catch(error){}})();');
+	return;
+
 	wp_register_style('zo-account', false, array(), ZO_PLUGIN_VERSION);
 	wp_enqueue_style('zo-account');
 	wp_register_script('zo-account', false, array(), ZO_PLUGIN_VERSION, true);

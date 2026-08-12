@@ -2,6 +2,8 @@
 /.git/
 *.bak
 *.md
+!AGENTS.md
+!SECURITY.md
 *.log
 *.old
 *.orig
