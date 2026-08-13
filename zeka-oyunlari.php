@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.85.asker.arslan
+ * Version: 1.5.89.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-define('ZO_PLUGIN_VERSION', '1.5.85.asker.arslan');
+define('ZO_PLUGIN_VERSION', '1.5.81.asker.arslan');
 define('ZO_PLUGIN_FILE', __FILE__);
 define('ZO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('ZO_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -13969,10 +13969,22 @@ function zo_render_game($slug, $post_id = 0) {
 			$localized_module['description'] = $localized_metadata['description'];
 		}
 
-		$result = call_user_func($localized_module['render_callback'], (int) $post_id, $localized_module);
+		try {
+			$result = call_user_func($localized_module['render_callback'], (int) $post_id, $localized_module);
 
-		if (is_string($result)) {
-			$html = $result;
+			if (is_string($result)) {
+				$html = $result;
+			}
+		} catch (Throwable $throwable) {
+			error_log(
+				sprintf(
+					'[Zeka Oyunlari] Game render failed for "%1$s": %2$s in %3$s on line %4$d',
+					(string) $slug,
+					$throwable->getMessage(),
+					$throwable->getFile(),
+					(int) $throwable->getLine()
+				)
+			);
 		}
 	}
 
@@ -15345,18 +15357,95 @@ function zo_game_shortcode($atts = array()) {
 }
 add_shortcode('zeka_oyunu', 'zo_game_shortcode');
 
-/**
- * SECURITY HARD-DISABLE (2026-08-12): front-end game accounts are retired.
- *
- * A child-authored account experiment used 4-9 digit PINs, stored those PINs
- * in browser localStorage, and briefly introduced anonymous account endpoints
- * without sufficient abuse controls. A WordPress nonce is not authentication,
- * a rate limit, or a storage cap. Do not restore account inputs or account
- * creation here without an adult maintainer's approval and a security review.
- * See SECURITY.md and AGENTS.md for the mandatory design requirements.
- */
+/** Shared player account block. This is not a WordPress user account. */
+function zo_shared_accounts_table() {
+	global $wpdb;
+	return $wpdb->prefix . 'zo_player_accounts';
+}
+
+function zo_shared_ensure_accounts_table() {
+	global $wpdb;
+	$table = zo_shared_accounts_table();
+	require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+	dbDelta("CREATE TABLE {$table} (
+		id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+		nickname_key varchar(64) NOT NULL,
+		nickname varchar(32) NOT NULL,
+		pin_hash varchar(255) NOT NULL,
+		progress longtext NULL,
+		created_at datetime NOT NULL,
+		updated_at datetime NOT NULL,
+		PRIMARY KEY  (id),
+		UNIQUE KEY nickname_key (nickname_key)
+	) {$wpdb->get_charset_collate()};");
+	return $table;
+}
+
+function zo_shared_normalize_nickname($nickname) {
+	$nickname = sanitize_text_field(wp_unslash((string) $nickname));
+	$nickname = trim(preg_replace('/\s+/', '-', $nickname));
+	return function_exists('mb_strtolower') ? mb_strtolower(substr($nickname, 0, 32), 'UTF-8') : strtolower(substr($nickname, 0, 32));
+}
+
+function zo_shared_clean_progress($progress) {
+	if (!is_array($progress)) return array();
+	$owned = array();
+	foreach ((array) ($progress['owned'] ?? array()) as $id => $value) {
+		$id = absint($id);
+		if ($id >= 1 && $id <= 1000 && $value) $owned[(string) $id] = true;
+	}
+	$owned['1'] = true;
+	return array(
+		'coins' => min(1000000000, max(0, absint($progress['coins'] ?? 150))),
+		'level' => min(9999, max(1, absint($progress['level'] ?? 1))),
+		'wins' => min(1000000000, max(0, absint($progress['wins'] ?? 0))),
+		'page' => min(83, max(0, absint($progress['page'] ?? 0))),
+		'selectedId' => min(1000, max(1, absint($progress['selectedId'] ?? 1))),
+		'owned' => $owned,
+	);
+}
+
+function zo_shared_account_ajax() {
+	check_ajax_referer('zo_shared_account', 'nonce');
+	global $wpdb;
+	$table = zo_shared_ensure_accounts_table();
+	$nickname = isset($_POST['nickname']) ? zo_shared_normalize_nickname($_POST['nickname']) : '';
+	$pin = isset($_POST['pin']) ? preg_replace('/\D+/', '', (string) wp_unslash($_POST['pin'])) : '';
+	$mode = isset($_POST['mode']) ? sanitize_key(wp_unslash($_POST['mode'])) : 'login';
+	if ($nickname === '' || strlen($pin) < 4 || strlen($pin) > 9) wp_send_json_error(array('message' => 'Enter a nickname and a 4–9 digit PIN.'), 400);
+	$key = md5($nickname);
+	$account = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$table} WHERE nickname_key = %s LIMIT 1", $key), ARRAY_A);
+	if ($mode === 'register') {
+		if ($account) wp_send_json_error(array('message' => 'That nickname already exists. Use Sign In.'), 409);
+		$progress = isset($_POST['progress']) ? zo_shared_clean_progress(json_decode(wp_unslash($_POST['progress']), true)) : zo_shared_clean_progress(array());
+		$now = current_time('mysql', true);
+		$wpdb->insert($table, array('nickname_key' => $key, 'nickname' => $nickname, 'pin_hash' => wp_hash_password($pin), 'progress' => wp_json_encode($progress), 'created_at' => $now, 'updated_at' => $now), array('%s', '%s', '%s', '%s', '%s', '%s'));
+		if (!$wpdb->insert_id) wp_send_json_error(array('message' => 'The account could not be created.'), 500);
+		wp_send_json_success(array('nickname' => $nickname, 'progress' => $progress));
+	}
+	if (!$account || !wp_check_password($pin, $account['pin_hash'])) wp_send_json_error(array('message' => 'Nickname or PIN did not match.'), 401);
+	$progress = !empty($account['progress']) ? json_decode($account['progress'], true) : array();
+	wp_send_json_success(array('nickname' => $account['nickname'], 'progress' => zo_shared_clean_progress($progress)));
+}
+add_action('wp_ajax_nopriv_zo_shared_account', 'zo_shared_account_ajax');
+add_action('wp_ajax_zo_shared_account', 'zo_shared_account_ajax');
+
+function zo_shared_account_save_ajax() {
+	check_ajax_referer('zo_shared_account', 'nonce');
+	global $wpdb;
+	$table = zo_shared_ensure_accounts_table();
+	$nickname = isset($_POST['nickname']) ? zo_shared_normalize_nickname($_POST['nickname']) : '';
+	$pin = isset($_POST['pin']) ? preg_replace('/\D+/', '', (string) wp_unslash($_POST['pin'])) : '';
+	$account = $wpdb->get_row($wpdb->prepare("SELECT * FROM {$table} WHERE nickname_key = %s LIMIT 1", md5($nickname)), ARRAY_A);
+	if (!$account || !wp_check_password($pin, $account['pin_hash'])) wp_send_json_error(array('message' => 'Account verification failed.'), 401);
+	$wpdb->update($table, array('progress' => wp_json_encode(zo_shared_clean_progress(json_decode(wp_unslash($_POST['progress'] ?? ''), true))), 'updated_at' => current_time('mysql', true)), array('id' => (int) $account['id']), array('%s', '%s'), array('%d'));
+	wp_send_json_success();
+}
+add_action('wp_ajax_nopriv_zo_shared_account_save', 'zo_shared_account_save_ajax');
+add_action('wp_ajax_zo_shared_account_save', 'zo_shared_account_save_ajax');
+
 function zo_is_arslan_account_page() {
-	return is_page('arslanin-oyunlari') || (isset($_GET['zo_account']) && sanitize_key(wp_unslash($_GET['zo_account'])) === '1' && is_page('arslanin-oyunlari'));
+	return is_page(array('oyunlar', 'askerin-oyunlari', 'arslanin-oyunlari')) || (isset($_GET['zo_account']) && sanitize_key(wp_unslash($_GET['zo_account'])) === '1' && is_page(array('oyunlar', 'askerin-oyunlari', 'arslanin-oyunlari')));
 }
 
 function zo_account_shortcode($atts = array()) {
@@ -15365,7 +15454,7 @@ function zo_account_shortcode($atts = array()) {
 	}
 	$atts = shortcode_atts(array('username' => 'arslan'), $atts, 'zeka_account');
 	$default_username = sanitize_user((string) $atts['username'], true) ?: 'arslan';
-	return '<div class="zo-account zo-account--disabled" role="status"><h2>Game accounts are temporarily disabled</h2><p class="zo-account__hint">The previous account feature did not protect PINs safely. It will remain unavailable until an adult maintainer approves a security-reviewed replacement.</p></div>';
+	return '<div class="zo-account" data-zo-shared-account data-zo-shared-ajax="' . esc_url(admin_url('admin-ajax.php')) . '" data-zo-shared-nonce="' . esc_attr(wp_create_nonce('zo_shared_account')) . '"><h2>Game account</h2><p class="zo-account__hint">Use the same nickname and PIN on any of the game pages or another computer.</p><p class="zo-account__message" data-zo-shared-status role="status"></p><form class="zo-account__form" data-zo-shared-form><label>Nickname<input type="text" name="nickname" value="' . esc_attr($default_username) . '" autocomplete="username" required></label><label>4–9 digit PIN<input type="password" name="pin" inputmode="numeric" maxlength="9" autocomplete="new-password" required></label><div class="zo-account__actions"><button type="button" class="zo-account__create" data-zo-shared-create>Create account</button><button type="button" class="zo-account__secondary" data-zo-shared-signin>Sign in</button><button type="button" class="zo-account__secondary" data-zo-shared-signout hidden>Sign out</button></div></form></div>';
 	$message = '';
 	$message_type = 'info';
 
@@ -15433,7 +15522,7 @@ function zo_account_url() {
 }
 
 function zo_account_query_content($content) {
-	if (zo_is_arslan_account_page() && isset($_GET['zo_account']) && sanitize_key(wp_unslash($_GET['zo_account'])) === '1') {
+	if (zo_is_arslan_account_page() && strpos((string) $content, 'data-zo-shared-account') === false) {
 		return '<div id="zo-account">' . zo_account_shortcode() . '</div>' . $content;
 	}
 	return $content;
@@ -15441,19 +15530,7 @@ function zo_account_query_content($content) {
 add_filter('the_content', 'zo_account_query_content', 12);
 
 function zo_account_shortcode_styles() {
-	$account_query = isset($_GET['zo_account']) && sanitize_key(wp_unslash($_GET['zo_account'])) === '1';
-	if (!zo_is_arslan_account_page() || (!$account_query && !has_shortcode((string) get_post_field('post_content', get_queried_object_id()), 'zeka_account'))) return;
-
-	// SECURITY: render only the disabled notice and remove known plaintext-PIN stores.
-	// Do not remove this hard stop merely to make the legacy form appear again.
-	wp_register_style('zo-account-security-disabled', false, array(), ZO_PLUGIN_VERSION);
-	wp_enqueue_style('zo-account-security-disabled');
-	wp_add_inline_style('zo-account-security-disabled', '.zo-account{max-width:620px;margin:24px auto;padding:28px;border:2px solid #b45309;border-radius:18px;background:#fff7ed;color:#7c2d12}.zo-account h2{margin:0 0 8px}.zo-account__hint{margin:0;color:#7c2d12}');
-	wp_register_script('zo-account-security-cleanup', false, array(), ZO_PLUGIN_VERSION, true);
-	wp_enqueue_script('zo-account-security-cleanup');
-	wp_add_inline_script('zo-account-security-cleanup', '(function(){try{localStorage.removeItem("zoArslanGameAccountsV1");localStorage.removeItem("zoArslanCurrentAccountV1");localStorage.removeItem("zoRoster1000AccountsV1");localStorage.removeItem("zoRoster1000CurrentAccountV1");}catch(error){}})();');
-	return;
-
+	if (!zo_is_arslan_account_page()) return;
 	wp_register_style('zo-account', false, array(), ZO_PLUGIN_VERSION);
 	wp_enqueue_style('zo-account');
 	wp_register_script('zo-account', false, array(), ZO_PLUGIN_VERSION, true);
@@ -15461,6 +15538,7 @@ function zo_account_shortcode_styles() {
 	wp_add_inline_style('zo-account', '.zo-account{max-width:460px;margin:24px auto;padding:28px;border-radius:18px;background:#fff;box-shadow:0 10px 30px rgba(15,23,42,.12)}.zo-account h2{margin:0 0 8px}.zo-account__hint{color:#64748b}.zo-account__form label{display:block;margin:16px 0;font-weight:600}.zo-account__form input{display:block;width:100%;box-sizing:border-box;margin-top:7px;padding:12px;border:1px solid #cbd5e1;border-radius:10px;font:inherit}.zo-account__actions{display:flex;gap:10px;flex-wrap:wrap}.zo-account button,.zo-account__button{display:inline-block;padding:11px 16px;border:0;border-radius:10px;background:#2563eb;color:#fff;text-decoration:none;font-weight:700;cursor:pointer}.zo-account__create{background:#16a34a!important}.zo-account__create:hover,.zo-account__create:focus{background:#15803d!important}.zo-account__secondary{background:#475569!important}.zo-account__message{padding:10px 12px;border-radius:10px}.zo-account__message--error{background:#fee2e2;color:#991b1b}.zo-account__message--success{background:#dcfce7;color:#166534}');
 	wp_add_inline_script('zo-account', '(function(){document.querySelectorAll("[data-zo-pin]").forEach(function(input){input.addEventListener("input",function(){input.value=input.value.replace(/\\D/g,"").slice(0,9);});});})();');
 	wp_add_inline_script('zo-account', '(function(){document.querySelectorAll("[data-zo-account-form]").forEach(function(form){var storeKey="zoArslanGameAccountsV1",currentKey="zoArslanCurrentAccountV1",nameInput=form.querySelector("[name=zo_account_username]"),pinInput=form.querySelector("[name=zo_account_pin]"),status=form.querySelector("[data-zo-account-status]"),create=form.querySelector("[data-zo-account-create]"),signin=form.querySelector("[data-zo-account-signin]"),signout=form.querySelector("[data-zo-account-signout]");function read(){try{return JSON.parse(localStorage.getItem(storeKey)||"{}");}catch(error){return {};}}function key(){return String(nameInput.value||"").trim().toLowerCase().replace(/\\s+/g,"-").slice(0,32);}function pin(){return String(pinInput.value||"").replace(/\\D/g,"").slice(0,9);}function say(text,ok){status.textContent=text;status.className="zo-account__message "+(ok?"zo-account__message--success":"zo-account__message--error");}function refresh(){var current=localStorage.getItem(currentKey)||"";signout.hidden=!current;create.disabled=!!current;signin.disabled=!!current;if(current){nameInput.value=current;say("Signed in as "+current+".",true);}}function signIn(){var k=key(),p=pin(),accounts=read();if(!k||p.length<4||p.length>9){say("Enter a username and a 4-9 digit PIN.");return;}if(!accounts[k]||accounts[k].pin!==p){say("Username or PIN did not match.");return;}localStorage.setItem(currentKey,k);say("Signed in as "+(accounts[k].name||k)+".",true);window.dispatchEvent(new CustomEvent("zoArslanAccountChanged"));refresh();}create.addEventListener("click",function(){var k=key(),p=pin(),accounts=read();if(!k||p.length<4||p.length>9){say("Use a username and a 4-9 digit PIN.");return;}if(accounts[k]){say("That account already exists. Use Sign in.");return;}accounts[k]={name:nameInput.value.trim().slice(0,32),pin:p};localStorage.setItem(storeKey,JSON.stringify(accounts));localStorage.setItem(currentKey,k);say("Account created. Progress will be saved on this device.",true);window.dispatchEvent(new CustomEvent("zoArslanAccountChanged"));refresh();});signin.addEventListener("click",signIn);signout.addEventListener("click",function(){localStorage.removeItem(currentKey);say("Signed out.",true);window.dispatchEvent(new CustomEvent("zoArslanAccountChanged"));refresh();});pinInput.addEventListener("input",function(){pinInput.value=pin();});refresh();});})();');
+	wp_add_inline_script('zo-account', '(function(){document.querySelectorAll("[data-zo-shared-form]").forEach(function(form){var root=form.closest("[data-zo-shared-account]"),ajax=root.getAttribute("data-zo-shared-ajax"),nonce=root.getAttribute("data-zo-shared-nonce"),name=form.querySelector("[name=nickname]"),pin=form.querySelector("[name=pin]"),status=root.querySelector("[data-zo-shared-status]"),create=root.querySelector("[data-zo-shared-create]"),signin=root.querySelector("[data-zo-shared-signin]"),signout=root.querySelector("[data-zo-shared-signout]"),currentKey="zoSharedCurrentAccountV1",currentPin="zoSharedCurrentPinV1";function key(){return String(name.value||"").trim().toLowerCase().replace(/\\s+/g,"-").slice(0,32);}function say(message,ok){status.textContent=message;status.className="zo-account__message "+(ok?"zo-account__message--success":"zo-account__message--error");}function setCurrent(n,p){sessionStorage.setItem(currentKey,n);sessionStorage.setItem(currentPin,p);name.value=n;pin.value="";create.hidden=true;signin.hidden=true;signout.hidden=false;say("Signed in as "+n+".",true);}function send(mode){var n=key(),p=String(pin.value||"").replace(/\\D/g,"").slice(0,9);if(!n||p.length<4||p.length>9){say("Enter a nickname and a 4-9 digit PIN.",false);return;}var body=new URLSearchParams();body.set("action","zo_shared_account");body.set("mode",mode);body.set("nonce",nonce);body.set("nickname",n);body.set("pin",p);if(mode==="register")body.set("progress",JSON.stringify({}));fetch(ajax,{method:"POST",credentials:"same-origin",headers:{"Content-Type":"application/x-www-form-urlencoded; charset=UTF-8"},body:body.toString()}).then(function(r){return r.json();}).then(function(x){if(!x.success)throw new Error(x.data&&x.data.message||"Account request failed.");setCurrent(x.data.nickname||n,p);window.dispatchEvent(new CustomEvent("zoSharedAccountChanged"));}).catch(function(e){say(e.message,false);});}create.addEventListener("click",function(){send("register");});signin.addEventListener("click",function(){send("login");});signout.addEventListener("click",function(){sessionStorage.removeItem(currentKey);sessionStorage.removeItem(currentPin);create.hidden=false;signin.hidden=false;signout.hidden=true;pin.value="";say("Signed out.",true);window.dispatchEvent(new CustomEvent("zoSharedAccountChanged"));});pin.addEventListener("input",function(){pin.value=String(pin.value||"").replace(/\\D/g,"").slice(0,9);});var saved=sessionStorage.getItem(currentKey)||"";if(saved){name.value=saved;create.hidden=true;signin.hidden=true;signout.hidden=false;say("Signed in as "+saved+".",true);}});})();');
 }
 add_action('wp_enqueue_scripts', 'zo_account_shortcode_styles');
 
