@@ -70,27 +70,52 @@ $account_cleanup_stop = strpos($source, "wp_add_inline_script('zo-account-securi
 $legacy_pin_storage = strpos($source, 'localStorage.setItem(storeKey', $account_disable);
 
 if ($account_disable === false || $disabled_notice === false ||
-	$legacy_wordpress_account === false || $disabled_notice > $legacy_wordpress_account ||
-	$account_cleanup_stop === false || $legacy_pin_storage === false ||
-	$account_cleanup_stop > $legacy_pin_storage) {
-	$failures[] = 'The insecure game-account UI and legacy PIN code must remain hard-disabled before any credential path can execute.';
+	$account_cleanup_stop === false ||
+	$legacy_wordpress_account !== false || $legacy_pin_storage !== false) {
+	$failures[] = 'The insecure game-account UI must remain hard-disabled and its legacy credential code must remain removed.';
 }
 
-$roster_disable = strpos($roster_source, 'SECURITY BAND-AID (2026-08-12)');
-$roster_early_return = strpos($roster_source, "'render_callback' => 'zo_game_roster_1000_security_disabled_render'", $roster_disable);
-$roster_legacy_handler = strpos($roster_source, 'function zo_roster_1000_ajax_load_progress()', $roster_disable);
+if (strpos($source, 'wp_ajax_nopriv_zo_shared_account') !== false ||
+	strpos($source, 'function zo_shared_account_ajax') !== false ||
+	strpos($source, 'sessionStorage.setItem(currentPin') !== false ||
+	strpos($source, 'data-zo-shared-account') !== false ||
+	strpos($source, 'name="zo_account_pin"') !== false) {
+	$failures[] = 'Anonymous shared-account handlers and browser PIN persistence must remain removed.';
+}
 
-if ($roster_disable === false || $roster_early_return === false ||
-	$roster_legacy_handler === false || $roster_early_return > $roster_legacy_handler) {
-	$failures[] = 'Roster 1000 must remain disabled before any legacy account/progress code can register.';
+if (strpos($source, 'sessionStorage.removeItem("zoSharedCurrentAccountV1")') === false ||
+	strpos($source, 'sessionStorage.removeItem("zoSharedCurrentPinV1")') === false) {
+	$failures[] = 'The security cleanup must remove shared-account session data left by the regressed release.';
+}
+
+$roster_disable = strpos($roster_source, 'SECURITY HARD-DISABLE (2026-08-12)');
+$roster_early_return = strpos($roster_source, "'render_callback' => 'zo_game_roster_1000_security_disabled_render'", $roster_disable);
+
+if ($roster_disable === false || $roster_early_return === false) {
+	$failures[] = 'Roster 1000 must remain explicitly hard-disabled.';
+}
+
+if (strpos($roster_source, 'function zo_roster_1000_ajax_') !== false ||
+	strpos($roster_source, 'wp_ajax_zo_roster_1000') !== false ||
+	strpos($roster_source, 'ACCOUNT_STORE_KEY') !== false ||
+	strpos($roster_source, 'localStorage.setItem') !== false) {
+	$failures[] = 'Roster 1000 legacy account, progress, and plaintext-PIN code must remain removed.';
 }
 
 if (strpos($roster_source, '5549 tokens truncated') !== false) {
 	$failures[] = 'Roster 1000 must not contain a generated truncation marker in executable source.';
 }
 
+if (strpos($roster_source, '…5549 tokens truncated…') !== false) {
+	$failures[] = 'Roster 1000 must not contain the Unicode form of the generated truncation marker.';
+}
+
 if (strpos($roster_source, 'wp_ajax_nopriv_zo_roster_1000') !== false) {
 	$failures[] = 'Roster 1000 must not restore anonymous account or progress AJAX handlers.';
+}
+
+if (strpos($roster_source, "sessionStorage.removeItem('zoSharedCurrentPinV1')") === false) {
+	$failures[] = 'Roster 1000 must clear the session-stored PIN left by the regressed release.';
 }
 
 if (strpos($agent_rules, 'explicit approval from an adult') === false ||
