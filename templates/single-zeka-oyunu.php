@@ -79,7 +79,6 @@ if ($game_owner === '' && function_exists('zo_get_game_owner_for_module')) {
 	$game_owner = zo_get_game_owner_for_module($module);
 }
 $games_url  = $game_owner !== '' && function_exists('zo_get_owner_games_url') ? zo_get_owner_games_url($game_owner, $language) : $back_url;
-$show_account_button = $slug === 'roster-1000';
 
 if ($module_description !== '') {
 	$seo_description = trim($page_title . ' ' . $play_suffix . '. ' . $module_description . ' ' . $seo_keywords);
@@ -553,9 +552,6 @@ if (function_exists('zo_get_game_difficulty_label')) {
 	<div class="zo-game-page">
 		<header class="zo-game-page__header">
 			<a class="zo-game-page__back" href="<?php echo esc_url($back_url); ?>"><?php echo esc_html(function_exists('zo_get_interface_text') ? zo_get_interface_text('home', $language) : 'Geri Dön'); ?></a>
-			<?php if ($show_account_button) : ?>
-			<a class="zo-game-page__account" href="#zo-roster-account"><?php echo esc_html(function_exists('zo_get_interface_text') ? zo_get_interface_text('sign_in', $language) : 'Sign In'); ?></a>
-			<?php endif; ?>
 		</header>
 		<main class="zo-game-page__main">
 			<div class="zo-game-page__meta">
