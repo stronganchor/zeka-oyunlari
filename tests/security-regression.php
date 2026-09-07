@@ -64,15 +64,15 @@ if (strpos($source, 'FILE_APPEND') !== false) {
 }
 
 $account_disable = strpos($source, 'SECURITY HARD-DISABLE (2026-08-12)');
-$disabled_notice = strpos($source, 'Game accounts are temporarily disabled', $account_disable);
+$empty_account_shortcode = strpos($source, "\treturn '';", $account_disable);
 $legacy_wordpress_account = strpos($source, 'wp_insert_user(', $account_disable);
 $account_cleanup_stop = strpos($source, "wp_add_inline_script('zo-account-security-cleanup'", $account_disable);
 $legacy_pin_storage = strpos($source, 'localStorage.setItem(storeKey', $account_disable);
 
-if ($account_disable === false || $disabled_notice === false ||
+if ($account_disable === false || $empty_account_shortcode === false ||
 	$account_cleanup_stop === false ||
 	$legacy_wordpress_account !== false || $legacy_pin_storage !== false) {
-	$failures[] = 'The insecure game-account UI must remain hard-disabled and its legacy credential code must remain removed.';
+	$failures[] = 'The insecure game-account UI must remain absent and its legacy credential code must remain removed.';
 }
 
 if (strpos($source, 'wp_ajax_nopriv_zo_shared_account') !== false ||
