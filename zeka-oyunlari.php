@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.90.asker.arslan
+ * Version: 1.5.91.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-define('ZO_PLUGIN_VERSION', '1.5.90.asker.arslan');
+define('ZO_PLUGIN_VERSION', '1.5.91.asker.arslan');
 define('ZO_PLUGIN_FILE', __FILE__);
 define('ZO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('ZO_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -15376,7 +15376,8 @@ function zo_account_shortcode($atts = array()) {
 		return '';
 	}
 
-	return '<div class="zo-account zo-account--disabled" role="status"><h2>Game accounts are temporarily disabled</h2><p class="zo-account__hint">The previous account feature did not protect PINs safely. It will remain unavailable until an adult maintainer approves a security-reviewed replacement.</p></div>';
+	// Keep the retired account shortcode registered, but render no account UI.
+	return '';
 }
 add_shortcode('zeka_account', 'zo_account_shortcode');
 
@@ -15398,11 +15399,7 @@ function zo_account_shortcode_styles() {
 	// Clean up every page where the regressed account UI could have appeared.
 	if (!is_page(array('oyunlar', 'askerin-oyunlari', 'arslanin-oyunlari'))) return;
 
-	// SECURITY: render only the disabled notice and remove known plaintext-PIN stores.
-	// Do not remove this hard stop merely to make the legacy form appear again.
-	wp_register_style('zo-account-security-disabled', false, array(), ZO_PLUGIN_VERSION);
-	wp_enqueue_style('zo-account-security-disabled');
-	wp_add_inline_style('zo-account-security-disabled', '.zo-account{max-width:620px;margin:24px auto;padding:28px;border:2px solid #b45309;border-radius:18px;background:#fff7ed;color:#7c2d12}.zo-account h2{margin:0 0 8px}.zo-account__hint{margin:0;color:#7c2d12}');
+	// Remove known plaintext-PIN stores left by the retired account feature.
 	wp_register_script('zo-account-security-cleanup', false, array(), ZO_PLUGIN_VERSION, true);
 	wp_enqueue_script('zo-account-security-cleanup');
 	wp_add_inline_script('zo-account-security-cleanup', '(function(){try{localStorage.removeItem("zoArslanGameAccountsV1");localStorage.removeItem("zoArslanCurrentAccountV1");localStorage.removeItem("zoRoster1000AccountsV1");localStorage.removeItem("zoRoster1000CurrentAccountV1");}catch(error){}try{sessionStorage.removeItem("zoSharedCurrentAccountV1");sessionStorage.removeItem("zoSharedCurrentPinV1");sessionStorage.removeItem("zoRoster1000CurrentAccountV1");}catch(error){}})();');
