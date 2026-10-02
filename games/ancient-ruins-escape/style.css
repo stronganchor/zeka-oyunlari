@@ -1,0 +1,45 @@
+.zo-game-root--ancient-ruins-escape {
+	box-sizing: border-box;
+	max-width: 940px;
+	margin: 0 auto;
+	padding: clamp(12px, 3vw, 24px);
+	border-radius: 24px;
+	background: #1d2b2d;
+	color: #f5efd5;
+	font-family: system-ui, sans-serif;
+	box-shadow: 0 18px 42px rgba(20, 26, 23, .2);
+}
+
+.zo-game-root--ancient-ruins-escape * { box-sizing: border-box; }
+.zo-game-root--ancient-ruins-escape h2 { margin: 0 0 6px; color: #ffda76; font-size: clamp(24px, 4vw, 36px); }
+.zo-ruins-instructions { margin: 0 0 16px; line-height: 1.5; color: #e8dfc6; }
+.zo-ruins-hud { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 10px; }
+.zo-ruins-hud > div { padding: 9px 12px; border-radius: 12px; background: #344341; text-align: center; }
+.zo-ruins-hud span, .zo-ruins-hud strong { display: block; }
+.zo-ruins-hud span { font-size: 13px; color: #d8d5bd; }
+.zo-ruins-hud strong { color: #ffda76; font-size: clamp(16px, 3vw, 23px); font-variant-numeric: tabular-nums; }
+.zo-ruins-stage { position: relative; overflow: hidden; border: 3px solid #64705a; border-radius: 18px; background: #222d2e; }
+.zo-ruins-stage canvas { display: block; width: 100%; height: auto; aspect-ratio: 900 / 650; touch-action: none; }
+.zo-ruins-stage canvas:focus-visible, .zo-game-root--ancient-ruins-escape button:focus-visible { outline: 3px solid #fff; outline-offset: 2px; }
+.zo-ruins-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 20px; background: rgba(15, 26, 27, .74); color: #fff; text-align: center; pointer-events: none; }
+.zo-ruins-overlay[hidden] { display: none; }
+.zo-ruins-overlay-title { color: #ffda76; font-size: clamp(23px, 5vw, 48px); line-height: 1.1; text-wrap: balance; }
+.zo-ruins-overlay-detail { font-size: clamp(15px, 2.6vw, 22px); }
+.zo-ruins-controls { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 9px; margin-top: 12px; }
+.zo-game-root--ancient-ruins-escape button { min-height: 48px; padding: 9px; border: 0; border-radius: 12px; color: #122421; font: 700 17px system-ui, sans-serif; cursor: pointer; touch-action: manipulation; }
+.zo-game-root--ancient-ruins-escape button:hover:not(:disabled) { filter: brightness(1.1); }
+.zo-game-root--ancient-ruins-escape button:disabled { opacity: .5; cursor: default; }
+.zo-ruins-move { background: #cfbb8f; }
+.zo-ruins-move span { font-size: 14px; }
+.zo-ruins-actions { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
+.zo-ruins-actions button { min-width: 135px; }
+.zo-ruins-start { background: #ffda76; }
+.zo-ruins-pause { background: #7fd2cb; }
+.zo-ruins-status { min-height: 24px; margin: 12px 0 0; text-align: center; color: #fff1c9; }
+
+@media (max-width: 520px) {
+	.zo-ruins-controls { gap: 5px; }
+	.zo-ruins-move span { display: block; font-size: 12px; }
+	.zo-ruins-hud > div { padding: 6px 4px; }
+	.zo-ruins-actions button { min-width: 0; flex: 1; }
+}

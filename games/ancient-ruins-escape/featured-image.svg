@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-label="Runner escaping ancient ruins">
+  <defs>
+    <linearGradient id="sky" x2="0" y2="1">
+      <stop stop-color="#233236"/>
+      <stop offset="1" stop-color="#716644"/>
+    </linearGradient>
+    <linearGradient id="road" x2="0" y2="1">
+      <stop stop-color="#ddba77"/>
+      <stop offset="1" stop-color="#9c7446"/>
+    </linearGradient>
+    <linearGradient id="edge" x2="0" y2="1">
+      <stop stop-color="#b79a64"/>
+      <stop offset="1" stop-color="#66513a"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#sky)"/>
+  <circle cx="895" cy="115" r="73" fill="#ffda76" opacity=".9"/>
+  <path d="M0 270h1200v405H0z" fill="#5c5940"/>
+  <g fill="#414c43">
+    <path d="M30 255V133h160v122zm15-122 65-45 67 45zM225 255V171h136v84zm-12-84 78-49 82 49zM849 255V148h143v107zm-13-107 85-48 84 48zM1030 255V106h142v149zm-15-149 86-52 86 52z"/>
+  </g>
+  <g fill="#273835">
+    <path d="M54 157h24v98H54zm45 0h24v98H99zm45 0h24v98h-24zM243 188h21v67h-21zm38 0h21v67h-21zm38 0h21v67h-21zM871 170h22v85h-22zm42 0h22v85h-22zm42 0h22v85h-22zM1050 130h24v125h-24zm44 0h24v125h-24zm44 0h24v125h-24z"/>
+  </g>
+  <path d="M569 245h62l526 430H43z" fill="url(#edge)"/>
+  <path d="M579 245h42l446 430H133z" fill="url(#road)"/>
+  <g stroke="#9d754a" stroke-width="7" opacity=".85">
+    <path d="M587 245 407 675m206-430 180 430"/>
+    <path d="M520 340h160M430 425h340M310 535h580"/>
+  </g>
+  <g fill="#8c8b67" stroke="#4e5d4a" stroke-width="5">
+    <path d="M320 320h48v175h-48zM300 300h88v26h-88zM845 320h48v175h-48zM825 300h88v26h-88z"/>
+    <path d="M92 423h75v252H92zM68 399h123v35H68zM1033 423h75v252h-75zM1009 399h123v35h-123z"/>
+  </g>
+  <g stroke="#5b624b" stroke-width="8" opacity=".8">
+    <path d="m111 457 43 93-30 80m910-145 49 120-20 70M343 341l15 70"/>
+  </g>
+  <g transform="translate(365 460)">
+    <path d="M-92 118 0-30 92 118z" fill="#e8dfb9" stroke="#684d35" stroke-width="9"/>
+    <path d="M-64 118 0 17 64 118z" fill="#c7b98e"/>
+  </g>
+  <g transform="translate(817 395)">
+    <path d="M-62-72h124v140H-62z" fill="#64715c" stroke="#3b4c41" stroke-width="9"/>
+    <path d="M-63-72H63v27H-63z" fill="#b7aa78"/>
+    <path d="m-28-38 31 48-20 49 47 28" fill="none" stroke="#344137" stroke-width="8"/>
+  </g>
+  <g transform="translate(610 530)">
+    <ellipse cx="0" cy="92" rx="78" ry="19" fill="#493e2c" opacity=".55"/>
+    <path d="m-22 21-39 94m68-92 48 87" fill="none" stroke="#29343b" stroke-width="23" stroke-linecap="round"/>
+    <path d="M-47-80h94v107h-94z" fill="#2b9aa1" stroke="#123d46" stroke-width="8"/>
+    <path d="m-41-71 79 81" stroke="#ffd970" stroke-width="13"/>
+    <path d="m-48-58-39 58m134-58 44 52" fill="none" stroke="#e5b883" stroke-width="20" stroke-linecap="round"/>
+    <circle cx="0" cy="-106" r="34" fill="#e5b883"/>
+    <ellipse cx="0" cy="-133" rx="55" ry="13" fill="#754d2f"/>
+    <path d="M-31-145q31-37 62 0" fill="#754d2f"/>
+  </g>
+  <path d="M0 0h1200v675H0z" fill="none" stroke="#17282b" stroke-width="24"/>
+</svg>
