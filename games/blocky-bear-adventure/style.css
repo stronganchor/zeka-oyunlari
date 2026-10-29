@@ -1,0 +1,46 @@
+.zo-game-root--blocky-bear-adventure {
+	box-sizing: border-box;
+	max-width: 1000px;
+	margin: 0 auto;
+	padding: clamp(12px, 3vw, 24px);
+	border-radius: 22px;
+	background: #244d42;
+	color: #fff;
+	font-family: system-ui, sans-serif;
+	box-shadow: 0 18px 42px rgba(17, 45, 36, .2);
+}
+
+.zo-game-root--blocky-bear-adventure * { box-sizing: border-box; }
+.zo-game-root--blocky-bear-adventure h2 { margin: 0 0 6px; color: #ffdb59; font-size: clamp(24px, 4vw, 36px); }
+.zo-bear-instructions { margin: 0 0 14px; line-height: 1.5; color: #edf8e8; }
+.zo-bear-hud { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 10px; }
+.zo-bear-hud > div { padding: 8px 12px; border-radius: 12px; background: #1a3c35; text-align: center; }
+.zo-bear-hud span, .zo-bear-hud strong { display: block; }
+.zo-bear-hud span { color: #d6efcb; font-size: 13px; }
+.zo-bear-hud strong { color: #ffdb59; font-size: clamp(18px, 3vw, 24px); font-variant-numeric: tabular-nums; }
+.zo-bear-stage { position: relative; overflow: hidden; border: 3px solid #b9e49e; border-radius: 16px; background: #69c9f2; }
+.zo-bear-stage canvas { display: block; width: 100%; height: auto; aspect-ratio: 960 / 600; touch-action: none; }
+.zo-bear-stage canvas:focus-visible, .zo-game-root--blocky-bear-adventure button:focus-visible { outline: 3px solid #ffdb59; outline-offset: 2px; }
+.zo-bear-overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 20px; background: rgba(24, 62, 52, .78); text-align: center; pointer-events: none; }
+.zo-bear-overlay[hidden] { display: none; }
+.zo-bear-overlay-title { color: #ffdb59; font-size: clamp(25px, 5vw, 50px); line-height: 1.1; text-wrap: balance; }
+.zo-bear-overlay-detail { color: #fff; font-size: clamp(16px, 2.8vw, 22px); }
+.zo-bear-controls { display: grid; grid-template-columns: 1fr 1fr 1.3fr; gap: 10px; margin-top: 12px; }
+.zo-game-root--blocky-bear-adventure button { min-height: 50px; padding: 9px; border: 0; border-radius: 12px; color: #16352e; font: 700 18px system-ui, sans-serif; cursor: pointer; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
+.zo-game-root--blocky-bear-adventure button:hover:not(:disabled) { filter: brightness(1.08); }
+.zo-game-root--blocky-bear-adventure button:disabled { opacity: .5; cursor: default; }
+.zo-bear-control { background: #c8ebae; }
+.zo-bear-control:active { background: #93d96a; }
+.zo-bear-jump { background: #ffdb59; }
+.zo-bear-control span { font-size: 14px; }
+.zo-bear-actions { display: flex; justify-content: center; gap: 10px; margin-top: 10px; }
+.zo-bear-actions button { min-width: 135px; }
+.zo-bear-start { background: #ffdb59; }
+.zo-bear-pause { background: #9be1f5; }
+.zo-bear-status { min-height: 24px; margin: 12px 0 0; color: #fff8c7; text-align: center; }
+
+@media (max-width: 520px) {
+	.zo-bear-controls { gap: 6px; }
+	.zo-bear-control span { display: block; font-size: 12px; }
+	.zo-bear-actions button { min-width: 0; flex: 1; }
+}

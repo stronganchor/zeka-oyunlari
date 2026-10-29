@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 675" role="img" aria-label="Blocky bear jumping across platforms toward a flag">
+  <defs>
+    <linearGradient id="sky" x2="0" y2="1">
+      <stop stop-color="#66c6f4"/>
+      <stop offset="1" stop-color="#a8e2f7"/>
+    </linearGradient>
+    <linearGradient id="grass" x2="0" y2="1">
+      <stop stop-color="#8fe36a"/>
+      <stop offset="1" stop-color="#4caf36"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="675" fill="url(#sky)"/>
+  <g fill="#fff" opacity=".92">
+    <path d="M82 125h126v32H82zM116 96h67v62h-67zM755 104h150v35H755zM789 75h79v66h-79zM1000 173h132v30h-132zM1030 145h68v59h-68z"/>
+  </g>
+  <g fill="#84cf69">
+    <ellipse cx="150" cy="604" rx="330" ry="236"/>
+    <ellipse cx="620" cy="618" rx="350" ry="230"/>
+    <ellipse cx="1090" cy="606" rx="340" ry="250"/>
+  </g>
+  <path d="M0 548h328v127H0zm457 0h360v127H457zM945 548h255v127H945z" fill="#a86b35"/>
+  <path d="M0 548h328v19H0zm457 0h360v19H457zm488 0h255v19H945z" fill="url(#grass)"/>
+  <g fill="#c18749">
+    <path d="M24 593h26v9H24zm74 42h28v9H98zm119-40h27v9h-27zm273 17h26v9h-26zm89 38h26v9h-26zm134-48h28v9h-28zm282 36h28v9h-28zm101-43h27v9h-27z"/>
+  </g>
+  <g fill="#a86b35">
+    <path d="M244 405h207v30H244zm431-139h221v30H675zM922 418h208v30H922z"/>
+  </g>
+  <g fill="#58bf36">
+    <path d="M244 405h207v13H244zm431-139h221v13H675zM922 418h208v13H922z"/>
+  </g>
+  <g fill="#ffdc35" stroke="#d68d0d" stroke-width="7">
+    <circle cx="323" cy="355" r="20"/><circle cx="393" cy="355" r="20"/>
+    <circle cx="715" cy="217" r="20"/><circle cx="790" cy="217" r="20"/>
+    <circle cx="1000" cy="368" r="20"/><circle cx="1071" cy="368" r="20"/>
+  </g>
+  <g transform="translate(560 346) rotate(-8)">
+    <path d="M-64-75h33v35h-33zm95 0h33v35H31z" fill="#784119"/>
+    <path d="M-70-50h140v98H-70z" fill="#b96b24" stroke="#653813" stroke-width="8"/>
+    <path d="M-42-11h84v48h-84z" fill="#ffe1a0"/>
+    <path d="M-38-28h13v20h-13zm63 0h13v20H25zM-10 7h20v13h-20z" fill="#251c18"/>
+    <path d="M-54 48h108v70H-54z" fill="#93501c"/>
+    <path d="M-27 54h54v51h-54z" fill="#f8d18a"/>
+    <path d="M-58 112h42v17h-42zm74 0h42v17H16z" fill="#633813"/>
+    <path d="M-70 44h-23v49h23zm140 0h23v49H70z" fill="#93501c"/>
+  </g>
+  <g transform="translate(1030 494)">
+    <path d="M-48-57h26v37h-26zm70 0h26v37H22z" fill="#ee418e"/>
+    <path d="M-55-28h110v78H-55z" fill="#e92b7f" stroke="#ad1d60" stroke-width="7"/>
+    <path d="M-32-5h26v27h-26zM6-5h26v27H6z" fill="#fff"/>
+    <path d="M-17 1h10v15h-10zm25 0h10v15H8z" fill="#241b29"/>
+  </g>
+  <path d="M1153 333h8v215h-8z" fill="#fff5d8"/>
+  <path d="M1161 333h78v48h-78z" fill="#ffb526"/>
+  <path d="M0 0h1200v675H0z" fill="none" stroke="#25554a" stroke-width="24"/>
+</svg>
