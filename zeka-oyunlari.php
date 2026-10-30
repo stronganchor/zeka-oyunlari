@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.97.asker.arslan
+ * Version: 1.5.98.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-define('ZO_PLUGIN_VERSION', '1.5.97.asker.arslan');
+define('ZO_PLUGIN_VERSION', '1.5.98.asker.arslan');
 define('ZO_PLUGIN_FILE', __FILE__);
 define('ZO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('ZO_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -138,6 +138,117 @@ function zo_get_page_loader_css() {
 		animation-duration: 1600ms;
 	}
 }
+.zo-page-loader {
+	padding: 24px;
+	background: radial-gradient(circle at 50% 48%, rgba(213, 239, 255, 0.7), transparent 38%), rgba(245, 249, 255, 0.94);
+	backdrop-filter: blur(10px);
+	transition: opacity 300ms ease, visibility 300ms ease;
+}
+.zo-page-loader__button {
+	position: relative;
+	overflow: hidden;
+	display: inline-flex;
+	align-items: center;
+	gap: 13px;
+	min-width: 214px;
+	padding: 14px 20px 14px 14px;
+	border: 1px solid rgba(30, 88, 164, 0.22);
+	border-radius: 999px;
+	background: linear-gradient(135deg, #123d78, #176ac2);
+	box-shadow: 0 14px 34px rgba(20, 75, 145, 0.24), inset 0 1px rgba(255, 255, 255, 0.22);
+	color: #fff;
+	font: 700 0.94rem/1 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+.zo-page-loader__button::before {
+	position: absolute;
+	top: 0;
+	left: -45%;
+	width: 28%;
+	height: 100%;
+	background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.22), transparent);
+	content: "";
+	transform: skewX(-18deg);
+	animation: zoPageLoaderShine 2.4s ease-in-out infinite;
+}
+.zo-page-loader__button::after {
+	position: absolute;
+	right: 18px;
+	bottom: 0;
+	left: 18px;
+	height: 2px;
+	border-radius: 99px;
+	background: linear-gradient(90deg, #7bf2ff, #ffffff, #7bf2ff);
+	box-shadow: 0 0 10px rgba(123, 242, 255, 0.9);
+	content: "";
+	transform: scaleX(0.25);
+	transform-origin: left;
+	animation: zoPageLoaderProgress 1.7s ease-in-out infinite;
+}
+.zo-page-loader__spinner {
+	display: grid;
+	flex: 0 0 34px;
+	place-items: center;
+	width: 34px;
+	height: 34px;
+	border: 3px solid rgba(255, 255, 255, 0.28);
+	border-top-color: #77ecff;
+	border-radius: 50%;
+	animation: zoPageLoaderSpin 850ms linear infinite;
+}
+.zo-page-loader__spinner::after {
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: #fff;
+	box-shadow: 0 0 12px #77ecff;
+	content: "";
+}
+.zo-page-loader__copy {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	text-align: left;
+}
+.zo-page-loader__title { font-size: 0.94rem; }
+.zo-page-loader__status {
+	color: rgba(230, 248, 255, 0.78);
+	font-size: 0.72rem;
+	font-weight: 500;
+}
+.zo-page-loader__dots { display: inline-flex; gap: 3px; margin-left: 2px; }
+.zo-page-loader__dots i {
+	display: block;
+	width: 3px;
+	height: 3px;
+	border-radius: 50%;
+	background: currentColor;
+	animation: zoPageLoaderDot 1s ease-in-out infinite;
+}
+.zo-page-loader__dots i:nth-child(2) { animation-delay: 140ms; }
+.zo-page-loader__dots i:nth-child(3) { animation-delay: 280ms; }
+@keyframes zoPageLoaderDot {
+	0%, 60%, 100% { opacity: 0.3; transform: translateY(0); }
+	30% { opacity: 1; transform: translateY(-2px); }
+}
+@keyframes zoPageLoaderShine {
+	0%, 35% { left: -45%; }
+	70%, 100% { left: 125%; }
+}
+@keyframes zoPageLoaderProgress {
+	0% { transform: scaleX(0.2); opacity: 0.55; }
+	50% { transform: scaleX(0.78); opacity: 1; }
+	100% { transform: scaleX(0.2); opacity: 0.55; }
+}
+@media (prefers-reduced-motion: reduce) {
+	.zo-page-loader__spinner,
+	.zo-page-loader__dots i,
+	.zo-page-loader__button::before,
+	.zo-page-loader__button::after { animation: none; }
+}
+@media (max-width: 360px) {
+	.zo-page-loader { padding: 16px; }
+	.zo-page-loader__button { min-width: 0; width: 100%; max-width: 280px; }
+}
 ';
 }
 
@@ -149,6 +260,7 @@ function zo_get_page_loader_js() {
 		if (!loader) {
 			return;
 		}
+		loader.setAttribute('aria-busy', 'false');
 		window.setTimeout(function () {
 			loader.classList.add('is-done');
 			window.setTimeout(function () {
@@ -208,8 +320,14 @@ function zo_render_page_loader() {
 		return;
 	}
 
-	echo '<div class="zo-page-loader" data-zo-page-loader role="status" aria-label="' . esc_attr__('Loading', 'zeka-oyunlari') . '">';
-	echo '<img class="zo-page-loader__symbol" src="' . esc_url(ZO_PLUGIN_URL . 'assets/loading-reload.svg') . '" alt="" decoding="async">';
+	echo '<div class="zo-page-loader" data-zo-page-loader role="status" aria-busy="true" aria-label="' . esc_attr__('Loading', 'zeka-oyunlari') . '">';
+	echo '<div class="zo-page-loader__button">';
+	echo '<span class="zo-page-loader__spinner" aria-hidden="true"></span>';
+	echo '<span class="zo-page-loader__copy">';
+	echo '<span class="zo-page-loader__title">' . esc_html__('Loading games', 'zeka-oyunlari') . '</span>';
+	echo '<span class="zo-page-loader__status" aria-hidden="true">' . esc_html__('Just a moment', 'zeka-oyunlari') . '<span class="zo-page-loader__dots" aria-hidden="true"><i></i><i></i><i></i></span></span>';
+	echo '</span>';
+	echo '</div>';
 	echo '</div>';
 }
 add_action('wp_body_open', 'zo_render_page_loader', 1);
