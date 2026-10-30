@@ -13,7 +13,7 @@
 .zo-game-root--blocky-bear-adventure * { box-sizing: border-box; }
 .zo-game-root--blocky-bear-adventure h2 { margin: 0 0 6px; color: #ffdb59; font-size: clamp(24px, 4vw, 36px); }
 .zo-bear-instructions { margin: 0 0 14px; line-height: 1.5; color: #edf8e8; }
-.zo-bear-hud { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 10px; }
+.zo-bear-hud { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 10px; }
 .zo-bear-hud > div { padding: 8px 12px; border-radius: 12px; background: #1a3c35; text-align: center; }
 .zo-bear-hud span, .zo-bear-hud strong { display: block; }
 .zo-bear-hud span { color: #d6efcb; font-size: 13px; }
@@ -38,8 +38,14 @@
 .zo-bear-start { background: #ffdb59; }
 .zo-bear-pause { background: #9be1f5; }
 .zo-bear-status { min-height: 24px; margin: 12px 0 0; color: #fff8c7; text-align: center; }
+.zo-bear-level-picker { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 12px; }
+.zo-bear-level-picker label { color: #edf8e8; font-weight: 700; }
+.zo-bear-level-input { width: 90px; min-height: 44px; padding: 6px 10px; border: 2px solid #b9e49e; border-radius: 10px; background: #fff; color: #16352e; font: 700 18px system-ui, sans-serif; }
+.zo-bear-level-input:focus-visible { outline: 3px solid #ffdb59; outline-offset: 2px; }
+.zo-bear-level-go { background: #c8ebae; }
 
 @media (max-width: 520px) {
+	.zo-bear-hud { grid-template-columns: repeat(2, 1fr); gap: 6px; }
 	.zo-bear-controls { gap: 6px; }
 	.zo-bear-control span { display: block; font-size: 12px; }
 	.zo-bear-actions button { min-width: 0; flex: 1; }

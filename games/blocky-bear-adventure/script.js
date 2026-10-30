@@ -18,30 +18,23 @@
 			const pauseButton = root.querySelector('.zo-bear-pause');
 			const heartsEl = root.querySelector('.zo-bear-hearts');
 			const coinsEl = root.querySelector('.zo-bear-coins');
-			const W = 960, H = 600, WORLD_WIDTH = 3300, GROUND = 520;
+			const W = 960, H = 600, GROUND = 520;
 			const BEAR_W = 42, BEAR_H = 64;
 			const STEP = 1 / 60;
-			const platforms = [
-				[0, GROUND, 740, 100], [850, GROUND, 760, 100],
-				[1740, GROUND, 710, 100], [2600, GROUND, 700, 100],
-				[260, 410, 160, 24], [520, 320, 150, 24],
-				[990, 410, 180, 24], [1280, 330, 160, 24],
-				[1820, 410, 180, 24], [2100, 320, 170, 24],
-				[2700, 410, 170, 24], [2940, 340, 160, 24]
-			];
-			const coinPositions = [
-				[300, 375], [380, 375], [560, 285], [630, 285],
-				[780, 400], [1030, 375], [1120, 375],
-				[1320, 295], [1400, 295], [1665, 400],
-				[1860, 375], [1950, 375], [2140, 285], [2220, 285],
-				[2520, 390], [2740, 375], [2820, 375],
-				[2980, 305], [3060, 305]
-			];
-			const enemyPositions = [
-				[460, 430, 680], [1220, 1180, 1520],
-				[2270, 2040, 2390], [2870, 2740, 3100]
-			];
+			const MAX_LEVEL = 1000;
+			const STORAGE_KEY = 'zo-blocky-bear-adventure-unlocked';
+			const levelEl = root.querySelector('.zo-bear-level');
+			const unlockedEl = root.querySelector('.zo-bear-unlocked');
+			const levelInput = root.querySelector('.zo-bear-level-input');
+			let unlocked = 1;
+			try {
+				const saved = Number.parseInt(window.localStorage.getItem(STORAGE_KEY), 10);
+				if (Number.isInteger(saved)) unlocked = Math.max(1, Math.min(MAX_LEVEL, saved));
+			} catch (_) { /* Progress still works for this visit if storage is unavailable. */ }
+			let level = unlocked;
+			let world = buildLevel(level);
 			let game = freshGame();
+			levelInput.value = String(level);
 			let active = false;
 			let paused = false;
 			let lastFrame = 0;
@@ -50,14 +43,49 @@
 			const held = new Set();
 			const pointerHeld = new Set();
 
+			function buildLevel(number) {
+				const widths = [740, 760, 710, 700];
+				const gaps = [110, 130, 150].map((gap) => gap + (number - 1) * .04);
+				const starts = [0];
+				for (let i = 0; i < gaps.length; i++) starts.push(starts[i] + widths[i] + gaps[i]);
+				const platforms = starts.map((x, i) => [x, GROUND, widths[i], 100]);
+				const ledges = [
+					[[260, 410, 160], [520, 320, 150]],
+					[[140, 410, 180], [430, 330, 160]],
+					[[80, 410, 180], [360, 320, 170]],
+					[[100, 410, 170], [340, 340, 160]]
+				];
+				const coins = [];
+				const enemies = [];
+				const enemyCount = 4 + Math.floor((number - 1) / 125);
+				const enemySpeed = 1.7 + (number - 1) * .0015;
+				starts.forEach((start, segment) => {
+					for (const [x, y, width] of ledges[segment]) {
+						platforms.push([start + x, y, width, 24]);
+						coins.push([start + x + width / 2, y - 35]);
+					}
+					for (const offset of [160, 370, 580]) coins.push([start + offset, 480]);
+					const count = Math.floor(enemyCount / 4) + (segment < enemyCount % 4 ? 1 : 0);
+					const patrolWidth = (widths[segment] - 180) / count;
+					for (let i = 0; i < count; i++) {
+						const lo = start + 90 + i * patrolWidth;
+						const hi = lo + patrolWidth - 45;
+						enemies.push([lo + (hi - lo) / 2, lo, hi, enemySpeed * (i % 2 ? -1 : 1)]);
+					}
+					if (segment < gaps.length) coins.push([start + widths[segment] + gaps[segment] / 2, 400]);
+				});
+				const width = starts[3] + widths[3];
+				return {platforms, coins, enemies, width, flagX: width - 90, gaps};
+			}
+
 			function freshGame() {
 				return {
 					x: 65, y: 440, vx: 0, vy: 0, grounded: false,
 					jumpRequest: false, hearts: 3, invincible: 0,
 					score: 0, state: 'playing', tick: 0, camera: 0,
-					coins: coinPositions.map(([x, y]) => ({x, y, taken: false})),
-					enemies: enemyPositions.map(([x, lo, hi]) => ({
-						x, y: GROUND - 40, lo, hi, speed: 1.7, alive: true
+					coins: world.coins.map(([x, y]) => ({x, y, taken: false})),
+					enemies: world.enemies.map(([x, lo, hi, speed]) => ({
+						x, y: GROUND - 40, lo, hi, speed, alive: true
 					}))
 				};
 			}
@@ -70,6 +98,9 @@
 				heartsEl.textContent = '♥ '.repeat(game.hearts).trim() || '♡';
 				heartsEl.setAttribute('aria-label', String(game.hearts));
 				coinsEl.textContent = `${game.score} / ${game.coins.length}`;
+				levelEl.textContent = `${level} / ${MAX_LEVEL}`;
+				unlockedEl.textContent = `${unlocked} / ${MAX_LEVEL}`;
+				levelInput.max = String(unlocked);
 			}
 
 			function showOverlay(title, detail) {
@@ -82,9 +113,13 @@
 				game.state = outcome;
 				active = false;
 				pauseButton.disabled = true;
-				startButton.textContent = text.again;
+				if (outcome === 'won' && level < MAX_LEVEL) {
+					unlocked = Math.max(unlocked, level + 1);
+					try { window.localStorage.setItem(STORAGE_KEY, String(unlocked)); } catch (_) { /* Keep in-memory progress. */ }
+				}
+				startButton.textContent = outcome === 'won' && level < MAX_LEVEL ? text.next : text.again;
 				status.textContent = text[outcome];
-				showOverlay(text[outcome], `${text.coins}: ${game.score} / ${game.coins.length}`);
+				showOverlay(text[outcome], `${text.level} ${level} / ${MAX_LEVEL} · ${text.coins}: ${game.score} / ${game.coins.length}`);
 				updateHud();
 			}
 
@@ -97,7 +132,7 @@
 				}
 				game.invincible = 100;
 				if (fell) {
-					const ground = platforms.filter((p) => p[1] === GROUND && p[0] <= game.x).pop() || platforms[0];
+					const ground = world.platforms.filter((p) => p[1] === GROUND && p[0] <= game.x).pop() || world.platforms[0];
 					game.x = ground[0] + 25;
 					game.y = GROUND - 80;
 					game.vx = 0;
@@ -121,8 +156,8 @@
 				}
 				game.jumpRequest = false;
 
-				let nextX = Math.max(0, Math.min(WORLD_WIDTH - BEAR_W, game.x + game.vx));
-				for (const [px, py, pw, ph] of platforms) {
+				let nextX = Math.max(0, Math.min(world.width - BEAR_W, game.x + game.vx));
+				for (const [px, py, pw, ph] of world.platforms) {
 					if (!overlaps(nextX, game.y, BEAR_W, BEAR_H, px, py, pw, ph)) continue;
 					if (game.vx > 0) nextX = Math.min(nextX, px - BEAR_W);
 					else if (game.vx < 0) nextX = Math.max(nextX, px + pw);
@@ -133,7 +168,7 @@
 				game.vy = Math.min(game.vy + .65, 16);
 				let nextY = game.y + game.vy;
 				game.grounded = false;
-				for (const [px, py, pw, ph] of platforms) {
+				for (const [px, py, pw, ph] of world.platforms) {
 					if (!overlaps(game.x, nextY, BEAR_W, BEAR_H, px, py, pw, ph)) continue;
 					if (game.vy > 0 && oldBottom <= py) {
 						nextY = py - BEAR_H;
@@ -170,8 +205,8 @@
 						}
 					}
 				}
-				if (game.x > 3190 && game.state === 'playing') finish('won');
-				game.camera = Math.max(0, Math.min(WORLD_WIDTH - W, game.x - W * .36));
+				if (game.x >= world.flagX - 20 && game.state === 'playing') finish('won');
+				game.camera = Math.max(0, Math.min(world.width - W, game.x - W * .36));
 				updateHud();
 			}
 
@@ -219,18 +254,18 @@
 
 			function paint() {
 				rect(0, 0, W, H, '#69c9f2');
-				for (let x = -100; x < WORLD_WIDTH; x += 360) {
+				for (let x = -100; x < world.width; x += 360) {
 					const sx = x - game.camera * .3;
 					if (sx > W + 530 || sx < -530) continue;
 					ellipse(sx + 265, 527.5, 265, 172.5, '#82cf69');
 				}
-				for (let x = 100; x < WORLD_WIDTH; x += 460) {
+				for (let x = 100; x < world.width; x += 460) {
 					const sx = x - game.camera * .5;
 					if (sx > W + 110 || sx < -110) continue;
 					rect(sx, 90, 110, 30, '#fff');
 					rect(sx + 22, 70, 58, 50, '#fff');
 				}
-				for (const [x, y, w, h] of platforms) {
+				for (const [x, y, w, h] of world.platforms) {
 					if (x + w < game.camera || x > game.camera + W) continue;
 					worldRect(x, y, w, h, '#a86b35');
 					worldRect(x, y, w, 12, '#50b732');
@@ -252,8 +287,8 @@
 					worldRect(x + 11, y + 13, 4, 6, '#241b29');
 					worldRect(x + 27, y + 13, 4, 6, '#241b29');
 				}
-			worldRect(3210, 350, 7, 170, '#fff5d8');
-			worldRect(3217, 350, 65, 40, '#ffb526');
+			worldRect(world.flagX, 350, 7, 170, '#fff5d8');
+			worldRect(world.flagX + 7, 350, 65, 40, '#ffb526');
 			bear();
 		}
 
@@ -272,9 +307,12 @@
 			if (active) frameId = requestAnimationFrame(loop);
 		}
 
-		function start() {
+		function start(targetLevel = level) {
 			cancelAnimationFrame(frameId);
+			level = targetLevel;
+			world = buildLevel(level);
 			game = freshGame();
+			levelInput.value = String(level);
 			held.clear();
 			pointerHeld.clear();
 			active = true;
@@ -329,13 +367,22 @@
 				}
 			});
 		});
-		startButton.addEventListener('click', start);
+		startButton.addEventListener('click', () => start(game.state === 'won' && level < MAX_LEVEL ? level + 1 : level));
+		root.querySelector('.zo-bear-level-go').addEventListener('click', () => {
+			const chosen = Number(levelInput.value);
+			if (!Number.isInteger(chosen) || chosen < 1 || chosen > unlocked) {
+				status.textContent = text.levelLocked;
+				return;
+			}
+			start(chosen);
+		});
 		pauseButton.addEventListener('click', togglePause);
 		root.addEventListener('keydown', (event) => {
+			if (event.target === levelInput) return;
 			const key = event.key.toLowerCase();
 			if (key === 'r') {
 				event.preventDefault();
-				start();
+				start(level);
 				return;
 			}
 			if (key === 'p' && active) {
