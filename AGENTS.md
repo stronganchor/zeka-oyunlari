@@ -36,3 +36,11 @@ and obtaining explicit adult-maintainer approval.
 Every security-sensitive change must receive PHP/JavaScript syntax checks,
 targeted regression tests, manual review of exposed WordPress hooks, and a
 documented deployment/rollback plan before release.
+
+## Persistent progress
+
+- Read the repository's `PROGRESS.md` before starting or resuming work.
+- Update it after meaningful milestones and before ending a session. Record the current request, completed changes and file paths, verification results, blockers, and concrete next steps.
+- Save code and artifacts to disk as work proceeds. Distinguish completed work from plans and unverified assumptions.
+- Preserve unrelated task entries when multiple chats use this repository. Never record secrets or credentials in progress notes.
+- Do not automatically commit, push, or deploy merely to save progress; follow the user's authorization.
