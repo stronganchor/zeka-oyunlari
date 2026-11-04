@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.5.98.asker.arslan
+ * Version: 1.5.98.1
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-define('ZO_PLUGIN_VERSION', '1.5.98.asker.arslan');
+define('ZO_PLUGIN_VERSION', '1.5.98.1');
 define('ZO_PLUGIN_FILE', __FILE__);
 define('ZO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('ZO_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -12629,7 +12629,10 @@ function zo_get_codex_report_mirror_dir() {
 	}
 
 	$dir = untrailingslashit(wp_normalize_path(trim($dir)));
-	if ($dir === '' || !wp_is_absolute_path($dir) || preg_match('#(^|/)\.\.(/|$)#', $dir)) {
+	// Core recognizes Windows drives with native separators, not normalized '/'.
+	$check_dir = DIRECTORY_SEPARATOR === '\\' ? str_replace('/', '\\', $dir) : $dir;
+	if ($dir === '' || strpos($dir, "\0") !== false || strpos($dir, '://') !== false ||
+		!path_is_absolute($check_dir) || preg_match('#(^|/)\.\.(/|$)#', $dir)) {
 		return '';
 	}
 
@@ -12658,7 +12661,8 @@ function zo_get_public_report_mirror_roots() {
 	$clean = array();
 	foreach ($roots as $root) {
 		$root = untrailingslashit(wp_normalize_path((string) $root));
-		if ($root !== '' && wp_is_absolute_path($root)) {
+		$check_root = DIRECTORY_SEPARATOR === '\\' ? str_replace('/', '\\', $root) : $root;
+		if ($root !== '' && strpos($root, "\0") === false && strpos($root, '://') === false && path_is_absolute($check_root)) {
 			$clean[] = $root;
 		}
 	}
