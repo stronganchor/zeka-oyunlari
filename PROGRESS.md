@@ -90,3 +90,20 @@ Next steps:
 - The coordinating chat owns a separate 1.5.98.1 compatibility branch based on
   the exact live source, so an incident-only repair can preserve the earlier
   security-release deployment boundary. No deployment is performed here.
+
+### Incident closeout - 2026-11-04
+
+The WordPress technical-issue alert was addressed with a narrow live
+compatibility repair, preserving the earlier no-deployment boundary for the
+report-admission release. Compatibility 1.5.98.1 was published separately as
+`7e6edc0ea8b08a8bfaaf181e40ca8dad0a48624c` from the exact installed c53bd9b
+baseline. Maintained main 1.5.100 carries the same path fix at
+`4df90bd971aea9abec8f556da389336982dc74c5`.
+
+Actual PHP 8.1/WordPress 7.1.4 path checks and authenticated PHP-FPM Content
+Lookup rendering passed; the affected page and public routes returned 200.
+Only the compatibility main PHP file was replaced. Report counts, activation
+and pre-existing sessions were preserved; temporary verification access was
+revoked. The 1.5.99 report-admission changes remain undeployed. Site notes and
+private incident receipts record the exact deployed hash and guarded rollback.
+No additional account, PIN, upload or paid-service feature was enabled.
