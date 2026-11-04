@@ -50,3 +50,43 @@ Next steps:
 - Parent and independent reviewer completed the bounded diff review and reran the final checks successfully. Separate commit/push is approved; the coordinating chat records remote readback.
 - Deployment remains explicitly excluded; use the security runbook only if a
   future deployment is separately authorized.
+
+## Report-mirror path API compatibility — 2026-11-04
+
+Request: Investigate the WordPress technical-issue alert and repair its confirmed
+undefined path API failure. The live baseline remains 1.5.98.asker.arslan; the
+separate 1.5.99 report-admission changes have not been deployed.
+
+Completed locally on maintained main:
+- Bumped the maintained source to 1.5.100 and replaced both unsupported
+  `wp_is_absolute_path()` calls with WordPress's `path_is_absolute()` API.
+- Added stream-wrapper and null-byte rejection before the core path check.
+  Relative, traversal and public-root guards, canonical/symlink verification,
+  private permissions and bounded mirror writes remain unchanged. On Windows,
+  core checks use native separators while returned paths stay normalized, so
+  native public roots remain protected. Non-native drive paths fail closed on
+  POSIX.
+- Added `tests/report-mirror-paths.php` with a CLI-only WordPress reference
+  fixture. It runs the actual snapshot → preparation → path helper chain with
+  writes intercepted, and can extract the supported APIs from installed core
+  using `ZO_TEST_WP_FUNCTIONS`.
+
+Verification:
+- The pre-fix source reproduces the alert's exact undefined-function fatal;
+  patched code passes 43 path/admin-snapshot checks on Windows (40 on POSIX)
+  with both portable reference and extracted installed core implementations.
+- All 82 report-admission checks, existing security invariants, PHP syntax
+  checks and `git diff --check` pass.
+- Independent owner-context validation with EA PHP 8.1.34 and extracted live
+  WordPress 7.1.4 core passes all 40 Linux cases; the pre-fix source fails with
+  the original undefined-function fatal under that same runtime.
+- No site requests, report data, files, mail or configuration were changed by
+  these fixtures. Parent and independent source reviews are complete;
+  live repair/verification remain with the coordinating chat.
+
+Next steps:
+- Commit and push approved maintained main source; the coordinating chat records
+  exact remote readback separately from live deployment.
+- The coordinating chat owns a separate 1.5.98.1 compatibility branch based on
+  the exact live source, so an incident-only repair can preserve the earlier
+  security-release deployment boundary. No deployment is performed here.
