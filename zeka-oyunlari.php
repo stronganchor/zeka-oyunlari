@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-define('ZO_PLUGIN_VERSION', '1.5.99.asker.arslan');
+define('ZO_PLUGIN_VERSION', '1.6.00.asker.arslan');
 define('ZO_PLUGIN_FILE', __FILE__);
 define('ZO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('ZO_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -12629,7 +12629,10 @@ function zo_get_codex_report_mirror_dir() {
 	}
 
 	$dir = untrailingslashit(wp_normalize_path(trim($dir)));
-	if ($dir === '' || !wp_is_absolute_path($dir) || preg_match('#(^|/)\.\.(/|$)#', $dir)) {
+	// Core recognizes Windows drives with native separators, not normalized '/'.
+	$check_dir = DIRECTORY_SEPARATOR === '\\' ? str_replace('/', '\\', $dir) : $dir;
+	if ($dir === '' || strpos($dir, "\0") !== false || strpos($dir, '://') !== false ||
+		!path_is_absolute($check_dir) || preg_match('#(^|/)\.\.(/|$)#', $dir)) {
 		return '';
 	}
 
@@ -12658,7 +12661,8 @@ function zo_get_public_report_mirror_roots() {
 	$clean = array();
 	foreach ($roots as $root) {
 		$root = untrailingslashit(wp_normalize_path((string) $root));
-		if ($root !== '' && wp_is_absolute_path($root)) {
+		$check_root = DIRECTORY_SEPARATOR === '\\' ? str_replace('/', '\\', $root) : $root;
+		if ($root !== '' && strpos($root, "\0") === false && strpos($root, '://') === false && path_is_absolute($check_root)) {
 			$clean[] = $root;
 		}
 	}
@@ -12857,37 +12861,169 @@ function zo_game_report_global_rate_window() {
 	return max(15 * MINUTE_IN_SECONDS, min(DAY_IN_SECONDS, is_numeric($window) ? (int) $window : HOUR_IN_SECONDS));
 }
 
-function zo_game_report_global_rate_allowed() {
-	$count = get_transient('zo_game_report_global_rate');
-	return max(0, (int) $count) < zo_game_report_global_rate_limit();
-}
-
-function zo_increment_game_report_global_rate() {
-	$count = max(0, (int) get_transient('zo_game_report_global_rate')) + 1;
-	set_transient('zo_game_report_global_rate', $count, zo_game_report_global_rate_window());
-	return $count;
-}
-
 function zo_game_report_storage_cap() {
 	$cap = apply_filters('zo_game_report_storage_cap', 1000);
 	return max(100, min(10000, is_numeric($cap) ? (int) $cap : 1000));
 }
 
-function zo_game_report_storage_available() {
-	$counts = wp_count_posts('zo_game_report');
-	if (!is_object($counts)) {
+/** Read admission state from the database, never a request/object-cache snapshot. */
+function zo_game_report_database_count($sql) {
+	global $wpdb;
+	$count = $wpdb->get_var($sql);
+	if ($wpdb->last_error !== '' || !is_scalar($count) || !ctype_digit((string) $count)) {
+		return new WP_Error('rate', 'Report admission is temporarily unavailable.');
+	}
+	return (int) $count;
+}
+
+function zo_game_report_lock_owned($lock_name) {
+	global $wpdb;
+	return (string) $wpdb->get_var($wpdb->prepare('SELECT IS_USED_LOCK(%s) = CONNECTION_ID()', $lock_name)) === '1'
+		&& $wpdb->last_error === '';
+}
+
+/**
+ * Reserve report capacity by inserting the private report while holding one
+ * site/database-scoped lock. A successful row, not a transient, is the budget.
+ * MySQL/MariaDB named locks are required; unavailable locks fail closed.
+ */
+function zo_insert_admitted_game_report($post_data, $peer_hash, $duplicate_hash) {
+	global $wpdb;
+	$database = defined('DB_NAME') ? DB_NAME : '';
+	$lock_name = 'zo_report_' . substr(hash('sha256', $database . '|' . $wpdb->posts), 0, 48);
+	$acquired = $wpdb->get_var($wpdb->prepare('SELECT GET_LOCK(%s, 1)', $lock_name));
+	if ((string) $acquired !== '1' || $wpdb->last_error !== '') {
+		return new WP_Error('rate', 'Report admission is temporarily unavailable.');
+	}
+
+	$post_id = 0;
+	try {
+		if (!zo_game_report_lock_owned($lock_name)) {
+			return new WP_Error('rate', 'Report admission is temporarily unavailable.');
+		}
+		$now = time();
+		$counts = array(
+			'stored' => zo_game_report_database_count($wpdb->prepare(
+				"SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = %s", 'zo_game_report'
+			)),
+			'recent' => zo_game_report_database_count($wpdb->prepare(
+				"SELECT COUNT(*) FROM {$wpdb->posts} WHERE post_type = %s AND post_date_gmt > %s",
+				'zo_game_report', gmdate('Y-m-d H:i:s', $now - zo_game_report_global_rate_window())
+			)),
+			'peer' => zo_game_report_database_count($wpdb->prepare(
+				"SELECT COUNT(DISTINCT p.ID) FROM {$wpdb->posts} p INNER JOIN {$wpdb->postmeta} m ON m.post_id = p.ID WHERE p.post_type = %s AND p.post_date_gmt > %s AND m.meta_key = %s AND m.meta_value = %s",
+				'zo_game_report', gmdate('Y-m-d H:i:s', $now - 5 * MINUTE_IN_SECONDS), '_zo_report_peer_hash', $peer_hash
+			)),
+			'duplicate' => zo_game_report_database_count($wpdb->prepare(
+				"SELECT COUNT(DISTINCT p.ID) FROM {$wpdb->posts} p INNER JOIN {$wpdb->postmeta} m ON m.post_id = p.ID WHERE p.post_type = %s AND p.post_date_gmt > %s AND m.meta_key = %s AND m.meta_value = %s",
+				'zo_game_report', gmdate('Y-m-d H:i:s', $now - 30 * DAY_IN_SECONDS), '_zo_report_duplicate_hash', $duplicate_hash
+			)),
+		);
+		foreach ($counts as $count) {
+			if (is_wp_error($count)) {
+				return $count;
+			}
+		}
+		if ($counts['stored'] >= zo_game_report_storage_cap() ||
+			$counts['recent'] >= zo_game_report_global_rate_limit() ||
+			$counts['peer'] > 0 || $counts['duplicate'] > 0 ||
+			!zo_game_report_lock_owned($lock_name)) {
+			return new WP_Error('rate', 'Report admission is temporarily unavailable.');
+		}
+
+		$post_data['post_type'] = 'zo_game_report';
+		$post_data['post_status'] = 'private';
+		$post_data['post_date_gmt'] = gmdate('Y-m-d H:i:s', $now);
+		$post_data['meta_input']['_zo_report_peer_hash'] = $peer_hash;
+		$post_data['meta_input']['_zo_report_duplicate_hash'] = $duplicate_hash;
+		$post_id = wp_insert_post(wp_slash($post_data), true);
+		if (is_wp_error($post_id) || $post_id <= 0) {
+			return new WP_Error('save', 'Could not save the report.');
+		}
+
+		// WordPress does not propagate meta_input failures. Verify every new
+		// metadata value before admission succeeds or any upload can begin.
+		foreach ($post_data['meta_input'] as $key => $value) {
+			// get_var() maps an existing empty string to null; get_row() must
+			// distinguish an optional empty value from a failed/missing write.
+			$stored = $wpdb->get_row($wpdb->prepare(
+				"SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = %s LIMIT 1",
+				$post_id, $key
+			), ARRAY_A);
+			if ($wpdb->last_error !== '' || !is_array($stored) || !isset($stored['meta_value']) || (string) $stored['meta_value'] !== (string) $value) {
+				wp_delete_post($post_id, true);
+				return new WP_Error('save', 'Could not save the report.');
+			}
+		}
+		if (!zo_game_report_lock_owned($lock_name)) {
+			wp_delete_post($post_id, true);
+			return new WP_Error('save', 'Could not save the report.');
+		}
+		return (int) $post_id;
+	} finally {
+		try {
+			$released = $wpdb->get_var($wpdb->prepare('SELECT RELEASE_LOCK(%s)', $lock_name));
+			$release_ok = (string) $released === '1' && $wpdb->last_error === '';
+		} catch (Throwable $error) {
+			$release_ok = false;
+		}
+		if (!$release_ok) {
+			if (is_int($post_id) && $post_id > 0) {
+				wp_delete_post($post_id, true);
+			}
+			return new WP_Error('rate', 'Report admission is temporarily unavailable.');
+		}
+	}
+}
+
+/** Bound parsed form input as well as the advertised multipart request size. */
+function zo_game_report_request_is_bounded() {
+	if (count($_POST) > 20 || count($_FILES) > 1 ||
+		array_diff(array_keys($_FILES), array('zo_screenshot')) ||
+		(isset($_FILES['zo_screenshot']) && !is_array($_FILES['zo_screenshot'])) ||
+		(isset($_SERVER['CONTENT_LENGTH']) &&
+			(!ctype_digit((string) $_SERVER['CONTENT_LENGTH']) || (int) $_SERVER['CONTENT_LENGTH'] > 2 * 1024 * 1024))) {
 		return false;
 	}
-
 	$total = 0;
-	foreach (get_object_vars($counts) as $count) {
-		$total += max(0, (int) $count);
+	foreach ($_POST as $key => $value) {
+		if (!is_string($key) || strlen($key) > 64 || !is_string($value) || strlen($value) > 4096) {
+			return false;
+		}
+		$total += strlen($key) + strlen($value);
 	}
+	return $total <= 8192;
+}
 
-	return $total < zo_game_report_storage_cap();
+function zo_game_report_screenshot_is_allowed($file) {
+	foreach (array('name', 'tmp_name', 'size', 'error') as $key) {
+		if (!isset($file[$key]) || !is_scalar($file[$key])) {
+			return false;
+		}
+	}
+	if ((int) $file['error'] !== UPLOAD_ERR_OK || (int) $file['size'] <= 0 ||
+		(int) $file['size'] > 1048576 || strlen((string) $file['name']) > 255) {
+		return false;
+	}
+	$actual_size = @filesize((string) $file['tmp_name']);
+	if ($actual_size === false || $actual_size <= 0 || $actual_size > 1048576) {
+		return false;
+	}
+	$type = wp_check_filetype((string) $file['name'], array('jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png'));
+	$dimensions = @getimagesize((string) $file['tmp_name']);
+	return !empty($type['type']) && is_array($dimensions) &&
+		isset($dimensions[0], $dimensions[1], $dimensions['mime']) &&
+		$dimensions['mime'] === $type['type'] &&
+		$dimensions[0] > 0 && $dimensions[0] <= 4096 &&
+		$dimensions[1] > 0 && $dimensions[1] <= 4096 &&
+		$dimensions[0] * $dimensions[1] <= 9000000;
 }
 
 function zo_handle_game_report_submission() {
+	if (!zo_game_report_request_is_bounded()) {
+		wp_safe_redirect(add_query_arg('report_error', 'rate', home_url('/report/')));
+		exit;
+	}
 	$posted_language = !empty($_POST['zo_lang']) ? sanitize_key(wp_unslash($_POST['zo_lang'])) : zo_get_current_language();
 	$posted_language = array_key_exists($posted_language, zo_get_language_options()) ? $posted_language : zo_get_current_language();
 	$report_url = add_query_arg('zo_lang', $posted_language, home_url('/report/'));
@@ -12902,18 +13038,13 @@ function zo_handle_game_report_submission() {
 		exit;
 	}
 
-	if (!zo_game_report_global_rate_allowed() || !zo_game_report_storage_available()) {
+	$ip = isset($_SERVER['REMOTE_ADDR']) && is_string($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '';
+	$packed_ip = filter_var($ip, FILTER_VALIDATE_IP) ? inet_pton($ip) : false;
+	if ($packed_ip === false) {
 		wp_safe_redirect(add_query_arg('report_error', 'rate', $report_url));
 		exit;
 	}
-
-	$ip = !empty($_SERVER['REMOTE_ADDR']) ? sanitize_text_field(wp_unslash($_SERVER['REMOTE_ADDR'])) : 'unknown';
-	$rate_key = 'zo_game_report_' . md5($ip);
-	if (get_transient($rate_key)) {
-		wp_safe_redirect(add_query_arg('report_error', 'rate', $report_url));
-		exit;
-	}
-	set_transient($rate_key, '1', 5 * MINUTE_IN_SECONDS);
+	$peer_hash = hash_hmac('sha256', $packed_ip, wp_salt('nonce'));
 
 	$slug = !empty($_POST['zo_game_slug']) ? sanitize_title(wp_unslash($_POST['zo_game_slug'])) : '';
 	$module = $slug !== '' ? zo_get_game_module($slug) : null;
@@ -12931,6 +13062,12 @@ function zo_handle_game_report_submission() {
 	$email = !empty($_POST['zo_email']) ? sanitize_email(wp_unslash($_POST['zo_email'])) : '';
 	$user_agent = !empty($_SERVER['HTTP_USER_AGENT']) ? sanitize_text_field(wp_unslash($_SERVER['HTTP_USER_AGENT'])) : '';
 	$language = $posted_language;
+	$game_url = substr($game_url, 0, 2048);
+	$browser = substr($browser, 0, 200);
+	$email = substr($email, 0, 254);
+	$user_agent = substr($user_agent, 0, 512);
+	$problem_type = substr($problem_type, 0, 40);
+	$device = substr($device, 0, 40);
 
 	$title = function_exists('mb_substr') ? mb_substr($title, 0, 100) : substr($title, 0, 100);
 	$message = function_exists('mb_substr') ? mb_substr($message, 0, 800) : substr($message, 0, 800);
@@ -12943,47 +13080,17 @@ function zo_handle_game_report_submission() {
 		exit;
 	}
 
-	$duplicate_key = 'zo_game_report_dup_' . md5($ip . '|' . $slug . '|' . strtolower($message_check));
-	if (get_transient($duplicate_key)) {
-		wp_safe_redirect(add_query_arg(array('report_error' => 'rate', 'game' => $slug), $report_url));
-		exit;
-	}
-
+	$duplicate_hash = hash('sha256', $peer_hash . '|' . $slug . '|' . strtolower($message_check));
 	$screenshot_file = isset($_FILES['zo_screenshot']) && is_array($_FILES['zo_screenshot']) ? $_FILES['zo_screenshot'] : array();
 	$has_screenshot = !empty($screenshot_file['name']);
-	if ($has_screenshot) {
-		$upload_error = isset($screenshot_file['error']) ? (int) $screenshot_file['error'] : UPLOAD_ERR_NO_FILE;
-		$upload_size  = isset($screenshot_file['size']) ? (int) $screenshot_file['size'] : 0;
-		$upload_name  = isset($screenshot_file['name']) ? (string) $screenshot_file['name'] : '';
-		$file_type    = wp_check_filetype($upload_name, array('jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg', 'png' => 'image/png'));
-
-		if ($upload_error !== UPLOAD_ERR_OK || $upload_size <= 0 || $upload_size > 1048576 || empty($file_type['type'])) {
-			wp_safe_redirect(add_query_arg(array('report_error' => 'screenshot', 'game' => $slug), $report_url));
-			exit;
-		}
+	if ($has_screenshot && !zo_game_report_screenshot_is_allowed($screenshot_file)) {
+		wp_safe_redirect(add_query_arg(array('report_error' => 'screenshot', 'game' => $slug), $report_url));
+		exit;
 	}
 
 	if ($title === '' && $slug !== '') {
 		$title = $slug;
 	}
-
-	$post_id = wp_insert_post(
-		wp_slash(
-			array(
-				'post_type'    => 'zo_game_report',
-				'post_status'  => 'private',
-				'post_title'   => 'Game Report - ' . ($title !== '' ? $title : current_time('mysql')),
-				'post_content' => $message,
-			)
-		),
-		true
-	);
-
-	if (is_wp_error($post_id) || $post_id <= 0) {
-		wp_safe_redirect(add_query_arg(array('report_error' => 'save', 'game' => $slug), $report_url));
-		exit;
-	}
-	zo_increment_game_report_global_rate();
 
 	$meta = array(
 		'_zo_report_game_slug'    => $slug,
@@ -12999,8 +13106,18 @@ function zo_handle_game_report_submission() {
 		'_zo_report_user_id'      => get_current_user_id(),
 	);
 
-	foreach ($meta as $key => $value) {
-		update_post_meta($post_id, $key, $value);
+	$post_id = zo_insert_admitted_game_report(
+		array(
+			'post_title' => 'Game Report - ' . ($title !== '' ? $title : current_time('mysql')),
+			'post_content' => $message,
+			'meta_input' => $meta,
+		),
+		$peer_hash,
+		$duplicate_hash
+	);
+	if (is_wp_error($post_id)) {
+		wp_safe_redirect(add_query_arg(array('report_error' => $post_id->get_error_code(), 'game' => $slug), $report_url));
+		exit;
 	}
 
 	if ($has_screenshot) {
@@ -13031,7 +13148,11 @@ function zo_handle_game_report_submission() {
 
 			if (!is_wp_error($attachment_id) && $attachment_id > 0) {
 				wp_update_attachment_metadata($attachment_id, wp_generate_attachment_metadata($attachment_id, $upload['file']));
-				update_post_meta($post_id, '_zo_report_screenshot_id', (int) $attachment_id);
+				if (!update_post_meta($post_id, '_zo_report_screenshot_id', (int) $attachment_id)) {
+					wp_delete_attachment($attachment_id, true);
+				}
+			} else {
+				wp_delete_file($upload['file']);
 			}
 		} elseif (!empty($upload['error'])) {
 			update_post_meta($post_id, '_zo_report_screenshot_error', sanitize_text_field($upload['error']));
@@ -13039,7 +13160,6 @@ function zo_handle_game_report_submission() {
 	}
 
 	zo_append_codex_game_report_mirror($post_id);
-	set_transient($duplicate_key, '1', 30 * DAY_IN_SECONDS);
 
 	wp_safe_redirect(add_query_arg(array('sent' => '1', 'game' => $slug), $report_url));
 	exit;
