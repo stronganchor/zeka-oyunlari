@@ -1,4 +1,10 @@
 *.php text eol=lf
+# Development and terminal scripts must not ship as public plugin assets.
+*.py export-ignore
+*.ps1 export-ignore
+*.sh export-ignore
+*.bat export-ignore
+*.cmd export-ignore
 /.gitattributes export-ignore
 /.gitignore export-ignore
 /.vscode export-ignore
