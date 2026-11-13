@@ -14,7 +14,7 @@ if (!defined('ABSPATH')) {
  * SECURITY.md, including a written threat model and abuse controls.
  */
 function zo_game_roster_1000_security_disabled_render() {
-	return '<div class="zo-game-security-disabled" role="status"><h2>Roster 1000 is temporarily unavailable</h2><p>This game was disabled while its account and saved-progress code is rebuilt safely.</p></div>';
+	return '<div class="zo-game-security-disabled" role="status"><h2>' . esc_html(zo_get_interface_text('game_unavailable')) . '</h2><p>' . esc_html(zo_get_interface_text('game_unavailable_description')) . '</p></div>';
 }
 
 $zo_roster_1000_security_cleanup = <<<'JS'
@@ -31,6 +31,7 @@ JS;
 
 return array(
 	'slug'            => 'roster-1000',
+	'available'       => false,
 	'name'            => 'Roster 1000 (temporarily disabled for security)',
 	'author'          => 'Asker',
 	'description'     => 'Temporarily disabled while the account and saved-progress implementation receives an adult security review.',

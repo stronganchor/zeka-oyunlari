@@ -1,5 +1,67 @@
 # Project progress
 
+## Game descriptions and description-page links — 2026-11-13
+
+Request: Add clear game instructions, rules and educational benefits, with a description-page link beneath every game. Latest instruction: make a plan first.
+
+Status: Planning only; no application changes made for this request.
+
+Inspected:
+- `zeka-oyunlari.php`: shared game registry, localized metadata, listing cards, game URL helpers and template selection.
+- `templates/single-zeka-oyunu.php`: current game page has a short introduction above gameplay but no shared detailed instructions/benefits section below it.
+- `templates/archive-zeka-oyunu.php`: archive uses the shared listing shortcode; shared card changes can cover archive and owner listings together.
+- Found 228 game directories; the number of public games must be established from the registry and availability rules before content is authored. Existing uncommitted listing/security-state/localization fixes belong to another task and must be preserved.
+
+Proposed implementation (not completed or verified):
+- Inventory public games and inspect their actual controls, objectives, win/loss rules and special cases.
+- Store game-specific, localized guide content keyed by slug, with modest educational statements describing skills practiced.
+- Add an accessible description link below each game card and beneath gameplay; show a concise guide below gameplay and a dedicated description page with full instructions, rules, benefits and a return-to-game link.
+- Render guide text and links in server HTML with unique page titles, descriptions, canonical URLs and suitable language handling; avoid requiring JavaScript for access.
+- Verify coverage, URL behavior, availability guards, language preservation, mobile layout, PHP syntax and relevant listing/security regression checks.
+
+Next steps: Present the plan and await the user's implementation instruction. No commit, push or deployment performed.
+
+## Fix reviewed Asker listing issues — 2026-11-13
+
+Request: Fix all five annotated review findings; mark Roster 1000 unavailable.
+
+Completed locally:
+- `zeka-oyunlari.php`: synchronized version 1.6.01.asker.arslan; folded Turkish search in PHP and both live filters; made categories stable across translated listings/game pages; removed position-based Popular badges; added localized unavailable labels and disabled-card presentation; excluded unavailable entries from recent/favorite shortcuts; added game-specific exact translations with idempotent rescans.
+- `games/roster-1000/game.php`: available=false metadata and localized disabled notice. Security guard and cleanup retained; no account/game functionality enabled.
+- `games/echo-cartographer/game.php`: complete Turkish phrases for static instructions, controls, map labels and dynamic game messages.
+- `tests/game-listing.php` and `tests/game-listing.js`: offline integration fixtures exercising actual shortcode rendering, emitted filter/reset events, stale favorite/recent shortcuts, translation payloads and repeated translation scans without WordPress hooks/data writes.
+
+Verification:
+- All 49 PHP listing/search/category/unavailability assertions and 70 JavaScript filter/search/shortcut/translation assertions pass. This includes lowercase/composed/decomposed Turkish I, Sports including football, reset/empty states, excluding unavailable games from stored shortcuts, all game status messages and translation idempotence.
+- PHP syntax checks for all four changed/new PHP files, generated JavaScript and test-script syntax, `git diff --check`, all 82 report-admission checks, all 43 report-mirror checks and existing account/report security invariants pass.
+- Reviewed the final changes: no WordPress hooks, report admission, accounts, uploads, credentials or persistence endpoints were added or changed. Roster's incident guard and security cleanup remain intact.
+- Browser preview was attempted but could not reach localhost, including after an escalated server launch. Browser layout and end-to-end DOM observation remain unverified. Temporary preview servers were stopped; preview artifacts are disposable.
+
+Next steps / release boundary:
+- Changes are saved locally, with no commit, push or deployment. The live site still requires a separately authorized release; earlier undeployed security changes on maintained main must be accounted for before publishing.
+- After release, verify the unavailable card, `ikili` search, Sports results and Turkish Echo Cartographer instructions in WordPress. Rollback these UI changes using the previous three application files; preserve Roster's security hard-disable throughout.
+
+## Live Asker game listing review — 2026-11-13
+
+Request: Look through https://xn--zek-kla.com/askerin-oyunlari/ and identify what is wrong.
+
+Completed (read-only review; no application changes):
+- Inspected the current rendered listing in the in-app browser: 50 cards. The web search reader returned an older cached listing, so current browser observations were used for findings.
+- Confirmed that the first card, 1000 Karakter Arenası, carries a Popüler badge and an active open-game link, but /oyunlar/roster-1000/ renders the intentional security-disabled notice. Recommend hiding it from playable listings or clearly labeling it unavailable; preserve its security hard-disable.
+- Reproduced Turkish search failure: `İkili` returns İkili Bulmaca (one result), while lowercase `ikili` returns zero. Local `zeka-oyunlari.php` lines 16090 and 16285 use plain JavaScript toLowerCase; server filtering around line 16136 also uses byte-oriented strtolower. A later fix should normalize Turkish search consistently on both paths.
+- Confirmed incorrect categories affect filtering: Yapay Zeka Futbol Maçı has data-category=memory and disappears from Spor, which shows only Mini Menajer. Yankı Haritacısı is Araçlar in the listing but Bulmaca on its game page. Local category inference at zeka-oyunlari.php:3892 matches broad keywords; `match` is checked before sports, and `time`/`builder` have first priority.
+- Confirmed partial translation on /oyunlar/echo-cartographer/: Turkish headings coexist with English instructions and fragments such as `Ok tuşlarını kullan or the buttons...`.
+- Additional local-source finding: Popüler badges in zeka-oyunlari.php around lines 16227–16242 are assigned by the first two/three server-rendered positions rather than measured play counts. This source was inspected locally; the exact deployed file was not retrieved.
+- Initially blank City Grid Revival cover loaded successfully (natural width 1200) when brought into view. Offscreen lazy-load placeholders alone are not evidence of missing images; no blanket broken-cover finding is established.
+
+Verification and scope:
+- Live browser tests covered listing rendering, search, category filtering, Roster 1000's disabled state, and Echo Cartographer's page/localization. Did not play through all 50 games or test mobile breakpoints.
+- Restored the listing to all 50 games with search closed after testing. No reports, account operations, uploads, or server writes were performed.
+- Repository was clean at the start. Only this progress entry was changed; application tests are not applicable. No commit, push, or deployment performed.
+
+Next steps:
+- If fixes are requested, prioritize unavailable-game listing treatment, Turkish search normalization, and explicit category metadata; then repair translations and popularity labeling. Preserve existing deployment and security boundaries.
+
 ## Resolve main merge conflict — 2026-11-06
 
 Request: Fix the interrupted merge with origin/main.

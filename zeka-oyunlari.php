@@ -3,7 +3,7 @@
  * Plugin Name: Zekâ Oyunları
  * Plugin URI: https://github.com/stronganchor/zeka-oyunlari
  * Description: Simple modular game framework for zekâ.com so kids can publish WordPress-based games and share them with friends.
- * Version: 1.6.00.asker.arslan
+ * Version: 1.6.02.asker.arslan
  * Update URI: https://github.com/stronganchor/zeka-oyunlari
  * Author: Anadolu Tasarım
  * Author URI: https://github.com/stronganchor/zeka-oyunlari
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
 	exit;
 }
 
-define('ZO_PLUGIN_VERSION', '1.6.00.asker.arslan');
+define('ZO_PLUGIN_VERSION', '1.6.01.asker.arslan');
 define('ZO_PLUGIN_FILE', __FILE__);
 define('ZO_PLUGIN_DIR', plugin_dir_path(__FILE__));
 define('ZO_PLUGIN_URL', plugin_dir_url(__FILE__));
@@ -3889,33 +3889,46 @@ function zo_get_game_category_icon($category) {
 	return $icons[$category] ?? $icons['all'];
 }
 
+function zo_normalize_game_search($value) {
+	// Fold Turkish dotted/dotless I and accents identically to the live filter.
+	$value = str_replace(array('İ', 'ı'), 'i', (string) $value);
+	$value = preg_replace('/[\x{0300}-\x{036f}]/u', '', $value);
+	return strtolower(remove_accents((string) $value));
+}
+
 function zo_get_game_category($slug, $title = '', $description = '') {
-	$text = strtolower((string) $slug . ' ' . (string) $title . ' ' . (string) $description);
-
-	if (preg_match('/clock|time|calculator|search|launcher|paint|designer|builder|studio|draw|drawing|boyama|arama|saat|hesap/', $text)) {
-		return 'tool';
+	// Resolve overlapping names explicitly, independently of the display language.
+	$categories = array(
+		'echo-cartographer' => 'puzzle',
+		'time-loop-runner' => 'memory',
+		'time-traveler-puzzle' => 'puzzle',
+		'sound-pattern-builder' => 'memory',
+		'mini-maze-builder' => 'puzzle',
+		'mirror-axiom' => 'puzzle',
+		'mirror-maze' => 'puzzle',
+		'rule-switch-rush' => 'action',
+	);
+	if (isset($categories[$slug])) {
+		return $categories[$slug];
 	}
 
-	if (preg_match('/math|number|binary|calculator|angle|quiz|soru|country|ulke|line/', $text)) {
-		return 'math';
+	$rules = array(
+		'sports' => 'soccer|football|penalty|race|racing|sled|snowboard|golf|sports|futbol|kosu|manager',
+		'math' => 'math|number|binary|angle|quiz|soru|country|ulke',
+		'tool' => 'clock|calculator|search|launcher|saat|hesap',
+		'memory' => 'memory|recall|simon|sequence|hafiza|remember|match',
+		'action' => 'runner|battle|shoot|shooter|defense|army|fight|survival|escape|rescue|dodge|ninja|dragon|heist|lava|arena|rocket',
+		'creative' => 'paint|design|designer|builder|factory|garden|shop|city|farm|creative|robot|studio|draw|drawing|boyama',
+	);
+	// A stable slug takes priority over incidental words in translated prose.
+	foreach (array($slug, $title, $description) as $value) {
+		$text = zo_normalize_game_search($value);
+		foreach ($rules as $category => $pattern) {
+			if (preg_match('/(?:^|[^a-z0-9])(?:' . $pattern . ')(?:$|[^a-z0-9])/', $text)) {
+				return $category;
+			}
+		}
 	}
-
-	if (preg_match('/memory|recall|simon|sequence|hafiza|remember|match/', $text)) {
-		return 'memory';
-	}
-
-	if (preg_match('/soccer|football|penalty|race|racing|sled|snowboard|golf|sports|futbol|kosu/', $text)) {
-		return 'sports';
-	}
-
-	if (preg_match('/runner|battle|shoot|shooter|defense|army|fight|survival|escape|rescue|dodg|ninja|dragon|heist|lava|arena|rocket/', $text)) {
-		return 'action';
-	}
-
-	if (preg_match('/paint|design|designer|builder|factory|garden|shop|city|farm|creative|robot/', $text)) {
-		return 'creative';
-	}
-
 	return 'puzzle';
 }
 
@@ -4632,6 +4645,22 @@ function zo_get_interface_text($key, $lang = '') {
 			'es-es' => 'Quitar de favoritos',
 			'fr' => 'Retirer des favoris',
 			'de' => 'Aus Favoriten entfernen',
+		),
+		'game_unavailable' => array(
+			'tr' => 'Şu anda kullanılamıyor',
+			'en' => 'Currently unavailable',
+			'es-mx' => 'No disponible por ahora',
+			'es-es' => 'No disponible por ahora',
+			'fr' => 'Indisponible pour le moment',
+			'de' => 'Derzeit nicht verfügbar',
+		),
+		'game_unavailable_description' => array(
+			'tr' => 'Bu oyun geçici olarak kullanılamıyor. Lütfen başka bir oyun seç.',
+			'en' => 'This game is temporarily unavailable. Please choose another game.',
+			'es-mx' => 'Este juego no está disponible temporalmente. Elige otro juego.',
+			'es-es' => 'Este juego no está disponible temporalmente. Elige otro juego.',
+			'fr' => 'Ce jeu est temporairement indisponible. Choisis un autre jeu.',
+			'de' => 'Dieses Spiel ist vorübergehend nicht verfügbar. Wähle bitte ein anderes Spiel.',
 		),
 		'badge_popular' => array(
 			'tr' => 'Popüler',
@@ -10832,6 +10861,16 @@ function zo_wrap_game_runtime_translator($html, $module, $lang) {
 		}
 	}
 
+	// Complete game-specific phrases take precedence over generic word replacements.
+	$module_translations = isset($module['runtime_translations'][$lang]) ? $module['runtime_translations'][$lang] : array();
+	foreach ($module_translations as $original => $translation) {
+		if (is_string($original) && is_string($translation)) {
+			$exact[$original] = $translation;
+			// MutationObserver rescans must leave already translated phrases intact.
+			$exact[$translation] = $translation;
+		}
+	}
+
 	$payload = array(
 		'lang' => $lang,
 		'locale' => array(
@@ -11627,22 +11666,21 @@ function zo_get_game_thumbnail_theme($slug, $title) {
 }
 
 function zo_render_game_thumbnail($post, $module, $url, $title) {
-	if ($url === '') {
-		return;
-	}
+	$open = $url !== '' ? '<a class="zo-games-grid__thumb" href="' . esc_url($url) . '">' : '<span class="zo-games-grid__thumb">';
+	$close = $url !== '' ? '</a>' : '</span>';
 
 	if ($post instanceof WP_Post && has_post_thumbnail($post)) {
-		echo '<a class="zo-games-grid__thumb" href="' . esc_url($url) . '">';
+		echo $open;
 		echo get_the_post_thumbnail($post, 'large');
-		echo '</a>';
+		echo $close;
 		return;
 	}
 
 	$image_url = zo_get_game_module_featured_image_url($module);
 	if ($image_url !== '') {
-		echo '<a class="zo-games-grid__thumb" href="' . esc_url($url) . '">';
+		echo $open;
 		echo '<img src="' . esc_url($image_url) . '" alt="' . esc_attr($title) . '" loading="lazy">';
-		echo '</a>';
+		echo $close;
 		return;
 	}
 }
@@ -15037,8 +15075,8 @@ function zo_enqueue_grid_styles() {
 	line-height: 1;
 	box-shadow: 0 8px 20px rgba(15, 23, 42, 0.18);
 }
-.zo-games-grid__badge--popular {
-	background: #1d4ed8;
+.zo-games-grid__badge--unavailable {
+	background: #92400e;
 }
 .zo-games-grid__favorite {
 	display: inline-grid;
@@ -16087,7 +16125,7 @@ function zo_games_grid_shortcode($atts = array()) {
 	echo '<a class="zo-games-grid__reset" href="' . esc_url(add_query_arg('zo_lang', $language, remove_query_arg(array('zo_game_search', 'zo_game_category', 'zo_game_sort', 'zo_lang', 'paged')))) . '" data-zo-games-reset>' . esc_html(zo_get_interface_text('filter_reset', $language)) . '</a>';
 	echo '<button class="zo-games-grid__filter-close" type="button" aria-label="' . esc_attr(zo_get_interface_text('close_search', $language)) . '" data-zo-games-search-close>&times;</button>';
 	echo '</form>';
-	echo '<script>(function(){var script=document.currentScript;var wrap=script&&script.closest(".zo-games-grid-wrap");if(!wrap){return;}var button=wrap.querySelector("[data-zo-games-search-toggle]");var panel=wrap.querySelector("[data-zo-games-search-panel]");var close=wrap.querySelector("[data-zo-games-search-close]");var input=wrap.querySelector("#zo-game-search");var category=wrap.querySelector("#zo-game-category");var sort=wrap.querySelector("#zo-game-sort");var grid=wrap.querySelector("[data-zo-games-grid]");var count=wrap.querySelector("[data-zo-games-count]");var empty=wrap.querySelector("[data-zo-games-live-empty]");var reset=wrap.querySelector("[data-zo-games-reset]");if(!button||!panel){return;}function openPanel(focusInput){panel.removeAttribute("hidden");button.setAttribute("aria-expanded","true");if(focusInput&&input){window.setTimeout(function(){input.focus();},0);}}function closePanel(){panel.setAttribute("hidden","");button.setAttribute("aria-expanded","false");button.focus();}function normalize(value){return String(value||"").toLowerCase();}function updateCount(total){if(count){count.textContent=String(count.getAttribute("data-count-template")||"%d").replace("%d",total);}}function applyFilters(){if(!grid){return;}var q=normalize(input&&input.value).trim();var cat=category?category.value:"all";var sortValue=sort?sort.value:"title";var cards=Array.prototype.slice.call(grid.querySelectorAll("[data-zo-game-card]"));var visible=[];cards.forEach(function(card){var matchesText=!q||normalize(card.getAttribute("data-search")).indexOf(q)!==-1;var matchesCategory=cat==="all"||card.getAttribute("data-category")===cat;var show=matchesText&&matchesCategory;card.hidden=!show;if(show){visible.push(card);}});visible.sort(function(a,b){if(sortValue==="newest"){return Number(b.getAttribute("data-timestamp")||0)-Number(a.getAttribute("data-timestamp")||0)||normalize(a.getAttribute("data-title")).localeCompare(normalize(b.getAttribute("data-title")));}if(sortValue==="category"){return normalize(a.getAttribute("data-category-label")).localeCompare(normalize(b.getAttribute("data-category-label")))||normalize(a.getAttribute("data-title")).localeCompare(normalize(b.getAttribute("data-title")));}return normalize(a.getAttribute("data-title")).localeCompare(normalize(b.getAttribute("data-title")));});visible.forEach(function(card){grid.appendChild(card);});updateCount(visible.length);if(empty){empty.hidden=visible.length!==0;}}button.addEventListener("click",function(){if(panel.hasAttribute("hidden")){openPanel(true);}else{closePanel();}});if(close){close.addEventListener("click",closePanel);}if(input){input.addEventListener("input",applyFilters);}if(category){category.addEventListener("change",applyFilters);}if(sort){sort.addEventListener("change",applyFilters);}if(reset){reset.addEventListener("click",function(event){event.preventDefault();if(input){input.value="";}if(category){category.value="all";}if(sort){sort.value="title";}applyFilters();openPanel(true);});}applyFilters();})();</script>';
+	echo '<script>(function(){var script=document.currentScript;var wrap=script&&script.closest(".zo-games-grid-wrap");if(!wrap){return;}var button=wrap.querySelector("[data-zo-games-search-toggle]");var panel=wrap.querySelector("[data-zo-games-search-panel]");var close=wrap.querySelector("[data-zo-games-search-close]");var input=wrap.querySelector("#zo-game-search");var category=wrap.querySelector("#zo-game-category");var sort=wrap.querySelector("#zo-game-sort");var grid=wrap.querySelector("[data-zo-games-grid]");var count=wrap.querySelector("[data-zo-games-count]");var empty=wrap.querySelector("[data-zo-games-live-empty]");var reset=wrap.querySelector("[data-zo-games-reset]");if(!button||!panel){return;}function openPanel(focusInput){panel.removeAttribute("hidden");button.setAttribute("aria-expanded","true");if(focusInput&&input){window.setTimeout(function(){input.focus();},0);}}function closePanel(){panel.setAttribute("hidden","");button.setAttribute("aria-expanded","false");button.focus();}function normalize(value){return String(value||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ı/g,"i").toLowerCase();}function updateCount(total){if(count){count.textContent=String(count.getAttribute("data-count-template")||"%d").replace("%d",total);}}function applyFilters(){if(!grid){return;}var q=normalize(input&&input.value).trim();var cat=category?category.value:"all";var sortValue=sort?sort.value:"title";var cards=Array.prototype.slice.call(grid.querySelectorAll("[data-zo-game-card]"));var visible=[];cards.forEach(function(card){var matchesText=!q||normalize(card.getAttribute("data-search")).indexOf(q)!==-1;var matchesCategory=cat==="all"||card.getAttribute("data-category")===cat;var show=matchesText&&matchesCategory;card.hidden=!show;if(show){visible.push(card);}});visible.sort(function(a,b){if(sortValue==="newest"){return Number(b.getAttribute("data-timestamp")||0)-Number(a.getAttribute("data-timestamp")||0)||normalize(a.getAttribute("data-title")).localeCompare(normalize(b.getAttribute("data-title")));}if(sortValue==="category"){return normalize(a.getAttribute("data-category-label")).localeCompare(normalize(b.getAttribute("data-category-label")))||normalize(a.getAttribute("data-title")).localeCompare(normalize(b.getAttribute("data-title")));}return normalize(a.getAttribute("data-title")).localeCompare(normalize(b.getAttribute("data-title")));});visible.forEach(function(card){grid.appendChild(card);});updateCount(visible.length);if(empty){empty.hidden=visible.length!==0;}}button.addEventListener("click",function(){if(panel.hasAttribute("hidden")){openPanel(true);}else{closePanel();}});if(close){close.addEventListener("click",closePanel);}if(input){input.addEventListener("input",applyFilters);}if(category){category.addEventListener("change",applyFilters);}if(sort){sort.addEventListener("change",applyFilters);}if(reset){reset.addEventListener("click",function(event){event.preventDefault();if(input){input.value="";}if(category){category.value="all";}if(sort){sort.value="title";}applyFilters();openPanel(true);});}applyFilters();})();</script>';
 
 	echo '<p class="zo-games-grid__intro">' . esc_html(zo_get_interface_text('intro', $language)) . '</p>';
 
@@ -16118,7 +16156,13 @@ function zo_games_grid_shortcode($atts = array()) {
 
 		$title   = zo_get_localized_text($title, $language);
 		$excerpt = zo_get_localized_text($excerpt, $language);
-		$category = zo_get_game_category($slug, $title, $excerpt);
+		$category_metadata = zo_get_localized_game_display_metadata($module, $language);
+		$category = $category_metadata['category_key'];
+		$available = !isset($module['available']) || $module['available'] !== false;
+		if (!$available) {
+			$url = '';
+			$excerpt = zo_get_interface_text('game_unavailable_description', $language);
+		}
 
 		if ($url !== '') {
 			$url = add_query_arg('zo_lang', $language, $url);
@@ -16133,8 +16177,8 @@ function zo_games_grid_shortcode($atts = array()) {
 		}
 
 		if ($search_query !== '') {
-			$haystack = strtolower($title . ' ' . $excerpt . ' ' . $slug . ' ' . $author . ' ' . zo_get_game_category_label($category, $language));
-			$needle = strtolower($search_query);
+			$haystack = zo_normalize_game_search($title . ' ' . $excerpt . ' ' . $slug . ' ' . $author . ' ' . zo_get_game_category_label($category, $language));
+			$needle = zo_normalize_game_search($search_query);
 
 			if (strpos($haystack, $needle) === false) {
 				continue;
@@ -16153,6 +16197,7 @@ function zo_games_grid_shortcode($atts = array()) {
 			'title' => $title,
 			'excerpt' => $excerpt,
 			'url' => $url,
+			'available' => $available,
 			'category' => $category,
 			'timestamp' => $created_timestamp,
 			'updated_timestamp' => $updated_timestamp > 0 ? $updated_timestamp : $created_timestamp,
@@ -16225,17 +16270,18 @@ function zo_games_grid_shortcode($atts = array()) {
 		$category_label = zo_get_game_category_label($category, $language);
 		$category_icon = zo_get_game_category_icon($category);
 		$timestamp = (int) $item['timestamp'];
-		$popular_badge_limit = $author_filter === '' ? 3 : 2;
-		$is_popular = !$filters_open && $index < $popular_badge_limit;
+		$available = $item['available'];
 		$search_text = $title . ' ' . $excerpt . ' ' . $slug . ' ' . $author . ' ' . $category_label;
 
 		echo '<article class="zo-games-grid__card" data-zo-game-card data-slug="' . esc_attr($slug) . '" data-title="' . esc_attr($title) . '" data-url="' . esc_url($url) . '" data-thumb="' . esc_url($item['thumbnail_url']) . '" data-category="' . esc_attr($category) . '" data-category-label="' . esc_attr($category_label) . '" data-owner="' . esc_attr($owner) . '" data-timestamp="' . esc_attr((string) $timestamp) . '" data-search="' . esc_attr($search_text) . '">';
 
-		echo '<button class="zo-games-grid__favorite" type="button" aria-label="' . esc_attr(zo_get_interface_text('favorite_game', $language)) . '" aria-pressed="false" data-zo-favorite-toggle data-label-add="' . esc_attr(zo_get_interface_text('favorite_game', $language)) . '" data-label-remove="' . esc_attr(zo_get_interface_text('remove_favorite', $language)) . '">&#9734;</button>';
+		if ($available) {
+			echo '<button class="zo-games-grid__favorite" type="button" aria-label="' . esc_attr(zo_get_interface_text('favorite_game', $language)) . '" aria-pressed="false" data-zo-favorite-toggle data-label-add="' . esc_attr(zo_get_interface_text('favorite_game', $language)) . '" data-label-remove="' . esc_attr(zo_get_interface_text('remove_favorite', $language)) . '">&#9734;</button>';
+		}
 
-		if ($is_popular) {
+		if (!$available) {
 			echo '<div class="zo-games-grid__badges">';
-			echo '<span class="zo-games-grid__badge zo-games-grid__badge--popular">' . esc_html(zo_get_interface_text('badge_popular', $language)) . '</span>';
+			echo '<span class="zo-games-grid__badge zo-games-grid__badge--unavailable">' . esc_html(zo_get_interface_text('game_unavailable', $language)) . '</span>';
 			echo '</div>';
 		}
 
@@ -16282,8 +16328,8 @@ function zo_games_grid_shortcode($atts = array()) {
 	echo '<p>' . esc_html(zo_get_interface_text('no_live_results', $language)) . '</p>';
 	echo '<a class="zo-games-grid__reset" href="' . esc_url(add_query_arg('zo_lang', $language, remove_query_arg(array('zo_game_search', 'zo_game_category', 'zo_game_sort', 'zo_lang', 'paged')))) . '" data-zo-games-reset>' . esc_html(zo_get_interface_text('filter_reset', $language)) . '</a>';
 	echo '</div>';
-	echo '<script>(function(){var script=document.currentScript;var wrap=script&&script.closest(".zo-games-grid-wrap");if(!wrap){return;}var input=wrap.querySelector("#zo-game-search");var category=wrap.querySelector("#zo-game-category");var sort=wrap.querySelector("#zo-game-sort");var grid=wrap.querySelector("[data-zo-games-grid]");var count=wrap.querySelector("[data-zo-games-count]");var empty=wrap.querySelector("[data-zo-games-live-empty]");var panel=wrap.querySelector("[data-zo-games-search-panel]");var button=wrap.querySelector("[data-zo-games-search-toggle]");function normalize(value){return String(value||"").toLowerCase();}function updateCount(total){if(count){count.textContent=String(count.getAttribute("data-count-template")||"%d").replace("%d",total);}}function openPanel(){if(panel){panel.removeAttribute("hidden");}if(button){button.setAttribute("aria-expanded","true");}}function applyFilters(){if(!grid){return;}var q=normalize(input&&input.value).trim();var cat=category?category.value:"all";var sortValue=sort?sort.value:"title";var cards=Array.prototype.slice.call(grid.querySelectorAll("[data-zo-game-card]"));var visible=[];cards.forEach(function(card){var matchesText=!q||normalize(card.getAttribute("data-search")).indexOf(q)!==-1;var matchesCategory=cat==="all"||card.getAttribute("data-category")===cat;var show=matchesText&&matchesCategory;card.hidden=!show;if(show){visible.push(card);}});visible.sort(function(a,b){if(sortValue==="newest"){return Number(b.getAttribute("data-timestamp")||0)-Number(a.getAttribute("data-timestamp")||0)||normalize(a.getAttribute("data-title")).localeCompare(normalize(b.getAttribute("data-title")));}if(sortValue==="category"){return normalize(a.getAttribute("data-category-label")).localeCompare(normalize(b.getAttribute("data-category-label")))||normalize(a.getAttribute("data-title")).localeCompare(normalize(b.getAttribute("data-title")));}return normalize(a.getAttribute("data-title")).localeCompare(normalize(b.getAttribute("data-title")));});visible.forEach(function(card){grid.appendChild(card);});updateCount(visible.length);if(empty){empty.hidden=visible.length!==0;}}if(input){input.addEventListener("input",applyFilters);}if(category){category.addEventListener("change",applyFilters);}if(sort){sort.addEventListener("change",applyFilters);}Array.prototype.forEach.call(wrap.querySelectorAll("[data-zo-games-reset]"),function(reset){reset.addEventListener("click",function(event){event.preventDefault();if(input){input.value="";}if(category){category.value="all";}if(sort){sort.value="title";}openPanel();applyFilters();if(input){input.focus();}});});applyFilters();})();</script>';
-	echo '<script>(function(){var script=document.currentScript;var wrap=script&&script.closest(".zo-games-grid-wrap");if(!wrap){return;}var grid=wrap.querySelector("[data-zo-games-grid]");if(!grid){return;}var recentKey="zoRecentlyPlayedGames";var favoriteKey="zoFavoriteGames";var cards=Array.prototype.slice.call(grid.querySelectorAll("[data-zo-game-card]"));var gameMap={};function read(key){try{var value=JSON.parse(localStorage.getItem(key)||"[]");return Array.isArray(value)?value:[];}catch(error){return [];}}function write(key,value){try{localStorage.setItem(key,JSON.stringify(value));}catch(error){}}function itemFromCard(card){return {slug:card.getAttribute("data-slug")||"",title:card.getAttribute("data-title")||"",url:card.getAttribute("data-url")||"",thumb:card.getAttribute("data-thumb")||""};}function miniCard(item){var a=document.createElement("a");a.className="zo-games-grid__mini-card";a.href=item.url||"#";var media;if(item.thumb){media=document.createElement("img");media.className="zo-games-grid__mini-thumb";media.src=item.thumb;media.alt="";media.loading="lazy";}else{media=document.createElement("span");media.className="zo-games-grid__mini-thumb";media.setAttribute("aria-hidden","true");}var title=document.createElement("span");title.className="zo-games-grid__mini-title";title.textContent=item.title||item.slug;a.appendChild(media);a.appendChild(title);return a;}function render(sectionSelector,listSelector,items){var section=wrap.querySelector(sectionSelector);var list=wrap.querySelector(listSelector);if(!section||!list){return;}list.innerHTML="";items.filter(function(item){return item&&item.slug&&gameMap[item.slug];}).slice(0,4).forEach(function(item){list.appendChild(miniCard(Object.assign({},gameMap[item.slug],item)));});section.hidden=!list.children.length;}function updateFavoriteButton(button,active){button.classList.toggle("is-active",active);button.setAttribute("aria-pressed",active?"true":"false");button.setAttribute("aria-label",button.getAttribute(active?"data-label-remove":"data-label-add")||"");button.innerHTML=active?"&#9733;":"&#9734;";}function renderAll(){var favorites=read(favoriteKey);var recent=read(recentKey);render("[data-zo-favorites-section]","[data-zo-favorites-list]",favorites);render("[data-zo-recent-section]","[data-zo-recent-list]",recent);}cards.forEach(function(card){var item=itemFromCard(card);if(!item.slug){return;}gameMap[item.slug]=item;var favButton=card.querySelector("[data-zo-favorite-toggle]");if(favButton){updateFavoriteButton(favButton,read(favoriteKey).some(function(favorite){return favorite.slug===item.slug;}));favButton.addEventListener("click",function(event){event.preventDefault();event.stopPropagation();var favorites=read(favoriteKey).filter(function(favorite){return favorite.slug!==item.slug;});var active=!favButton.classList.contains("is-active");if(active){favorites.unshift(item);}favorites=favorites.slice(0,40);write(favoriteKey,favorites);updateFavoriteButton(favButton,active);renderAll();});}card.addEventListener("click",function(event){if(event.target.closest("[data-zo-favorite-toggle]")){return;}if(!event.target.closest("a")){return;}var recent=read(recentKey).filter(function(recentItem){return recentItem.slug!==item.slug;});recent.unshift(item);write(recentKey,recent.slice(0,20));});});renderAll();})();</script>';
+	echo '<script>(function(){var script=document.currentScript;var wrap=script&&script.closest(".zo-games-grid-wrap");if(!wrap){return;}var input=wrap.querySelector("#zo-game-search");var category=wrap.querySelector("#zo-game-category");var sort=wrap.querySelector("#zo-game-sort");var grid=wrap.querySelector("[data-zo-games-grid]");var count=wrap.querySelector("[data-zo-games-count]");var empty=wrap.querySelector("[data-zo-games-live-empty]");var panel=wrap.querySelector("[data-zo-games-search-panel]");var button=wrap.querySelector("[data-zo-games-search-toggle]");function normalize(value){return String(value||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/ı/g,"i").toLowerCase();}function updateCount(total){if(count){count.textContent=String(count.getAttribute("data-count-template")||"%d").replace("%d",total);}}function openPanel(){if(panel){panel.removeAttribute("hidden");}if(button){button.setAttribute("aria-expanded","true");}}function applyFilters(){if(!grid){return;}var q=normalize(input&&input.value).trim();var cat=category?category.value:"all";var sortValue=sort?sort.value:"title";var cards=Array.prototype.slice.call(grid.querySelectorAll("[data-zo-game-card]"));var visible=[];cards.forEach(function(card){var matchesText=!q||normalize(card.getAttribute("data-search")).indexOf(q)!==-1;var matchesCategory=cat==="all"||card.getAttribute("data-category")===cat;var show=matchesText&&matchesCategory;card.hidden=!show;if(show){visible.push(card);}});visible.sort(function(a,b){if(sortValue==="newest"){return Number(b.getAttribute("data-timestamp")||0)-Number(a.getAttribute("data-timestamp")||0)||normalize(a.getAttribute("data-title")).localeCompare(normalize(b.getAttribute("data-title")));}if(sortValue==="category"){return normalize(a.getAttribute("data-category-label")).localeCompare(normalize(b.getAttribute("data-category-label")))||normalize(a.getAttribute("data-title")).localeCompare(normalize(b.getAttribute("data-title")));}return normalize(a.getAttribute("data-title")).localeCompare(normalize(b.getAttribute("data-title")));});visible.forEach(function(card){grid.appendChild(card);});updateCount(visible.length);if(empty){empty.hidden=visible.length!==0;}}if(input){input.addEventListener("input",applyFilters);}if(category){category.addEventListener("change",applyFilters);}if(sort){sort.addEventListener("change",applyFilters);}Array.prototype.forEach.call(wrap.querySelectorAll("[data-zo-games-reset]"),function(reset){reset.addEventListener("click",function(event){event.preventDefault();if(input){input.value="";}if(category){category.value="all";}if(sort){sort.value="title";}openPanel();applyFilters();if(input){input.focus();}});});applyFilters();})();</script>';
+	echo '<script>(function(){var script=document.currentScript;var wrap=script&&script.closest(".zo-games-grid-wrap");if(!wrap){return;}var grid=wrap.querySelector("[data-zo-games-grid]");if(!grid){return;}var recentKey="zoRecentlyPlayedGames";var favoriteKey="zoFavoriteGames";var cards=Array.prototype.slice.call(grid.querySelectorAll("[data-zo-game-card]"));var gameMap={};function read(key){try{var value=JSON.parse(localStorage.getItem(key)||"[]");return Array.isArray(value)?value:[];}catch(error){return [];}}function write(key,value){try{localStorage.setItem(key,JSON.stringify(value));}catch(error){}}function itemFromCard(card){return {slug:card.getAttribute("data-slug")||"",title:card.getAttribute("data-title")||"",url:card.getAttribute("data-url")||"",thumb:card.getAttribute("data-thumb")||""};}function miniCard(item){var a=document.createElement("a");a.className="zo-games-grid__mini-card";a.href=item.url||"#";var media;if(item.thumb){media=document.createElement("img");media.className="zo-games-grid__mini-thumb";media.src=item.thumb;media.alt="";media.loading="lazy";}else{media=document.createElement("span");media.className="zo-games-grid__mini-thumb";media.setAttribute("aria-hidden","true");}var title=document.createElement("span");title.className="zo-games-grid__mini-title";title.textContent=item.title||item.slug;a.appendChild(media);a.appendChild(title);return a;}function render(sectionSelector,listSelector,items){var section=wrap.querySelector(sectionSelector);var list=wrap.querySelector(listSelector);if(!section||!list){return;}list.innerHTML="";items.filter(function(item){return item&&item.slug&&gameMap[item.slug];}).slice(0,4).forEach(function(item){list.appendChild(miniCard(Object.assign({},gameMap[item.slug],item)));});section.hidden=!list.children.length;}function updateFavoriteButton(button,active){button.classList.toggle("is-active",active);button.setAttribute("aria-pressed",active?"true":"false");button.setAttribute("aria-label",button.getAttribute(active?"data-label-remove":"data-label-add")||"");button.innerHTML=active?"&#9733;":"&#9734;";}function renderAll(){var favorites=read(favoriteKey);var recent=read(recentKey);render("[data-zo-favorites-section]","[data-zo-favorites-list]",favorites);render("[data-zo-recent-section]","[data-zo-recent-list]",recent);}cards.forEach(function(card){var item=itemFromCard(card);if(!item.slug||!item.url){return;}gameMap[item.slug]=item;var favButton=card.querySelector("[data-zo-favorite-toggle]");if(favButton){updateFavoriteButton(favButton,read(favoriteKey).some(function(favorite){return favorite.slug===item.slug;}));favButton.addEventListener("click",function(event){event.preventDefault();event.stopPropagation();var favorites=read(favoriteKey).filter(function(favorite){return favorite.slug!==item.slug;});var active=!favButton.classList.contains("is-active");if(active){favorites.unshift(item);}favorites=favorites.slice(0,40);write(favoriteKey,favorites);updateFavoriteButton(favButton,active);renderAll();});}card.addEventListener("click",function(event){if(event.target.closest("[data-zo-favorite-toggle]")){return;}if(!event.target.closest("a")){return;}var recent=read(recentKey).filter(function(recentItem){return recentItem.slug!==item.slug;});recent.unshift(item);write(recentKey,recent.slice(0,20));});});renderAll();})();</script>';
 	if (!$has_results) {
 		echo '<p class="zo-games-grid__empty">' . esc_html(zo_get_interface_text('no_live_results', $language)) . '</p>';
 		echo '<p><a class="zo-games-grid__reset" href="' . esc_url(add_query_arg('zo_lang', $language, remove_query_arg(array('zo_game_search', 'zo_game_category', 'zo_game_sort', 'zo_lang', 'paged')))) . '">' . esc_html(zo_get_interface_text('filter_reset', $language)) . '</a></p>';
