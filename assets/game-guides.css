@@ -1,0 +1,41 @@
+.zo-game-guide, .zo-description-page {
+	box-sizing: border-box;
+	font: 1rem/1.7 system-ui, -apple-system, "Segoe UI", sans-serif;
+	overflow-wrap: anywhere;
+}
+.zo-game-guide {
+	width: min(100%, 960px);
+	margin: 28px auto;
+	padding: clamp(18px, 4vw, 36px);
+	border: 1px solid #cbd5e1;
+	border-radius: 18px;
+	background: #fff;
+	color: #1e293b;
+}
+.zo-game-guide h2, .zo-game-guide h3 { color: #0f172a; line-height: 1.3; }
+.zo-game-guide h2 { margin: 0 0 20px; font-size: 1.5rem; }
+.zo-game-guide h3 { margin: 22px 0 8px; font-size: 1.1rem; }
+.zo-game-guide ol, .zo-game-guide ul { margin: 0; padding-inline-start: 1.5em; }
+.zo-game-guide li + li { margin-top: 10px; }
+.zo-game-guide p { margin: 8px 0 16px; }
+.zo-game-guide-link {
+	display: inline-block;
+	padding: 10px 0;
+	color: #075985;
+	font: 700 .95rem/1.5 system-ui, sans-serif;
+	text-underline-offset: 4px;
+}
+.zo-game-guide-link:hover { color: #0c4a6e; }
+.zo-game-guide-link:focus-visible, .zo-description-page a:focus-visible {
+	outline: 3px solid #0284c7;
+	outline-offset: 4px;
+}
+.zo-description-body { margin: 0; background: #f1f5f9; color: #1e293b; }
+.zo-description-page { max-width: 1040px; margin: auto; padding: 24px clamp(14px, 4vw, 40px) 48px; }
+.zo-description-page__nav { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; }
+.zo-description-page__nav a { color: #075985; }
+.zo-description-page h1 { color: #0f172a; font-size: clamp(1.7rem, 4vw, 2.6rem); line-height: 1.2; margin: 32px 0 20px; }
+.zo-description-page__intro { font-size: 1.1rem; max-width: 70ch; }
+.zo-description-page__play { display: inline-block; border-radius: 8px; padding: 12px 20px; background: #075985; color: #fff; text-decoration: none; font-weight: 700; }
+.zo-description-page__note { color: #475569; font-size: .9rem; }
+.zo-description-page .zo-game-guide { width: 100%; }

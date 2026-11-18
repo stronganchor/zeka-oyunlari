@@ -3,6 +3,7 @@
 if (PHP_SAPI !== 'cli') { http_response_code(404); exit; }
 error_reporting(E_ALL);
 define('ABSPATH', dirname(__DIR__) . '/');
+define('ZO_PLUGIN_DIR', dirname(__DIR__) . '/');
 define('ZO_PLUGIN_URL', '/');
 define('ZO_PLUGIN_VERSION', 'test');
 
@@ -65,7 +66,8 @@ function zo_get_game_display_metadata($module) {
 	$metadata = zo_get_asker_multilingual_game_metadata($module['slug']);
 	return is_array($metadata) ? $metadata : array('name' => $module['name'], 'description' => $module['description']);
 }
-function zo_get_game_owner_for_module($module) { return 'asker'; }
+function zo_get_game_owner_for_module($module) { return $module['owner'] ?? $module['author_key'] ?? strtolower($module['author'] ?? 'asker'); }
+function zo_get_game_module($slug) { return $GLOBALS['listing_modules'][$slug] ?? null; }
 function zo_get_game_owner_label($owner) { return 'Asker'; }
 function zo_normalize_game_owner($owner) { return $owner; }
 function zo_get_owner_games_url($owner, $lang) { return '/' . $owner . '/?zo_lang=' . $lang; }
@@ -75,6 +77,7 @@ function zo_dedupe_game_items_by_similarity($items) { return $items; }
 function zo_get_owner_about_url($owner, $lang = '') { return '/about/'; }
 
 $source = file_get_contents(dirname(__DIR__) . '/zeka-oyunlari.php');
+require dirname(__DIR__) . '/includes/game-guides.php';
 listing_load_function($source, 'zo_get_asker_multilingual_game_metadata');
 foreach (array('zo_get_language_options', 'zo_normalize_game_search', 'zo_get_game_category', 'zo_get_game_category_options', 'zo_get_game_category_label', 'zo_get_game_category_icon', 'zo_get_localized_text', 'zo_get_localized_game_display_metadata', 'zo_get_interface_text', 'zo_get_shortcode_logo_html', 'zo_get_shortcode_logo_css', 'zo_render_game_thumbnail', 'zo_get_game_thumbnail_url', 'zo_is_game_available_for_language', 'zo_get_game_language_availability', 'zo_enqueue_grid_styles', 'zo_games_grid_shortcode', 'zo_count_mojibake_markers', 'zo_fix_mojibake_text', 'zo_fix_runtime_replacement_pairs', 'zo_get_runtime_translation_exact_map', 'zo_get_runtime_translation_replacements', 'zo_wrap_game_runtime_translator') as $name) {
 	listing_load_function($source, $name);
@@ -107,7 +110,8 @@ $xpath = listing_dom($grid);
 $disabled = $xpath->query('//article[@data-slug="roster-1000"]')->item(0);
 listing_check($disabled !== null, 'Unavailable game remains listed.');
 listing_check($disabled->getAttribute('data-url') === '', 'Unavailable game has no launch URL.');
-listing_check($xpath->query('.//a | .//button', $disabled)->length === 0, 'Unavailable game has no play/favorite links.');
+listing_check($xpath->query('.//a[not(@data-zo-game-description-link)] | .//button', $disabled)->length === 0, 'Unavailable game has no play/favorite links.');
+listing_check($xpath->query('.//a[@data-zo-game-description-link]', $disabled)->length === 1, 'Unavailable game has an informational description link.');
 listing_check($xpath->query('.//img', $disabled)->length === 1, 'Unavailable game retains its cover.');
 listing_check(strpos($disabled->textContent, 'Şu anda kullanılamıyor') !== false, 'Unavailable status is visible.');
 listing_check(strpos($grid, 'badge--popular') === false, 'No invented popularity badges.');

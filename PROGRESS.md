@@ -2,9 +2,18 @@
 
 ## Game descriptions and description-page links — 2026-11-13
 
-Request: Add clear game instructions, rules and educational benefits, with a description-page link beneath every game. Latest instruction: make a plan first.
+Request: Add clear game instructions, rules and educational benefits, with a description-page link beneath every game. User approved implementation and narrowed the scope to Asker's games.
 
-Status: Planning only; no application changes made for this request.
+Status: Implementation saved; verification and integration refinement in progress.
+
+Completed implementation milestones:
+- Inventoried 86 Asker modules: 50 games/tools and 36 clock modules. Reviewed local game source for instructions and mechanics; language-restricted titles retain their existing restrictions.
+- Added `includes/game-guide-content.php` with game-specific instructions, rules and modest skills-practice descriptions. Common city-clock mechanics share localized copy. Turkish, English, German, French and Spanish copy covers each title's permitted languages (both Spanish locales share content).
+- Added `includes/game-guides.php`, `assets/game-guides.css` and `templates/game-description.php`: read-only guide helpers, accessible presentation, stable public query URLs, localized titles/meta descriptions/canonical/alternate links, 404 handling and unavailable-game notices.
+- Integrated card links and guides below game rendering in `zeka-oyunlari.php`; adjusted the single-game stage to stack content below gameplay. Working version is 1.6.03.asker.arslan (the existing HEAD header was 1.6.02 while its constant was 1.6.01).
+- Existing listing/translation fixes are now in HEAD `9c25b3e`; no commits, pushes or deployment performed by this task.
+
+Pending: finish listing styles and ensure description clicks do not count as plays; add and run coverage/rendering/route regression checks; review generated pages and escaping; verify PHP syntax, existing regressions and responsive layout.
 
 Inspected:
 - `zeka-oyunlari.php`: shared game registry, localized metadata, listing cards, game URL helpers and template selection.
@@ -19,7 +28,7 @@ Proposed implementation (not completed or verified):
 - Render guide text and links in server HTML with unique page titles, descriptions, canonical URLs and suitable language handling; avoid requiring JavaScript for access.
 - Verify coverage, URL behavior, availability guards, language preservation, mobile layout, PHP syntax and relevant listing/security regression checks.
 
-Next steps: Present the plan and await the user's implementation instruction. No commit, push or deployment performed.
+Next steps: Complete the pending integration and verification above. Save final results and limitations here. No commit, push or deployment is authorized by this implementation request.
 
 ## Fix reviewed Asker listing issues — 2026-11-13
 

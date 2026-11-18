@@ -56,15 +56,27 @@ nodes['#zo-game-sort'].value = 'title';
 const wrap = element();
 wrap.querySelector = selector=>nodes[selector] || null;
 wrap.querySelectorAll = selector=>selector === '[data-zo-games-reset]' ? [nodes[selector]] : [];
+const recentWrites = [];
 const filterContext = vm.createContext({
 	document:{currentScript:{closest:()=>wrap},createElement:()=>element()},
 	window:{setTimeout:callback=>callback()},
-	localStorage:{getItem:()=>JSON.stringify([{slug:'roster-1000',url:'/old-roster-link/'},{slug:'binary-puzzle',url:'/oyunlar/binary-puzzle/'}]),setItem(){}}
+	localStorage:{getItem:()=>JSON.stringify([{slug:'roster-1000',url:'/old-roster-link/'},{slug:'binary-puzzle',url:'/oyunlar/binary-puzzle/'}]),setItem(key,value){ if (key === 'zoRecentlyPlayedGames') recentWrites.push(value); }}
 });
 for (const script of gridScripts.filter(script=>script.includes('function applyFilters') || script.includes('var recentKey='))) {
 	vm.runInContext(script, filterContext);
 }
 const shown = ()=>grid.children.filter(card=>!card.hidden).map(card=>card.getAttribute('data-slug'));
+const binaryCard = cards.find(card=>card.getAttribute('data-slug') === 'binary-puzzle');
+for (const handler of binaryCard.listeners.click || []) {
+	handler({target:{closest:selector=>selector.includes('data-zo-game-description-link') || selector === 'a' ? {} : null}});
+}
+assert.equal(recentWrites.length, 0, 'Reading a description does not record a game play.');
+checks++;
+for (const handler of binaryCard.listeners.click || []) {
+	handler({target:{closest:selector=>selector === 'a' ? {} : null}});
+}
+assert.equal(recentWrites.length, 1, 'Opening the game still records a recent play.');
+checks++;
 for (const query of ['ikili','İKİLİ','IKILI','I\u0307kili']) {
 	nodes['#zo-game-search'].value = query;
 	nodes['#zo-game-search'].emit('input');

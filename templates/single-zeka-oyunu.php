@@ -320,6 +320,7 @@ if (function_exists('zo_get_game_difficulty_label')) {
 
 		.zo-game-page__stage {
 			flex: 1 1 auto;
+			flex-direction: column;
 			width: min(100%, 1400px);
 			margin: 0 auto;
 			display: flex;
